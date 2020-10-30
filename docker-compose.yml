@@ -1,23 +1,23 @@
 version: "3.7"
 services:
-  app:
-    build:
-      context: "./go"
-      dockerfile: "go.dockerfile"
-    container_name: "app_go"
-    ports:
-      - "8080:80"
-    #volumes:
-    #- "./html/public/:/var/www/html/"
-    #- "./html/errorpages/:/var/www/errorpages/"
-    #- "./nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
-  db:
-    image: mariadb:10.5.6-focal
-    restart: always
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=database
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=password
-    ports:
-      - "3406:3306"
+    app:
+        build:
+            context: "./go"
+            dockerfile: "go.dockerfile"
+        container_name: "app_go"
+        ports:
+            - "8080:80"
+        #volumes:
+        #- "./html/public/:/var/www/html/"
+        #- "./html/errorpages/:/var/www/errorpages/"
+        #- "./nginx/nginx.conf:/etc/nginx/conf.d/default.conf"
+    db:
+        image: mariadb:10.5.6-focal
+        restart: always
+        environment:
+            - MYSQL_ROOT_PASSWORD=password
+            - MYSQL_DATABASE=database
+            - MYSQL_USER=user
+            - MYSQL_PASSWORD=password
+        ports:
+            - "3406:3306"
