@@ -1,0 +1,21 @@
+{
+    "name": "fs5-gestiondesocios-backend",
+    "version": "1.0.0",
+    "description": "Backend project",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "clean": "rm -rf dist build .cache"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fullstacktf/fs5-gestiondesocios-backend.git"
+    },
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/fullstacktf/fs5-gestiondesocios-backend/issues"
+    },
+    "homepage": "https://github.com/fullstacktf/fs5-gestiondesocios-backend#readme",
+    "devDependencies": {}
+}
