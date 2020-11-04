@@ -3,7 +3,10 @@ name: CICD
 on:
     push:
         branches:
-            - master
+            - main
+    pull_request:
+        branches:
+            - main
 
 jobs:
     build:
@@ -27,5 +30,5 @@ jobs:
 
             - name: Run vet & lint
               run: |
-                  go vet .
+                  cd go/src/ && go vet .
                   golint .
