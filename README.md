@@ -5,3 +5,34 @@
 ## BBDD Diagram
 
 ![BBDD Diagram](https://i.imgur.com/OHzLH8v.png)
+
+
+# Endpoints
+
+## GET
+
+/api/games/$id
+
+/api/borrowedGames/$id
+
+## DELETE
+
+/api/games/$id
+
+/api/borrowedGames/$id
+
+/api/partner/$id
+
+## POST
+
+/api/games/
+
+/api/borrowedGames
+
+/api/partner/
+
+## PATCH 
+
+/api/games/$id
+
+/api/borrowedGames/$id
