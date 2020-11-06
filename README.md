@@ -4,7 +4,7 @@
 
 ## BBDD Diagram
 
-![BBDD Diagram](https://i.imgur.com/OHzLH8v.png)
+![BBDD Diagram](https://i.imgur.com/tAxAZuj.png)
 
 
 # Endpoints
