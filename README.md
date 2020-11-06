@@ -31,7 +31,7 @@
 
 /api/partner/
 
-## PATCH 
+## PUT 
 
 /api/games/$id
 
