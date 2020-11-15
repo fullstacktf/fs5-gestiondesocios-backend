@@ -7,6 +7,11 @@ services:
         container_name: "app_go"
         ports:
             - "8080:80"
+        networks:
+            - my_network
+        depends_on:
+            - "db"
+
         #volumes:
         #- "./html/public/:/var/www/html/"
         #- "./html/errorpages/:/var/www/errorpages/"
@@ -16,3 +21,13 @@ services:
             context: "./mysql"
             dockerfile: "mariadb.dockerfile"
         container_name: app_mariadb
+        restart: always
+        networks:
+            - my_network
+        ports:
+            - "3306:3306"
+volumes:
+    dbdata:
+networks:
+    my_network:
+        driver: bridge

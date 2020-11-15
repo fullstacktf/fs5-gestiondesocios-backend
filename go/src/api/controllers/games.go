@@ -29,16 +29,14 @@ func DbURL(dbConfig *DBConfig) string {
 
 func main() {
 	config := &DBConfig{
-		Host:     "app_mariadb",
+		Host:     "0.0.0.0",
 		Port:     3306,
-		User:     "dev",
-		DBName:   "fullstackAsociacion",
-		Password: "passdev",
+		User:     "root",
+		DBName:   "dbname",
+		Password: "A123456abcd_A",
 	}
 	_, err := gorm.Open(mysql.Open(DbURL(config)), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Error BBDD")
-	} else {
-		log.Printf("It Worked!")
 	}
 }
