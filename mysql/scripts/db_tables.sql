@@ -1,33 +1,33 @@
 USE fullstackAsociacion;
 
-CREATE TABLE assocPartner (
+CREATE TABLE assoc_partners (
   id INT PRIMARY KEY,
   partnerName VARCHAR(30) NOT NULL
 );
 
-CREATE TABLE borrowedGame (
+CREATE TABLE borrowedGames (
   idGame INT PRIMARY KEY,
   idBorrower INT NOT NULL,
   borrowDate DATE,
-  FOREIGN KEY (idBorrower) REFERENCES assocPartner (id)
+  FOREIGN KEY (idBorrower) REFERENCES assoc_partners (id)
 );
 
-CREATE TABLE game (
+CREATE TABLE games (
   id INT PRIMARY KEY,
   idOwner INT,
   entryDate DATE,
   disponibility BIT(1) NOT NULL,
   comments VARCHAR(200),
-  CONSTRAINT fk_idOwner FOREIGN KEY (idOwner) REFERENCES assocPartner (id),
-  CONSTRAINT fk_idGame FOREIGN KEY (id) REFERENCES borrowedGame (idGame)
+  CONSTRAINT fk_idOwner FOREIGN KEY (idOwner) REFERENCES assoc_partners (id),
+  CONSTRAINT fk_idGame FOREIGN KEY (id) REFERENCES borrowedGames (idGame)
 );
 
-CREATE TABLE user (
+CREATE TABLE assoc_users (
   id INT PRIMARY KEY,
-  userName VARCHAR(30) NOT NULL,
-  userPassword VARCHAR(30) NOT NULL
+  username VARCHAR(30) NOT NULL,
+  user_password VARCHAR(30) NOT NULL
 );
 
-
+INSERT INTO assoc_users VALUES (1, "David", "password")
 
 

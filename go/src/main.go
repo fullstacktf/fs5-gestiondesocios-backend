@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"fs5-gestiondesocios-backend/src/api/routes"
+	"fs5-gestiondesocios-backend/src/api/utils"
 	"log"
 	"net/http"
 	"sync/atomic"
@@ -30,21 +32,20 @@ func dbURL(dbConfig *dBConfig) string {
 }
 
 func main() {
-	/*utils.MigrateDB()
-		router := mux.NewRouter()
-		routes.SetGamesRoutes(router)
-		server := http.Server{
-			Addr:    ":8081",
-			Handler: router,
-		}
-		router.HandleFunc("/", Counter).Methods("GET")
-		log.Println("Running on port 8081")
-	    log.Println(server.ListenAndServe())*/
-	atomic.AddUint64(&counter, 0)
+	utils.MigrateDB()
+	router := mux.NewRouter()
+	routes.SetUsersRoutes(router)
+	server := http.Server{
+		Addr:    ":80",
+		Handler: router,
+	}
+	log.Println("Running on port 80")
+	log.Println(server.ListenAndServe())
+	/*atomic.AddUint64(&counter, 0)
 	router := mux.NewRouter()
 	router.HandleFunc("/", Counter).Methods("GET")
 	fmt.Println("GO REST server running on http://localhost:8080 ")
-	log.Fatal(http.ListenAndServe(":80", router))
+	log.Fatal(http.ListenAndServe(":80", router))*/
 }
 
 var counter uint64
