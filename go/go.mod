@@ -1,4 +1,4 @@
-module github.com/manolors/gorm-init-example
+module fs5-gestiondesocios-backend
 
 go 1.15
 

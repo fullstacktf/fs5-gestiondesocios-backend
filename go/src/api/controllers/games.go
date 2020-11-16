@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"encoding/json"
+	"fs5-gestiondesocios-backend/src/api/models"
+	"fs5-gestiondesocios-backend/src/api/utils"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/manolors/gorm-init-example/src/api/models"
-	"github.com/manolors/gorm-init-example/src/api/utils"
 )
 
 //GetGame retrieves a game by id

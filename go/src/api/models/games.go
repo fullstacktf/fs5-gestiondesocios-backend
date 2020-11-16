@@ -13,7 +13,7 @@ type Game struct {
 	gorm.Model
 	ID            uint      `json:"id"`
 	IDOwner       uint      `json:"idOwner"`
-	EntryDate     entryDate `json:"entryDate"`
+	EntryDate     entryDate `json:"entryDate" gorm:"-"`
 	Disponibility bool      `json:"disponibility"`
 	Comments      string    `json:"comments" gorm:"size:200"`
 }

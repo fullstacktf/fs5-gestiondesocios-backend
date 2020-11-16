@@ -1,11 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
+	"sync/atomic"
 
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
+	"github.com/gorilla/mux"
 )
 
 type dBConfig struct {
@@ -28,17 +30,26 @@ func dbURL(dbConfig *dBConfig) string {
 }
 
 func main() {
-	config := &dBConfig{
-		Host:     "app_mariadb",
-		Port:     3306,
-		User:     "dev",
-		DBName:   "fullstackAsociacion",
-		Password: "passdev",
-	}
-	_, err := gorm.Open(mysql.Open(dbURL(config)), &gorm.Config{})
-	if err != nil {
-		log.Fatal("Error BBDD")
-	} else {
-		log.Printf("It Worked!")
-	}
+	/*utils.MigrateDB()
+		router := mux.NewRouter()
+		routes.SetGamesRoutes(router)
+		server := http.Server{
+			Addr:    ":8081",
+			Handler: router,
+		}
+		router.HandleFunc("/", Counter).Methods("GET")
+		log.Println("Running on port 8081")
+	    log.Println(server.ListenAndServe())*/
+	atomic.AddUint64(&counter, 0)
+	router := mux.NewRouter()
+	router.HandleFunc("/", Counter).Methods("GET")
+	fmt.Println("GO REST server running on http://localhost:8080 ")
+	log.Fatal(http.ListenAndServe(":8081", router))
+}
+
+var counter uint64
+
+func Counter(w http.ResponseWriter, r *http.Request) {
+	atomic.AddUint64(&counter, 1)
+	json.NewEncoder(w).Encode(counter)
 }

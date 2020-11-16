@@ -2,9 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"fs5-gestiondesocios-backend/src/api/models"
 	"log"
-
-	"github.com/manolors/gorm-init-example/src/api/models"
 )
 
 //MigrateDB automigrates the DB from the model
