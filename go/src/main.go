@@ -44,7 +44,7 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", Counter).Methods("GET")
 	fmt.Println("GO REST server running on http://localhost:8080 ")
-	log.Fatal(http.ListenAndServe(":8081", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
 var counter uint64

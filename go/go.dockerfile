@@ -10,6 +10,6 @@ RUN ls -lh
 RUN go get github.com/gorilla/mux
 RUN go get gorm.io/gorm
 RUN go get gorm.io/driver/mysql
-EXPOSE 8081
+EXPOSE 8080
 CMD ["go","run","main.go"]
 
