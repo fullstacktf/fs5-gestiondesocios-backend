@@ -8,8 +8,8 @@ type entryDate struct {
 	Day   int `json:"day"`
 }
 
-//Games is the struc of the table called "games"
-type Games struct {
+//Game is the struc of the table called "games"
+type Game struct {
 	gorm.Model
 	ID            uint      `json:"id"`
 	IDOwner       uint      `json:"idOwner"`

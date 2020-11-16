@@ -17,5 +17,5 @@ func MigrateDB() {
 		defer sqlDB.Close()
 	}
 	fmt.Println("Migrating models...")
-	db.AutoMigrate(&models.Games{})
+	db.AutoMigrate(&models.Game{})
 }
