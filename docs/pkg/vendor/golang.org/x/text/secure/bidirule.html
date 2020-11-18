@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/text/secure/bidirule</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>bidirule</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../../index.html#pkg-vendor/golang.org/x/text/secure/bidirule">vendor/golang.org/x/text/secure/bidirule</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/text/secure/bidirule/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/text/secure/bidirule" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../../dep/vendor/golang.org/x/text/secure/bidirule.html">4 packages</a>, and imported by <a href="../../../../../../dep/vendor/golang.org/x/text/secure/bidirule.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#doc">d-&gt;</a> <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html">bidirule.go</a>
+	    <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule10.0.0.go.html">bidirule10.0.0.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Transformer" data-popularity="325">	 type <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-193">Transformer</a> <i>(struct)</i>
+		Transformer implements transform.Transform.
+
+		<input type='checkbox' class="stat" id="Transformer-stat-methods"><label for="Transformer-stat-methods">Exported Methods (3)</label><span id='Transformer-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-207">Reset</a>()
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-226">Span</a>(src []<a href="../../../../../builtin.html#name-byte">byte</a>, atEOF <a href="../../../../../builtin.html#name-bool">bool</a>) (n <a href="../../../../../builtin.html#name-int">int</a>, err <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-211">Transform</a>(dst, src []<a href="../../../../../builtin.html#name-byte">byte</a>, atEOF <a href="../../../../../builtin.html#name-bool">bool</a>) (nDst, nSrc <a href="../../../../../builtin.html#name-int">int</a>, err <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Transformer-stat-impls"><label for="Transformer-stat-impls">Implements (2+)</label><span id='Transformer-stat-impls-content' class="stat-content">
+			*T : vendor/golang.org/x/text/transform.<a href="../transform.html#name-SpanningTransformer">SpanningTransformer</a>
+			*T : vendor/golang.org/x/text/transform.<a href="../transform.html#name-Transformer">Transformer</a></span>
+		<input type='checkbox' class="stat" id="Transformer-stat-results"><label for="Transformer-stat-results">As Outputs Of (1+)</label><span id='Transformer-stat-results-content' class="stat-content">
+			func <a href="#name-New">New</a>() *<b>Transformer</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Direction">	 func <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-135">Direction</a>(b []<a href="../../../../../builtin.html#name-byte">byte</a>) <a href="../unicode/bidi.html">bidi</a>.<a href="../unicode/bidi.html#name-Direction">Direction</a>
+		Direction reports the direction of the given label as defined by RFC 5893.
+		The Bidi Rule does not have to be applied to labels of the category
+		LeftToRight.</div>
+<div class="anchor" id="name-DirectionString">	 func <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-153">DirectionString</a>(s <a href="../../../../../builtin.html#name-string">string</a>) <a href="../unicode/bidi.html">bidi</a>.<a href="../unicode/bidi.html#name-Direction">Direction</a>
+		DirectionString reports the direction of the given label as defined by RFC
+		5893. The Bidi Rule does not have to be applied to labels of the category
+		LeftToRight.</div>
+<div class="anchor" id="name-ErrInvalid">	  var <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-46">ErrInvalid</a> <a href="../../../../../builtin.html#name-error">error</a>
+		ErrInvalid indicates a label is invalid according to the Bidi Rule.</div>
+<div class="anchor" id="name-New">	 func <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-188">New</a>() *<a href="#name-Transformer">Transformer</a>
+		New returns a Transformer that verifies that input adheres to the Bidi Rule.</div>
+<div class="anchor" id="name-Valid">	 func <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-170">Valid</a>(b []<a href="../../../../../builtin.html#name-byte">byte</a>) <a href="../../../../../builtin.html#name-bool">bool</a>
+		Valid reports whether b conforms to the BiDi rule.</div>
+<div class="anchor" id="name-ValidString">	 func <a href="../../../../../../src/vendor/golang.org/x/text/secure/bidirule/bidirule.go.html#line-179">ValidString</a>(s <a href="../../../../../builtin.html#name-string">string</a>) <a href="../../../../../builtin.html#name-bool">bool</a>
+		ValidString reports whether s conforms to the BiDi rule.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

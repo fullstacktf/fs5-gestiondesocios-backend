@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: internal/cpu</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>cpu</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-internal/cpu">internal/cpu</a><i> (on <a href="https://golang.org/pkg/internal/cpu/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/internal/cpu" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports 0 packages, and imported by <a href="../../dep/internal/cpu.html#imported-by">10 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/internal/cpu/cpu.go.html#doc">d-&gt;</a> <a href="../../src/internal/cpu/cpu.go.html">cpu.go</a>
+	    <a href="../../src/internal/cpu/cpu_amd64.go.html">cpu_amd64.go</a>
+	    <a href="../../src/internal/cpu/cpu_x86.go.html">cpu_x86.go</a>
+	    <a href="../../src/internal/cpu/cpu_x86.s.html">cpu_x86.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-CacheLinePad" data-popularity="0">	 type <a href="../../src/internal/cpu/cpu.go.html#line-15">CacheLinePad</a> <i>(struct)</i>
+		CacheLinePad is used to pad structs to avoid false sharing.
+</div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ARM">	  var <a href="../../src/internal/cpu/cpu.go.html#line-49">ARM</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasVFPv4 <a href="../builtin.html#name-bool">bool</a>; HasIDIVA <a href="../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		The booleans in ARM contain the correspondingly named cpu feature bit.
+		The struct is padded to avoid false sharing.</div>
+<div class="anchor" id="name-ARM64">	  var <a href="../../src/internal/cpu/cpu.go.html#line-58">ARM64</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasFP <a href="../builtin.html#name-bool">bool</a>; HasASIMD <a href="../builtin.html#name-bool">bool</a>; HasEVTSTRM <a href="../builtin.html#name-bool">bool</a>; HasAES <a href="../builtin.html#name-bool">bool</a>; HasPMULL <a href="../builtin.html#name-bool">bool</a>; HasSHA1 <a href="../builtin.html#name-bool">bool</a>; HasSHA2 <a href="../builtin.html#name-bool">bool</a>; HasCRC32 <a href="../builtin.html#name-bool">bool</a>; HasATOMICS <a href="../builtin.html#name-bool">bool</a>; HasFPHP <a href="../builtin.html#name-bool">bool</a>; HasASIMDHP <a href="../builtin.html#name-bool">bool</a>; HasCPUID <a href="../builtin.html#name-bool">bool</a>; HasASIMDRDM <a href="../builtin.html#name-bool">bool</a>; HasJSCVT <a href="../builtin.html#name-bool">bool</a>; HasFCMA <a href="../builtin.html#name-bool">bool</a>; HasLRCPC <a href="../builtin.html#name-bool">bool</a>; HasDCPOP <a href="../builtin.html#name-bool">bool</a>; HasSHA3 <a href="../builtin.html#name-bool">bool</a>; HasSM3 <a href="../builtin.html#name-bool">bool</a>; HasSM4 <a href="../builtin.html#name-bool">bool</a>; HasASIMDDP <a href="../builtin.html#name-bool">bool</a>; HasSHA512 <a href="../builtin.html#name-bool">bool</a>; HasSVE <a href="../builtin.html#name-bool">bool</a>; HasASIMDFHM <a href="../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		The booleans in ARM64 contain the correspondingly named cpu feature bit.
+		The struct is padded to avoid false sharing.</div>
+<div class="anchor" id="name-CacheLinePadSize">	const <a href="../../src/internal/cpu/cpu_x86.go.html#line-9">CacheLinePadSize</a> = 64</div>
+<div class="anchor" id="name-CacheLineSize">	  var <a href="../../src/internal/cpu/cpu.go.html#line-20">CacheLineSize</a> <a href="../builtin.html#name-uintptr">uintptr</a>
+		CacheLineSize is the CPU's assumed cache line size.
+		There is currently no runtime detection of the real cache line size
+		so we use the constant per GOARCH CacheLinePadSize as an approximation.</div>
+<div class="anchor" id="name-DebugOptions">	  var <a href="../../src/internal/cpu/cpu.go.html#line-12">DebugOptions</a> <a href="../builtin.html#name-bool">bool</a>
+		DebugOptions is set to true by the runtime if the OS supports reading
+		GODEBUG early in runtime startup.
+		This should not be changed after it is initialized.</div>
+<div class="anchor" id="name-GOARCH">	const <a href="../../src/internal/cpu/cpu_amd64.go.html#line-7">GOARCH</a> = "amd64"</div>
+<div class="anchor" id="name-Initialize">	 func <a href="../../src/internal/cpu/cpu.go.html#line-137">Initialize</a>(env <a href="../builtin.html#name-string">string</a>)
+		Initialize examines the processor and sets the relevant variables above.
+		This is called by the runtime package early in program initialization,
+		before normal init functions are run. env is set by runtime if the OS supports
+		cpu feature options in GODEBUG.</div>
+<div class="anchor" id="name-MIPS64X">	  var <a href="../../src/internal/cpu/cpu.go.html#line-87">MIPS64X</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasMSA <a href="../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}</div>
+<div class="anchor" id="name-PPC64">	  var <a href="../../src/internal/cpu/cpu.go.html#line-98">PPC64</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasDARN <a href="../builtin.html#name-bool">bool</a>; HasSCV <a href="../builtin.html#name-bool">bool</a>; IsPOWER8 <a href="../builtin.html#name-bool">bool</a>; IsPOWER9 <a href="../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		For ppc64(le), it is safe to check only for ISA level starting on ISA v3.00,
+		since there are no optional categories. There are some exceptions that also
+		require kernel support to work (darn, scv), so there are feature bits for
+		those as well. The minimum processor requirement is POWER8 (ISA 2.07).
+		The struct is padded to avoid false sharing.</div>
+<div class="anchor" id="name-S390X">	  var <a href="../../src/internal/cpu/cpu.go.html#line-107">S390X</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasZARCH <a href="../builtin.html#name-bool">bool</a>; HasSTFLE <a href="../builtin.html#name-bool">bool</a>; HasLDISP <a href="../builtin.html#name-bool">bool</a>; HasEIMM <a href="../builtin.html#name-bool">bool</a>; HasDFP <a href="../builtin.html#name-bool">bool</a>; HasETF3EH <a href="../builtin.html#name-bool">bool</a>; HasMSA <a href="../builtin.html#name-bool">bool</a>; HasAES <a href="../builtin.html#name-bool">bool</a>; HasAESCBC <a href="../builtin.html#name-bool">bool</a>; HasAESCTR <a href="../builtin.html#name-bool">bool</a>; HasAESGCM <a href="../builtin.html#name-bool">bool</a>; HasGHASH <a href="../builtin.html#name-bool">bool</a>; HasSHA1 <a href="../builtin.html#name-bool">bool</a>; HasSHA256 <a href="../builtin.html#name-bool">bool</a>; HasSHA512 <a href="../builtin.html#name-bool">bool</a>; HasSHA3 <a href="../builtin.html#name-bool">bool</a>; HasVX <a href="../builtin.html#name-bool">bool</a>; HasVXE <a href="../builtin.html#name-bool">bool</a>; HasKDSA <a href="../builtin.html#name-bool">bool</a>; HasECDSA <a href="../builtin.html#name-bool">bool</a>; HasEDDSA <a href="../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}</div>
+<div class="anchor" id="name-X86">	  var <a href="../../src/internal/cpu/cpu.go.html#line-26">X86</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasAES <a href="../builtin.html#name-bool">bool</a>; HasADX <a href="../builtin.html#name-bool">bool</a>; HasAVX <a href="../builtin.html#name-bool">bool</a>; HasAVX2 <a href="../builtin.html#name-bool">bool</a>; HasBMI1 <a href="../builtin.html#name-bool">bool</a>; HasBMI2 <a href="../builtin.html#name-bool">bool</a>; HasERMS <a href="../builtin.html#name-bool">bool</a>; HasFMA <a href="../builtin.html#name-bool">bool</a>; HasOSXSAVE <a href="../builtin.html#name-bool">bool</a>; HasPCLMULQDQ <a href="../builtin.html#name-bool">bool</a>; HasPOPCNT <a href="../builtin.html#name-bool">bool</a>; HasSSE2 <a href="../builtin.html#name-bool">bool</a>; HasSSE3 <a href="../builtin.html#name-bool">bool</a>; HasSSSE3 <a href="../builtin.html#name-bool">bool</a>; HasSSE41 <a href="../builtin.html#name-bool">bool</a>; HasSSE42 <a href="../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		The booleans in X86 contain the correspondingly named cpuid feature bit.
+		HasAVX and HasAVX2 are only set if the OS does support XMM and YMM registers
+		in addition to the cpuid feature bit being set.
+		The struct is padded to avoid false sharing.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

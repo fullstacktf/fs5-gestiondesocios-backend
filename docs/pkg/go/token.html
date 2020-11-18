@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: go/token</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>token</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-go/token">go/token</a><i> (on <a href="https://golang.org/pkg/go/token/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/go/token" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/go/token.html">6 packages</a>, and imported by <a href="../../dep/go/token.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/go/token/position.go.html">position.go</a>
+	    <a href="../../src/go/token/serialize.go.html">serialize.go</a>
+	<a href="../../src/go/token/token.go.html#doc">d-&gt;</a> <a href="../../src/go/token/token.go.html">token.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-File" data-popularity="985">	 type <a href="../../src/go/token/position.go.html#line-99">File</a> <i>(struct)</i>
+		A File is a handle for a file belonging to a FileSet.
+		A File has a name, size, and line offset table.
+
+		<input type='checkbox' class="stat" id="File-stat-methods"><label for="File-stat-methods">Exported Methods (16)</label><span id='File-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/token/position.go.html#line-138">AddLine</a>(offset <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-256">AddLineColumnInfo</a>(offset <a href="../builtin.html#name-int">int</a>, filename <a href="../builtin.html#name-string">string</a>, line, column <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-243">AddLineInfo</a>(offset <a href="../builtin.html#name-int">int</a>, filename <a href="../builtin.html#name-string">string</a>, line <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-117">Base</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-289">Line</a>(p <a href="#name-Pos">Pos</a>) <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-127">LineCount</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-218">LineStart</a>(line <a href="../builtin.html#name-int">int</a>) <a href="#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-151">MergeLine</a>(line <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-112">Name</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-279">Offset</a>(p <a href="#name-Pos">Pos</a>) <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-268">Pos</a>(offset <a href="../builtin.html#name-int">int</a>) <a href="#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-359">Position</a>(p <a href="#name-Pos">Pos</a>) (pos <a href="#name-Position">Position</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-346">PositionFor</a>(p <a href="#name-Pos">Pos</a>, adjusted <a href="../builtin.html#name-bool">bool</a>) (pos <a href="#name-Position">Position</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-178">SetLines</a>(lines []<a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-196">SetLinesForContent</a>(content []<a href="../builtin.html#name-byte">byte</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-122">Size</a>() <a href="../builtin.html#name-int">int</a></span>
+		<input type='checkbox' class="stat" id="File-stat-results"><label for="File-stat-results">As Outputs Of (2+)</label><span id='File-stat-results-content' class="stat-content">
+			func (*<a href="#name-FileSet">FileSet</a>).<a href="../../src/go/token/position.go.html#line-427">AddFile</a>(filename <a href="../builtin.html#name-string">string</a>, base, size <a href="../builtin.html#name-int">int</a>) *<b>File</b>
+			func (*<a href="#name-FileSet">FileSet</a>).<a href="../../src/go/token/position.go.html#line-497">File</a>(p <a href="#name-Pos">Pos</a>) (f *<b>File</b>)</span>
+		<input type='checkbox' class="stat" id="File-stat-params"><label for="File-stat-params">As Inputs Of (1+)</label><span id='File-stat-params-content' class="stat-content">
+			func go/scanner.(*<a href="scanner.html#name-Scanner">Scanner</a>).<a href="../../src/go/scanner/scanner.go.html#line-122">Init</a>(file *<b>File</b>, src []<a href="../builtin.html#name-byte">byte</a>, err <a href="scanner.html">scanner</a>.<a href="scanner.html#name-ErrorHandler">ErrorHandler</a>, mode <a href="scanner.html">scanner</a>.<a href="scanner.html#name-Mode">Mode</a>)</span></div>
+<div class="anchor" id="name-FileSet" data-popularity="650">	 type <a href="../../src/go/token/position.go.html#line-386">FileSet</a> <i>(struct)</i>
+		A FileSet represents a set of source files.
+		Methods of file sets are synchronized; multiple goroutines
+		may invoke them concurrently.
+
+		The byte offsets for each file in a file set are mapped into
+		distinct (integer) intervals, one interval [base, base+size]
+		per file. Base represents the first byte in the file, and size
+		is the corresponding file size. A Pos value is a value in such
+		an interval. By determining the interval a Pos value belongs
+		to, the file, its file base, and thus the byte offset (position)
+		the Pos value is representing can be computed.
+
+		When adding a new file, a file base must be provided. That can
+		be any integer value that is past the end of any interval of any
+		file already in the file set. For convenience, FileSet.Base provides
+		such a value, which is simply the end of the Pos interval of the most
+		recently added file, plus one. Unless there is a need to extend an
+		interval later, using the FileSet.Base should be used as argument
+		for FileSet.AddFile.
+
+		<input type='checkbox' class="stat" id="FileSet-stat-methods"><label for="FileSet-stat-methods">Exported Methods (8)</label><span id='FileSet-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/token/position.go.html#line-427">AddFile</a>(filename <a href="../builtin.html#name-string">string</a>, base, size <a href="../builtin.html#name-int">int</a>) *<a href="#name-File">File</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-403">Base</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/go/token/position.go.html#line-497">File</a>(p <a href="#name-Pos">Pos</a>) (f *<a href="#name-File">File</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-452">Iterate</a>(f func(*<a href="#name-File">File</a>) <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-521">Position</a>(p <a href="#name-Pos">Pos</a>) (pos <a href="#name-Position">Position</a>)
+			(*T) <a href="../../src/go/token/position.go.html#line-509">PositionFor</a>(p <a href="#name-Pos">Pos</a>, adjusted <a href="../builtin.html#name-bool">bool</a>) (pos <a href="#name-Position">Position</a>)
+			(*T) <a href="../../src/go/token/serialize.go.html#line-22">Read</a>(decode func(interface{}) <a href="../builtin.html#name-error">error</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/go/token/serialize.go.html#line-50">Write</a>(encode func(interface{}) <a href="../builtin.html#name-error">error</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="FileSet-stat-results"><label for="FileSet-stat-results">As Outputs Of (1+)</label><span id='FileSet-stat-results-content' class="stat-content">
+			func <a href="#name-NewFileSet">NewFileSet</a>() *<b>FileSet</b></span>
+		<input type='checkbox' class="stat" id="FileSet-stat-params"><label for="FileSet-stat-params">As Inputs Of (5+)</label><span id='FileSet-stat-params-content' class="stat-content">
+			func go/ast.<a href="ast.html#name-Fprint">Fprint</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, fset *<b>FileSet</b>, x interface{}, f <a href="ast.html">ast</a>.<a href="ast.html#name-FieldFilter">FieldFilter</a>) <a href="../builtin.html#name-error">error</a>
+			func go/ast.<a href="ast.html#name-NewCommentMap">NewCommentMap</a>(fset *<b>FileSet</b>, node <a href="ast.html">ast</a>.<a href="ast.html#name-Node">Node</a>, comments []*<a href="ast.html">ast</a>.<a href="ast.html#name-CommentGroup">CommentGroup</a>) <a href="ast.html">ast</a>.<a href="ast.html#name-CommentMap">CommentMap</a>
+			func go/ast.<a href="ast.html#name-NewPackage">NewPackage</a>(fset *<b>FileSet</b>, files map[<a href="../builtin.html#name-string">string</a>]*<a href="ast.html">ast</a>.<a href="ast.html#name-File">File</a>, importer <a href="ast.html">ast</a>.<a href="ast.html#name-Importer">Importer</a>, universe *<a href="ast.html">ast</a>.<a href="ast.html#name-Scope">Scope</a>) (*<a href="ast.html">ast</a>.<a href="ast.html#name-Package">Package</a>, <a href="../builtin.html#name-error">error</a>)
+			func go/ast.<a href="ast.html#name-Print">Print</a>(fset *<b>FileSet</b>, x interface{}) <a href="../builtin.html#name-error">error</a>
+			func go/ast.<a href="ast.html#name-SortImports">SortImports</a>(fset *<b>FileSet</b>, f *<a href="ast.html">ast</a>.<a href="ast.html#name-File">File</a>)</span></div>
+<div class="anchor" id="name-Pos" data-popularity="9650">	 type <a href="../../src/go/token/position.go.html#line-79">Pos</a> <a href="../builtin.html#name-int">int</a>
+		Pos is a compact encoding of a source position within a file set.
+		It can be converted into a Position for a more convenient, but much
+		larger, representation.
+
+		The Pos value for a given file is a number in the range [base, base+size],
+		where base and size are specified when a file is added to the file set.
+		The difference between a Pos value and the corresponding file base
+		corresponds to the byte offset of that position (represented by the Pos value)
+		from the beginning of the file. Thus, the file base offset is the Pos value
+		representing the first byte in the file.
+
+		To create the Pos value for a specific source offset (measured in bytes),
+		first add the respective file to the current file set using FileSet.AddFile
+		and then call File.Pos(offset) for that file. Given a Pos value p
+		for a specific file set fset, the corresponding Position value is
+		obtained by calling fset.Position(p).
+
+		Pos values can be compared directly with the usual comparison operators:
+		If two Pos values p and q are in the same file, comparing p and q is
+		equivalent to comparing the respective source file offsets. If p and q
+		are in different files, p &lt; q is true if the file implied by p was added
+		to the respective file set before the file implied by q.
+
+		<input type='checkbox' class="stat" id="Pos-stat-methods"><label for="Pos-stat-methods">One Exported Method</label><span id='Pos-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/token/position.go.html#line-89">IsValid</a>() <a href="../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="Pos-stat-impls"><label for="Pos-stat-impls">Implements (1+)</label><span id='Pos-stat-impls-content' class="stat-content">
+			 T : database/sql/driver.<a href="../database/sql/driver.html#name-Validator">Validator</a></span>
+		<input type='checkbox' class="stat" id="Pos-stat-results"><label for="Pos-stat-results">As Outputs Of (124+)</label><span id='Pos-stat-results-content' class="stat-content">
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-218">LineStart</a>(line <a href="../builtin.html#name-int">int</a>) <b>Pos</b>
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-268">Pos</a>(offset <a href="../builtin.html#name-int">int</a>) <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ArrayType">ArrayType</a>).<a href="../../src/go/ast/ast.go.html#line-512">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ArrayType">ArrayType</a>).<a href="../../src/go/ast/ast.go.html#line-479">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-AssignStmt">AssignStmt</a>).<a href="../../src/go/ast/ast.go.html#line-780">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-AssignStmt">AssignStmt</a>).<a href="../../src/go/ast/ast.go.html#line-751">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BadDecl">BadDecl</a>).<a href="../../src/go/ast/ast.go.html#line-979">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BadDecl">BadDecl</a>).<a href="../../src/go/ast/ast.go.html#line-975">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BadExpr">BadExpr</a>).<a href="../../src/go/ast/ast.go.html#line-491">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BadExpr">BadExpr</a>).<a href="../../src/go/ast/ast.go.html#line-458">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BadStmt">BadStmt</a>).<a href="../../src/go/ast/ast.go.html#line-766">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BadStmt">BadStmt</a>).<a href="../../src/go/ast/ast.go.html#line-744">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BasicLit">BasicLit</a>).<a href="../../src/go/ast/ast.go.html#line-499">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BasicLit">BasicLit</a>).<a href="../../src/go/ast/ast.go.html#line-461">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BinaryExpr">BinaryExpr</a>).<a href="../../src/go/ast/ast.go.html#line-510">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BinaryExpr">BinaryExpr</a>).<a href="../../src/go/ast/ast.go.html#line-477">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BlockStmt">BlockStmt</a>).<a href="../../src/go/ast/ast.go.html#line-795">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BlockStmt">BlockStmt</a>).<a href="../../src/go/ast/ast.go.html#line-756">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BranchStmt">BranchStmt</a>).<a href="../../src/go/ast/ast.go.html#line-789">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-BranchStmt">BranchStmt</a>).<a href="../../src/go/ast/ast.go.html#line-755">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CallExpr">CallExpr</a>).<a href="../../src/go/ast/ast.go.html#line-507">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CallExpr">CallExpr</a>).<a href="../../src/go/ast/ast.go.html#line-474">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CaseClause">CaseClause</a>).<a href="../../src/go/ast/ast.go.html#line-810">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CaseClause">CaseClause</a>).<a href="../../src/go/ast/ast.go.html#line-758">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ChanType">ChanType</a>).<a href="../../src/go/ast/ast.go.html#line-522">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ChanType">ChanType</a>).<a href="../../src/go/ast/ast.go.html#line-489">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CommClause">CommClause</a>).<a href="../../src/go/ast/ast.go.html#line-818">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CommClause">CommClause</a>).<a href="../../src/go/ast/ast.go.html#line-761">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Comment">Comment</a>).<a href="../../src/go/ast/ast.go.html#line-66">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Comment">Comment</a>).<a href="../../src/go/ast/ast.go.html#line-65">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CommentGroup">CommentGroup</a>).<a href="../../src/go/ast/ast.go.html#line-76">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CommentGroup">CommentGroup</a>).<a href="../../src/go/ast/ast.go.html#line-75">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CompositeLit">CompositeLit</a>).<a href="../../src/go/ast/ast.go.html#line-501">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-CompositeLit">CompositeLit</a>).<a href="../../src/go/ast/ast.go.html#line-463">Pos</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Decl">Decl</a>.<a href="../../src/go/ast/ast.go.html#line-35">End</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Decl">Decl</a>.<a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-DeclStmt">DeclStmt</a>).<a href="../../src/go/ast/ast.go.html#line-767">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-DeclStmt">DeclStmt</a>).<a href="../../src/go/ast/ast.go.html#line-745">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-DeferStmt">DeferStmt</a>).<a href="../../src/go/ast/ast.go.html#line-782">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-DeferStmt">DeferStmt</a>).<a href="../../src/go/ast/ast.go.html#line-753">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Ellipsis">Ellipsis</a>).<a href="../../src/go/ast/ast.go.html#line-493">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Ellipsis">Ellipsis</a>).<a href="../../src/go/ast/ast.go.html#line-460">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-EmptyStmt">EmptyStmt</a>).<a href="../../src/go/ast/ast.go.html#line-768">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-EmptyStmt">EmptyStmt</a>).<a href="../../src/go/ast/ast.go.html#line-746">Pos</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Expr">Expr</a>.<a href="../../src/go/ast/ast.go.html#line-35">End</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Expr">Expr</a>.<a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ExprStmt">ExprStmt</a>).<a href="../../src/go/ast/ast.go.html#line-775">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ExprStmt">ExprStmt</a>).<a href="../../src/go/ast/ast.go.html#line-748">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Field">Field</a>).<a href="../../src/go/ast/ast.go.html#line-207">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Field">Field</a>).<a href="../../src/go/ast/ast.go.html#line-200">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FieldList">FieldList</a>).<a href="../../src/go/ast/ast.go.html#line-233">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FieldList">FieldList</a>).<a href="../../src/go/ast/ast.go.html#line-221">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-File">File</a>).<a href="../../src/go/ast/ast.go.html#line-1034">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-File">File</a>).<a href="../../src/go/ast/ast.go.html#line-1033">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ForStmt">ForStmt</a>).<a href="../../src/go/ast/ast.go.html#line-825">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ForStmt">ForStmt</a>).<a href="../../src/go/ast/ast.go.html#line-763">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FuncDecl">FuncDecl</a>).<a href="../../src/go/ast/ast.go.html#line-986">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FuncDecl">FuncDecl</a>).<a href="../../src/go/ast/ast.go.html#line-977">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FuncLit">FuncLit</a>).<a href="../../src/go/ast/ast.go.html#line-500">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FuncLit">FuncLit</a>).<a href="../../src/go/ast/ast.go.html#line-462">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FuncType">FuncType</a>).<a href="../../src/go/ast/ast.go.html#line-514">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-FuncType">FuncType</a>).<a href="../../src/go/ast/ast.go.html#line-481">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-GenDecl">GenDecl</a>).<a href="../../src/go/ast/ast.go.html#line-980">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-GenDecl">GenDecl</a>).<a href="../../src/go/ast/ast.go.html#line-976">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-GoStmt">GoStmt</a>).<a href="../../src/go/ast/ast.go.html#line-781">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-GoStmt">GoStmt</a>).<a href="../../src/go/ast/ast.go.html#line-752">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Ident">Ident</a>).<a href="../../src/go/ast/ast.go.html#line-492">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Ident">Ident</a>).<a href="../../src/go/ast/ast.go.html#line-459">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-IfStmt">IfStmt</a>).<a href="../../src/go/ast/ast.go.html#line-804">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-IfStmt">IfStmt</a>).<a href="../../src/go/ast/ast.go.html#line-757">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ImportSpec">ImportSpec</a>).<a href="../../src/go/ast/ast.go.html#line-907">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ImportSpec">ImportSpec</a>).<a href="../../src/go/ast/ast.go.html#line-898">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-IncDecStmt">IncDecStmt</a>).<a href="../../src/go/ast/ast.go.html#line-777">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-IncDecStmt">IncDecStmt</a>).<a href="../../src/go/ast/ast.go.html#line-750">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-IndexExpr">IndexExpr</a>).<a href="../../src/go/ast/ast.go.html#line-504">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-IndexExpr">IndexExpr</a>).<a href="../../src/go/ast/ast.go.html#line-471">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-InterfaceType">InterfaceType</a>).<a href="../../src/go/ast/ast.go.html#line-520">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-InterfaceType">InterfaceType</a>).<a href="../../src/go/ast/ast.go.html#line-487">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-KeyValueExpr">KeyValueExpr</a>).<a href="../../src/go/ast/ast.go.html#line-511">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-KeyValueExpr">KeyValueExpr</a>).<a href="../../src/go/ast/ast.go.html#line-478">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-LabeledStmt">LabeledStmt</a>).<a href="../../src/go/ast/ast.go.html#line-774">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-LabeledStmt">LabeledStmt</a>).<a href="../../src/go/ast/ast.go.html#line-747">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-MapType">MapType</a>).<a href="../../src/go/ast/ast.go.html#line-521">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-MapType">MapType</a>).<a href="../../src/go/ast/ast.go.html#line-488">Pos</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Node">Node</a>.<a href="../../src/go/ast/ast.go.html#line-35">End</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Node">Node</a>.<a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Object">Object</a>).<a href="../../src/go/ast/scope.go.html#line-92">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Package">Package</a>).<a href="../../src/go/ast/ast.go.html#line-1052">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-Package">Package</a>).<a href="../../src/go/ast/ast.go.html#line-1051">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ParenExpr">ParenExpr</a>).<a href="../../src/go/ast/ast.go.html#line-502">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ParenExpr">ParenExpr</a>).<a href="../../src/go/ast/ast.go.html#line-469">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-RangeStmt">RangeStmt</a>).<a href="../../src/go/ast/ast.go.html#line-826">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-RangeStmt">RangeStmt</a>).<a href="../../src/go/ast/ast.go.html#line-764">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ReturnStmt">ReturnStmt</a>).<a href="../../src/go/ast/ast.go.html#line-783">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ReturnStmt">ReturnStmt</a>).<a href="../../src/go/ast/ast.go.html#line-754">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SelectorExpr">SelectorExpr</a>).<a href="../../src/go/ast/ast.go.html#line-503">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SelectorExpr">SelectorExpr</a>).<a href="../../src/go/ast/ast.go.html#line-470">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SelectStmt">SelectStmt</a>).<a href="../../src/go/ast/ast.go.html#line-824">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SelectStmt">SelectStmt</a>).<a href="../../src/go/ast/ast.go.html#line-762">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SendStmt">SendStmt</a>).<a href="../../src/go/ast/ast.go.html#line-776">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SendStmt">SendStmt</a>).<a href="../../src/go/ast/ast.go.html#line-749">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SliceExpr">SliceExpr</a>).<a href="../../src/go/ast/ast.go.html#line-505">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SliceExpr">SliceExpr</a>).<a href="../../src/go/ast/ast.go.html#line-472">Pos</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Spec">Spec</a>.<a href="../../src/go/ast/ast.go.html#line-35">End</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Spec">Spec</a>.<a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-StarExpr">StarExpr</a>).<a href="../../src/go/ast/ast.go.html#line-508">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-StarExpr">StarExpr</a>).<a href="../../src/go/ast/ast.go.html#line-475">Pos</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Stmt">Stmt</a>.<a href="../../src/go/ast/ast.go.html#line-35">End</a>() <b>Pos</b>
+			func go/ast.<a href="ast.html#name-Stmt">Stmt</a>.<a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-StructType">StructType</a>).<a href="../../src/go/ast/ast.go.html#line-513">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-StructType">StructType</a>).<a href="../../src/go/ast/ast.go.html#line-480">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SwitchStmt">SwitchStmt</a>).<a href="../../src/go/ast/ast.go.html#line-816">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-SwitchStmt">SwitchStmt</a>).<a href="../../src/go/ast/ast.go.html#line-759">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-TypeAssertExpr">TypeAssertExpr</a>).<a href="../../src/go/ast/ast.go.html#line-506">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-TypeAssertExpr">TypeAssertExpr</a>).<a href="../../src/go/ast/ast.go.html#line-473">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-TypeSpec">TypeSpec</a>).<a href="../../src/go/ast/ast.go.html#line-923">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-TypeSpec">TypeSpec</a>).<a href="../../src/go/ast/ast.go.html#line-905">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-TypeSwitchStmt">TypeSwitchStmt</a>).<a href="../../src/go/ast/ast.go.html#line-817">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-TypeSwitchStmt">TypeSwitchStmt</a>).<a href="../../src/go/ast/ast.go.html#line-760">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-UnaryExpr">UnaryExpr</a>).<a href="../../src/go/ast/ast.go.html#line-509">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-UnaryExpr">UnaryExpr</a>).<a href="../../src/go/ast/ast.go.html#line-476">Pos</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ValueSpec">ValueSpec</a>).<a href="../../src/go/ast/ast.go.html#line-914">End</a>() <b>Pos</b>
+			func go/ast.(*<a href="ast.html#name-ValueSpec">ValueSpec</a>).<a href="../../src/go/ast/ast.go.html#line-904">Pos</a>() <b>Pos</b>
+			func go/scanner.(*<a href="scanner.html#name-Scanner">Scanner</a>).<a href="../../src/go/scanner/scanner.go.html#line-782">Scan</a>() (pos <b>Pos</b>, tok <a href="#name-Token">Token</a>, lit <a href="../builtin.html#name-string">string</a>)</span>
+		<input type='checkbox' class="stat" id="Pos-stat-params"><label for="Pos-stat-params">As Inputs Of (7+)</label><span id='Pos-stat-params-content' class="stat-content">
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-289">Line</a>(p <b>Pos</b>) <a href="../builtin.html#name-int">int</a>
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-279">Offset</a>(p <b>Pos</b>) <a href="../builtin.html#name-int">int</a>
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-359">Position</a>(p <b>Pos</b>) (pos <a href="#name-Position">Position</a>)
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-346">PositionFor</a>(p <b>Pos</b>, adjusted <a href="../builtin.html#name-bool">bool</a>) (pos <a href="#name-Position">Position</a>)
+			func (*<a href="#name-FileSet">FileSet</a>).<a href="../../src/go/token/position.go.html#line-497">File</a>(p <b>Pos</b>) (f *<a href="#name-File">File</a>)
+			func (*<a href="#name-FileSet">FileSet</a>).<a href="../../src/go/token/position.go.html#line-521">Position</a>(p <b>Pos</b>) (pos <a href="#name-Position">Position</a>)
+			func (*<a href="#name-FileSet">FileSet</a>).<a href="../../src/go/token/position.go.html#line-509">PositionFor</a>(p <b>Pos</b>, adjusted <a href="../builtin.html#name-bool">bool</a>) (pos <a href="#name-Position">Position</a>)</span>
+		<input type='checkbox' class="stat" id="Pos-stat-values"><label for="Pos-stat-values">As Types Of (1+)</label><span id='Pos-stat-values-content' class="stat-content">
+			const <a href="#name-NoPos">NoPos</a></span></div>
+<div class="anchor" id="name-Position" data-popularity="535">	 type <a href="../../src/go/token/position.go.html#line-20">Position</a> <i>(struct)</i>
+		Position describes an arbitrary source position
+		including the file, line, and column location.
+		A Position is valid if the line number is &gt; 0.
+
+		<input type='checkbox' class="stat" id="Position-stat-fields"><label for="Position-stat-fields">Exported Fields (4)</label><span id='Position-stat-fields-content' class="stat-content">
+			<a href="../../src/go/token/position.go.html#line-24">Column</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/go/token/position.go.html#line-21">Filename</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/go/token/position.go.html#line-23">Line</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/go/token/position.go.html#line-22">Offset</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="Position-stat-methods"><label for="Position-stat-methods">Exported Methods (2)</label><span id='Position-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/token/position.go.html#line-28">IsValid</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/go/token/position.go.html#line-39">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Position-stat-impls"><label for="Position-stat-impls">Implements (2+)</label><span id='Position-stat-impls-content' class="stat-content">
+			*T : database/sql/driver.<a href="../database/sql/driver.html#name-Validator">Validator</a>
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Position-stat-results"><label for="Position-stat-results">As Outputs Of (4+)</label><span id='Position-stat-results-content' class="stat-content">
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-359">Position</a>(p <a href="#name-Pos">Pos</a>) (pos <b>Position</b>)
+			func (*<a href="#name-File">File</a>).<a href="../../src/go/token/position.go.html#line-346">PositionFor</a>(p <a href="#name-Pos">Pos</a>, adjusted <a href="../builtin.html#name-bool">bool</a>) (pos <b>Position</b>)
+			func (*<a href="#name-FileSet">FileSet</a>).<a href="../../src/go/token/position.go.html#line-521">Position</a>(p <a href="#name-Pos">Pos</a>) (pos <b>Position</b>)
+			func (*<a href="#name-FileSet">FileSet</a>).<a href="../../src/go/token/position.go.html#line-509">PositionFor</a>(p <a href="#name-Pos">Pos</a>, adjusted <a href="../builtin.html#name-bool">bool</a>) (pos <b>Position</b>)</span>
+		<input type='checkbox' class="stat" id="Position-stat-params"><label for="Position-stat-params">As Inputs Of (1+)</label><span id='Position-stat-params-content' class="stat-content">
+			func go/scanner.(*<a href="scanner.html#name-ErrorList">ErrorList</a>).<a href="../../src/go/scanner/errors.go.html#line-40">Add</a>(pos <b>Position</b>, msg <a href="../builtin.html#name-string">string</a>)</span></div>
+<div class="anchor" id="name-Token" data-popularity="465">	 type <a href="../../src/go/token/token.go.html#line-17">Token</a> <a href="../builtin.html#name-int">int</a>
+		Token is the set of lexical tokens of the Go programming language.
+
+		<input type='checkbox' class="stat" id="Token-stat-methods"><label for="Token-stat-methods">Exported Methods (5)</label><span id='Token-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/token/token.go.html#line-312">IsKeyword</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/go/token/token.go.html#line-302">IsLiteral</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/go/token/token.go.html#line-307">IsOperator</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/go/token/token.go.html#line-263">Precedence</a>() <a href="../builtin.html#name-int">int</a>
+			 (T) <a href="../../src/go/token/token.go.html#line-236">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Token-stat-impls"><label for="Token-stat-impls">Implements (1+)</label><span id='Token-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Token-stat-results"><label for="Token-stat-results">As Outputs Of (2+)</label><span id='Token-stat-results-content' class="stat-content">
+			func <a href="#name-Lookup">Lookup</a>(ident <a href="../builtin.html#name-string">string</a>) <b>Token</b>
+			func go/scanner.(*<a href="scanner.html#name-Scanner">Scanner</a>).<a href="../../src/go/scanner/scanner.go.html#line-782">Scan</a>() (pos <a href="#name-Pos">Pos</a>, tok <b>Token</b>, lit <a href="../builtin.html#name-string">string</a>)</span>
+		<input type='checkbox' class="stat" id="Token-stat-values"><label for="Token-stat-values">As Types Of (81+)</label><span id='Token-stat-values-content' class="stat-content">
+			const <a href="#name-ADD">ADD</a>
+			const <a href="#name-ADD_ASSIGN">ADD_ASSIGN</a>
+			const <a href="#name-AND">AND</a>
+			const <a href="#name-AND_ASSIGN">AND_ASSIGN</a>
+			const <a href="#name-AND_NOT">AND_NOT</a>
+			const <a href="#name-AND_NOT_ASSIGN">AND_NOT_ASSIGN</a>
+			const <a href="#name-ARROW">ARROW</a>
+			const <a href="#name-ASSIGN">ASSIGN</a>
+			const <a href="#name-BREAK">BREAK</a>
+			const <a href="#name-CASE">CASE</a>
+			const <a href="#name-CHAN">CHAN</a>
+			const <a href="#name-CHAR">CHAR</a>
+			const <a href="#name-COLON">COLON</a>
+			const <a href="#name-COMMA">COMMA</a>
+			const <a href="#name-COMMENT">COMMENT</a>
+			const <a href="#name-CONST">CONST</a>
+			const <a href="#name-CONTINUE">CONTINUE</a>
+			const <a href="#name-DEC">DEC</a>
+			const <a href="#name-DEFAULT">DEFAULT</a>
+			const <a href="#name-DEFER">DEFER</a>
+			const <a href="#name-DEFINE">DEFINE</a>
+			const <a href="#name-ELLIPSIS">ELLIPSIS</a>
+			const <a href="#name-ELSE">ELSE</a>
+			const <a href="#name-EOF">EOF</a>
+			const <a href="#name-EQL">EQL</a>
+			const <a href="#name-FALLTHROUGH">FALLTHROUGH</a>
+			const <a href="#name-FLOAT">FLOAT</a>
+			const <a href="#name-FOR">FOR</a>
+			const <a href="#name-FUNC">FUNC</a>
+			const <a href="#name-GEQ">GEQ</a>
+			const <a href="#name-GO">GO</a>
+			const <a href="#name-GOTO">GOTO</a>
+			const <a href="#name-GTR">GTR</a>
+			const <a href="#name-IDENT">IDENT</a>
+			const <a href="#name-IF">IF</a>
+			const <a href="#name-ILLEGAL">ILLEGAL</a>
+			const <a href="#name-IMAG">IMAG</a>
+			const <a href="#name-IMPORT">IMPORT</a>
+			const <a href="#name-INC">INC</a>
+			const <a href="#name-INT">INT</a>
+			const <a href="#name-INTERFACE">INTERFACE</a>
+			const <a href="#name-LAND">LAND</a>
+			const <a href="#name-LBRACE">LBRACE</a>
+			const <a href="#name-LBRACK">LBRACK</a>
+			const <a href="#name-LEQ">LEQ</a>
+			const <a href="#name-LOR">LOR</a>
+			const <a href="#name-LPAREN">LPAREN</a>
+			const <a href="#name-LSS">LSS</a>
+			const <a href="#name-MAP">MAP</a>
+			const <a href="#name-MUL">MUL</a>
+			const <a href="#name-MUL_ASSIGN">MUL_ASSIGN</a>
+			const <a href="#name-NEQ">NEQ</a>
+			const <a href="#name-NOT">NOT</a>
+			const <a href="#name-OR">OR</a>
+			const <a href="#name-OR_ASSIGN">OR_ASSIGN</a>
+			const <a href="#name-PACKAGE">PACKAGE</a>
+			const <a href="#name-PERIOD">PERIOD</a>
+			const <a href="#name-QUO">QUO</a>
+			const <a href="#name-QUO_ASSIGN">QUO_ASSIGN</a>
+			const <a href="#name-RANGE">RANGE</a>
+			const <a href="#name-RBRACE">RBRACE</a>
+			const <a href="#name-RBRACK">RBRACK</a>
+			const <a href="#name-REM">REM</a>
+			const <a href="#name-REM_ASSIGN">REM_ASSIGN</a>
+			const <a href="#name-RETURN">RETURN</a>
+			const <a href="#name-RPAREN">RPAREN</a>
+			const <a href="#name-SELECT">SELECT</a>
+			const <a href="#name-SEMICOLON">SEMICOLON</a>
+			const <a href="#name-SHL">SHL</a>
+			const <a href="#name-SHL_ASSIGN">SHL_ASSIGN</a>
+			const <a href="#name-SHR">SHR</a>
+			const <a href="#name-SHR_ASSIGN">SHR_ASSIGN</a>
+			const <a href="#name-STRING">STRING</a>
+			const <a href="#name-STRUCT">STRUCT</a>
+			const <a href="#name-SUB">SUB</a>
+			const <a href="#name-SUB_ASSIGN">SUB_ASSIGN</a>
+			const <a href="#name-SWITCH">SWITCH</a>
+			const <a href="#name-TYPE">TYPE</a>
+			const <a href="#name-VAR">VAR</a>
+			const <a href="#name-XOR">XOR</a>
+			const <a href="#name-XOR_ASSIGN">XOR_ASSIGN</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ADD">	const <a href="../../src/go/token/token.go.html#line-39">ADD</a> <a href="#name-Token">Token</a> = 12 // +
+		Operators and delimiters</div>
+<div class="anchor" id="name-ADD_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-52">ADD_ASSIGN</a> <a href="#name-Token">Token</a> = 23 // +=
+		The list of tokens.</div>
+<div class="anchor" id="name-AND">	const <a href="../../src/go/token/token.go.html#line-45">AND</a> <a href="#name-Token">Token</a> = 17 // &amp;
+		The list of tokens.</div>
+<div class="anchor" id="name-AND_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-58">AND_ASSIGN</a> <a href="#name-Token">Token</a> = 28 // &amp;=
+		The list of tokens.</div>
+<div class="anchor" id="name-AND_NOT">	const <a href="../../src/go/token/token.go.html#line-50">AND_NOT</a> <a href="#name-Token">Token</a> = 22 // &amp;^
+		The list of tokens.</div>
+<div class="anchor" id="name-AND_NOT_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-63">AND_NOT_ASSIGN</a> <a href="#name-Token">Token</a> = 33 // &amp;^=
+		The list of tokens.</div>
+<div class="anchor" id="name-ARROW">	const <a href="../../src/go/token/token.go.html#line-67">ARROW</a> <a href="#name-Token">Token</a> = 36 // &lt;-
+		The list of tokens.</div>
+<div class="anchor" id="name-ASSIGN">	const <a href="../../src/go/token/token.go.html#line-74">ASSIGN</a> <a href="#name-Token">Token</a> = 42 // =
+		The list of tokens.</div>
+<div class="anchor" id="name-BREAK">	const <a href="../../src/go/token/token.go.html#line-98">BREAK</a> <a href="#name-Token">Token</a> = 61
+		Keywords</div>
+<div class="anchor" id="name-CASE">	const <a href="../../src/go/token/token.go.html#line-99">CASE</a> <a href="#name-Token">Token</a> = 62
+		The list of tokens.</div>
+<div class="anchor" id="name-CHAN">	const <a href="../../src/go/token/token.go.html#line-100">CHAN</a> <a href="#name-Token">Token</a> = 63
+		The list of tokens.</div>
+<div class="anchor" id="name-CHAR">	const <a href="../../src/go/token/token.go.html#line-33">CHAR</a> <a href="#name-Token">Token</a> = 8 // 'a'
+		The list of tokens.</div>
+<div class="anchor" id="name-COLON">	const <a href="../../src/go/token/token.go.html#line-93">COLON</a> <a href="#name-Token">Token</a> = 58 // :
+		The list of tokens.</div>
+<div class="anchor" id="name-COMMA">	const <a href="../../src/go/token/token.go.html#line-86">COMMA</a> <a href="#name-Token">Token</a> = 52 // ,
+		The list of tokens.</div>
+<div class="anchor" id="name-COMMENT">	const <a href="../../src/go/token/token.go.html#line-24">COMMENT</a> <a href="#name-Token">Token</a> = 2
+		The list of tokens.</div>
+<div class="anchor" id="name-CONST">	const <a href="../../src/go/token/token.go.html#line-101">CONST</a> <a href="#name-Token">Token</a> = 64
+		The list of tokens.</div>
+<div class="anchor" id="name-CONTINUE">	const <a href="../../src/go/token/token.go.html#line-102">CONTINUE</a> <a href="#name-Token">Token</a> = 65
+		The list of tokens.</div>
+<div class="anchor" id="name-DEC">	const <a href="../../src/go/token/token.go.html#line-69">DEC</a> <a href="#name-Token">Token</a> = 38 // --
+		The list of tokens.</div>
+<div class="anchor" id="name-DEFAULT">	const <a href="../../src/go/token/token.go.html#line-104">DEFAULT</a> <a href="#name-Token">Token</a> = 66
+		The list of tokens.</div>
+<div class="anchor" id="name-DEFER">	const <a href="../../src/go/token/token.go.html#line-105">DEFER</a> <a href="#name-Token">Token</a> = 67
+		The list of tokens.</div>
+<div class="anchor" id="name-DEFINE">	const <a href="../../src/go/token/token.go.html#line-80">DEFINE</a> <a href="#name-Token">Token</a> = 47 // :=
+		The list of tokens.</div>
+<div class="anchor" id="name-ELLIPSIS">	const <a href="../../src/go/token/token.go.html#line-81">ELLIPSIS</a> <a href="#name-Token">Token</a> = 48 // ...
+		The list of tokens.</div>
+<div class="anchor" id="name-ELSE">	const <a href="../../src/go/token/token.go.html#line-106">ELSE</a> <a href="#name-Token">Token</a> = 68
+		The list of tokens.</div>
+<div class="anchor" id="name-EOF">	const <a href="../../src/go/token/token.go.html#line-23">EOF</a> <a href="#name-Token">Token</a> = 1
+		The list of tokens.</div>
+<div class="anchor" id="name-EQL">	const <a href="../../src/go/token/token.go.html#line-71">EQL</a> <a href="#name-Token">Token</a> = 39 // ==
+		The list of tokens.</div>
+<div class="anchor" id="name-FALLTHROUGH">	const <a href="../../src/go/token/token.go.html#line-107">FALLTHROUGH</a> <a href="#name-Token">Token</a> = 69
+		The list of tokens.</div>
+<div class="anchor" id="name-FLOAT">	const <a href="../../src/go/token/token.go.html#line-31">FLOAT</a> <a href="#name-Token">Token</a> = 6 // 123.45
+		The list of tokens.</div>
+<div class="anchor" id="name-FOR">	const <a href="../../src/go/token/token.go.html#line-108">FOR</a> <a href="#name-Token">Token</a> = 70
+		The list of tokens.</div>
+<div class="anchor" id="name-FUNC">	const <a href="../../src/go/token/token.go.html#line-110">FUNC</a> <a href="#name-Token">Token</a> = 71
+		The list of tokens.</div>
+<div class="anchor" id="name-GEQ">	const <a href="../../src/go/token/token.go.html#line-79">GEQ</a> <a href="#name-Token">Token</a> = 46 // &gt;=
+		The list of tokens.</div>
+<div class="anchor" id="name-GO">	const <a href="../../src/go/token/token.go.html#line-111">GO</a> <a href="#name-Token">Token</a> = 72
+		The list of tokens.</div>
+<div class="anchor" id="name-GOTO">	const <a href="../../src/go/token/token.go.html#line-112">GOTO</a> <a href="#name-Token">Token</a> = 73
+		The list of tokens.</div>
+<div class="anchor" id="name-GTR">	const <a href="../../src/go/token/token.go.html#line-73">GTR</a> <a href="#name-Token">Token</a> = 41 // &gt;
+		The list of tokens.</div>
+<div class="anchor" id="name-HighestPrec">	const <a href="../../src/go/token/token.go.html#line-256">HighestPrec</a> = 7
+		A set of constants for precedence-based expression parsing.
+		Non-operators have lowest precedence, followed by operators
+		starting with precedence 1 up to unary operators. The highest
+		precedence serves as "catch-all" precedence for selector,
+		indexing, and other operator and delimiter tokens.</div>
+<div class="anchor" id="name-IDENT">	const <a href="../../src/go/token/token.go.html#line-29">IDENT</a> <a href="#name-Token">Token</a> = 4 // main
+		Identifiers and basic type literals
+		(these tokens stand for classes of literals)</div>
+<div class="anchor" id="name-IF">	const <a href="../../src/go/token/token.go.html#line-113">IF</a> <a href="#name-Token">Token</a> = 74
+		The list of tokens.</div>
+<div class="anchor" id="name-ILLEGAL">	const <a href="../../src/go/token/token.go.html#line-22">ILLEGAL</a> <a href="#name-Token">Token</a> = 0
+		Special tokens</div>
+<div class="anchor" id="name-IMAG">	const <a href="../../src/go/token/token.go.html#line-32">IMAG</a> <a href="#name-Token">Token</a> = 7 // 123.45i
+		The list of tokens.</div>
+<div class="anchor" id="name-IMPORT">	const <a href="../../src/go/token/token.go.html#line-114">IMPORT</a> <a href="#name-Token">Token</a> = 75
+		The list of tokens.</div>
+<div class="anchor" id="name-INC">	const <a href="../../src/go/token/token.go.html#line-68">INC</a> <a href="#name-Token">Token</a> = 37 // ++
+		The list of tokens.</div>
+<div class="anchor" id="name-INT">	const <a href="../../src/go/token/token.go.html#line-30">INT</a> <a href="#name-Token">Token</a> = 5 // 12345
+		The list of tokens.</div>
+<div class="anchor" id="name-INTERFACE">	const <a href="../../src/go/token/token.go.html#line-116">INTERFACE</a> <a href="#name-Token">Token</a> = 76
+		The list of tokens.</div>
+<div class="anchor" id="name-IsExported">	 func <a href="../../src/go/token/token.go.html#line-316">IsExported</a>(name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+		IsExported reports whether name starts with an upper-case letter.</div>
+<div class="anchor" id="name-IsIdentifier">	 func <a href="../../src/go/token/token.go.html#line-333">IsIdentifier</a>(name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+		IsIdentifier reports whether name is a Go identifier, that is, a non-empty
+		string made up of letters, digits, and underscores, where the first character
+		is not a digit. Keywords are not identifiers.</div>
+<div class="anchor" id="name-IsKeyword">	 func <a href="../../src/go/token/token.go.html#line-323">IsKeyword</a>(name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+		IsKeyword reports whether name is a Go keyword, such as "func" or "return".</div>
+<div class="anchor" id="name-LAND">	const <a href="../../src/go/token/token.go.html#line-65">LAND</a> <a href="#name-Token">Token</a> = 34 // &amp;&amp;
+		The list of tokens.</div>
+<div class="anchor" id="name-LBRACE">	const <a href="../../src/go/token/token.go.html#line-85">LBRACE</a> <a href="#name-Token">Token</a> = 51 // {
+		The list of tokens.</div>
+<div class="anchor" id="name-LBRACK">	const <a href="../../src/go/token/token.go.html#line-84">LBRACK</a> <a href="#name-Token">Token</a> = 50 // [
+		The list of tokens.</div>
+<div class="anchor" id="name-LEQ">	const <a href="../../src/go/token/token.go.html#line-78">LEQ</a> <a href="#name-Token">Token</a> = 45 // &lt;=
+		The list of tokens.</div>
+<div class="anchor" id="name-Lookup">	 func <a href="../../src/go/token/token.go.html#line-290">Lookup</a>(ident <a href="../builtin.html#name-string">string</a>) <a href="#name-Token">Token</a>
+		Lookup maps an identifier to its keyword token or IDENT (if not a keyword).</div>
+<div class="anchor" id="name-LOR">	const <a href="../../src/go/token/token.go.html#line-66">LOR</a> <a href="#name-Token">Token</a> = 35 // ||
+		The list of tokens.</div>
+<div class="anchor" id="name-LowestPrec">	const <a href="../../src/go/token/token.go.html#line-254">LowestPrec</a> = 0 // non-operators
+		A set of constants for precedence-based expression parsing.
+		Non-operators have lowest precedence, followed by operators
+		starting with precedence 1 up to unary operators. The highest
+		precedence serves as "catch-all" precedence for selector,
+		indexing, and other operator and delimiter tokens.</div>
+<div class="anchor" id="name-LPAREN">	const <a href="../../src/go/token/token.go.html#line-83">LPAREN</a> <a href="#name-Token">Token</a> = 49 // (
+		The list of tokens.</div>
+<div class="anchor" id="name-LSS">	const <a href="../../src/go/token/token.go.html#line-72">LSS</a> <a href="#name-Token">Token</a> = 40 // &lt;
+		The list of tokens.</div>
+<div class="anchor" id="name-MAP">	const <a href="../../src/go/token/token.go.html#line-117">MAP</a> <a href="#name-Token">Token</a> = 77
+		The list of tokens.</div>
+<div class="anchor" id="name-MUL">	const <a href="../../src/go/token/token.go.html#line-41">MUL</a> <a href="#name-Token">Token</a> = 14 // *
+		The list of tokens.</div>
+<div class="anchor" id="name-MUL_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-54">MUL_ASSIGN</a> <a href="#name-Token">Token</a> = 25 // *=
+		The list of tokens.</div>
+<div class="anchor" id="name-NEQ">	const <a href="../../src/go/token/token.go.html#line-77">NEQ</a> <a href="#name-Token">Token</a> = 44 // !=
+		The list of tokens.</div>
+<div class="anchor" id="name-NewFileSet">	 func <a href="../../src/go/token/position.go.html#line-394">NewFileSet</a>() *<a href="#name-FileSet">FileSet</a>
+		NewFileSet creates a new file set.</div>
+<div class="anchor" id="name-NoPos">	const <a href="../../src/go/token/position.go.html#line-86">NoPos</a> <a href="#name-Pos">Pos</a> = 0
+		The zero value for Pos is NoPos; there is no file and line information
+		associated with it, and NoPos.IsValid() is false. NoPos is always
+		smaller than any other Pos value. The corresponding Position value
+		for NoPos is the zero value for Position.</div>
+<div class="anchor" id="name-NOT">	const <a href="../../src/go/token/token.go.html#line-75">NOT</a> <a href="#name-Token">Token</a> = 43 // !
+		The list of tokens.</div>
+<div class="anchor" id="name-OR">	const <a href="../../src/go/token/token.go.html#line-46">OR</a> <a href="#name-Token">Token</a> = 18 // |
+		The list of tokens.</div>
+<div class="anchor" id="name-OR_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-59">OR_ASSIGN</a> <a href="#name-Token">Token</a> = 29 // |=
+		The list of tokens.</div>
+<div class="anchor" id="name-PACKAGE">	const <a href="../../src/go/token/token.go.html#line-118">PACKAGE</a> <a href="#name-Token">Token</a> = 78
+		The list of tokens.</div>
+<div class="anchor" id="name-PERIOD">	const <a href="../../src/go/token/token.go.html#line-87">PERIOD</a> <a href="#name-Token">Token</a> = 53 // .
+		The list of tokens.</div>
+<div class="anchor" id="name-QUO">	const <a href="../../src/go/token/token.go.html#line-42">QUO</a> <a href="#name-Token">Token</a> = 15 // /
+		The list of tokens.</div>
+<div class="anchor" id="name-QUO_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-55">QUO_ASSIGN</a> <a href="#name-Token">Token</a> = 26 // /=
+		The list of tokens.</div>
+<div class="anchor" id="name-RANGE">	const <a href="../../src/go/token/token.go.html#line-119">RANGE</a> <a href="#name-Token">Token</a> = 79
+		The list of tokens.</div>
+<div class="anchor" id="name-RBRACE">	const <a href="../../src/go/token/token.go.html#line-91">RBRACE</a> <a href="#name-Token">Token</a> = 56 // }
+		The list of tokens.</div>
+<div class="anchor" id="name-RBRACK">	const <a href="../../src/go/token/token.go.html#line-90">RBRACK</a> <a href="#name-Token">Token</a> = 55 // ]
+		The list of tokens.</div>
+<div class="anchor" id="name-REM">	const <a href="../../src/go/token/token.go.html#line-43">REM</a> <a href="#name-Token">Token</a> = 16 // %
+		The list of tokens.</div>
+<div class="anchor" id="name-REM_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-56">REM_ASSIGN</a> <a href="#name-Token">Token</a> = 27 // %=
+		The list of tokens.</div>
+<div class="anchor" id="name-RETURN">	const <a href="../../src/go/token/token.go.html#line-120">RETURN</a> <a href="#name-Token">Token</a> = 80
+		The list of tokens.</div>
+<div class="anchor" id="name-RPAREN">	const <a href="../../src/go/token/token.go.html#line-89">RPAREN</a> <a href="#name-Token">Token</a> = 54 // )
+		The list of tokens.</div>
+<div class="anchor" id="name-SELECT">	const <a href="../../src/go/token/token.go.html#line-122">SELECT</a> <a href="#name-Token">Token</a> = 81
+		The list of tokens.</div>
+<div class="anchor" id="name-SEMICOLON">	const <a href="../../src/go/token/token.go.html#line-92">SEMICOLON</a> <a href="#name-Token">Token</a> = 57 // ;
+		The list of tokens.</div>
+<div class="anchor" id="name-SHL">	const <a href="../../src/go/token/token.go.html#line-48">SHL</a> <a href="#name-Token">Token</a> = 20 // &lt;&lt;
+		The list of tokens.</div>
+<div class="anchor" id="name-SHL_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-61">SHL_ASSIGN</a> <a href="#name-Token">Token</a> = 31 // &lt;&lt;=
+		The list of tokens.</div>
+<div class="anchor" id="name-SHR">	const <a href="../../src/go/token/token.go.html#line-49">SHR</a> <a href="#name-Token">Token</a> = 21 // &gt;&gt;
+		The list of tokens.</div>
+<div class="anchor" id="name-SHR_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-62">SHR_ASSIGN</a> <a href="#name-Token">Token</a> = 32 // &gt;&gt;=
+		The list of tokens.</div>
+<div class="anchor" id="name-STRING">	const <a href="../../src/go/token/token.go.html#line-34">STRING</a> <a href="#name-Token">Token</a> = 9 // "abc"
+		The list of tokens.</div>
+<div class="anchor" id="name-STRUCT">	const <a href="../../src/go/token/token.go.html#line-123">STRUCT</a> <a href="#name-Token">Token</a> = 82
+		The list of tokens.</div>
+<div class="anchor" id="name-SUB">	const <a href="../../src/go/token/token.go.html#line-40">SUB</a> <a href="#name-Token">Token</a> = 13 // -
+		The list of tokens.</div>
+<div class="anchor" id="name-SUB_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-53">SUB_ASSIGN</a> <a href="#name-Token">Token</a> = 24 // -=
+		The list of tokens.</div>
+<div class="anchor" id="name-SWITCH">	const <a href="../../src/go/token/token.go.html#line-124">SWITCH</a> <a href="#name-Token">Token</a> = 83
+		The list of tokens.</div>
+<div class="anchor" id="name-TYPE">	const <a href="../../src/go/token/token.go.html#line-125">TYPE</a> <a href="#name-Token">Token</a> = 84
+		The list of tokens.</div>
+<div class="anchor" id="name-UnaryPrec">	const <a href="../../src/go/token/token.go.html#line-255">UnaryPrec</a> = 6
+		A set of constants for precedence-based expression parsing.
+		Non-operators have lowest precedence, followed by operators
+		starting with precedence 1 up to unary operators. The highest
+		precedence serves as "catch-all" precedence for selector,
+		indexing, and other operator and delimiter tokens.</div>
+<div class="anchor" id="name-VAR">	const <a href="../../src/go/token/token.go.html#line-126">VAR</a> <a href="#name-Token">Token</a> = 85
+		The list of tokens.</div>
+<div class="anchor" id="name-XOR">	const <a href="../../src/go/token/token.go.html#line-47">XOR</a> <a href="#name-Token">Token</a> = 19 // ^
+		The list of tokens.</div>
+<div class="anchor" id="name-XOR_ASSIGN">	const <a href="../../src/go/token/token.go.html#line-60">XOR_ASSIGN</a> <a href="#name-Token">Token</a> = 30 // ^=
+		The list of tokens.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

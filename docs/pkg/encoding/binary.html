@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: encoding/binary</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>binary</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-encoding/binary">encoding/binary</a><i> (on <a href="https://golang.org/pkg/encoding/binary/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/encoding/binary" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/encoding/binary.html">5 packages</a>, and imported by <a href="../../dep/encoding/binary.html#imported-by">19 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/encoding/binary/binary.go.html#doc">d-&gt;</a> <a href="../../src/encoding/binary/binary.go.html">binary.go</a>
+	    <a href="../../src/encoding/binary/varint.go.html">varint.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-ByteOrder" data-popularity="470">	 type <a href="../../src/encoding/binary/binary.go.html#line-34">ByteOrder</a> <b<i>(interface)</i></b>
+		A ByteOrder specifies how to convert byte sequences into
+		16-, 32-, or 64-bit unsigned integers.
+
+		<input type='checkbox' class="stat" id="ByteOrder-stat-methods"><label for="ByteOrder-stat-methods">Exported Methods (7)</label><span id='ByteOrder-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/encoding/binary/binary.go.html#line-38">PutUint16</a>([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-uint16">uint16</a>)
+			 (T) <a href="../../src/encoding/binary/binary.go.html#line-39">PutUint32</a>([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-uint32">uint32</a>)
+			 (T) <a href="../../src/encoding/binary/binary.go.html#line-40">PutUint64</a>([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-uint64">uint64</a>)
+			 (T) <a href="../../src/encoding/binary/binary.go.html#line-41">String</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/encoding/binary/binary.go.html#line-35">Uint16</a>([]<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-uint16">uint16</a>
+			 (T) <a href="../../src/encoding/binary/binary.go.html#line-36">Uint32</a>([]<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-uint32">uint32</a>
+			 (T) <a href="../../src/encoding/binary/binary.go.html#line-37">Uint64</a>([]<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-uint64">uint64</a></span>
+		<input type='checkbox' class="stat" id="ByteOrder-stat-impls"><label for="ByteOrder-stat-impls">Implements (1+)</label><span id='ByteOrder-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="ByteOrder-stat-params"><label for="ByteOrder-stat-params">As Inputs Of (2+)</label><span id='ByteOrder-stat-params-content' class="stat-content">
+			func <a href="#name-Read">Read</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, order <b>ByteOrder</b>, data interface{}) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-Write">Write</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, order <b>ByteOrder</b>, data interface{}) <a href="../builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BigEndian">	  var <a href="../../src/encoding/binary/binary.go.html#line-48">BigEndian</a> <a href="../../src/encoding/binary/binary.go.html#line-98">bigEndian</a>
+		BigEndian is the big-endian implementation of ByteOrder.</div>
+<div class="anchor" id="name-LittleEndian">	  var <a href="../../src/encoding/binary/binary.go.html#line-45">LittleEndian</a> <a href="../../src/encoding/binary/binary.go.html#line-50">littleEndian</a>
+		LittleEndian is the little-endian implementation of ByteOrder.</div>
+<div class="anchor" id="name-MaxVarintLen16">	const <a href="../../src/encoding/binary/varint.go.html#line-34">MaxVarintLen16</a> = 3
+		MaxVarintLenN is the maximum length of a varint-encoded N-bit integer.</div>
+<div class="anchor" id="name-MaxVarintLen32">	const <a href="../../src/encoding/binary/varint.go.html#line-35">MaxVarintLen32</a> = 5
+		MaxVarintLenN is the maximum length of a varint-encoded N-bit integer.</div>
+<div class="anchor" id="name-MaxVarintLen64">	const <a href="../../src/encoding/binary/varint.go.html#line-36">MaxVarintLen64</a> = 10
+		MaxVarintLenN is the maximum length of a varint-encoded N-bit integer.</div>
+<div class="anchor" id="name-PutUvarint">	 func <a href="../../src/encoding/binary/varint.go.html#line-41">PutUvarint</a>(buf []<a href="../builtin.html#name-byte">byte</a>, x <a href="../builtin.html#name-uint64">uint64</a>) <a href="../builtin.html#name-int">int</a>
+		PutUvarint encodes a uint64 into buf and returns the number of bytes written.
+		If the buffer is too small, PutUvarint will panic.</div>
+<div class="anchor" id="name-PutVarint">	 func <a href="../../src/encoding/binary/varint.go.html#line-78">PutVarint</a>(buf []<a href="../builtin.html#name-byte">byte</a>, x <a href="../builtin.html#name-int64">int64</a>) <a href="../builtin.html#name-int">int</a>
+		PutVarint encodes an int64 into buf and returns the number of bytes written.
+		If the buffer is too small, PutVarint will panic.</div>
+<div class="anchor" id="name-Read">	 func <a href="../../src/encoding/binary/binary.go.html#line-162">Read</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, order <a href="#name-ByteOrder">ByteOrder</a>, data interface{}) <a href="../builtin.html#name-error">error</a>
+		Read reads structured binary data from r into data.
+		Data must be a pointer to a fixed-size value or a slice
+		of fixed-size values.
+		Bytes read from r are decoded using the specified byte order
+		and written to successive fields of the data.
+		When decoding boolean values, a zero byte is decoded as false, and
+		any other non-zero byte is decoded as true.
+		When reading into structs, the field data for fields with
+		blank (_) field names is skipped; i.e., blank field names
+		may be used for padding.
+		When reading into a struct, all non-blank fields must be exported
+		or Read may panic.
+
+		The error is EOF only if no bytes were read.
+		If an EOF happens after reading some but not all the bytes,
+		Read returns ErrUnexpectedEOF.</div>
+<div class="anchor" id="name-ReadUvarint">	 func <a href="../../src/encoding/binary/varint.go.html#line-106">ReadUvarint</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-ByteReader">ByteReader</a>) (<a href="../builtin.html#name-uint64">uint64</a>, <a href="../builtin.html#name-error">error</a>)
+		ReadUvarint reads an encoded unsigned integer from r and returns it as a uint64.</div>
+<div class="anchor" id="name-ReadVarint">	 func <a href="../../src/encoding/binary/varint.go.html#line-127">ReadVarint</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-ByteReader">ByteReader</a>) (<a href="../builtin.html#name-int64">int64</a>, <a href="../builtin.html#name-error">error</a>)
+		ReadVarint reads an encoded signed integer from r and returns it as an int64.</div>
+<div class="anchor" id="name-Size">	 func <a href="../../src/encoding/binary/binary.go.html#line-395">Size</a>(v interface{}) <a href="../builtin.html#name-int">int</a>
+		Size returns how many bytes Write would generate to encode the value v, which
+		must be a fixed-size value or a slice of fixed-size values, or a pointer to such data.
+		If v is neither of these, Size returns -1.</div>
+<div class="anchor" id="name-Uvarint">	 func <a href="../../src/encoding/binary/varint.go.html#line-60">Uvarint</a>(buf []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-uint64">uint64</a>, <a href="../builtin.html#name-int">int</a>)
+		Uvarint decodes a uint64 from buf and returns that value and the
+		number of bytes read (&gt; 0). If an error occurred, the value is 0
+		and the number of bytes n is &lt;= 0 meaning:
+
+			n == 0: buf too small
+			n  &lt; 0: value larger than 64 bits (overflow)
+			        and -n is the number of bytes read</div>
+<div class="anchor" id="name-Varint">	 func <a href="../../src/encoding/binary/varint.go.html#line-94">Varint</a>(buf []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int64">int64</a>, <a href="../builtin.html#name-int">int</a>)
+		Varint decodes an int64 from buf and returns that value and the
+		number of bytes read (&gt; 0). If an error occurred, the value is 0
+		and the number of bytes n is &lt;= 0 with the following meaning:
+
+			n == 0: buf too small
+			n  &lt; 0: value larger than 64 bits (overflow)
+			        and -n is the number of bytes read</div>
+<div class="anchor" id="name-Write">	 func <a href="../../src/encoding/binary/binary.go.html#line-271">Write</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, order <a href="#name-ByteOrder">ByteOrder</a>, data interface{}) <a href="../builtin.html#name-error">error</a>
+		Write writes the binary representation of data into w.
+		Data must be a fixed-size value or a slice of fixed-size
+		values, or a pointer to such data.
+		Boolean values encode as one byte: 1 for true, and 0 for false.
+		Bytes written to w are encoded using the specified byte order
+		and read from successive fields of the data.
+		When writing structs, zero values are written for fields
+		with blank (_) field names.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

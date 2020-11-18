@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: exec_darwin.go in package syscall</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	exec_darwin.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/syscall.html">syscall</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package syscall</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"unsafe"</code></span>
+<span class="codeline" id="line-9"><code>)</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>type SysProcAttr struct {</code></span>
+<span class="codeline" id="line-12"><code>	Chroot     string      // Chroot.</code></span>
+<span class="codeline" id="line-13"><code>	Credential *Credential // Credential.</code></span>
+<span class="codeline" id="line-14"><code>	Ptrace     bool        // Enable tracing.</code></span>
+<span class="codeline" id="line-15"><code>	Setsid     bool        // Create session.</code></span>
+<span class="codeline" id="line-16"><code>	// Setpgid sets the process group ID of the child to Pgid,</code></span>
+<span class="codeline" id="line-17"><code>	// or, if Pgid == 0, to the new child's process ID.</code></span>
+<span class="codeline" id="line-18"><code>	Setpgid bool</code></span>
+<span class="codeline" id="line-19"><code>	// Setctty sets the controlling terminal of the child to</code></span>
+<span class="codeline" id="line-20"><code>	// file descriptor Ctty. Ctty must be a descriptor number</code></span>
+<span class="codeline" id="line-21"><code>	// in the child process: an index into ProcAttr.Files.</code></span>
+<span class="codeline" id="line-22"><code>	// This is only meaningful if Setsid is true.</code></span>
+<span class="codeline" id="line-23"><code>	Setctty bool</code></span>
+<span class="codeline" id="line-24"><code>	Noctty  bool // Detach fd 0 from controlling terminal</code></span>
+<span class="codeline" id="line-25"><code>	Ctty    int  // Controlling TTY fd</code></span>
+<span class="codeline" id="line-26"><code>	// Foreground places the child process group in the foreground.</code></span>
+<span class="codeline" id="line-27"><code>	// This implies Setpgid. The Ctty field must be set to</code></span>
+<span class="codeline" id="line-28"><code>	// the descriptor of the controlling TTY.</code></span>
+<span class="codeline" id="line-29"><code>	// Unlike Setctty, in this case Ctty must be a descriptor</code></span>
+<span class="codeline" id="line-30"><code>	// number in the parent process.</code></span>
+<span class="codeline" id="line-31"><code>	Foreground bool</code></span>
+<span class="codeline" id="line-32"><code>	Pgid       int // Child's process group ID if Setpgid.</code></span>
+<span class="codeline" id="line-33"><code>}</code></span>
+<span class="codeline" id="line-34"><code></code></span>
+<span class="codeline" id="line-35"><code>// Implemented in runtime package.</code></span>
+<span class="codeline" id="line-36"><code>func runtime_BeforeFork()</code></span>
+<span class="codeline" id="line-37"><code>func runtime_AfterFork()</code></span>
+<span class="codeline" id="line-38"><code>func runtime_AfterForkInChild()</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>// Fork, dup fd onto 0..len(fd), and exec(argv0, argvv, envv) in child.</code></span>
+<span class="codeline" id="line-41"><code>// If a dup or exec fails, write the errno error to pipe.</code></span>
+<span class="codeline" id="line-42"><code>// (Pipe is close-on-exec so if exec succeeds, it will be closed.)</code></span>
+<span class="codeline" id="line-43"><code>// In the child, this function must not acquire any locks, because</code></span>
+<span class="codeline" id="line-44"><code>// they might have been locked at the time of the fork. This means</code></span>
+<span class="codeline" id="line-45"><code>// no rescheduling, no malloc calls, and no new stack segments.</code></span>
+<span class="codeline" id="line-46"><code>// For the same reason compiler does not race instrument it.</code></span>
+<span class="codeline" id="line-47"><code>// The calls to rawSyscall are okay because they are assembly</code></span>
+<span class="codeline" id="line-48"><code>// functions that do not grow the stack.</code></span>
+<span class="codeline" id="line-49"><code>//go:norace</code></span>
+<span class="codeline" id="line-50"><code>func forkAndExecInChild(argv0 *byte, argv, envv []*byte, chroot, dir *byte, attr *ProcAttr, sys *SysProcAttr, pipe int) (pid int, err Errno) {</code></span>
+<span class="codeline" id="line-51"><code>	// Declare all variables at top in case any</code></span>
+<span class="codeline" id="line-52"><code>	// declarations require heap allocation (e.g., err1).</code></span>
+<span class="codeline" id="line-53"><code>	var (</code></span>
+<span class="codeline" id="line-54"><code>		r1     uintptr</code></span>
+<span class="codeline" id="line-55"><code>		err1   Errno</code></span>
+<span class="codeline" id="line-56"><code>		nextfd int</code></span>
+<span class="codeline" id="line-57"><code>		i      int</code></span>
+<span class="codeline" id="line-58"><code>	)</code></span>
+<span class="codeline" id="line-59"><code></code></span>
+<span class="codeline" id="line-60"><code>	// guard against side effects of shuffling fds below.</code></span>
+<span class="codeline" id="line-61"><code>	// Make sure that nextfd is beyond any currently open files so</code></span>
+<span class="codeline" id="line-62"><code>	// that we can't run the risk of overwriting any of them.</code></span>
+<span class="codeline" id="line-63"><code>	fd := make([]int, len(attr.Files))</code></span>
+<span class="codeline" id="line-64"><code>	nextfd = len(attr.Files)</code></span>
+<span class="codeline" id="line-65"><code>	for i, ufd := range attr.Files {</code></span>
+<span class="codeline" id="line-66"><code>		if nextfd &lt; int(ufd) {</code></span>
+<span class="codeline" id="line-67"><code>			nextfd = int(ufd)</code></span>
+<span class="codeline" id="line-68"><code>		}</code></span>
+<span class="codeline" id="line-69"><code>		fd[i] = int(ufd)</code></span>
+<span class="codeline" id="line-70"><code>	}</code></span>
+<span class="codeline" id="line-71"><code>	nextfd++</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>	// About to call fork.</code></span>
+<span class="codeline" id="line-74"><code>	// No more allocation or calls of non-assembly functions.</code></span>
+<span class="codeline" id="line-75"><code>	runtime_BeforeFork()</code></span>
+<span class="codeline" id="line-76"><code>	r1, _, err1 = rawSyscall(funcPC(libc_fork_trampoline), 0, 0, 0)</code></span>
+<span class="codeline" id="line-77"><code>	if err1 != 0 {</code></span>
+<span class="codeline" id="line-78"><code>		runtime_AfterFork()</code></span>
+<span class="codeline" id="line-79"><code>		return 0, err1</code></span>
+<span class="codeline" id="line-80"><code>	}</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>	if r1 != 0 {</code></span>
+<span class="codeline" id="line-83"><code>		// parent; return PID</code></span>
+<span class="codeline" id="line-84"><code>		runtime_AfterFork()</code></span>
+<span class="codeline" id="line-85"><code>		return int(r1), 0</code></span>
+<span class="codeline" id="line-86"><code>	}</code></span>
+<span class="codeline" id="line-87"><code></code></span>
+<span class="codeline" id="line-88"><code>	// Fork succeeded, now in child.</code></span>
+<span class="codeline" id="line-89"><code></code></span>
+<span class="codeline" id="line-90"><code>	runtime_AfterForkInChild()</code></span>
+<span class="codeline" id="line-91"><code></code></span>
+<span class="codeline" id="line-92"><code>	// Enable tracing if requested.</code></span>
+<span class="codeline" id="line-93"><code>	if sys.Ptrace {</code></span>
+<span class="codeline" id="line-94"><code>		if err := ptrace(PTRACE_TRACEME, 0, 0, 0); err != nil {</code></span>
+<span class="codeline" id="line-95"><code>			err1 = err.(Errno)</code></span>
+<span class="codeline" id="line-96"><code>			goto childerror</code></span>
+<span class="codeline" id="line-97"><code>		}</code></span>
+<span class="codeline" id="line-98"><code>	}</code></span>
+<span class="codeline" id="line-99"><code></code></span>
+<span class="codeline" id="line-100"><code>	// Session ID</code></span>
+<span class="codeline" id="line-101"><code>	if sys.Setsid {</code></span>
+<span class="codeline" id="line-102"><code>		_, _, err1 = rawSyscall(funcPC(libc_setsid_trampoline), 0, 0, 0)</code></span>
+<span class="codeline" id="line-103"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-104"><code>			goto childerror</code></span>
+<span class="codeline" id="line-105"><code>		}</code></span>
+<span class="codeline" id="line-106"><code>	}</code></span>
+<span class="codeline" id="line-107"><code></code></span>
+<span class="codeline" id="line-108"><code>	// Set process group</code></span>
+<span class="codeline" id="line-109"><code>	if sys.Setpgid || sys.Foreground {</code></span>
+<span class="codeline" id="line-110"><code>		// Place child in process group.</code></span>
+<span class="codeline" id="line-111"><code>		_, _, err1 = rawSyscall(funcPC(libc_setpgid_trampoline), 0, uintptr(sys.Pgid), 0)</code></span>
+<span class="codeline" id="line-112"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-113"><code>			goto childerror</code></span>
+<span class="codeline" id="line-114"><code>		}</code></span>
+<span class="codeline" id="line-115"><code>	}</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>	if sys.Foreground {</code></span>
+<span class="codeline" id="line-118"><code>		pgrp := sys.Pgid</code></span>
+<span class="codeline" id="line-119"><code>		if pgrp == 0 {</code></span>
+<span class="codeline" id="line-120"><code>			r1, _, err1 = rawSyscall(funcPC(libc_getpid_trampoline), 0, 0, 0)</code></span>
+<span class="codeline" id="line-121"><code>			if err1 != 0 {</code></span>
+<span class="codeline" id="line-122"><code>				goto childerror</code></span>
+<span class="codeline" id="line-123"><code>			}</code></span>
+<span class="codeline" id="line-124"><code></code></span>
+<span class="codeline" id="line-125"><code>			pgrp = int(r1)</code></span>
+<span class="codeline" id="line-126"><code>		}</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>		// Place process group in foreground.</code></span>
+<span class="codeline" id="line-129"><code>		_, _, err1 = rawSyscall(funcPC(libc_ioctl_trampoline), uintptr(sys.Ctty), uintptr(TIOCSPGRP), uintptr(unsafe.Pointer(&amp;pgrp)))</code></span>
+<span class="codeline" id="line-130"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-131"><code>			goto childerror</code></span>
+<span class="codeline" id="line-132"><code>		}</code></span>
+<span class="codeline" id="line-133"><code>	}</code></span>
+<span class="codeline" id="line-134"><code></code></span>
+<span class="codeline" id="line-135"><code>	// Chroot</code></span>
+<span class="codeline" id="line-136"><code>	if chroot != nil {</code></span>
+<span class="codeline" id="line-137"><code>		_, _, err1 = rawSyscall(funcPC(libc_chroot_trampoline), uintptr(unsafe.Pointer(chroot)), 0, 0)</code></span>
+<span class="codeline" id="line-138"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-139"><code>			goto childerror</code></span>
+<span class="codeline" id="line-140"><code>		}</code></span>
+<span class="codeline" id="line-141"><code>	}</code></span>
+<span class="codeline" id="line-142"><code></code></span>
+<span class="codeline" id="line-143"><code>	// User and groups</code></span>
+<span class="codeline" id="line-144"><code>	if cred := sys.Credential; cred != nil {</code></span>
+<span class="codeline" id="line-145"><code>		ngroups := uintptr(len(cred.Groups))</code></span>
+<span class="codeline" id="line-146"><code>		groups := uintptr(0)</code></span>
+<span class="codeline" id="line-147"><code>		if ngroups &gt; 0 {</code></span>
+<span class="codeline" id="line-148"><code>			groups = uintptr(unsafe.Pointer(&amp;cred.Groups[0]))</code></span>
+<span class="codeline" id="line-149"><code>		}</code></span>
+<span class="codeline" id="line-150"><code>		if !cred.NoSetGroups {</code></span>
+<span class="codeline" id="line-151"><code>			_, _, err1 = rawSyscall(funcPC(libc_setgroups_trampoline), ngroups, groups, 0)</code></span>
+<span class="codeline" id="line-152"><code>			if err1 != 0 {</code></span>
+<span class="codeline" id="line-153"><code>				goto childerror</code></span>
+<span class="codeline" id="line-154"><code>			}</code></span>
+<span class="codeline" id="line-155"><code>		}</code></span>
+<span class="codeline" id="line-156"><code>		_, _, err1 = rawSyscall(funcPC(libc_setgid_trampoline), uintptr(cred.Gid), 0, 0)</code></span>
+<span class="codeline" id="line-157"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-158"><code>			goto childerror</code></span>
+<span class="codeline" id="line-159"><code>		}</code></span>
+<span class="codeline" id="line-160"><code>		_, _, err1 = rawSyscall(funcPC(libc_setuid_trampoline), uintptr(cred.Uid), 0, 0)</code></span>
+<span class="codeline" id="line-161"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-162"><code>			goto childerror</code></span>
+<span class="codeline" id="line-163"><code>		}</code></span>
+<span class="codeline" id="line-164"><code>	}</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>	// Chdir</code></span>
+<span class="codeline" id="line-167"><code>	if dir != nil {</code></span>
+<span class="codeline" id="line-168"><code>		_, _, err1 = rawSyscall(funcPC(libc_chdir_trampoline), uintptr(unsafe.Pointer(dir)), 0, 0)</code></span>
+<span class="codeline" id="line-169"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-170"><code>			goto childerror</code></span>
+<span class="codeline" id="line-171"><code>		}</code></span>
+<span class="codeline" id="line-172"><code>	}</code></span>
+<span class="codeline" id="line-173"><code></code></span>
+<span class="codeline" id="line-174"><code>	// Pass 1: look for fd[i] &lt; i and move those up above len(fd)</code></span>
+<span class="codeline" id="line-175"><code>	// so that pass 2 won't stomp on an fd it needs later.</code></span>
+<span class="codeline" id="line-176"><code>	if pipe &lt; nextfd {</code></span>
+<span class="codeline" id="line-177"><code>		_, _, err1 = rawSyscall(funcPC(libc_dup2_trampoline), uintptr(pipe), uintptr(nextfd), 0)</code></span>
+<span class="codeline" id="line-178"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-179"><code>			goto childerror</code></span>
+<span class="codeline" id="line-180"><code>		}</code></span>
+<span class="codeline" id="line-181"><code>		rawSyscall(funcPC(libc_fcntl_trampoline), uintptr(nextfd), F_SETFD, FD_CLOEXEC)</code></span>
+<span class="codeline" id="line-182"><code>		pipe = nextfd</code></span>
+<span class="codeline" id="line-183"><code>		nextfd++</code></span>
+<span class="codeline" id="line-184"><code>	}</code></span>
+<span class="codeline" id="line-185"><code>	for i = 0; i &lt; len(fd); i++ {</code></span>
+<span class="codeline" id="line-186"><code>		if fd[i] &gt;= 0 &amp;&amp; fd[i] &lt; int(i) {</code></span>
+<span class="codeline" id="line-187"><code>			if nextfd == pipe { // don't stomp on pipe</code></span>
+<span class="codeline" id="line-188"><code>				nextfd++</code></span>
+<span class="codeline" id="line-189"><code>			}</code></span>
+<span class="codeline" id="line-190"><code>			_, _, err1 = rawSyscall(funcPC(libc_dup2_trampoline), uintptr(fd[i]), uintptr(nextfd), 0)</code></span>
+<span class="codeline" id="line-191"><code>			if err1 != 0 {</code></span>
+<span class="codeline" id="line-192"><code>				goto childerror</code></span>
+<span class="codeline" id="line-193"><code>			}</code></span>
+<span class="codeline" id="line-194"><code>			rawSyscall(funcPC(libc_fcntl_trampoline), uintptr(nextfd), F_SETFD, FD_CLOEXEC)</code></span>
+<span class="codeline" id="line-195"><code>			fd[i] = nextfd</code></span>
+<span class="codeline" id="line-196"><code>			nextfd++</code></span>
+<span class="codeline" id="line-197"><code>		}</code></span>
+<span class="codeline" id="line-198"><code>	}</code></span>
+<span class="codeline" id="line-199"><code></code></span>
+<span class="codeline" id="line-200"><code>	// Pass 2: dup fd[i] down onto i.</code></span>
+<span class="codeline" id="line-201"><code>	for i = 0; i &lt; len(fd); i++ {</code></span>
+<span class="codeline" id="line-202"><code>		if fd[i] == -1 {</code></span>
+<span class="codeline" id="line-203"><code>			rawSyscall(funcPC(libc_close_trampoline), uintptr(i), 0, 0)</code></span>
+<span class="codeline" id="line-204"><code>			continue</code></span>
+<span class="codeline" id="line-205"><code>		}</code></span>
+<span class="codeline" id="line-206"><code>		if fd[i] == int(i) {</code></span>
+<span class="codeline" id="line-207"><code>			// dup2(i, i) won't clear close-on-exec flag on Linux,</code></span>
+<span class="codeline" id="line-208"><code>			// probably not elsewhere either.</code></span>
+<span class="codeline" id="line-209"><code>			_, _, err1 = rawSyscall(funcPC(libc_fcntl_trampoline), uintptr(fd[i]), F_SETFD, 0)</code></span>
+<span class="codeline" id="line-210"><code>			if err1 != 0 {</code></span>
+<span class="codeline" id="line-211"><code>				goto childerror</code></span>
+<span class="codeline" id="line-212"><code>			}</code></span>
+<span class="codeline" id="line-213"><code>			continue</code></span>
+<span class="codeline" id="line-214"><code>		}</code></span>
+<span class="codeline" id="line-215"><code>		// The new fd is created NOT close-on-exec,</code></span>
+<span class="codeline" id="line-216"><code>		// which is exactly what we want.</code></span>
+<span class="codeline" id="line-217"><code>		_, _, err1 = rawSyscall(funcPC(libc_dup2_trampoline), uintptr(fd[i]), uintptr(i), 0)</code></span>
+<span class="codeline" id="line-218"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-219"><code>			goto childerror</code></span>
+<span class="codeline" id="line-220"><code>		}</code></span>
+<span class="codeline" id="line-221"><code>	}</code></span>
+<span class="codeline" id="line-222"><code></code></span>
+<span class="codeline" id="line-223"><code>	// By convention, we don't close-on-exec the fds we are</code></span>
+<span class="codeline" id="line-224"><code>	// started with, so if len(fd) &lt; 3, close 0, 1, 2 as needed.</code></span>
+<span class="codeline" id="line-225"><code>	// Programs that know they inherit fds &gt;= 3 will need</code></span>
+<span class="codeline" id="line-226"><code>	// to set them close-on-exec.</code></span>
+<span class="codeline" id="line-227"><code>	for i = len(fd); i &lt; 3; i++ {</code></span>
+<span class="codeline" id="line-228"><code>		rawSyscall(funcPC(libc_close_trampoline), uintptr(i), 0, 0)</code></span>
+<span class="codeline" id="line-229"><code>	}</code></span>
+<span class="codeline" id="line-230"><code></code></span>
+<span class="codeline" id="line-231"><code>	// Detach fd 0 from tty</code></span>
+<span class="codeline" id="line-232"><code>	if sys.Noctty {</code></span>
+<span class="codeline" id="line-233"><code>		_, _, err1 = rawSyscall(funcPC(libc_ioctl_trampoline), 0, uintptr(TIOCNOTTY), 0)</code></span>
+<span class="codeline" id="line-234"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-235"><code>			goto childerror</code></span>
+<span class="codeline" id="line-236"><code>		}</code></span>
+<span class="codeline" id="line-237"><code>	}</code></span>
+<span class="codeline" id="line-238"><code></code></span>
+<span class="codeline" id="line-239"><code>	// Set the controlling TTY to Ctty</code></span>
+<span class="codeline" id="line-240"><code>	if sys.Setctty {</code></span>
+<span class="codeline" id="line-241"><code>		_, _, err1 = rawSyscall(funcPC(libc_ioctl_trampoline), uintptr(sys.Ctty), uintptr(TIOCSCTTY), 0)</code></span>
+<span class="codeline" id="line-242"><code>		if err1 != 0 {</code></span>
+<span class="codeline" id="line-243"><code>			goto childerror</code></span>
+<span class="codeline" id="line-244"><code>		}</code></span>
+<span class="codeline" id="line-245"><code>	}</code></span>
+<span class="codeline" id="line-246"><code></code></span>
+<span class="codeline" id="line-247"><code>	// Time to exec.</code></span>
+<span class="codeline" id="line-248"><code>	_, _, err1 = rawSyscall(funcPC(libc_execve_trampoline),</code></span>
+<span class="codeline" id="line-249"><code>		uintptr(unsafe.Pointer(argv0)),</code></span>
+<span class="codeline" id="line-250"><code>		uintptr(unsafe.Pointer(&amp;argv[0])),</code></span>
+<span class="codeline" id="line-251"><code>		uintptr(unsafe.Pointer(&amp;envv[0])))</code></span>
+<span class="codeline" id="line-252"><code></code></span>
+<span class="codeline" id="line-253"><code>childerror:</code></span>
+<span class="codeline" id="line-254"><code>	// send error code on pipe</code></span>
+<span class="codeline" id="line-255"><code>	rawSyscall(funcPC(libc_write_trampoline), uintptr(pipe), uintptr(unsafe.Pointer(&amp;err1)), unsafe.Sizeof(err1))</code></span>
+<span class="codeline" id="line-256"><code>	for {</code></span>
+<span class="codeline" id="line-257"><code>		rawSyscall(funcPC(libc_exit_trampoline), 253, 0, 0)</code></span>
+<span class="codeline" id="line-258"><code>	}</code></span>
+<span class="codeline" id="line-259"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: regexp</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>regexp</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-regexp">regexp</a><i> (on <a href="https://golang.org/pkg/regexp/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/regexp" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/regexp.html">9 packages</a>, and imported by <a href="../dep/regexp.html#imported-by">8 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/regexp/backtrack.go.html">backtrack.go</a>
+	    <a href="../src/regexp/exec.go.html">exec.go</a>
+	    <a href="../src/regexp/onepass.go.html">onepass.go</a>
+	<a href="../src/regexp/regexp.go.html#doc">d-&gt;</a> <a href="../src/regexp/regexp.go.html">regexp.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Regexp" data-popularity="2310">	 type <a href="../src/regexp/regexp.go.html#line-82">Regexp</a> <i>(struct)</i>
+		Regexp is the representation of a compiled regular expression.
+		A Regexp is safe for concurrent use by multiple goroutines,
+		except for configuration methods, such as Longest.
+
+		<input type='checkbox' class="stat" id="Regexp-stat-methods"><label for="Regexp-stat-methods">Exported Methods (37)</label><span id='Regexp-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/regexp/regexp.go.html#line-117">Copy</a>() *<b>Regexp</b>
+			(*T) <a href="../src/regexp/regexp.go.html#line-912">Expand</a>(dst []<a href="builtin.html#name-byte">byte</a>, template []<a href="builtin.html#name-byte">byte</a>, src []<a href="builtin.html#name-byte">byte</a>, match []<a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-919">ExpandString</a>(dst []<a href="builtin.html#name-byte">byte</a>, template <a href="builtin.html#name-string">string</a>, src <a href="builtin.html#name-string">string</a>, match []<a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-815">Find</a>(b []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1076">FindAll</a>(b []<a href="builtin.html#name-byte">byte</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1094">FindAllIndex</a>(b []<a href="builtin.html#name-byte">byte</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1112">FindAllString</a>(s <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1130">FindAllStringIndex</a>(s <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1190">FindAllStringSubmatch</a>(s <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1215">FindAllStringSubmatchIndex</a>(s <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1148">FindAllSubmatch</a>(b []<a href="builtin.html#name-byte">byte</a>, n <a href="builtin.html#name-int">int</a>) [][][]<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1172">FindAllSubmatchIndex</a>(b []<a href="builtin.html#name-byte">byte</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-828">FindIndex</a>(b []<a href="builtin.html#name-byte">byte</a>) (loc []<a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/regexp/regexp.go.html#line-867">FindReaderIndex</a>(r <a href="io.html">io</a>.<a href="io.html#name-RuneReader">RuneReader</a>) (loc []<a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/regexp/regexp.go.html#line-1066">FindReaderSubmatchIndex</a>(r <a href="io.html">io</a>.<a href="io.html#name-RuneReader">RuneReader</a>) []<a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-841">FindString</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-854">FindStringIndex</a>(s <a href="builtin.html#name-string">string</a>) (loc []<a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/regexp/regexp.go.html#line-1037">FindStringSubmatch</a>(s <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1057">FindStringSubmatchIndex</a>(s <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-880">FindSubmatch</a>(b []<a href="builtin.html#name-byte">byte</a>) [][]<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1028">FindSubmatchIndex</a>(b []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-512">LiteralPrefix</a>() (prefix <a href="builtin.html#name-string">string</a>, complete <a href="builtin.html#name-bool">bool</a>)
+			(*T) <a href="../src/regexp/regexp.go.html#line-165">Longest</a>()
+			(*T) <a href="../src/regexp/regexp.go.html#line-530">Match</a>(b []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-518">MatchReader</a>(r <a href="io.html">io</a>.<a href="io.html#name-RuneReader">RuneReader</a>) <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-524">MatchString</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-335">NumSubexp</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-669">ReplaceAll</a>(src, repl []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-697">ReplaceAllFunc</a>(src []<a href="builtin.html#name-byte">byte</a>, repl func([]<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-687">ReplaceAllLiteral</a>(src, repl []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-584">ReplaceAllLiteralString</a>(src, repl <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-570">ReplaceAllString</a>(src, repl <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-594">ReplaceAllStringFunc</a>(src <a href="builtin.html#name-string">string</a>, repl func(<a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-1244">Split</a>(s <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-105">String</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-355">SubexpIndex</a>(name <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/regexp/regexp.go.html#line-344">SubexpNames</a>() []<a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Regexp-stat-impls"><label for="Regexp-stat-impls">Implements (1+)</label><span id='Regexp-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Regexp-stat-results"><label for="Regexp-stat-results">As Outputs Of (5+)</label><span id='Regexp-stat-results-content' class="stat-content">
+			func <a href="#name-Compile">Compile</a>(expr <a href="builtin.html#name-string">string</a>) (*<b>Regexp</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-CompilePOSIX">CompilePOSIX</a>(expr <a href="builtin.html#name-string">string</a>) (*<b>Regexp</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-MustCompile">MustCompile</a>(str <a href="builtin.html#name-string">string</a>) *<b>Regexp</b>
+			func <a href="#name-MustCompilePOSIX">MustCompilePOSIX</a>(str <a href="builtin.html#name-string">string</a>) *<b>Regexp</b>
+			func (*<a href="#name-Regexp">Regexp</a>).<a href="../src/regexp/regexp.go.html#line-117">Copy</a>() *<b>Regexp</b></span>
+		<input type='checkbox' class="stat" id="Regexp-stat-params"><label for="Regexp-stat-params">As Inputs Of (1+)</label><span id='Regexp-stat-params-content' class="stat-content">
+			func gorm.io/gorm/logger.<a href="gorm.io/gorm/logger.html#name-ExplainSQL">ExplainSQL</a>(sql <a href="builtin.html#name-string">string</a>, numericPlaceholder *<b>Regexp</b>, escaper <a href="builtin.html#name-string">string</a>, avars ...interface{}) <a href="builtin.html#name-string">string</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Compile">	 func <a href="../src/regexp/regexp.go.html#line-132">Compile</a>(expr <a href="builtin.html#name-string">string</a>) (*<a href="#name-Regexp">Regexp</a>, <a href="builtin.html#name-error">error</a>)
+		Compile parses a regular expression and returns, if successful,
+		a Regexp object that can be used to match against text.
+
+		When matching against text, the regexp returns a match that
+		begins as early as possible in the input (leftmost), and among those
+		it chooses the one that a backtracking search would have found first.
+		This so-called leftmost-first matching is the same semantics
+		that Perl, Python, and other implementations use, although this
+		package implements it without the expense of backtracking.
+		For POSIX leftmost-longest matching, see CompilePOSIX.</div>
+<div class="anchor" id="name-CompilePOSIX">	 func <a href="../src/regexp/regexp.go.html#line-155">CompilePOSIX</a>(expr <a href="builtin.html#name-string">string</a>) (*<a href="#name-Regexp">Regexp</a>, <a href="builtin.html#name-error">error</a>)
+		CompilePOSIX is like Compile but restricts the regular expression
+		to POSIX ERE (egrep) syntax and changes the match semantics to
+		leftmost-longest.
+
+		That is, when matching against text, the regexp returns a match that
+		begins as early as possible in the input (leftmost), and among those
+		it chooses a match that is as long as possible.
+		This so-called leftmost-longest matching is the same semantics
+		that early regular expression implementations used and that POSIX
+		specifies.
+
+		However, there can be multiple leftmost-longest matches, with different
+		submatch choices, and here this package diverges from POSIX.
+		Among the possible leftmost-longest matches, this package chooses
+		the one that a backtracking search would have found first, while POSIX
+		specifies that the match be chosen to maximize the length of the first
+		subexpression, then the second, and so on from left to right.
+		The POSIX rule is computationally prohibitive and not even well-defined.
+		See https://swtch.com/~rsc/regexp/regexp2.html#posix for details.</div>
+<div class="anchor" id="name-Match">	 func <a href="../src/regexp/regexp.go.html#line-559">Match</a>(pattern <a href="builtin.html#name-string">string</a>, b []<a href="builtin.html#name-byte">byte</a>) (matched <a href="builtin.html#name-bool">bool</a>, err <a href="builtin.html#name-error">error</a>)
+		Match reports whether the byte slice b
+		contains any match of the regular expression pattern.
+		More complicated queries need to use Compile and the full Regexp interface.</div>
+<div class="anchor" id="name-MatchReader">	 func <a href="../src/regexp/regexp.go.html#line-537">MatchReader</a>(pattern <a href="builtin.html#name-string">string</a>, r <a href="io.html">io</a>.<a href="io.html#name-RuneReader">RuneReader</a>) (matched <a href="builtin.html#name-bool">bool</a>, err <a href="builtin.html#name-error">error</a>)
+		MatchReader reports whether the text returned by the RuneReader
+		contains any match of the regular expression pattern.
+		More complicated queries need to use Compile and the full Regexp interface.</div>
+<div class="anchor" id="name-MatchString">	 func <a href="../src/regexp/regexp.go.html#line-548">MatchString</a>(pattern <a href="builtin.html#name-string">string</a>, s <a href="builtin.html#name-string">string</a>) (matched <a href="builtin.html#name-bool">bool</a>, err <a href="builtin.html#name-error">error</a>)
+		MatchString reports whether the string s
+		contains any match of the regular expression pattern.
+		More complicated queries need to use Compile and the full Regexp interface.</div>
+<div class="anchor" id="name-MustCompile">	 func <a href="../src/regexp/regexp.go.html#line-308">MustCompile</a>(str <a href="builtin.html#name-string">string</a>) *<a href="#name-Regexp">Regexp</a>
+		MustCompile is like Compile but panics if the expression cannot be parsed.
+		It simplifies safe initialization of global variables holding compiled regular
+		expressions.</div>
+<div class="anchor" id="name-MustCompilePOSIX">	 func <a href="../src/regexp/regexp.go.html#line-319">MustCompilePOSIX</a>(str <a href="builtin.html#name-string">string</a>) *<a href="#name-Regexp">Regexp</a>
+		MustCompilePOSIX is like CompilePOSIX but panics if the expression cannot be parsed.
+		It simplifies safe initialization of global variables holding compiled regular
+		expressions.</div>
+<div class="anchor" id="name-QuoteMeta">	 func <a href="../src/regexp/regexp.go.html#line-720">QuoteMeta</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		QuoteMeta returns a string that escapes all regular expression metacharacters
+		inside the argument text; the returned string is a regular expression matching
+		the literal text.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

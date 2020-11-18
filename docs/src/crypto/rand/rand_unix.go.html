@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: rand_unix.go in package crypto/rand</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	rand_unix.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/rand.html">crypto/rand</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2010 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build aix darwin dragonfly freebsd linux netbsd openbsd plan9 solaris</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>// Unix cryptographically secure pseudorandom number</code></span>
+<span class="codeline" id="line-8"><code>// generator.</code></span>
+<span class="codeline" id="line-9"><code></code></span>
+<span class="codeline" id="line-10"><code>package rand</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>import (</code></span>
+<span class="codeline" id="line-13"><code>	"bufio"</code></span>
+<span class="codeline" id="line-14"><code>	"crypto/aes"</code></span>
+<span class="codeline" id="line-15"><code>	"crypto/cipher"</code></span>
+<span class="codeline" id="line-16"><code>	"encoding/binary"</code></span>
+<span class="codeline" id="line-17"><code>	"io"</code></span>
+<span class="codeline" id="line-18"><code>	"os"</code></span>
+<span class="codeline" id="line-19"><code>	"runtime"</code></span>
+<span class="codeline" id="line-20"><code>	"sync"</code></span>
+<span class="codeline" id="line-21"><code>	"sync/atomic"</code></span>
+<span class="codeline" id="line-22"><code>	"time"</code></span>
+<span class="codeline" id="line-23"><code>)</code></span>
+<span class="codeline" id="line-24"><code></code></span>
+<span class="codeline" id="line-25"><code>const urandomDevice = "/dev/urandom"</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>// Easy implementation: read from /dev/urandom.</code></span>
+<span class="codeline" id="line-28"><code>// This is sufficient on Linux, OS X, and FreeBSD.</code></span>
+<span class="codeline" id="line-29"><code></code></span>
+<span class="codeline" id="line-30"><code>func init() {</code></span>
+<span class="codeline" id="line-31"><code>	if runtime.GOOS == "plan9" {</code></span>
+<span class="codeline" id="line-32"><code>		Reader = newReader(nil)</code></span>
+<span class="codeline" id="line-33"><code>	} else {</code></span>
+<span class="codeline" id="line-34"><code>		Reader = &amp;devReader{name: urandomDevice}</code></span>
+<span class="codeline" id="line-35"><code>	}</code></span>
+<span class="codeline" id="line-36"><code>}</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>// A devReader satisfies reads by reading the file named name.</code></span>
+<span class="codeline" id="line-39"><code>type devReader struct {</code></span>
+<span class="codeline" id="line-40"><code>	name string</code></span>
+<span class="codeline" id="line-41"><code>	f    io.Reader</code></span>
+<span class="codeline" id="line-42"><code>	mu   sync.Mutex</code></span>
+<span class="codeline" id="line-43"><code>	used int32 // atomic; whether this devReader has been used</code></span>
+<span class="codeline" id="line-44"><code>}</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>// altGetRandom if non-nil specifies an OS-specific function to get</code></span>
+<span class="codeline" id="line-47"><code>// urandom-style randomness.</code></span>
+<span class="codeline" id="line-48"><code>var altGetRandom func([]byte) (ok bool)</code></span>
+<span class="codeline" id="line-49"><code></code></span>
+<span class="codeline" id="line-50"><code>func (r *devReader) Read(b []byte) (n int, err error) {</code></span>
+<span class="codeline" id="line-51"><code>	if atomic.CompareAndSwapInt32(&amp;r.used, 0, 1) {</code></span>
+<span class="codeline" id="line-52"><code>		// First use of randomness. Start timer to warn about</code></span>
+<span class="codeline" id="line-53"><code>		// being blocked on entropy not being available.</code></span>
+<span class="codeline" id="line-54"><code>		t := time.AfterFunc(60*time.Second, warnBlocked)</code></span>
+<span class="codeline" id="line-55"><code>		defer t.Stop()</code></span>
+<span class="codeline" id="line-56"><code>	}</code></span>
+<span class="codeline" id="line-57"><code>	if altGetRandom != nil &amp;&amp; r.name == urandomDevice &amp;&amp; altGetRandom(b) {</code></span>
+<span class="codeline" id="line-58"><code>		return len(b), nil</code></span>
+<span class="codeline" id="line-59"><code>	}</code></span>
+<span class="codeline" id="line-60"><code>	r.mu.Lock()</code></span>
+<span class="codeline" id="line-61"><code>	defer r.mu.Unlock()</code></span>
+<span class="codeline" id="line-62"><code>	if r.f == nil {</code></span>
+<span class="codeline" id="line-63"><code>		f, err := os.Open(r.name)</code></span>
+<span class="codeline" id="line-64"><code>		if f == nil {</code></span>
+<span class="codeline" id="line-65"><code>			return 0, err</code></span>
+<span class="codeline" id="line-66"><code>		}</code></span>
+<span class="codeline" id="line-67"><code>		if runtime.GOOS == "plan9" {</code></span>
+<span class="codeline" id="line-68"><code>			r.f = f</code></span>
+<span class="codeline" id="line-69"><code>		} else {</code></span>
+<span class="codeline" id="line-70"><code>			r.f = bufio.NewReader(hideAgainReader{f})</code></span>
+<span class="codeline" id="line-71"><code>		}</code></span>
+<span class="codeline" id="line-72"><code>	}</code></span>
+<span class="codeline" id="line-73"><code>	return r.f.Read(b)</code></span>
+<span class="codeline" id="line-74"><code>}</code></span>
+<span class="codeline" id="line-75"><code></code></span>
+<span class="codeline" id="line-76"><code>var isEAGAIN func(error) bool // set by eagain.go on unix systems</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>// hideAgainReader masks EAGAIN reads from /dev/urandom.</code></span>
+<span class="codeline" id="line-79"><code>// See golang.org/issue/9205</code></span>
+<span class="codeline" id="line-80"><code>type hideAgainReader struct {</code></span>
+<span class="codeline" id="line-81"><code>	r io.Reader</code></span>
+<span class="codeline" id="line-82"><code>}</code></span>
+<span class="codeline" id="line-83"><code></code></span>
+<span class="codeline" id="line-84"><code>func (hr hideAgainReader) Read(p []byte) (n int, err error) {</code></span>
+<span class="codeline" id="line-85"><code>	n, err = hr.r.Read(p)</code></span>
+<span class="codeline" id="line-86"><code>	if err != nil &amp;&amp; isEAGAIN != nil &amp;&amp; isEAGAIN(err) {</code></span>
+<span class="codeline" id="line-87"><code>		err = nil</code></span>
+<span class="codeline" id="line-88"><code>	}</code></span>
+<span class="codeline" id="line-89"><code>	return</code></span>
+<span class="codeline" id="line-90"><code>}</code></span>
+<span class="codeline" id="line-91"><code></code></span>
+<span class="codeline" id="line-92"><code>// Alternate pseudo-random implementation for use on</code></span>
+<span class="codeline" id="line-93"><code>// systems without a reliable /dev/urandom.</code></span>
+<span class="codeline" id="line-94"><code></code></span>
+<span class="codeline" id="line-95"><code>// newReader returns a new pseudorandom generator that</code></span>
+<span class="codeline" id="line-96"><code>// seeds itself by reading from entropy. If entropy == nil,</code></span>
+<span class="codeline" id="line-97"><code>// the generator seeds itself by reading from the system's</code></span>
+<span class="codeline" id="line-98"><code>// random number generator, typically /dev/random.</code></span>
+<span class="codeline" id="line-99"><code>// The Read method on the returned reader always returns</code></span>
+<span class="codeline" id="line-100"><code>// the full amount asked for, or else it returns an error.</code></span>
+<span class="codeline" id="line-101"><code>//</code></span>
+<span class="codeline" id="line-102"><code>// The generator uses the X9.31 algorithm with AES-128,</code></span>
+<span class="codeline" id="line-103"><code>// reseeding after every 1 MB of generated data.</code></span>
+<span class="codeline" id="line-104"><code>func newReader(entropy io.Reader) io.Reader {</code></span>
+<span class="codeline" id="line-105"><code>	if entropy == nil {</code></span>
+<span class="codeline" id="line-106"><code>		entropy = &amp;devReader{name: "/dev/random"}</code></span>
+<span class="codeline" id="line-107"><code>	}</code></span>
+<span class="codeline" id="line-108"><code>	return &amp;reader{entropy: entropy}</code></span>
+<span class="codeline" id="line-109"><code>}</code></span>
+<span class="codeline" id="line-110"><code></code></span>
+<span class="codeline" id="line-111"><code>type reader struct {</code></span>
+<span class="codeline" id="line-112"><code>	mu                   sync.Mutex</code></span>
+<span class="codeline" id="line-113"><code>	budget               int // number of bytes that can be generated</code></span>
+<span class="codeline" id="line-114"><code>	cipher               cipher.Block</code></span>
+<span class="codeline" id="line-115"><code>	entropy              io.Reader</code></span>
+<span class="codeline" id="line-116"><code>	time, seed, dst, key [aes.BlockSize]byte</code></span>
+<span class="codeline" id="line-117"><code>}</code></span>
+<span class="codeline" id="line-118"><code></code></span>
+<span class="codeline" id="line-119"><code>func (r *reader) Read(b []byte) (n int, err error) {</code></span>
+<span class="codeline" id="line-120"><code>	r.mu.Lock()</code></span>
+<span class="codeline" id="line-121"><code>	defer r.mu.Unlock()</code></span>
+<span class="codeline" id="line-122"><code>	n = len(b)</code></span>
+<span class="codeline" id="line-123"><code></code></span>
+<span class="codeline" id="line-124"><code>	for len(b) &gt; 0 {</code></span>
+<span class="codeline" id="line-125"><code>		if r.budget == 0 {</code></span>
+<span class="codeline" id="line-126"><code>			_, err := io.ReadFull(r.entropy, r.seed[0:])</code></span>
+<span class="codeline" id="line-127"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-128"><code>				return n - len(b), err</code></span>
+<span class="codeline" id="line-129"><code>			}</code></span>
+<span class="codeline" id="line-130"><code>			_, err = io.ReadFull(r.entropy, r.key[0:])</code></span>
+<span class="codeline" id="line-131"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-132"><code>				return n - len(b), err</code></span>
+<span class="codeline" id="line-133"><code>			}</code></span>
+<span class="codeline" id="line-134"><code>			r.cipher, err = aes.NewCipher(r.key[0:])</code></span>
+<span class="codeline" id="line-135"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-136"><code>				return n - len(b), err</code></span>
+<span class="codeline" id="line-137"><code>			}</code></span>
+<span class="codeline" id="line-138"><code>			r.budget = 1 &lt;&lt; 20 // reseed after generating 1MB</code></span>
+<span class="codeline" id="line-139"><code>		}</code></span>
+<span class="codeline" id="line-140"><code>		r.budget -= aes.BlockSize</code></span>
+<span class="codeline" id="line-141"><code></code></span>
+<span class="codeline" id="line-142"><code>		// ANSI X9.31 (== X9.17) algorithm, but using AES in place of 3DES.</code></span>
+<span class="codeline" id="line-143"><code>		//</code></span>
+<span class="codeline" id="line-144"><code>		// single block:</code></span>
+<span class="codeline" id="line-145"><code>		// t = encrypt(time)</code></span>
+<span class="codeline" id="line-146"><code>		// dst = encrypt(t^seed)</code></span>
+<span class="codeline" id="line-147"><code>		// seed = encrypt(t^dst)</code></span>
+<span class="codeline" id="line-148"><code>		ns := time.Now().UnixNano()</code></span>
+<span class="codeline" id="line-149"><code>		binary.BigEndian.PutUint64(r.time[:], uint64(ns))</code></span>
+<span class="codeline" id="line-150"><code>		r.cipher.Encrypt(r.time[0:], r.time[0:])</code></span>
+<span class="codeline" id="line-151"><code>		for i := 0; i &lt; aes.BlockSize; i++ {</code></span>
+<span class="codeline" id="line-152"><code>			r.dst[i] = r.time[i] ^ r.seed[i]</code></span>
+<span class="codeline" id="line-153"><code>		}</code></span>
+<span class="codeline" id="line-154"><code>		r.cipher.Encrypt(r.dst[0:], r.dst[0:])</code></span>
+<span class="codeline" id="line-155"><code>		for i := 0; i &lt; aes.BlockSize; i++ {</code></span>
+<span class="codeline" id="line-156"><code>			r.seed[i] = r.time[i] ^ r.dst[i]</code></span>
+<span class="codeline" id="line-157"><code>		}</code></span>
+<span class="codeline" id="line-158"><code>		r.cipher.Encrypt(r.seed[0:], r.seed[0:])</code></span>
+<span class="codeline" id="line-159"><code></code></span>
+<span class="codeline" id="line-160"><code>		m := copy(b, r.dst[0:])</code></span>
+<span class="codeline" id="line-161"><code>		b = b[m:]</code></span>
+<span class="codeline" id="line-162"><code>	}</code></span>
+<span class="codeline" id="line-163"><code></code></span>
+<span class="codeline" id="line-164"><code>	return n, nil</code></span>
+<span class="codeline" id="line-165"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

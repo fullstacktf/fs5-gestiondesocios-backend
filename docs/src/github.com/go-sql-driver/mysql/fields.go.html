@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: fields.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	fields.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2017 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"database/sql"</code></span>
+<span class="codeline" id="line-13"><code>	"reflect"</code></span>
+<span class="codeline" id="line-14"><code>)</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>func (mf *mysqlField) typeDatabaseName() string {</code></span>
+<span class="codeline" id="line-17"><code>	switch mf.fieldType {</code></span>
+<span class="codeline" id="line-18"><code>	case fieldTypeBit:</code></span>
+<span class="codeline" id="line-19"><code>		return "BIT"</code></span>
+<span class="codeline" id="line-20"><code>	case fieldTypeBLOB:</code></span>
+<span class="codeline" id="line-21"><code>		if mf.charSet != collations[binaryCollation] {</code></span>
+<span class="codeline" id="line-22"><code>			return "TEXT"</code></span>
+<span class="codeline" id="line-23"><code>		}</code></span>
+<span class="codeline" id="line-24"><code>		return "BLOB"</code></span>
+<span class="codeline" id="line-25"><code>	case fieldTypeDate:</code></span>
+<span class="codeline" id="line-26"><code>		return "DATE"</code></span>
+<span class="codeline" id="line-27"><code>	case fieldTypeDateTime:</code></span>
+<span class="codeline" id="line-28"><code>		return "DATETIME"</code></span>
+<span class="codeline" id="line-29"><code>	case fieldTypeDecimal:</code></span>
+<span class="codeline" id="line-30"><code>		return "DECIMAL"</code></span>
+<span class="codeline" id="line-31"><code>	case fieldTypeDouble:</code></span>
+<span class="codeline" id="line-32"><code>		return "DOUBLE"</code></span>
+<span class="codeline" id="line-33"><code>	case fieldTypeEnum:</code></span>
+<span class="codeline" id="line-34"><code>		return "ENUM"</code></span>
+<span class="codeline" id="line-35"><code>	case fieldTypeFloat:</code></span>
+<span class="codeline" id="line-36"><code>		return "FLOAT"</code></span>
+<span class="codeline" id="line-37"><code>	case fieldTypeGeometry:</code></span>
+<span class="codeline" id="line-38"><code>		return "GEOMETRY"</code></span>
+<span class="codeline" id="line-39"><code>	case fieldTypeInt24:</code></span>
+<span class="codeline" id="line-40"><code>		return "MEDIUMINT"</code></span>
+<span class="codeline" id="line-41"><code>	case fieldTypeJSON:</code></span>
+<span class="codeline" id="line-42"><code>		return "JSON"</code></span>
+<span class="codeline" id="line-43"><code>	case fieldTypeLong:</code></span>
+<span class="codeline" id="line-44"><code>		return "INT"</code></span>
+<span class="codeline" id="line-45"><code>	case fieldTypeLongBLOB:</code></span>
+<span class="codeline" id="line-46"><code>		if mf.charSet != collations[binaryCollation] {</code></span>
+<span class="codeline" id="line-47"><code>			return "LONGTEXT"</code></span>
+<span class="codeline" id="line-48"><code>		}</code></span>
+<span class="codeline" id="line-49"><code>		return "LONGBLOB"</code></span>
+<span class="codeline" id="line-50"><code>	case fieldTypeLongLong:</code></span>
+<span class="codeline" id="line-51"><code>		return "BIGINT"</code></span>
+<span class="codeline" id="line-52"><code>	case fieldTypeMediumBLOB:</code></span>
+<span class="codeline" id="line-53"><code>		if mf.charSet != collations[binaryCollation] {</code></span>
+<span class="codeline" id="line-54"><code>			return "MEDIUMTEXT"</code></span>
+<span class="codeline" id="line-55"><code>		}</code></span>
+<span class="codeline" id="line-56"><code>		return "MEDIUMBLOB"</code></span>
+<span class="codeline" id="line-57"><code>	case fieldTypeNewDate:</code></span>
+<span class="codeline" id="line-58"><code>		return "DATE"</code></span>
+<span class="codeline" id="line-59"><code>	case fieldTypeNewDecimal:</code></span>
+<span class="codeline" id="line-60"><code>		return "DECIMAL"</code></span>
+<span class="codeline" id="line-61"><code>	case fieldTypeNULL:</code></span>
+<span class="codeline" id="line-62"><code>		return "NULL"</code></span>
+<span class="codeline" id="line-63"><code>	case fieldTypeSet:</code></span>
+<span class="codeline" id="line-64"><code>		return "SET"</code></span>
+<span class="codeline" id="line-65"><code>	case fieldTypeShort:</code></span>
+<span class="codeline" id="line-66"><code>		return "SMALLINT"</code></span>
+<span class="codeline" id="line-67"><code>	case fieldTypeString:</code></span>
+<span class="codeline" id="line-68"><code>		if mf.charSet == collations[binaryCollation] {</code></span>
+<span class="codeline" id="line-69"><code>			return "BINARY"</code></span>
+<span class="codeline" id="line-70"><code>		}</code></span>
+<span class="codeline" id="line-71"><code>		return "CHAR"</code></span>
+<span class="codeline" id="line-72"><code>	case fieldTypeTime:</code></span>
+<span class="codeline" id="line-73"><code>		return "TIME"</code></span>
+<span class="codeline" id="line-74"><code>	case fieldTypeTimestamp:</code></span>
+<span class="codeline" id="line-75"><code>		return "TIMESTAMP"</code></span>
+<span class="codeline" id="line-76"><code>	case fieldTypeTiny:</code></span>
+<span class="codeline" id="line-77"><code>		return "TINYINT"</code></span>
+<span class="codeline" id="line-78"><code>	case fieldTypeTinyBLOB:</code></span>
+<span class="codeline" id="line-79"><code>		if mf.charSet != collations[binaryCollation] {</code></span>
+<span class="codeline" id="line-80"><code>			return "TINYTEXT"</code></span>
+<span class="codeline" id="line-81"><code>		}</code></span>
+<span class="codeline" id="line-82"><code>		return "TINYBLOB"</code></span>
+<span class="codeline" id="line-83"><code>	case fieldTypeVarChar:</code></span>
+<span class="codeline" id="line-84"><code>		if mf.charSet == collations[binaryCollation] {</code></span>
+<span class="codeline" id="line-85"><code>			return "VARBINARY"</code></span>
+<span class="codeline" id="line-86"><code>		}</code></span>
+<span class="codeline" id="line-87"><code>		return "VARCHAR"</code></span>
+<span class="codeline" id="line-88"><code>	case fieldTypeVarString:</code></span>
+<span class="codeline" id="line-89"><code>		if mf.charSet == collations[binaryCollation] {</code></span>
+<span class="codeline" id="line-90"><code>			return "VARBINARY"</code></span>
+<span class="codeline" id="line-91"><code>		}</code></span>
+<span class="codeline" id="line-92"><code>		return "VARCHAR"</code></span>
+<span class="codeline" id="line-93"><code>	case fieldTypeYear:</code></span>
+<span class="codeline" id="line-94"><code>		return "YEAR"</code></span>
+<span class="codeline" id="line-95"><code>	default:</code></span>
+<span class="codeline" id="line-96"><code>		return ""</code></span>
+<span class="codeline" id="line-97"><code>	}</code></span>
+<span class="codeline" id="line-98"><code>}</code></span>
+<span class="codeline" id="line-99"><code></code></span>
+<span class="codeline" id="line-100"><code>var (</code></span>
+<span class="codeline" id="line-101"><code>	scanTypeFloat32   = reflect.TypeOf(float32(0))</code></span>
+<span class="codeline" id="line-102"><code>	scanTypeFloat64   = reflect.TypeOf(float64(0))</code></span>
+<span class="codeline" id="line-103"><code>	scanTypeInt8      = reflect.TypeOf(int8(0))</code></span>
+<span class="codeline" id="line-104"><code>	scanTypeInt16     = reflect.TypeOf(int16(0))</code></span>
+<span class="codeline" id="line-105"><code>	scanTypeInt32     = reflect.TypeOf(int32(0))</code></span>
+<span class="codeline" id="line-106"><code>	scanTypeInt64     = reflect.TypeOf(int64(0))</code></span>
+<span class="codeline" id="line-107"><code>	scanTypeNullFloat = reflect.TypeOf(sql.NullFloat64{})</code></span>
+<span class="codeline" id="line-108"><code>	scanTypeNullInt   = reflect.TypeOf(sql.NullInt64{})</code></span>
+<span class="codeline" id="line-109"><code>	scanTypeNullTime  = reflect.TypeOf(NullTime{})</code></span>
+<span class="codeline" id="line-110"><code>	scanTypeUint8     = reflect.TypeOf(uint8(0))</code></span>
+<span class="codeline" id="line-111"><code>	scanTypeUint16    = reflect.TypeOf(uint16(0))</code></span>
+<span class="codeline" id="line-112"><code>	scanTypeUint32    = reflect.TypeOf(uint32(0))</code></span>
+<span class="codeline" id="line-113"><code>	scanTypeUint64    = reflect.TypeOf(uint64(0))</code></span>
+<span class="codeline" id="line-114"><code>	scanTypeRawBytes  = reflect.TypeOf(sql.RawBytes{})</code></span>
+<span class="codeline" id="line-115"><code>	scanTypeUnknown   = reflect.TypeOf(new(interface{}))</code></span>
+<span class="codeline" id="line-116"><code>)</code></span>
+<span class="codeline" id="line-117"><code></code></span>
+<span class="codeline" id="line-118"><code>type mysqlField struct {</code></span>
+<span class="codeline" id="line-119"><code>	tableName string</code></span>
+<span class="codeline" id="line-120"><code>	name      string</code></span>
+<span class="codeline" id="line-121"><code>	length    uint32</code></span>
+<span class="codeline" id="line-122"><code>	flags     fieldFlag</code></span>
+<span class="codeline" id="line-123"><code>	fieldType fieldType</code></span>
+<span class="codeline" id="line-124"><code>	decimals  byte</code></span>
+<span class="codeline" id="line-125"><code>	charSet   uint8</code></span>
+<span class="codeline" id="line-126"><code>}</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>func (mf *mysqlField) scanType() reflect.Type {</code></span>
+<span class="codeline" id="line-129"><code>	switch mf.fieldType {</code></span>
+<span class="codeline" id="line-130"><code>	case fieldTypeTiny:</code></span>
+<span class="codeline" id="line-131"><code>		if mf.flags&amp;flagNotNULL != 0 {</code></span>
+<span class="codeline" id="line-132"><code>			if mf.flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-133"><code>				return scanTypeUint8</code></span>
+<span class="codeline" id="line-134"><code>			}</code></span>
+<span class="codeline" id="line-135"><code>			return scanTypeInt8</code></span>
+<span class="codeline" id="line-136"><code>		}</code></span>
+<span class="codeline" id="line-137"><code>		return scanTypeNullInt</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>	case fieldTypeShort, fieldTypeYear:</code></span>
+<span class="codeline" id="line-140"><code>		if mf.flags&amp;flagNotNULL != 0 {</code></span>
+<span class="codeline" id="line-141"><code>			if mf.flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-142"><code>				return scanTypeUint16</code></span>
+<span class="codeline" id="line-143"><code>			}</code></span>
+<span class="codeline" id="line-144"><code>			return scanTypeInt16</code></span>
+<span class="codeline" id="line-145"><code>		}</code></span>
+<span class="codeline" id="line-146"><code>		return scanTypeNullInt</code></span>
+<span class="codeline" id="line-147"><code></code></span>
+<span class="codeline" id="line-148"><code>	case fieldTypeInt24, fieldTypeLong:</code></span>
+<span class="codeline" id="line-149"><code>		if mf.flags&amp;flagNotNULL != 0 {</code></span>
+<span class="codeline" id="line-150"><code>			if mf.flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-151"><code>				return scanTypeUint32</code></span>
+<span class="codeline" id="line-152"><code>			}</code></span>
+<span class="codeline" id="line-153"><code>			return scanTypeInt32</code></span>
+<span class="codeline" id="line-154"><code>		}</code></span>
+<span class="codeline" id="line-155"><code>		return scanTypeNullInt</code></span>
+<span class="codeline" id="line-156"><code></code></span>
+<span class="codeline" id="line-157"><code>	case fieldTypeLongLong:</code></span>
+<span class="codeline" id="line-158"><code>		if mf.flags&amp;flagNotNULL != 0 {</code></span>
+<span class="codeline" id="line-159"><code>			if mf.flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-160"><code>				return scanTypeUint64</code></span>
+<span class="codeline" id="line-161"><code>			}</code></span>
+<span class="codeline" id="line-162"><code>			return scanTypeInt64</code></span>
+<span class="codeline" id="line-163"><code>		}</code></span>
+<span class="codeline" id="line-164"><code>		return scanTypeNullInt</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>	case fieldTypeFloat:</code></span>
+<span class="codeline" id="line-167"><code>		if mf.flags&amp;flagNotNULL != 0 {</code></span>
+<span class="codeline" id="line-168"><code>			return scanTypeFloat32</code></span>
+<span class="codeline" id="line-169"><code>		}</code></span>
+<span class="codeline" id="line-170"><code>		return scanTypeNullFloat</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>	case fieldTypeDouble:</code></span>
+<span class="codeline" id="line-173"><code>		if mf.flags&amp;flagNotNULL != 0 {</code></span>
+<span class="codeline" id="line-174"><code>			return scanTypeFloat64</code></span>
+<span class="codeline" id="line-175"><code>		}</code></span>
+<span class="codeline" id="line-176"><code>		return scanTypeNullFloat</code></span>
+<span class="codeline" id="line-177"><code></code></span>
+<span class="codeline" id="line-178"><code>	case fieldTypeDecimal, fieldTypeNewDecimal, fieldTypeVarChar,</code></span>
+<span class="codeline" id="line-179"><code>		fieldTypeBit, fieldTypeEnum, fieldTypeSet, fieldTypeTinyBLOB,</code></span>
+<span class="codeline" id="line-180"><code>		fieldTypeMediumBLOB, fieldTypeLongBLOB, fieldTypeBLOB,</code></span>
+<span class="codeline" id="line-181"><code>		fieldTypeVarString, fieldTypeString, fieldTypeGeometry, fieldTypeJSON,</code></span>
+<span class="codeline" id="line-182"><code>		fieldTypeTime:</code></span>
+<span class="codeline" id="line-183"><code>		return scanTypeRawBytes</code></span>
+<span class="codeline" id="line-184"><code></code></span>
+<span class="codeline" id="line-185"><code>	case fieldTypeDate, fieldTypeNewDate,</code></span>
+<span class="codeline" id="line-186"><code>		fieldTypeTimestamp, fieldTypeDateTime:</code></span>
+<span class="codeline" id="line-187"><code>		// NullTime is always returned for more consistent behavior as it can</code></span>
+<span class="codeline" id="line-188"><code>		// handle both cases of parseTime regardless if the field is nullable.</code></span>
+<span class="codeline" id="line-189"><code>		return scanTypeNullTime</code></span>
+<span class="codeline" id="line-190"><code></code></span>
+<span class="codeline" id="line-191"><code>	default:</code></span>
+<span class="codeline" id="line-192"><code>		return scanTypeUnknown</code></span>
+<span class="codeline" id="line-193"><code>	}</code></span>
+<span class="codeline" id="line-194"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: naming.go in package gorm.io/gorm/schema</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	naming.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/gorm.io/gorm/schema.html">gorm.io/gorm/schema</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>package schema</code></span>
+<span class="codeline" id="line-2"><code></code></span>
+<span class="codeline" id="line-3"><code>import (</code></span>
+<span class="codeline" id="line-4"><code>	"crypto/sha1"</code></span>
+<span class="codeline" id="line-5"><code>	"fmt"</code></span>
+<span class="codeline" id="line-6"><code>	"strings"</code></span>
+<span class="codeline" id="line-7"><code>	"sync"</code></span>
+<span class="codeline" id="line-8"><code>	"unicode/utf8"</code></span>
+<span class="codeline" id="line-9"><code></code></span>
+<span class="codeline" id="line-10"><code>	"github.com/jinzhu/inflection"</code></span>
+<span class="codeline" id="line-11"><code>)</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>// Namer namer interface</code></span>
+<span class="codeline" id="line-14"><code>type Namer interface {</code></span>
+<span class="codeline" id="line-15"><code>	TableName(table string) string</code></span>
+<span class="codeline" id="line-16"><code>	ColumnName(table, column string) string</code></span>
+<span class="codeline" id="line-17"><code>	JoinTableName(joinTable string) string</code></span>
+<span class="codeline" id="line-18"><code>	RelationshipFKName(Relationship) string</code></span>
+<span class="codeline" id="line-19"><code>	CheckerName(table, column string) string</code></span>
+<span class="codeline" id="line-20"><code>	IndexName(table, column string) string</code></span>
+<span class="codeline" id="line-21"><code>}</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>// NamingStrategy tables, columns naming strategy</code></span>
+<span class="codeline" id="line-24"><code>type NamingStrategy struct {</code></span>
+<span class="codeline" id="line-25"><code>	TablePrefix   string</code></span>
+<span class="codeline" id="line-26"><code>	SingularTable bool</code></span>
+<span class="codeline" id="line-27"><code>}</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>// TableName convert string to table name</code></span>
+<span class="codeline" id="line-30"><code>func (ns NamingStrategy) TableName(str string) string {</code></span>
+<span class="codeline" id="line-31"><code>	if ns.SingularTable {</code></span>
+<span class="codeline" id="line-32"><code>		return ns.TablePrefix + toDBName(str)</code></span>
+<span class="codeline" id="line-33"><code>	}</code></span>
+<span class="codeline" id="line-34"><code>	return ns.TablePrefix + inflection.Plural(toDBName(str))</code></span>
+<span class="codeline" id="line-35"><code>}</code></span>
+<span class="codeline" id="line-36"><code></code></span>
+<span class="codeline" id="line-37"><code>// ColumnName convert string to column name</code></span>
+<span class="codeline" id="line-38"><code>func (ns NamingStrategy) ColumnName(table, column string) string {</code></span>
+<span class="codeline" id="line-39"><code>	return toDBName(column)</code></span>
+<span class="codeline" id="line-40"><code>}</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>// JoinTableName convert string to join table name</code></span>
+<span class="codeline" id="line-43"><code>func (ns NamingStrategy) JoinTableName(str string) string {</code></span>
+<span class="codeline" id="line-44"><code>	if strings.ToLower(str) == str {</code></span>
+<span class="codeline" id="line-45"><code>		return ns.TablePrefix + str</code></span>
+<span class="codeline" id="line-46"><code>	}</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>	if ns.SingularTable {</code></span>
+<span class="codeline" id="line-49"><code>		return ns.TablePrefix + toDBName(str)</code></span>
+<span class="codeline" id="line-50"><code>	}</code></span>
+<span class="codeline" id="line-51"><code>	return ns.TablePrefix + inflection.Plural(toDBName(str))</code></span>
+<span class="codeline" id="line-52"><code>}</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>// RelationshipFKName generate fk name for relation</code></span>
+<span class="codeline" id="line-55"><code>func (ns NamingStrategy) RelationshipFKName(rel Relationship) string {</code></span>
+<span class="codeline" id="line-56"><code>	return strings.Replace(fmt.Sprintf("fk_%s_%s", rel.Schema.Table, toDBName(rel.Name)), ".", "_", -1)</code></span>
+<span class="codeline" id="line-57"><code>}</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>// CheckerName generate checker name</code></span>
+<span class="codeline" id="line-60"><code>func (ns NamingStrategy) CheckerName(table, column string) string {</code></span>
+<span class="codeline" id="line-61"><code>	return strings.Replace(fmt.Sprintf("chk_%s_%s", table, column), ".", "_", -1)</code></span>
+<span class="codeline" id="line-62"><code>}</code></span>
+<span class="codeline" id="line-63"><code></code></span>
+<span class="codeline" id="line-64"><code>// IndexName generate index name</code></span>
+<span class="codeline" id="line-65"><code>func (ns NamingStrategy) IndexName(table, column string) string {</code></span>
+<span class="codeline" id="line-66"><code>	idxName := fmt.Sprintf("idx_%v_%v", table, toDBName(column))</code></span>
+<span class="codeline" id="line-67"><code>	idxName = strings.Replace(idxName, ".", "_", -1)</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>	if utf8.RuneCountInString(idxName) &gt; 64 {</code></span>
+<span class="codeline" id="line-70"><code>		h := sha1.New()</code></span>
+<span class="codeline" id="line-71"><code>		h.Write([]byte(idxName))</code></span>
+<span class="codeline" id="line-72"><code>		bs := h.Sum(nil)</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>		idxName = fmt.Sprintf("idx%v%v", table, column)[0:56] + string(bs)[:8]</code></span>
+<span class="codeline" id="line-75"><code>	}</code></span>
+<span class="codeline" id="line-76"><code>	return idxName</code></span>
+<span class="codeline" id="line-77"><code>}</code></span>
+<span class="codeline" id="line-78"><code></code></span>
+<span class="codeline" id="line-79"><code>var (</code></span>
+<span class="codeline" id="line-80"><code>	smap sync.Map</code></span>
+<span class="codeline" id="line-81"><code>	// https://github.com/golang/lint/blob/master/lint.go#L770</code></span>
+<span class="codeline" id="line-82"><code>	commonInitialisms         = []string{"API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "LHS", "QPS", "RAM", "RHS", "RPC", "SLA", "SMTP", "SSH", "TLS", "TTL", "UID", "UI", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XSRF", "XSS"}</code></span>
+<span class="codeline" id="line-83"><code>	commonInitialismsReplacer *strings.Replacer</code></span>
+<span class="codeline" id="line-84"><code>)</code></span>
+<span class="codeline" id="line-85"><code></code></span>
+<span class="codeline" id="line-86"><code>func init() {</code></span>
+<span class="codeline" id="line-87"><code>	var commonInitialismsForReplacer []string</code></span>
+<span class="codeline" id="line-88"><code>	for _, initialism := range commonInitialisms {</code></span>
+<span class="codeline" id="line-89"><code>		commonInitialismsForReplacer = append(commonInitialismsForReplacer, initialism, strings.Title(strings.ToLower(initialism)))</code></span>
+<span class="codeline" id="line-90"><code>	}</code></span>
+<span class="codeline" id="line-91"><code>	commonInitialismsReplacer = strings.NewReplacer(commonInitialismsForReplacer...)</code></span>
+<span class="codeline" id="line-92"><code>}</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>func toDBName(name string) string {</code></span>
+<span class="codeline" id="line-95"><code>	if name == "" {</code></span>
+<span class="codeline" id="line-96"><code>		return ""</code></span>
+<span class="codeline" id="line-97"><code>	} else if v, ok := smap.Load(name); ok {</code></span>
+<span class="codeline" id="line-98"><code>		return fmt.Sprint(v)</code></span>
+<span class="codeline" id="line-99"><code>	}</code></span>
+<span class="codeline" id="line-100"><code></code></span>
+<span class="codeline" id="line-101"><code>	var (</code></span>
+<span class="codeline" id="line-102"><code>		value                          = commonInitialismsReplacer.Replace(name)</code></span>
+<span class="codeline" id="line-103"><code>		buf                            strings.Builder</code></span>
+<span class="codeline" id="line-104"><code>		lastCase, nextCase, nextNumber bool // upper case == true</code></span>
+<span class="codeline" id="line-105"><code>		curCase                        = value[0] &lt;= 'Z' &amp;&amp; value[0] &gt;= 'A'</code></span>
+<span class="codeline" id="line-106"><code>	)</code></span>
+<span class="codeline" id="line-107"><code></code></span>
+<span class="codeline" id="line-108"><code>	for i, v := range value[:len(value)-1] {</code></span>
+<span class="codeline" id="line-109"><code>		nextCase = value[i+1] &lt;= 'Z' &amp;&amp; value[i+1] &gt;= 'A'</code></span>
+<span class="codeline" id="line-110"><code>		nextNumber = value[i+1] &gt;= '0' &amp;&amp; value[i+1] &lt;= '9'</code></span>
+<span class="codeline" id="line-111"><code></code></span>
+<span class="codeline" id="line-112"><code>		if curCase {</code></span>
+<span class="codeline" id="line-113"><code>			if lastCase &amp;&amp; (nextCase || nextNumber) {</code></span>
+<span class="codeline" id="line-114"><code>				buf.WriteRune(v + 32)</code></span>
+<span class="codeline" id="line-115"><code>			} else {</code></span>
+<span class="codeline" id="line-116"><code>				if i &gt; 0 &amp;&amp; value[i-1] != '_' &amp;&amp; value[i+1] != '_' {</code></span>
+<span class="codeline" id="line-117"><code>					buf.WriteByte('_')</code></span>
+<span class="codeline" id="line-118"><code>				}</code></span>
+<span class="codeline" id="line-119"><code>				buf.WriteRune(v + 32)</code></span>
+<span class="codeline" id="line-120"><code>			}</code></span>
+<span class="codeline" id="line-121"><code>		} else {</code></span>
+<span class="codeline" id="line-122"><code>			buf.WriteRune(v)</code></span>
+<span class="codeline" id="line-123"><code>		}</code></span>
+<span class="codeline" id="line-124"><code></code></span>
+<span class="codeline" id="line-125"><code>		lastCase = curCase</code></span>
+<span class="codeline" id="line-126"><code>		curCase = nextCase</code></span>
+<span class="codeline" id="line-127"><code>	}</code></span>
+<span class="codeline" id="line-128"><code></code></span>
+<span class="codeline" id="line-129"><code>	if curCase {</code></span>
+<span class="codeline" id="line-130"><code>		if !lastCase &amp;&amp; len(value) &gt; 1 {</code></span>
+<span class="codeline" id="line-131"><code>			buf.WriteByte('_')</code></span>
+<span class="codeline" id="line-132"><code>		}</code></span>
+<span class="codeline" id="line-133"><code>		buf.WriteByte(value[len(value)-1] + 32)</code></span>
+<span class="codeline" id="line-134"><code>	} else {</code></span>
+<span class="codeline" id="line-135"><code>		buf.WriteByte(value[len(value)-1])</code></span>
+<span class="codeline" id="line-136"><code>	}</code></span>
+<span class="codeline" id="line-137"><code></code></span>
+<span class="codeline" id="line-138"><code>	return buf.String()</code></span>
+<span class="codeline" id="line-139"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: gorm.io/driver/mysql</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>mysql</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-gorm.io/driver/mysql">gorm.io/driver/mysql</a><i> (on <a href="https://pkg.go.dev/gorm.io/driver/mysql" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/gorm.io/driver/mysql.html">12 packages</a>, and imported by <a href="../../../dep/gorm.io/driver/mysql.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../src/gorm.io/driver/mysql/migrator.go.html">migrator.go</a>
+	    <a href="../../../src/gorm.io/driver/mysql/mysql.go.html">mysql.go</a>
+	    <a href="../../../src/gorm.io/driver/mysql/update_with_order_by_limit.go.html">update_with_order_by_limit.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Column" data-popularity="300">	 type <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-18">Column</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Column-stat-methods"><label for="Column-stat-methods">Exported Methods (5)</label><span id='Column-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-32">DatabaseTypeName</a>() <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-55">DecimalSize</a>() (precision <a href="../../builtin.html#name-int64">int64</a>, scale <a href="../../builtin.html#name-int64">int64</a>, ok <a href="../../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-36">Length</a>() (length <a href="../../builtin.html#name-int64">int64</a>, ok <a href="../../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-28">Name</a>() <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-46">Nullable</a>() (nullable <a href="../../builtin.html#name-bool">bool</a>, ok <a href="../../builtin.html#name-bool">bool</a>)</span>
+		<input type='checkbox' class="stat" id="Column-stat-impls"><label for="Column-stat-impls">Implements (1+)</label><span id='Column-stat-impls-content' class="stat-content">
+			 T : gorm.io/gorm.<a href="../gorm.html#name-ColumnType">ColumnType</a></span></div>
+<div class="anchor" id="name-Config" data-popularity="35">	 type <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-19">Config</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Config-stat-fields"><label for="Config-stat-fields">Exported Fields (8)</label><span id='Config-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-22">Conn</a> <i><a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ConnPool">ConnPool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-21">DSN</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-24">DefaultStringSize</a> <i><a href="../../builtin.html#name-uint">uint</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-25">DisableDatetimePrecision</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-27">DontSupportRenameColumn</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-26">DontSupportRenameIndex</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-20">DriverName</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-23">SkipInitializeWithVersion</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Config-stat-params"><label for="Config-stat-params">As Inputs Of (1+)</label><span id='Config-stat-params-content' class="stat-content">
+			func <a href="#name-New">New</a>(config <b>Config</b>) <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Dialector">Dialector</a></span></div>
+<div class="anchor" id="name-Dialector" data-popularity="700">	 type <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-30">Dialector</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Dialector-stat-fields"><label for="Dialector-stat-fields">Exported Fields (9)</label><span id='Dialector-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31">Config</a> <i>*<a href="#name-Config">Config</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-22">Conn</a> <i><a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ConnPool">ConnPool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-21">DSN</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-24">DefaultStringSize</a> <i><a href="../../builtin.html#name-uint">uint</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-25">DisableDatetimePrecision</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-27">DontSupportRenameColumn</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-26">DontSupportRenameIndex</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-20">DriverName</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-23">SkipInitializeWithVersion</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Dialector-stat-methods"><label for="Dialector-stat-methods">Exported Methods (11)</label><span id='Dialector-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-163">BindVarTo</a>(writer <a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-Writer">Writer</a>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, v interface{})
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-95">ClauseBuilders</a>() map[<a href="../../builtin.html#name-string">string</a>]<a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-ClauseBuilder">ClauseBuilder</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-187">DataTypeOf</a>(field *<a href="../gorm/schema.html">schema</a>.<a href="../gorm/schema.html#name-Field">Field</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-147">DefaultValueOf</a>(field *<a href="../gorm/schema.html">schema</a>.<a href="../gorm/schema.html#name-Field">Field</a>) <a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-Expression">Expression</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-183">Explain</a>(sql <a href="../../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-46">Initialize</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) (err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-151">Migrator</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Migrator">Migrator</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-42">Name</a>() <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-167">QuoteTo</a>(writer <a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-Writer">Writer</a>, str <a href="../../builtin.html#name-string">string</a>)
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-280">RollbackTo</a>(tx *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-275">SavePoint</a>(tx *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Dialector-stat-impls"><label for="Dialector-stat-impls">Implements (3+)</label><span id='Dialector-stat-impls-content' class="stat-content">
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Plugin">Plugin</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-SavePointerDialectorInterface">SavePointerDialectorInterface</a></span></div>
+<div class="anchor" id="name-Migrator" data-popularity="2000">	 type <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-13">Migrator</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Migrator-stat-fields"><label for="Migrator-stat-fields">Exported Fields (12)</label><span id='Migrator-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15">Dialector</a> <i><a href="#name-Dialector">Dialector</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-22">Conn</a> <i><a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ConnPool">ConnPool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-21">DSN</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-24">DefaultStringSize</a> <i><a href="../../builtin.html#name-uint">uint</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-25">DisableDatetimePrecision</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-27">DontSupportRenameColumn</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-26">DontSupportRenameIndex</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-20">DriverName</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-15" class="path-duplicate">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-31" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-23">SkipInitializeWithVersion</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-14">Migrator</a> <i><a href="../gorm/migrator.html">migrator</a>.<a href="../gorm/migrator.html#name-Migrator">Migrator</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-14" class="path-duplicate">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-17">Config</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-22">CreateIndexAfterCreateTable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-14" class="path-duplicate">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-17" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-23">DB</a> <i>*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a></i></span>
+		<input type='checkbox' class="stat" id="Migrator-stat-methods"><label for="Migrator-stat-methods">Exported Methods (36)</label><span id='Migrator-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-288">AddColumn</a>(value interface{}, field <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-80">AlterColumn</a>(value interface{}, field <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-83">AutoMigrate</a>(values ...interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-163">BindVarTo</a>(writer <a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-Writer">Writer</a>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, v interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-512">BuildIndexOptions</a>(opts []<a href="../gorm/schema.html">schema</a>.<a href="../gorm/schema.html#name-IndexOption">IndexOption</a>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) (results []interface{})
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-95">ClauseBuilders</a>() map[<a href="../../builtin.html#name-string">string</a>]<a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-ClauseBuilder">ClauseBuilder</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-192">ColumnTypes</a>(value interface{}) (columnTypes []<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ColumnType">ColumnType</a>, err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-452">CreateConstraint</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-537">CreateIndex</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-155">CreateTable</a>(values ...interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-422">CreateView</a>(name <a href="../../builtin.html#name-string">string</a>, option <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ViewOption">ViewOption</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-600">CurrentDatabase</a>() (name <a href="../../builtin.html#name-string">string</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-701">CurrentTable</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) interface{}
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-147">DefaultValueOf</a>(field *<a href="../gorm/schema.html">schema</a>.<a href="../gorm/schema.html#name-Field">Field</a>) <a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-Expression">Expression</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-300">DropColumn</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-174">DropConstraint</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-564">DropIndex</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-159">DropTable</a>(values ...interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-426">DropView</a>(name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-183">Explain</a>(sql <a href="../../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-70">FullDataTypeOf</a>(field *<a href="../gorm/schema.html">schema</a>.<a href="../gorm/schema.html#name-Field">Field</a>) <a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-Expr">Expr</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-326">HasColumn</a>(value interface{}, field <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-499">HasConstraint</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-574">HasIndex</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-250">HasTable</a>(value interface{}) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-46">Initialize</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) (err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-361">MigrateColumn</a>(value interface{}, field *<a href="../gorm/schema.html">schema</a>.<a href="../gorm/schema.html#name-Field">Field</a>, columnType <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ColumnType">ColumnType</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-42">Name</a>() <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-167">QuoteTo</a>(writer <a href="../gorm/clause.html">clause</a>.<a href="../gorm/clause.html#name-Writer">Writer</a>, str <a href="../../builtin.html#name-string">string</a>)
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-92">RenameColumn</a>(value interface{}, oldName, newName <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-120">RenameIndex</a>(value interface{}, oldName, newName <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-261">RenameTable</a>(oldName, newName interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-606">ReorderModels</a>(values []interface{}, autoAdd <a href="../../builtin.html#name-bool">bool</a>) (results []interface{})
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-280">RollbackTo</a>(tx *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-31">RunWithValue</a>(value interface{}, fc func(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) <a href="../../builtin.html#name-error">error</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-275">SavePoint</a>(tx *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Migrator-stat-impls"><label for="Migrator-stat-impls">Implements (4+)</label><span id='Migrator-stat-impls-content' class="stat-content">
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Migrator">Migrator</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Plugin">Plugin</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-SavePointerDialectorInterface">SavePointerDialectorInterface</a>
+			 T : gorm.io/gorm/migrator.<a href="../gorm/migrator.html#name-BuildIndexOptionsInterface">BuildIndexOptionsInterface</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-New">	 func <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-38">New</a>(config <a href="#name-Config">Config</a>) <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Dialector">Dialector</a></div>
+<div class="anchor" id="name-Open">	 func <a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-34">Open</a>(dsn <a href="../../builtin.html#name-string">string</a>) <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Dialector">Dialector</a></div>
+<div class="anchor" id="name-Update">	 func <a href="../../../src/gorm.io/driver/mysql/update_with_order_by_limit.go.html#line-9">Update</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

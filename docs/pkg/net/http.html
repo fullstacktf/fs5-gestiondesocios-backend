@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: net/http</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>http</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-net/http">net/http</a><i> (on <a href="https://golang.org/pkg/net/http/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/net/http" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/net/http.html">39 packages</a>, and imported by <a href="../../dep/net/http.html#imported-by">4 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/net/http/client.go.html">client.go</a>
+	    <a href="../../src/net/http/clone.go.html">clone.go</a>
+	    <a href="../../src/net/http/cookie.go.html">cookie.go</a>
+	<a href="../../src/net/http/doc.go.html#doc">d-&gt;</a> <a href="../../src/net/http/doc.go.html">doc.go</a>
+	    <a href="../../src/net/http/filetransport.go.html">filetransport.go</a>
+	    <a href="../../src/net/http/fs.go.html">fs.go</a>
+	    <a href="../../src/net/http/h2_bundle.go.html">h2_bundle.go</a>
+	    <a href="../../src/net/http/header.go.html">header.go</a>
+	    <a href="../../src/net/http/http.go.html">http.go</a>
+	    <a href="../../src/net/http/jar.go.html">jar.go</a>
+	    <a href="../../src/net/http/method.go.html">method.go</a>
+	    <a href="../../src/net/http/request.go.html">request.go</a>
+	    <a href="../../src/net/http/response.go.html">response.go</a>
+	    <a href="../../src/net/http/roundtrip.go.html">roundtrip.go</a>
+	    <a href="../../src/net/http/server.go.html">server.go</a>
+	    <a href="../../src/net/http/sniff.go.html">sniff.go</a>
+	    <a href="../../src/net/http/socks_bundle.go.html">socks_bundle.go</a>
+	    <a href="../../src/net/http/status.go.html">status.go</a>
+	    <a href="../../src/net/http/transfer.go.html">transfer.go</a>
+	    <a href="../../src/net/http/transport.go.html">transport.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Client" data-popularity="305">	 type <a href="../../src/net/http/client.go.html#line-58">Client</a> <i>(struct)</i>
+		A Client is an HTTP client. Its zero value (DefaultClient) is a
+		usable client that uses DefaultTransport.
+
+		The Client's Transport typically has internal state (cached TCP
+		connections), so Clients should be reused instead of created as
+		needed. Clients are safe for concurrent use by multiple goroutines.
+
+		A Client is higher-level than a RoundTripper (such as Transport)
+		and additionally handles HTTP details such as cookies and
+		redirects.
+
+		When following redirects, the Client will forward all headers set on the
+		initial Request except:
+
+		• when forwarding sensitive headers like "Authorization",
+		"WWW-Authenticate", and "Cookie" to untrusted targets.
+		These headers will be ignored when following a redirect to a domain
+		that is not a subdomain match or exact match of the initial domain.
+		For example, a redirect from "foo.com" to either "foo.com" or "sub.foo.com"
+		will forward the sensitive headers, but a redirect to "bar.com" will not.
+
+		• when forwarding the "Cookie" header with a non-nil cookie Jar.
+		Since each redirect may mutate the state of the cookie jar,
+		a redirect may possibly alter a cookie set in the initial request.
+		When forwarding the "Cookie" header, any mutated cookies will be omitted,
+		with the expectation that the Jar will insert those mutated cookies
+		with the updated values (assuming the origin matches).
+		If Jar is nil, the initial cookies are forwarded without change.
+
+		<input type='checkbox' class="stat" id="Client-stat-fields"><label for="Client-stat-fields">Exported Fields (4)</label><span id='Client-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/client.go.html#line-78">CheckRedirect</a> <i>func(req *<a href="#name-Request">Request</a>, via []*<a href="#name-Request">Request</a>) <a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/net/http/client.go.html#line-89">Jar</a> <i><a href="#name-CookieJar">CookieJar</a></i>
+			<a href="../../src/net/http/client.go.html#line-106">Timeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/client.go.html#line-62">Transport</a> <i><a href="#name-RoundTripper">RoundTripper</a></i></span>
+		<input type='checkbox' class="stat" id="Client-stat-methods"><label for="Client-stat-methods">Exported Methods (6)</label><span id='Client-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/client.go.html#line-920">CloseIdleConnections</a>()
+			(*T) <a href="../../src/net/http/client.go.html#line-585">Do</a>(req *<a href="#name-Request">Request</a>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/client.go.html#line-470">Get</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/client.go.html#line-905">Head</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/client.go.html#line-840">Post</a>(url, contentType <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/client.go.html#line-877">PostForm</a>(url <a href="../builtin.html#name-string">string</a>, data <a href="url.html">url</a>.<a href="url.html#name-Values">Values</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Client-stat-values"><label for="Client-stat-values">As Types Of (1+)</label><span id='Client-stat-values-content' class="stat-content">
+			  var <a href="#name-DefaultClient">DefaultClient</a> *Client</span></div>
+<div class="anchor" id="name-CloseNotifier" data-popularity="50">	 type <a href="../../src/net/http/server.go.html#line-211">CloseNotifier</a> <b<i>(interface)</i></b>
+		The CloseNotifier interface is implemented by ResponseWriters which
+		allow detecting when the underlying connection has gone away.
+
+		This mechanism can be used to cancel long operations on the server
+		if the client has disconnected before the response is ready.
+
+		Deprecated: the CloseNotifier interface predates Go's context package.
+		New code should use Request.Context instead.
+
+		<input type='checkbox' class="stat" id="CloseNotifier-stat-methods"><label for="CloseNotifier-stat-methods">One Exported Method</label><span id='CloseNotifier-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/server.go.html#line-230">CloseNotify</a>() &lt;-chan <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-ConnState" data-popularity="115">	 type <a href="../../src/net/http/server.go.html#line-2779">ConnState</a> <a href="../builtin.html#name-int">int</a>
+		A ConnState represents the state of a client connection to a server.
+		It's used by the optional Server.ConnState hook.
+
+		<input type='checkbox' class="stat" id="ConnState-stat-methods"><label for="ConnState-stat-methods">One Exported Method</label><span id='ConnState-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/server.go.html#line-2825">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ConnState-stat-impls"><label for="ConnState-stat-impls">Implements (1+)</label><span id='ConnState-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="ConnState-stat-values"><label for="ConnState-stat-values">As Types Of (5+)</label><span id='ConnState-stat-values-content' class="stat-content">
+			const <a href="#name-StateActive">StateActive</a>
+			const <a href="#name-StateClosed">StateClosed</a>
+			const <a href="#name-StateHijacked">StateHijacked</a>
+			const <a href="#name-StateIdle">StateIdle</a>
+			const <a href="#name-StateNew">StateNew</a></span></div>
+<div class="anchor" id="name-Cookie" data-popularity="505">	 type <a href="../../src/net/http/cookie.go.html#line-20">Cookie</a> <i>(struct)</i>
+		A Cookie represents an HTTP cookie as sent in the Set-Cookie header of an
+		HTTP response or the Cookie header of an HTTP request.
+
+		See https://tools.ietf.org/html/rfc6265 for details.
+
+		<input type='checkbox' class="stat" id="Cookie-stat-fields"><label for="Cookie-stat-fields">Exported Fields (12)</label><span id='Cookie-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/cookie.go.html#line-25">Domain</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-26">Expires</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-34">HttpOnly</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-32">MaxAge</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-21">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-24">Path</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-36">Raw</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-27">RawExpires</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-35">SameSite</a> <i><a href="#name-SameSite">SameSite</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-33">Secure</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-37">Unparsed</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/cookie.go.html#line-22">Value</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Cookie-stat-methods"><label for="Cookie-stat-methods">One Exported Method</label><span id='Cookie-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/cookie.go.html#line-171">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Cookie-stat-impls"><label for="Cookie-stat-impls">Implements (1+)</label><span id='Cookie-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Cookie-stat-results"><label for="Cookie-stat-results">As Outputs Of (4+)</label><span id='Cookie-stat-results-content' class="stat-content">
+			func <a href="#name-CookieJar">CookieJar</a>.<a href="../../src/net/http/jar.go.html#line-26">Cookies</a>(u *<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>) []*<b>Cookie</b>
+			func (*<a href="#name-Request">Request</a>).<a href="../../src/net/http/request.go.html#line-417">Cookie</a>(name <a href="../builtin.html#name-string">string</a>) (*<b>Cookie</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Request">Request</a>).<a href="../../src/net/http/request.go.html#line-406">Cookies</a>() []*<b>Cookie</b>
+			func (*<a href="#name-Response">Response</a>).<a href="../../src/net/http/response.go.html#line-125">Cookies</a>() []*<b>Cookie</b></span>
+		<input type='checkbox' class="stat" id="Cookie-stat-params"><label for="Cookie-stat-params">As Inputs Of (3+)</label><span id='Cookie-stat-params-content' class="stat-content">
+			func <a href="#name-SetCookie">SetCookie</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, cookie *<b>Cookie</b>)
+			func <a href="#name-CookieJar">CookieJar</a>.<a href="../../src/net/http/jar.go.html#line-21">SetCookies</a>(u *<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>, cookies []*<b>Cookie</b>)
+			func (*<a href="#name-Request">Request</a>).<a href="../../src/net/http/request.go.html#line-430">AddCookie</a>(c *<b>Cookie</b>)</span></div>
+<div class="anchor" id="name-CookieJar" data-popularity="100">	 type <a href="../../src/net/http/jar.go.html#line-17">CookieJar</a> <b<i>(interface)</i></b>
+		A CookieJar manages storage and use of cookies in HTTP requests.
+
+		Implementations of CookieJar must be safe for concurrent use by multiple
+		goroutines.
+
+		The net/http/cookiejar package provides a CookieJar implementation.
+
+		<input type='checkbox' class="stat" id="CookieJar-stat-methods"><label for="CookieJar-stat-methods">Exported Methods (2)</label><span id='CookieJar-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/jar.go.html#line-26">Cookies</a>(u *<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>) []*<a href="#name-Cookie">Cookie</a>
+			 (T) <a href="../../src/net/http/jar.go.html#line-21">SetCookies</a>(u *<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>, cookies []*<a href="#name-Cookie">Cookie</a>)</span></div>
+<div class="anchor" id="name-Dir" data-popularity="100">	 type <a href="../../src/net/http/fs.go.html#line-42">Dir</a> <a href="../builtin.html#name-string">string</a>
+		A Dir implements FileSystem using the native file system restricted to a
+		specific directory tree.
+
+		While the FileSystem.Open method takes '/'-separated paths, a Dir's string
+		value is a filename on the native file system, not a URL, so it is separated
+		by filepath.Separator, which isn't necessarily '/'.
+
+		Note that Dir could expose sensitive files and directories. Dir will follow
+		symlinks pointing out of the directory tree, which can be especially dangerous
+		if serving from a directory in which users are able to create arbitrary symlinks.
+		Dir will also allow access to files and directories starting with a period,
+		which could expose sensitive directories like .git or sensitive files like
+		.htpasswd. To exclude files with a leading period, remove the files/directories
+		from the server or create a custom FileSystem implementation.
+
+		An empty Dir is treated as ".".
+
+		<input type='checkbox' class="stat" id="Dir-stat-methods"><label for="Dir-stat-methods">One Exported Method</label><span id='Dir-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/fs.go.html#line-70">Open</a>(name <a href="../builtin.html#name-string">string</a>) (<a href="#name-File">File</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Dir-stat-impls"><label for="Dir-stat-impls">Implements (1+)</label><span id='Dir-stat-impls-content' class="stat-content">
+			 T : <a href="#name-FileSystem">FileSystem</a></span></div>
+<div class="anchor" id="name-File" data-popularity="800">	 type <a href="../../src/net/http/fs.go.html#line-97">File</a> <b<i>(interface)</i></b>
+		A File is returned by a FileSystem's Open method and can be
+		served by the FileServer implementation.
+
+		The methods should behave the same as those on an *os.File.
+
+		<input type='checkbox' class="stat" id="File-stat-methods"><label for="File-stat-methods">Exported Methods (5)</label><span id='File-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/io/io.go.html#line-99">Close</a>() <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/io/io.go.html#line-78">Read</a>(p []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/net/http/fs.go.html#line-101">Readdir</a>(count <a href="../builtin.html#name-int">int</a>) ([]<a href="../os.html">os</a>.<a href="../os.html#name-FileInfo">FileInfo</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/io/io.go.html#line-116">Seek</a>(offset <a href="../builtin.html#name-int64">int64</a>, whence <a href="../builtin.html#name-int">int</a>) (<a href="../builtin.html#name-int64">int64</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/net/http/fs.go.html#line-102">Stat</a>() (<a href="../os.html">os</a>.<a href="../os.html#name-FileInfo">FileInfo</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="File-stat-impledby"><label for="File-stat-impledby">Implemented By (1+)</label><span id='File-stat-impledby-content' class="stat-content">
+			os.(*<a href="../os.html#name-File">File</a>)</span>
+		<input type='checkbox' class="stat" id="File-stat-impls"><label for="File-stat-impls">Implements (5+)</label><span id='File-stat-impls-content' class="stat-content">
+			 T : io.<a href="../io.html#name-Closer">Closer</a>
+			 T : io.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+			 T : io.<a href="../io.html#name-Reader">Reader</a>
+			 T : io.<a href="../io.html#name-ReadSeeker">ReadSeeker</a>
+			 T : io.<a href="../io.html#name-Seeker">Seeker</a></span>
+		<input type='checkbox' class="stat" id="File-stat-results"><label for="File-stat-results">As Outputs Of (2+)</label><span id='File-stat-results-content' class="stat-content">
+			func <a href="#name-Dir">Dir</a>.<a href="../../src/net/http/fs.go.html#line-70">Open</a>(name <a href="../builtin.html#name-string">string</a>) (<b>File</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-FileSystem">FileSystem</a>.<a href="../../src/net/http/fs.go.html#line-90">Open</a>(name <a href="../builtin.html#name-string">string</a>) (<b>File</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-FileSystem" data-popularity="270">	 type <a href="../../src/net/http/fs.go.html#line-89">FileSystem</a> <b<i>(interface)</i></b>
+		A FileSystem implements access to a collection of named files.
+		The elements in a file path are separated by slash ('/', U+002F)
+		characters, regardless of host operating system convention.
+
+		<input type='checkbox' class="stat" id="FileSystem-stat-methods"><label for="FileSystem-stat-methods">One Exported Method</label><span id='FileSystem-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/fs.go.html#line-90">Open</a>(name <a href="../builtin.html#name-string">string</a>) (<a href="#name-File">File</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="FileSystem-stat-impledby"><label for="FileSystem-stat-impledby">Implemented By (1+)</label><span id='FileSystem-stat-impledby-content' class="stat-content">
+			<a href="#name-Dir">Dir</a></span>
+		<input type='checkbox' class="stat" id="FileSystem-stat-params"><label for="FileSystem-stat-params">As Inputs Of (2+)</label><span id='FileSystem-stat-params-content' class="stat-content">
+			func <a href="#name-FileServer">FileServer</a>(root <b>FileSystem</b>) <a href="#name-Handler">Handler</a>
+			func <a href="#name-NewFileTransport">NewFileTransport</a>(fs <b>FileSystem</b>) <a href="#name-RoundTripper">RoundTripper</a></span></div>
+<div class="anchor" id="name-Flusher" data-popularity="50">	 type <a href="../../src/net/http/server.go.html#line-168">Flusher</a> <b<i>(interface)</i></b>
+		The Flusher interface is implemented by ResponseWriters that allow
+		an HTTP handler to flush buffered data to the client.
+
+		The default HTTP/1.x and HTTP/2 ResponseWriter implementations
+		support Flusher, but ResponseWriter wrappers may not. Handlers
+		should always test for this ability at runtime.
+
+		Note that even for ResponseWriters that support Flush,
+		if the client is connected through an HTTP proxy,
+		the buffered data may not reach the client until the response
+		completes.
+
+		<input type='checkbox' class="stat" id="Flusher-stat-methods"><label for="Flusher-stat-methods">One Exported Method</label><span id='Flusher-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/server.go.html#line-170">Flush</a>()</span></div>
+<div class="anchor" id="name-Handler" data-popularity="1485">	 type <a href="../../src/net/http/server.go.html#line-86">Handler</a> <b<i>(interface)</i></b>
+		A Handler responds to an HTTP request.
+
+		ServeHTTP should write reply headers and data to the ResponseWriter
+		and then return. Returning signals that the request is finished; it
+		is not valid to use the ResponseWriter or read from the
+		Request.Body after or concurrently with the completion of the
+		ServeHTTP call.
+
+		Depending on the HTTP client software, HTTP protocol version, and
+		any intermediaries between the client and the Go server, it may not
+		be possible to read from the Request.Body after writing to the
+		ResponseWriter. Cautious handlers should read the Request.Body
+		first, and then reply.
+
+		Except for reading the body, handlers should not modify the
+		provided Request.
+
+		If ServeHTTP panics, the server (the caller of ServeHTTP) assumes
+		that the effect of the panic was isolated to the active request.
+		It recovers the panic, logs a stack trace to the server error log,
+		and either closes the network connection or sends an HTTP/2
+		RST_STREAM, depending on the HTTP protocol. To abort a handler so
+		the client sees an interrupted response but the server doesn't log
+		an error, panic with the value ErrAbortHandler.
+
+		<input type='checkbox' class="stat" id="Handler-stat-methods"><label for="Handler-stat-methods">One Exported Method</label><span id='Handler-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/server.go.html#line-87">ServeHTTP</a>(<a href="#name-ResponseWriter">ResponseWriter</a>, *<a href="#name-Request">Request</a>)</span>
+		<input type='checkbox' class="stat" id="Handler-stat-impledby"><label for="Handler-stat-impledby">Implemented By (3+)</label><span id='Handler-stat-impledby-content' class="stat-content">
+			<a href="#name-HandlerFunc">HandlerFunc</a>
+			*<a href="#name-ServeMux">ServeMux</a>
+			github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Router">Router</a>)</span>
+		<input type='checkbox' class="stat" id="Handler-stat-results"><label for="Handler-stat-results">As Outputs Of (8+)</label><span id='Handler-stat-results-content' class="stat-content">
+			func <a href="#name-FileServer">FileServer</a>(root <a href="#name-FileSystem">FileSystem</a>) <b>Handler</b>
+			func <a href="#name-NotFoundHandler">NotFoundHandler</a>() <b>Handler</b>
+			func <a href="#name-RedirectHandler">RedirectHandler</a>(url <a href="../builtin.html#name-string">string</a>, code <a href="../builtin.html#name-int">int</a>) <b>Handler</b>
+			func <a href="#name-StripPrefix">StripPrefix</a>(prefix <a href="../builtin.html#name-string">string</a>, h <b>Handler</b>) <b>Handler</b>
+			func <a href="#name-TimeoutHandler">TimeoutHandler</a>(h <b>Handler</b>, dt <a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a>, msg <a href="../builtin.html#name-string">string</a>) <b>Handler</b>
+			func (*<a href="#name-ServeMux">ServeMux</a>).<a href="../../src/net/http/server.go.html#line-2352">Handler</a>(r *<a href="#name-Request">Request</a>) (h <b>Handler</b>, pattern <a href="../builtin.html#name-string">string</a>)
+			func github.com/gorilla/mux.<a href="../github.com/gorilla/mux.html#name-MiddlewareFunc">MiddlewareFunc</a>.<a href="../../src/github.com/gorilla/mux/middleware.go.html#line-19">Middleware</a>(handler <b>Handler</b>) <b>Handler</b>
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Route">Route</a>).<a href="../../src/github.com/gorilla/mux/route.go.html#line-131">GetHandler</a>() <b>Handler</b></span>
+		<input type='checkbox' class="stat" id="Handler-stat-params"><label for="Handler-stat-params">As Inputs Of (11+)</label><span id='Handler-stat-params-content' class="stat-content">
+			func <a href="#name-Handle">Handle</a>(pattern <a href="../builtin.html#name-string">string</a>, handler <b>Handler</b>)
+			func <a href="#name-ListenAndServe">ListenAndServe</a>(addr <a href="../builtin.html#name-string">string</a>, handler <b>Handler</b>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-ListenAndServeTLS">ListenAndServeTLS</a>(addr, certFile, keyFile <a href="../builtin.html#name-string">string</a>, handler <b>Handler</b>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-Serve">Serve</a>(l <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, handler <b>Handler</b>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-ServeTLS">ServeTLS</a>(l <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, handler <b>Handler</b>, certFile, keyFile <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-StripPrefix">StripPrefix</a>(prefix <a href="../builtin.html#name-string">string</a>, h <b>Handler</b>) <b>Handler</b>
+			func <a href="#name-TimeoutHandler">TimeoutHandler</a>(h <b>Handler</b>, dt <a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a>, msg <a href="../builtin.html#name-string">string</a>) <b>Handler</b>
+			func (*<a href="#name-ServeMux">ServeMux</a>).<a href="../../src/net/http/server.go.html#line-2422">Handle</a>(pattern <a href="../builtin.html#name-string">string</a>, handler <b>Handler</b>)
+			func github.com/gorilla/mux.<a href="../github.com/gorilla/mux.html#name-MiddlewareFunc">MiddlewareFunc</a>.<a href="../../src/github.com/gorilla/mux/middleware.go.html#line-19">Middleware</a>(handler <b>Handler</b>) <b>Handler</b>
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Route">Route</a>).<a href="../../src/github.com/gorilla/mux/route.go.html#line-118">Handler</a>(handler <b>Handler</b>) *<a href="../github.com/gorilla/mux.html">mux</a>.<a href="../github.com/gorilla/mux.html#name-Route">Route</a>
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Router">Router</a>).<a href="../../src/github.com/gorilla/mux/mux.go.html#line-292">Handle</a>(path <a href="../builtin.html#name-string">string</a>, handler <b>Handler</b>) *<a href="../github.com/gorilla/mux.html">mux</a>.<a href="../github.com/gorilla/mux.html#name-Route">Route</a></span></div>
+<div class="anchor" id="name-HandlerFunc" data-popularity="100">	 type <a href="../../src/net/http/server.go.html#line-2038">HandlerFunc</a> <i>(func)</i>
+		The HandlerFunc type is an adapter to allow the use of
+		ordinary functions as HTTP handlers. If f is a function
+		with the appropriate signature, HandlerFunc(f) is a
+		Handler that calls f.
+
+		<input type='checkbox' class="stat" id="HandlerFunc-stat-methods"><label for="HandlerFunc-stat-methods">One Exported Method</label><span id='HandlerFunc-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/server.go.html#line-2041">ServeHTTP</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<a href="#name-Request">Request</a>)</span>
+		<input type='checkbox' class="stat" id="HandlerFunc-stat-impls"><label for="HandlerFunc-stat-impls">Implements (1+)</label><span id='HandlerFunc-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Handler">Handler</a></span></div>
+<div class="anchor" id="name-Header" data-popularity="550">	 type <a href="../../src/net/http/header.go.html#line-21">Header</a> <i>(map)</i>
+		A Header represents the key-value pairs in an HTTP header.
+
+		The keys should be in canonical form, as returned by
+		CanonicalHeaderKey.
+
+		<input type='checkbox' class="stat" id="Header-stat-methods"><label for="Header-stat-methods">Exported Methods (8)</label><span id='Header-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/header.go.html#line-27">Add</a>(key, value <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/http/header.go.html#line-90">Clone</a>() <b>Header</b>
+			 (T) <a href="../../src/net/http/header.go.html#line-76">Del</a>(key <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/http/header.go.html#line-45">Get</a>(key <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/net/http/header.go.html#line-36">Set</a>(key, value <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/http/header.go.html#line-54">Values</a>(key <a href="../builtin.html#name-string">string</a>) []<a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/net/http/header.go.html#line-81">Write</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/net/http/header.go.html#line-182">WriteSubset</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, exclude map[<a href="../builtin.html#name-string">string</a>]<a href="../builtin.html#name-bool">bool</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Header-stat-results"><label for="Header-stat-results">As Outputs Of (2+)</label><span id='Header-stat-results-content' class="stat-content">
+			func <a href="#name-Header">Header</a>.<a href="../../src/net/http/header.go.html#line-90">Clone</a>() <b>Header</b>
+			func <a href="#name-ResponseWriter">ResponseWriter</a>.<a href="../../src/net/http/server.go.html#line-116">Header</a>() <b>Header</b></span></div>
+<div class="anchor" id="name-Hijacker" data-popularity="50">	 type <a href="../../src/net/http/server.go.html#line-180">Hijacker</a> <b<i>(interface)</i></b>
+		The Hijacker interface is implemented by ResponseWriters that allow
+		an HTTP handler to take over the connection.
+
+		The default ResponseWriter for HTTP/1.x connections supports
+		Hijacker, but HTTP/2 connections intentionally do not.
+		ResponseWriter wrappers may also not support Hijacker. Handlers
+		should always test for this ability at runtime.
+
+		<input type='checkbox' class="stat" id="Hijacker-stat-methods"><label for="Hijacker-stat-methods">One Exported Method</label><span id='Hijacker-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/server.go.html#line-200">Hijack</a>() (<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-ReadWriter">ReadWriter</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ProtocolError" data-popularity="115">	 type <a href="../../src/net/http/request.go.html#line-45">ProtocolError</a> <i>(struct)</i>
+		ProtocolError represents an HTTP protocol error.
+
+		Deprecated: Not all errors in the http package related to protocol errors
+		are of type ProtocolError.
+
+		<input type='checkbox' class="stat" id="ProtocolError-stat-fields"><label for="ProtocolError-stat-fields">One Exported Field</label><span id='ProtocolError-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/request.go.html#line-46">ErrorString</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="ProtocolError-stat-methods"><label for="ProtocolError-stat-methods">One Exported Method</label><span id='ProtocolError-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/request.go.html#line-49">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ProtocolError-stat-impls"><label for="ProtocolError-stat-impls">Implements (1+)</label><span id='ProtocolError-stat-impls-content' class="stat-content">
+			*T : <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="ProtocolError-stat-values"><label for="ProtocolError-stat-values">As Types Of (7+)</label><span id='ProtocolError-stat-values-content' class="stat-content">
+			  var <a href="#name-ErrHeaderTooLong">ErrHeaderTooLong</a> *ProtocolError
+			  var <a href="#name-ErrMissingBoundary">ErrMissingBoundary</a> *ProtocolError
+			  var <a href="#name-ErrMissingContentLength">ErrMissingContentLength</a> *ProtocolError
+			  var <a href="#name-ErrNotMultipart">ErrNotMultipart</a> *ProtocolError
+			  var <a href="#name-ErrNotSupported">ErrNotSupported</a> *ProtocolError
+			  var <a href="#name-ErrShortBody">ErrShortBody</a> *ProtocolError
+			  var <a href="#name-ErrUnexpectedTrailer">ErrUnexpectedTrailer</a> *ProtocolError</span></div>
+<div class="anchor" id="name-Pusher" data-popularity="50">	 type <a href="../../src/net/http/http.go.html#line-142">Pusher</a> <b<i>(interface)</i></b>
+		Pusher is the interface implemented by ResponseWriters that support
+		HTTP/2 server push. For more background, see
+		https://tools.ietf.org/html/rfc7540#section-8.2.
+
+		<input type='checkbox' class="stat" id="Pusher-stat-methods"><label for="Pusher-stat-methods">One Exported Method</label><span id='Pusher-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/http.go.html#line-167">Push</a>(target <a href="../builtin.html#name-string">string</a>, opts *<a href="#name-PushOptions">PushOptions</a>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-PushOptions" data-popularity="35">	 type <a href="../../src/net/http/http.go.html#line-128">PushOptions</a> <i>(struct)</i>
+		PushOptions describes options for Pusher.Push.
+
+		<input type='checkbox' class="stat" id="PushOptions-stat-fields"><label for="PushOptions-stat-fields">Exported Fields (2)</label><span id='PushOptions-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/http.go.html#line-136">Header</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/net/http/http.go.html#line-131">Method</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="PushOptions-stat-params"><label for="PushOptions-stat-params">As Inputs Of (1+)</label><span id='PushOptions-stat-params-content' class="stat-content">
+			func <a href="#name-Pusher">Pusher</a>.<a href="../../src/net/http/http.go.html#line-167">Push</a>(target <a href="../builtin.html#name-string">string</a>, opts *<b>PushOptions</b>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Request" data-popularity="2240">	 type <a href="../../src/net/http/request.go.html#line-103">Request</a> <i>(struct)</i>
+		A Request represents an HTTP request received by a server
+		or to be sent by a client.
+
+		The field semantics differ slightly between client and server
+		usage. In addition to the notes on the fields below, see the
+		documentation for Request.Write and RoundTripper.
+
+		<input type='checkbox' class="stat" id="Request-stat-fields"><label for="Request-stat-fields">Exported Fields (21)</label><span id='Request-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/request.go.html#line-178">Body</a> <i><a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a></i>
+			<a href="../../src/net/http/request.go.html#line-308">Cancel</a> <i>&lt;-chan struct{}</i>
+			<a href="../../src/net/http/request.go.html#line-214">Close</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/http/request.go.html#line-195">ContentLength</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/net/http/request.go.html#line-241">Form</a> <i><a href="url.html">url</a>.<a href="url.html#name-Values">Values</a></i>
+			<a href="../../src/net/http/request.go.html#line-186">GetBody</a> <i>func() (<a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/net/http/request.go.html#line-166">Header</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/net/http/request.go.html#line-235">Host</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/request.go.html#line-110">Method</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/request.go.html#line-253">MultipartForm</a> <i>*<a href="../mime/multipart.html">multipart</a>.<a href="../mime/multipart.html#name-Form">Form</a></i>
+			<a href="../../src/net/http/request.go.html#line-248">PostForm</a> <i><a href="url.html">url</a>.<a href="url.html#name-Values">Values</a></i>
+			<a href="../../src/net/http/request.go.html#line-131">Proto</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/request.go.html#line-132">ProtoMajor</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/request.go.html#line-133">ProtoMinor</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/request.go.html#line-282">RemoteAddr</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/request.go.html#line-288">RequestURI</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/request.go.html#line-313">Response</a> <i>*<a href="#name-Response">Response</a></i>
+			<a href="../../src/net/http/request.go.html#line-297">TLS</a> <i>*<a href="../crypto/tls.html">tls</a>.<a href="../crypto/tls.html#name-ConnectionState">ConnectionState</a></i>
+			<a href="../../src/net/http/request.go.html#line-273">Trailer</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/net/http/request.go.html#line-202">TransferEncoding</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/request.go.html#line-124">URL</a> <i>*<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a></i></span>
+		<input type='checkbox' class="stat" id="Request-stat-methods"><label for="Request-stat-methods">Exported Methods (19)</label><span id='Request-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/request.go.html#line-430">AddCookie</a>(c *<a href="#name-Cookie">Cookie</a>)
+			(*T) <a href="../../src/net/http/request.go.html#line-922">BasicAuth</a>() (username, password <a href="../builtin.html#name-string">string</a>, ok <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/net/http/request.go.html#line-368">Clone</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) *<b>Request</b>
+			(*T) <a href="../../src/net/http/request.go.html#line-333">Context</a>() <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-417">Cookie</a>(name <a href="../builtin.html#name-string">string</a>) (*<a href="#name-Cookie">Cookie</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/request.go.html#line-406">Cookies</a>() []*<a href="#name-Cookie">Cookie</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-1349">FormFile</a>(key <a href="../builtin.html#name-string">string</a>) (<a href="../mime/multipart.html">multipart</a>.<a href="../mime/multipart.html#name-File">File</a>, *<a href="../mime/multipart.html">multipart</a>.<a href="../mime/multipart.html#name-FileHeader">FileHeader</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/request.go.html#line-1322">FormValue</a>(key <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-463">MultipartReader</a>() (*<a href="../mime/multipart.html">multipart</a>.<a href="../mime/multipart.html#name-Reader">Reader</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/request.go.html#line-1236">ParseForm</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-1277">ParseMultipartForm</a>(maxMemory <a href="../builtin.html#name-int64">int64</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-1337">PostFormValue</a>(key <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-395">ProtoAtLeast</a>(major, minor <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-447">Referer</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-959">SetBasicAuth</a>(username, password <a href="../builtin.html#name-string">string</a>)
+			(*T) <a href="../../src/net/http/request.go.html#line-401">UserAgent</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-351">WithContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) *<b>Request</b>
+			(*T) <a href="../../src/net/http/request.go.html#line-523">Write</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/request.go.html#line-533">WriteProxy</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Request-stat-results"><label for="Request-stat-results">As Outputs Of (6+)</label><span id='Request-stat-results-content' class="stat-content">
+			func <a href="#name-NewRequest">NewRequest</a>(method, url <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<b>Request</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-NewRequestWithContext">NewRequestWithContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, method, url <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<b>Request</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-ReadRequest">ReadRequest</a>(b *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a>) (*<b>Request</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Request">Request</a>).<a href="../../src/net/http/request.go.html#line-368">Clone</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) *<b>Request</b>
+			func (*<a href="#name-Request">Request</a>).<a href="../../src/net/http/request.go.html#line-351">WithContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) *<b>Request</b>
+			func github.com/gorilla/mux.<a href="../github.com/gorilla/mux.html#name-SetURLVars">SetURLVars</a>(r *<b>Request</b>, val map[<a href="../builtin.html#name-string">string</a>]<a href="../builtin.html#name-string">string</a>) *<b>Request</b></span>
+		<input type='checkbox' class="stat" id="Request-stat-params"><label for="Request-stat-params">As Inputs Of (24+)</label><span id='Request-stat-params-content' class="stat-content">
+			func <a href="#name-NotFound">NotFound</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>)
+			func <a href="#name-ProxyFromEnvironment">ProxyFromEnvironment</a>(req *<b>Request</b>) (*<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-ReadResponse">ReadResponse</a>(r *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a>, req *<b>Request</b>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-Redirect">Redirect</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>, url <a href="../builtin.html#name-string">string</a>, code <a href="../builtin.html#name-int">int</a>)
+			func <a href="#name-ServeContent">ServeContent</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, req *<b>Request</b>, name <a href="../builtin.html#name-string">string</a>, modtime <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>, content <a href="../io.html">io</a>.<a href="../io.html#name-ReadSeeker">ReadSeeker</a>)
+			func <a href="#name-ServeFile">ServeFile</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>, name <a href="../builtin.html#name-string">string</a>)
+			func (*<a href="#name-Client">Client</a>).<a href="../../src/net/http/client.go.html#line-585">Do</a>(req *<b>Request</b>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-Handler">Handler</a>.<a href="../../src/net/http/server.go.html#line-87">ServeHTTP</a>(<a href="#name-ResponseWriter">ResponseWriter</a>, *<b>Request</b>)
+			func <a href="#name-HandlerFunc">HandlerFunc</a>.<a href="../../src/net/http/server.go.html#line-2041">ServeHTTP</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>)
+			func <a href="#name-RoundTripper">RoundTripper</a>.<a href="../../src/net/http/client.go.html#line-142">RoundTrip</a>(*<b>Request</b>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-ServeMux">ServeMux</a>).<a href="../../src/net/http/server.go.html#line-2352">Handler</a>(r *<b>Request</b>) (h <a href="#name-Handler">Handler</a>, pattern <a href="../builtin.html#name-string">string</a>)
+			func (*<a href="#name-ServeMux">ServeMux</a>).<a href="../../src/net/http/server.go.html#line-2408">ServeHTTP</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>)
+			func (*<a href="#name-Transport">Transport</a>).<a href="../../src/net/http/transport.go.html#line-764">CancelRequest</a>(req *<b>Request</b>)
+			func (*<a href="#name-Transport">Transport</a>).<a href="../../src/net/http/roundtrip.go.html#line-16">RoundTrip</a>(req *<b>Request</b>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)
+			func fs5-gestiondesocios-backend/src/api/controllers.<a href="../fs5-gestiondesocios-backend/src/api/controllers.html#name-GetGame">GetGame</a>(writer <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>)
+			func fs5-gestiondesocios-backend/src/api/controllers.<a href="../fs5-gestiondesocios-backend/src/api/controllers.html#name-GetUser">GetUser</a>(writer <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>)
+			func fs5-gestiondesocios-backend/src/api/controllers.<a href="../fs5-gestiondesocios-backend/src/api/controllers.html#name-GetUsers">GetUsers</a>(writer <a href="#name-ResponseWriter">ResponseWriter</a>, r *<b>Request</b>)
+			func github.com/gorilla/mux.<a href="../github.com/gorilla/mux.html#name-CurrentRoute">CurrentRoute</a>(r *<b>Request</b>) *<a href="../github.com/gorilla/mux.html">mux</a>.<a href="../github.com/gorilla/mux.html#name-Route">Route</a>
+			func github.com/gorilla/mux.<a href="../github.com/gorilla/mux.html#name-SetURLVars">SetURLVars</a>(r *<b>Request</b>, val map[<a href="../builtin.html#name-string">string</a>]<a href="../builtin.html#name-string">string</a>) *<b>Request</b>
+			func github.com/gorilla/mux.<a href="../github.com/gorilla/mux.html#name-Vars">Vars</a>(r *<b>Request</b>) map[<a href="../builtin.html#name-string">string</a>]<a href="../builtin.html#name-string">string</a>
+			func github.com/gorilla/mux.<a href="../github.com/gorilla/mux.html#name-MatcherFunc">MatcherFunc</a>.<a href="../../src/github.com/gorilla/mux/route.go.html#line-304">Match</a>(r *<b>Request</b>, match *<a href="../github.com/gorilla/mux.html">mux</a>.<a href="../github.com/gorilla/mux.html#name-RouteMatch">RouteMatch</a>) <a href="../builtin.html#name-bool">bool</a>
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Route">Route</a>).<a href="../../src/github.com/gorilla/mux/route.go.html#line-41">Match</a>(req *<b>Request</b>, match *<a href="../github.com/gorilla/mux.html">mux</a>.<a href="../github.com/gorilla/mux.html#name-RouteMatch">RouteMatch</a>) <a href="../builtin.html#name-bool">bool</a>
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Router">Router</a>).<a href="../../src/github.com/gorilla/mux/mux.go.html#line-136">Match</a>(req *<b>Request</b>, match *<a href="../github.com/gorilla/mux.html">mux</a>.<a href="../github.com/gorilla/mux.html#name-RouteMatch">RouteMatch</a>) <a href="../builtin.html#name-bool">bool</a>
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Router">Router</a>).<a href="../../src/github.com/gorilla/mux/mux.go.html#line-173">ServeHTTP</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, req *<b>Request</b>)</span></div>
+<div class="anchor" id="name-Response" data-popularity="1100">	 type <a href="../../src/net/http/response.go.html#line-35">Response</a> <i>(struct)</i>
+		Response represents the response from an HTTP request.
+
+		The Client and Transport return Responses from servers once
+		the response headers have been received. The response body
+		is streamed on demand as the Body field is read.
+
+		<input type='checkbox' class="stat" id="Response-stat-fields"><label for="Response-stat-fields">Exported Fields (14)</label><span id='Response-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/response.go.html#line-72">Body</a> <i><a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a></i>
+			<a href="../../src/net/http/response.go.html#line-87">Close</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/http/response.go.html#line-78">ContentLength</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/net/http/response.go.html#line-51">Header</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/net/http/response.go.html#line-38">Proto</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/response.go.html#line-39">ProtoMajor</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/response.go.html#line-40">ProtoMinor</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/response.go.html#line-115">Request</a> <i>*<a href="#name-Request">Request</a></i>
+			<a href="../../src/net/http/response.go.html#line-36">Status</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/response.go.html#line-37">StatusCode</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/response.go.html#line-121">TLS</a> <i>*<a href="../crypto/tls.html">tls</a>.<a href="../crypto/tls.html#name-ConnectionState">ConnectionState</a></i>
+			<a href="../../src/net/http/response.go.html#line-110">Trailer</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/net/http/response.go.html#line-82">TransferEncoding</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/response.go.html#line-96">Uncompressed</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Response-stat-methods"><label for="Response-stat-methods">Exported Methods (4)</label><span id='Response-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/response.go.html#line-125">Cookies</a>() []*<a href="#name-Cookie">Cookie</a>
+			(*T) <a href="../../src/net/http/response.go.html#line-137">Location</a>() (*<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/http/response.go.html#line-224">ProtoAtLeast</a>(major, minor <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/net/http/response.go.html#line-245">Write</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Response-stat-results"><label for="Response-stat-results">As Outputs Of (12+)</label><span id='Response-stat-results-content' class="stat-content">
+			func <a href="#name-Get">Get</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-Head">Head</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-Post">Post</a>(url, contentType <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-PostForm">PostForm</a>(url <a href="../builtin.html#name-string">string</a>, data <a href="url.html">url</a>.<a href="url.html#name-Values">Values</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-ReadResponse">ReadResponse</a>(r *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a>, req *<a href="#name-Request">Request</a>) (*<b>Response</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Client">Client</a>).<a href="../../src/net/http/client.go.html#line-585">Do</a>(req *<a href="#name-Request">Request</a>) (*<b>Response</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Client">Client</a>).<a href="../../src/net/http/client.go.html#line-470">Get</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Client">Client</a>).<a href="../../src/net/http/client.go.html#line-905">Head</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Client">Client</a>).<a href="../../src/net/http/client.go.html#line-840">Post</a>(url, contentType <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Client">Client</a>).<a href="../../src/net/http/client.go.html#line-877">PostForm</a>(url <a href="../builtin.html#name-string">string</a>, data <a href="url.html">url</a>.<a href="url.html#name-Values">Values</a>) (resp *<b>Response</b>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-RoundTripper">RoundTripper</a>.<a href="../../src/net/http/client.go.html#line-142">RoundTrip</a>(*<a href="#name-Request">Request</a>) (*<b>Response</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Transport">Transport</a>).<a href="../../src/net/http/roundtrip.go.html#line-16">RoundTrip</a>(req *<a href="#name-Request">Request</a>) (*<b>Response</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ResponseWriter" data-popularity="760">	 type <a href="../../src/net/http/server.go.html#line-95">ResponseWriter</a> <b<i>(interface)</i></b>
+		A ResponseWriter interface is used by an HTTP handler to
+		construct an HTTP response.
+
+		A ResponseWriter may not be used after the Handler.ServeHTTP method
+		has returned.
+
+		<input type='checkbox' class="stat" id="ResponseWriter-stat-methods"><label for="ResponseWriter-stat-methods">Exported Methods (3)</label><span id='ResponseWriter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/server.go.html#line-116">Header</a>() <a href="#name-Header">Header</a>
+			 (T) <a href="../../src/net/http/server.go.html#line-139">Write</a>([]<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/net/http/server.go.html#line-154">WriteHeader</a>(statusCode <a href="../builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="ResponseWriter-stat-impls"><label for="ResponseWriter-stat-impls">Implements (1+)</label><span id='ResponseWriter-stat-impls-content' class="stat-content">
+			 T : io.<a href="../io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="ResponseWriter-stat-params"><label for="ResponseWriter-stat-params">As Inputs Of (16+)</label><span id='ResponseWriter-stat-params-content' class="stat-content">
+			func <a href="#name-Error">Error</a>(w <b>ResponseWriter</b>, error <a href="../builtin.html#name-string">string</a>, code <a href="../builtin.html#name-int">int</a>)
+			func <a href="#name-MaxBytesReader">MaxBytesReader</a>(w <b>ResponseWriter</b>, r <a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a>, n <a href="../builtin.html#name-int64">int64</a>) <a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+			func <a href="#name-NotFound">NotFound</a>(w <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>)
+			func <a href="#name-Redirect">Redirect</a>(w <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>, url <a href="../builtin.html#name-string">string</a>, code <a href="../builtin.html#name-int">int</a>)
+			func <a href="#name-ServeContent">ServeContent</a>(w <b>ResponseWriter</b>, req *<a href="#name-Request">Request</a>, name <a href="../builtin.html#name-string">string</a>, modtime <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>, content <a href="../io.html">io</a>.<a href="../io.html#name-ReadSeeker">ReadSeeker</a>)
+			func <a href="#name-ServeFile">ServeFile</a>(w <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>, name <a href="../builtin.html#name-string">string</a>)
+			func <a href="#name-SetCookie">SetCookie</a>(w <b>ResponseWriter</b>, cookie *<a href="#name-Cookie">Cookie</a>)
+			func <a href="#name-Handler">Handler</a>.<a href="../../src/net/http/server.go.html#line-87">ServeHTTP</a>(<b>ResponseWriter</b>, *<a href="#name-Request">Request</a>)
+			func <a href="#name-HandlerFunc">HandlerFunc</a>.<a href="../../src/net/http/server.go.html#line-2041">ServeHTTP</a>(w <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>)
+			func (*<a href="#name-ServeMux">ServeMux</a>).<a href="../../src/net/http/server.go.html#line-2408">ServeHTTP</a>(w <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>)
+			func fs5-gestiondesocios-backend/src/api/controllers.<a href="../fs5-gestiondesocios-backend/src/api/controllers.html#name-GetGame">GetGame</a>(writer <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>)
+			func fs5-gestiondesocios-backend/src/api/controllers.<a href="../fs5-gestiondesocios-backend/src/api/controllers.html#name-GetUser">GetUser</a>(writer <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>)
+			func fs5-gestiondesocios-backend/src/api/controllers.<a href="../fs5-gestiondesocios-backend/src/api/controllers.html#name-GetUsers">GetUsers</a>(writer <b>ResponseWriter</b>, r *<a href="#name-Request">Request</a>)
+			func fs5-gestiondesocios-backend/src/api/utils.<a href="../fs5-gestiondesocios-backend/src/api/utils.html#name-SendError">SendError</a>(writer <b>ResponseWriter</b>, status <a href="../builtin.html#name-int">int</a>)
+			func fs5-gestiondesocios-backend/src/api/utils.<a href="../fs5-gestiondesocios-backend/src/api/utils.html#name-SendResponse">SendResponse</a>(writer <b>ResponseWriter</b>, status <a href="../builtin.html#name-int">int</a>, data []<a href="../builtin.html#name-byte">byte</a>)
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Router">Router</a>).<a href="../../src/github.com/gorilla/mux/mux.go.html#line-173">ServeHTTP</a>(w <b>ResponseWriter</b>, req *<a href="#name-Request">Request</a>)</span></div>
+<div class="anchor" id="name-RoundTripper" data-popularity="315">	 type <a href="../../src/net/http/client.go.html#line-117">RoundTripper</a> <b<i>(interface)</i></b>
+		RoundTripper is an interface representing the ability to execute a
+		single HTTP transaction, obtaining the Response for a given Request.
+
+		A RoundTripper must be safe for concurrent use by multiple
+		goroutines.
+
+		<input type='checkbox' class="stat" id="RoundTripper-stat-methods"><label for="RoundTripper-stat-methods">One Exported Method</label><span id='RoundTripper-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/http/client.go.html#line-142">RoundTrip</a>(*<a href="#name-Request">Request</a>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="RoundTripper-stat-impledby"><label for="RoundTripper-stat-impledby">Implemented By (1+)</label><span id='RoundTripper-stat-impledby-content' class="stat-content">
+			*<a href="#name-Transport">Transport</a></span>
+		<input type='checkbox' class="stat" id="RoundTripper-stat-results"><label for="RoundTripper-stat-results">As Outputs Of (1+)</label><span id='RoundTripper-stat-results-content' class="stat-content">
+			func <a href="#name-NewFileTransport">NewFileTransport</a>(fs <a href="#name-FileSystem">FileSystem</a>) <b>RoundTripper</b></span>
+		<input type='checkbox' class="stat" id="RoundTripper-stat-params"><label for="RoundTripper-stat-params">As Inputs Of (1+)</label><span id='RoundTripper-stat-params-content' class="stat-content">
+			func (*<a href="#name-Transport">Transport</a>).<a href="../../src/net/http/transport.go.html#line-721">RegisterProtocol</a>(scheme <a href="../builtin.html#name-string">string</a>, rt <b>RoundTripper</b>)</span>
+		<input type='checkbox' class="stat" id="RoundTripper-stat-values"><label for="RoundTripper-stat-values">As Types Of (1+)</label><span id='RoundTripper-stat-values-content' class="stat-content">
+			  var <a href="#name-DefaultTransport">DefaultTransport</a></span></div>
+<div class="anchor" id="name-SameSite" data-popularity="15">	 type <a href="../../src/net/http/cookie.go.html#line-46">SameSite</a> <a href="../builtin.html#name-int">int</a>
+		SameSite allows a server to define a cookie attribute making it impossible for
+		the browser to send this cookie along with cross-site requests. The main
+		goal is to mitigate the risk of cross-origin information leakage, and provide
+		some protection against cross-site request forgery attacks.
+
+		See https://tools.ietf.org/html/draft-ietf-httpbis-cookie-same-site-00 for details.
+
+		<input type='checkbox' class="stat" id="SameSite-stat-values"><label for="SameSite-stat-values">As Types Of (4+)</label><span id='SameSite-stat-values-content' class="stat-content">
+			const <a href="#name-SameSiteDefaultMode">SameSiteDefaultMode</a>
+			const <a href="#name-SameSiteLaxMode">SameSiteLaxMode</a>
+			const <a href="#name-SameSiteNoneMode">SameSiteNoneMode</a>
+			const <a href="#name-SameSiteStrictMode">SameSiteStrictMode</a></span></div>
+<div class="anchor" id="name-ServeMux" data-popularity="330">	 type <a href="../../src/net/http/server.go.html#line-2222">ServeMux</a> <i>(struct)</i>
+		ServeMux is an HTTP request multiplexer.
+		It matches the URL of each incoming request against a list of registered
+		patterns and calls the handler for the pattern that
+		most closely matches the URL.
+
+		Patterns name fixed, rooted paths, like "/favicon.ico",
+		or rooted subtrees, like "/images/" (note the trailing slash).
+		Longer patterns take precedence over shorter ones, so that
+		if there are handlers registered for both "/images/"
+		and "/images/thumbnails/", the latter handler will be
+		called for paths beginning "/images/thumbnails/" and the
+		former will receive requests for any other paths in the
+		"/images/" subtree.
+
+		Note that since a pattern ending in a slash names a rooted subtree,
+		the pattern "/" matches all paths not matched by other registered
+		patterns, not just the URL with Path == "/".
+
+		If a subtree has been registered and a request is received naming the
+		subtree root without its trailing slash, ServeMux redirects that
+		request to the subtree root (adding the trailing slash). This behavior can
+		be overridden with a separate registration for the path without
+		the trailing slash. For example, registering "/images/" causes ServeMux
+		to redirect a request for "/images" to "/images/", unless "/images" has
+		been registered separately.
+
+		Patterns may optionally begin with a host name, restricting matches to
+		URLs on that host only. Host-specific patterns take precedence over
+		general patterns, so that a handler might register for the two patterns
+		"/codesearch" and "codesearch.google.com/" without also taking over
+		requests for "http://www.google.com/".
+
+		ServeMux also takes care of sanitizing the URL request path and the Host
+		header, stripping the port number and redirecting any request containing . or
+		.. elements or repeated slashes to an equivalent, cleaner URL.
+
+		<input type='checkbox' class="stat" id="ServeMux-stat-methods"><label for="ServeMux-stat-methods">Exported Methods (4)</label><span id='ServeMux-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/server.go.html#line-2422">Handle</a>(pattern <a href="../builtin.html#name-string">string</a>, handler <a href="#name-Handler">Handler</a>)
+			(*T) <a href="../../src/net/http/server.go.html#line-2466">HandleFunc</a>(pattern <a href="../builtin.html#name-string">string</a>, handler func(<a href="#name-ResponseWriter">ResponseWriter</a>, *<a href="#name-Request">Request</a>))
+			(*T) <a href="../../src/net/http/server.go.html#line-2352">Handler</a>(r *<a href="#name-Request">Request</a>) (h <a href="#name-Handler">Handler</a>, pattern <a href="../builtin.html#name-string">string</a>)
+			(*T) <a href="../../src/net/http/server.go.html#line-2408">ServeHTTP</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<a href="#name-Request">Request</a>)</span>
+		<input type='checkbox' class="stat" id="ServeMux-stat-impls"><label for="ServeMux-stat-impls">Implements (1+)</label><span id='ServeMux-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Handler">Handler</a></span>
+		<input type='checkbox' class="stat" id="ServeMux-stat-results"><label for="ServeMux-stat-results">As Outputs Of (1+)</label><span id='ServeMux-stat-results-content' class="stat-content">
+			func <a href="#name-NewServeMux">NewServeMux</a>() *<b>ServeMux</b></span>
+		<input type='checkbox' class="stat" id="ServeMux-stat-values"><label for="ServeMux-stat-values">As Types Of (1+)</label><span id='ServeMux-stat-values-content' class="stat-content">
+			  var <a href="#name-DefaultServeMux">DefaultServeMux</a> *ServeMux</span></div>
+<div class="anchor" id="name-Server" data-popularity="450">	 type <a href="../../src/net/http/server.go.html#line-2520">Server</a> <i>(struct)</i>
+		A Server defines parameters for running an HTTP server.
+		The zero value for Server is a valid configuration.
+
+		<input type='checkbox' class="stat" id="Server-stat-fields"><label for="Server-stat-fields">Exported Fields (13)</label><span id='Server-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/server.go.html#line-2525">Addr</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/http/server.go.html#line-2602">BaseContext</a> <i>func(<a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>) <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a></i>
+			<a href="../../src/net/http/server.go.html#line-2608">ConnContext</a> <i>func(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, c <a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>) <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a></i>
+			<a href="../../src/net/http/server.go.html#line-2588">ConnState</a> <i>func(<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, <a href="#name-ConnState">ConnState</a>)</i>
+			<a href="../../src/net/http/server.go.html#line-2594">ErrorLog</a> <i>*<a href="../log.html">log</a>.<a href="../log.html#name-Logger">Logger</a></i>
+			<a href="../../src/net/http/server.go.html#line-2527">Handler</a> <i><a href="#name-Handler">Handler</a></i>
+			<a href="../../src/net/http/server.go.html#line-2565">IdleTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/server.go.html#line-2572">MaxHeaderBytes</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/server.go.html#line-2553">ReadHeaderTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/server.go.html#line-2545">ReadTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/server.go.html#line-2536">TLSConfig</a> <i>*<a href="../crypto/tls.html">tls</a>.<a href="../crypto/tls.html#name-Config">Config</a></i>
+			<a href="../../src/net/http/server.go.html#line-2583">TLSNextProto</a> <i>map[<a href="../builtin.html#name-string">string</a>]func(*<b>Server</b>, *<a href="../crypto/tls.html">tls</a>.<a href="../crypto/tls.html#name-Conn">Conn</a>, <a href="#name-Handler">Handler</a>)</i>
+			<a href="../../src/net/http/server.go.html#line-2559">WriteTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i></span>
+		<input type='checkbox' class="stat" id="Server-stat-methods"><label for="Server-stat-methods">Exported Methods (8)</label><span id='Server-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/server.go.html#line-2657">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/server.go.html#line-2854">ListenAndServe</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/server.go.html#line-3148">ListenAndServeTLS</a>(certFile, keyFile <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/server.go.html#line-2729">RegisterOnShutdown</a>(f func())
+			(*T) <a href="../../src/net/http/server.go.html#line-2907">Serve</a>(l <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/server.go.html#line-2986">ServeTLS</a>(l <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, certFile, keyFile <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/http/server.go.html#line-3078">SetKeepAlivesEnabled</a>(v <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/net/http/server.go.html#line-2699">Shutdown</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Server-stat-impls"><label for="Server-stat-impls">Implements (1+)</label><span id='Server-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a></span></div>
+<div class="anchor" id="name-Transport" data-popularity="375">	 type <a href="../../src/net/http/transport.go.html#line-95">Transport</a> <i>(struct)</i>
+		Transport is an implementation of RoundTripper that supports HTTP,
+		HTTPS, and HTTP proxies (for either HTTP or HTTPS with CONNECT).
+
+		By default, Transport caches connections for future re-use.
+		This may leave many open connections when accessing many hosts.
+		This behavior can be managed using Transport's CloseIdleConnections method
+		and the MaxIdleConnsPerHost and DisableKeepAlives fields.
+
+		Transports should be reused instead of created as needed.
+		Transports are safe for concurrent use by multiple goroutines.
+
+		A Transport is a low-level primitive for making HTTP and HTTPS requests.
+		For high-level functionality, such as cookies and redirects, see Client.
+
+		Transport uses HTTP/1.1 for HTTP URLs and either HTTP/1.1 or HTTP/2
+		for HTTPS URLs, depending on whether the server supports HTTP/2,
+		and how the Transport is configured. The DefaultTransport supports HTTP/2.
+		To explicitly enable HTTP/2 on a transport, use golang.org/x/net/http2
+		and call ConfigureTransport. See the package docs for more about HTTP/2.
+
+		Responses with status codes in the 1xx range are either handled
+		automatically (100 expect-continue) or ignored. The one
+		exception is HTTP status code 101 (Switching Protocols), which is
+		considered a terminal status and returned by RoundTrip. To see the
+		ignored 1xx responses, use the httptrace trace package's
+		ClientTrace.Got1xxResponse.
+
+		Transport only retries a request upon encountering a network error
+		if the request is idempotent and either has no body or has its
+		Request.GetBody defined. HTTP requests are considered idempotent if
+		they have HTTP methods GET, HEAD, OPTIONS, or TRACE; or if their
+		Header map contains an "Idempotency-Key" or "X-Idempotency-Key"
+		entry. If the idempotency key value is a zero-length slice, the
+		request is treated as idempotent but the header is not sent on the
+		wire.
+
+		<input type='checkbox' class="stat" id="Transport-stat-fields"><label for="Transport-stat-fields">Exported Fields (21)</label><span id='Transport-stat-fields-content' class="stat-content">
+			<a href="../../src/net/http/transport.go.html#line-143">Dial</a> <i>func(network, addr <a href="../builtin.html#name-string">string</a>) (<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/net/http/transport.go.html#line-131">DialContext</a> <i>func(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, network, addr <a href="../builtin.html#name-string">string</a>) (<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/net/http/transport.go.html#line-163">DialTLS</a> <i>func(network, addr <a href="../builtin.html#name-string">string</a>) (<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/net/http/transport.go.html#line-155">DialTLSContext</a> <i>func(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, network, addr <a href="../builtin.html#name-string">string</a>) (<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/net/http/transport.go.html#line-190">DisableCompression</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/http/transport.go.html#line-180">DisableKeepAlives</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/http/transport.go.html#line-227">ExpectContinueTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/transport.go.html#line-273">ForceAttemptHTTP2</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/http/transport.go.html#line-212">IdleConnTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/transport.go.html#line-206">MaxConnsPerHost</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/transport.go.html#line-194">MaxIdleConns</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/transport.go.html#line-199">MaxIdleConnsPerHost</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/transport.go.html#line-250">MaxResponseHeaderBytes</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/net/http/transport.go.html#line-121">Proxy</a> <i>func(*<a href="#name-Request">Request</a>) (*<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/net/http/transport.go.html#line-243">ProxyConnectHeader</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/net/http/transport.go.html#line-260">ReadBufferSize</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/http/transport.go.html#line-218">ResponseHeaderTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/transport.go.html#line-169">TLSClientConfig</a> <i>*<a href="../crypto/tls.html">tls</a>.<a href="../crypto/tls.html#name-Config">Config</a></i>
+			<a href="../../src/net/http/transport.go.html#line-173">TLSHandshakeTimeout</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i>
+			<a href="../../src/net/http/transport.go.html#line-239">TLSNextProto</a> <i>map[<a href="../builtin.html#name-string">string</a>]func(authority <a href="../builtin.html#name-string">string</a>, c *<a href="../crypto/tls.html">tls</a>.<a href="../crypto/tls.html#name-Conn">Conn</a>) <a href="#name-RoundTripper">RoundTripper</a></i>
+			<a href="../../src/net/http/transport.go.html#line-255">WriteBufferSize</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="Transport-stat-methods"><label for="Transport-stat-methods">Exported Methods (5)</label><span id='Transport-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/http/transport.go.html#line-764">CancelRequest</a>(req *<a href="#name-Request">Request</a>)
+			(*T) <a href="../../src/net/http/transport.go.html#line-298">Clone</a>() *<b>Transport</b>
+			(*T) <a href="../../src/net/http/transport.go.html#line-740">CloseIdleConnections</a>()
+			(*T) <a href="../../src/net/http/transport.go.html#line-721">RegisterProtocol</a>(scheme <a href="../builtin.html#name-string">string</a>, rt <a href="#name-RoundTripper">RoundTripper</a>)
+			(*T) <a href="../../src/net/http/roundtrip.go.html#line-16">RoundTrip</a>(req *<a href="#name-Request">Request</a>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Transport-stat-impls"><label for="Transport-stat-impls">Implements (1+)</label><span id='Transport-stat-impls-content' class="stat-content">
+			*T : <a href="#name-RoundTripper">RoundTripper</a></span>
+		<input type='checkbox' class="stat" id="Transport-stat-results"><label for="Transport-stat-results">As Outputs Of (1+)</label><span id='Transport-stat-results-content' class="stat-content">
+			func (*<a href="#name-Transport">Transport</a>).<a href="../../src/net/http/transport.go.html#line-298">Clone</a>() *<b>Transport</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-CanonicalHeaderKey">	 func <a href="../../src/net/http/header.go.html#line-223">CanonicalHeaderKey</a>(s <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+		CanonicalHeaderKey returns the canonical format of the
+		header key s. The canonicalization converts the first
+		letter and any letter following a hyphen to upper case;
+		the rest are converted to lowercase. For example, the
+		canonical key for "accept-encoding" is "Accept-Encoding".
+		If s contains a space or invalid header field bytes, it is
+		returned without modifications.</div>
+<div class="anchor" id="name-DefaultClient">	  var <a href="../../src/net/http/client.go.html#line-110">DefaultClient</a> *<a href="#name-Client">Client</a>
+		DefaultClient is the default Client and is used by Get, Head, and Post.</div>
+<div class="anchor" id="name-DefaultMaxHeaderBytes">	const <a href="../../src/net/http/server.go.html#line-873">DefaultMaxHeaderBytes</a> = 1048576 // 1 MB
+		DefaultMaxHeaderBytes is the maximum permitted size of the headers
+		in an HTTP request.
+		This can be overridden by setting Server.MaxHeaderBytes.</div>
+<div class="anchor" id="name-DefaultMaxIdleConnsPerHost">	const <a href="../../src/net/http/transport.go.html#line-58">DefaultMaxIdleConnsPerHost</a> = 2
+		DefaultMaxIdleConnsPerHost is the default value of Transport's
+		MaxIdleConnsPerHost.</div>
+<div class="anchor" id="name-DefaultServeMux">	  var <a href="../../src/net/http/server.go.html#line-2238">DefaultServeMux</a> *<a href="#name-ServeMux">ServeMux</a>
+		DefaultServeMux is the default ServeMux used by Serve.</div>
+<div class="anchor" id="name-DefaultTransport">	  var <a href="../../src/net/http/transport.go.html#line-42">DefaultTransport</a> <a href="#name-RoundTripper">RoundTripper</a>
+		DefaultTransport is the default implementation of Transport and is
+		used by DefaultClient. It establishes network connections as needed
+		and caches them for reuse by subsequent calls. It uses HTTP proxies
+		as directed by the $HTTP_PROXY and $NO_PROXY (or $http_proxy and
+		$no_proxy) environment variables.</div>
+<div class="anchor" id="name-DetectContentType">	 func <a href="../../src/net/http/sniff.go.html#line-21">DetectContentType</a>(data []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-string">string</a>
+		DetectContentType implements the algorithm described
+		at https://mimesniff.spec.whatwg.org/ to determine the
+		Content-Type of the given data. It considers at most the
+		first 512 bytes of data. DetectContentType always returns
+		a valid MIME type: if it cannot determine a more specific one, it
+		returns "application/octet-stream".</div>
+<div class="anchor" id="name-ErrAbortHandler">	  var <a href="../../src/net/http/server.go.html#line-1774">ErrAbortHandler</a> <a href="../builtin.html#name-error">error</a>
+		ErrAbortHandler is a sentinel panic value to abort a handler.
+		While any panic from ServeHTTP aborts the response to the client,
+		panicking with ErrAbortHandler also suppresses logging of a stack
+		trace to the server's error log.</div>
+<div class="anchor" id="name-ErrBodyNotAllowed">	  var <a href="../../src/net/http/server.go.html#line-41">ErrBodyNotAllowed</a> <a href="../builtin.html#name-error">error</a>
+		ErrBodyNotAllowed is returned by ResponseWriter.Write calls
+		when the HTTP method or response code does not permit a
+		body.</div>
+<div class="anchor" id="name-ErrBodyReadAfterClose">	  var <a href="../../src/net/http/transfer.go.html#line-817">ErrBodyReadAfterClose</a> <a href="../builtin.html#name-error">error</a>
+		ErrBodyReadAfterClose is returned when reading a Request or Response
+		Body after the body has been closed. This typically happens when the body is
+		read after an HTTP Handler calls WriteHeader or Write on its
+		ResponseWriter.</div>
+<div class="anchor" id="name-ErrContentLength">	  var <a href="../../src/net/http/server.go.html#line-54">ErrContentLength</a> <a href="../builtin.html#name-error">error</a>
+		ErrContentLength is returned by ResponseWriter.Write calls
+		when a Handler set a Content-Length response header with a
+		declared size and then attempted to write more bytes than
+		declared.</div>
+<div class="anchor" id="name-ErrHandlerTimeout">	  var <a href="../../src/net/http/server.go.html#line-3232">ErrHandlerTimeout</a> <a href="../builtin.html#name-error">error</a>
+		ErrHandlerTimeout is returned on ResponseWriter Write calls
+		in handlers which have timed out.</div>
+<div class="anchor" id="name-ErrHeaderTooLong">	  var <a href="../../src/net/http/request.go.html#line-73">ErrHeaderTooLong</a> *<a href="#name-ProtocolError">ProtocolError</a>
+		Deprecated: ErrHeaderTooLong is no longer returned by
+		anything in the net/http package. Callers should not
+		compare errors against this variable.</div>
+<div class="anchor" id="name-ErrHijacked">	  var <a href="../../src/net/http/server.go.html#line-48">ErrHijacked</a> <a href="../builtin.html#name-error">error</a>
+		ErrHijacked is returned by ResponseWriter.Write calls when
+		the underlying connection has been hijacked using the
+		Hijacker interface. A zero-byte write on a hijacked
+		connection will return ErrHijacked without any other side
+		effects.</div>
+<div class="anchor" id="name-ErrLineTooLong">	  var <a href="../../src/net/http/transfer.go.html#line-29">ErrLineTooLong</a> <a href="../builtin.html#name-error">error</a>
+		ErrLineTooLong is returned when reading request or response bodies
+		with malformed chunked encoding.</div>
+<div class="anchor" id="name-ErrMissingBoundary">	  var <a href="../../src/net/http/request.go.html#line-64">ErrMissingBoundary</a> *<a href="#name-ProtocolError">ProtocolError</a>
+		ErrMissingBoundary is returned by Request.MultipartReader when the
+		request's Content-Type does not include a "boundary" parameter.</div>
+<div class="anchor" id="name-ErrMissingContentLength">	  var <a href="../../src/net/http/request.go.html#line-83">ErrMissingContentLength</a> *<a href="#name-ProtocolError">ProtocolError</a>
+		Deprecated: ErrMissingContentLength is no longer returned by
+		anything in the net/http package. Callers should not
+		compare errors against this variable.</div>
+<div class="anchor" id="name-ErrMissingFile">	  var <a href="../../src/net/http/request.go.html#line-39">ErrMissingFile</a> <a href="../builtin.html#name-error">error</a>
+		ErrMissingFile is returned by FormFile when the provided file field name
+		is either not present in the request or not a file field.</div>
+<div class="anchor" id="name-ErrNoCookie">	  var <a href="../../src/net/http/request.go.html#line-411">ErrNoCookie</a> <a href="../builtin.html#name-error">error</a>
+		ErrNoCookie is returned by Request's Cookie method when a cookie is not found.</div>
+<div class="anchor" id="name-ErrNoLocation">	  var <a href="../../src/net/http/response.go.html#line-131">ErrNoLocation</a> <a href="../builtin.html#name-error">error</a>
+		ErrNoLocation is returned by Response's Location method
+		when no Location header is present.</div>
+<div class="anchor" id="name-ErrNotMultipart">	  var <a href="../../src/net/http/request.go.html#line-68">ErrNotMultipart</a> *<a href="#name-ProtocolError">ProtocolError</a>
+		ErrNotMultipart is returned by Request.MultipartReader when the
+		request's Content-Type is not multipart/form-data.</div>
+<div class="anchor" id="name-ErrNotSupported">	  var <a href="../../src/net/http/request.go.html#line-55">ErrNotSupported</a> *<a href="#name-ProtocolError">ProtocolError</a>
+		ErrNotSupported is returned by the Push method of Pusher
+		implementations to indicate that HTTP/2 Push support is not
+		available.</div>
+<div class="anchor" id="name-Error">	 func <a href="../../src/net/http/server.go.html#line-2051">Error</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, error <a href="../builtin.html#name-string">string</a>, code <a href="../builtin.html#name-int">int</a>)
+		Error replies to the request with the specified error message and HTTP code.
+		It does not otherwise end the request; the caller should ensure no further
+		writes are done to w.
+		The error message should be plain text.</div>
+<div class="anchor" id="name-ErrServerClosed">	  var <a href="../../src/net/http/server.go.html#line-2895">ErrServerClosed</a> <a href="../builtin.html#name-error">error</a>
+		ErrServerClosed is returned by the Server's Serve, ServeTLS, ListenAndServe,
+		and ListenAndServeTLS methods after a call to Shutdown or Close.</div>
+<div class="anchor" id="name-ErrShortBody">	  var <a href="../../src/net/http/request.go.html#line-78">ErrShortBody</a> *<a href="#name-ProtocolError">ProtocolError</a>
+		Deprecated: ErrShortBody is no longer returned by
+		anything in the net/http package. Callers should not
+		compare errors against this variable.</div>
+<div class="anchor" id="name-ErrSkipAltProtocol">	  var <a href="../../src/net/http/transport.go.html#line-709">ErrSkipAltProtocol</a> <a href="../builtin.html#name-error">error</a>
+		ErrSkipAltProtocol is a sentinel error value defined by Transport.RegisterProtocol.</div>
+<div class="anchor" id="name-ErrUnexpectedTrailer">	  var <a href="../../src/net/http/request.go.html#line-60">ErrUnexpectedTrailer</a> *<a href="#name-ProtocolError">ProtocolError</a>
+		Deprecated: ErrUnexpectedTrailer is no longer returned by
+		anything in the net/http package. Callers should not
+		compare errors against this variable.</div>
+<div class="anchor" id="name-ErrUseLastResponse">	  var <a href="../../src/net/http/client.go.html#line-484">ErrUseLastResponse</a> <a href="../builtin.html#name-error">error</a>
+		ErrUseLastResponse can be returned by Client.CheckRedirect hooks to
+		control how redirects are processed. If returned, the next request
+		is not sent and the most recent response is returned with its body
+		unclosed.</div>
+<div class="anchor" id="name-ErrWriteAfterFlush">	  var <a href="../../src/net/http/server.go.html#line-59">ErrWriteAfterFlush</a> <a href="../builtin.html#name-error">error</a>
+		Deprecated: ErrWriteAfterFlush is no longer returned by
+		anything in the net/http package. Callers should not
+		compare errors against this variable.</div>
+<div class="anchor" id="name-FileServer">	 func <a href="../../src/net/http/fs.go.html#line-720">FileServer</a>(root <a href="#name-FileSystem">FileSystem</a>) <a href="#name-Handler">Handler</a>
+		FileServer returns a handler that serves HTTP requests
+		with the contents of the file system rooted at root.
+
+		To use the operating system's file system implementation,
+		use http.Dir:
+
+		    http.Handle("/", http.FileServer(http.Dir("/tmp")))
+
+		As a special case, the returned file server redirects any request
+		ending in "/index.html" to the same path, without the final
+		"index.html".</div>
+<div class="anchor" id="name-Get">	 func <a href="../../src/net/http/client.go.html#line-446">Get</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+		Get issues a GET to the specified URL. If the response is one of
+		the following redirect codes, Get follows the redirect, up to a
+		maximum of 10 redirects:
+
+		   301 (Moved Permanently)
+		   302 (Found)
+		   303 (See Other)
+		   307 (Temporary Redirect)
+		   308 (Permanent Redirect)
+
+		An error is returned if there were too many redirects or if there
+		was an HTTP protocol error. A non-2xx response doesn't cause an
+		error. Any returned error will be of type *url.Error. The url.Error
+		value's Timeout method will report true if request timed out or was
+		canceled.
+
+		When err is nil, resp always contains a non-nil resp.Body.
+		Caller should close resp.Body when done reading from it.
+
+		Get is a wrapper around DefaultClient.Get.
+
+		To make a request with custom headers, use NewRequest and
+		DefaultClient.Do.</div>
+<div class="anchor" id="name-Handle">	 func <a href="../../src/net/http/server.go.html#line-2476">Handle</a>(pattern <a href="../builtin.html#name-string">string</a>, handler <a href="#name-Handler">Handler</a>)
+		Handle registers the handler for the given pattern
+		in the DefaultServeMux.
+		The documentation for ServeMux explains how patterns are matched.</div>
+<div class="anchor" id="name-HandleFunc">	 func <a href="../../src/net/http/server.go.html#line-2481">HandleFunc</a>(pattern <a href="../builtin.html#name-string">string</a>, handler func(<a href="#name-ResponseWriter">ResponseWriter</a>, *<a href="#name-Request">Request</a>))
+		HandleFunc registers the handler function for the given pattern
+		in the DefaultServeMux.
+		The documentation for ServeMux explains how patterns are matched.</div>
+<div class="anchor" id="name-Head">	 func <a href="../../src/net/http/client.go.html#line-892">Head</a>(url <a href="../builtin.html#name-string">string</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+		Head issues a HEAD to the specified URL. If the response is one of
+		the following redirect codes, Head follows the redirect, up to a
+		maximum of 10 redirects:
+
+		   301 (Moved Permanently)
+		   302 (Found)
+		   303 (See Other)
+		   307 (Temporary Redirect)
+		   308 (Permanent Redirect)
+
+		Head is a wrapper around DefaultClient.Head</div>
+<div class="anchor" id="name-ListenAndServe">	 func <a href="../../src/net/http/server.go.html#line-3118">ListenAndServe</a>(addr <a href="../builtin.html#name-string">string</a>, handler <a href="#name-Handler">Handler</a>) <a href="../builtin.html#name-error">error</a>
+		ListenAndServe listens on the TCP network address addr and then calls
+		Serve with handler to handle requests on incoming connections.
+		Accepted connections are configured to enable TCP keep-alives.
+
+		The handler is typically nil, in which case the DefaultServeMux is used.
+
+		ListenAndServe always returns a non-nil error.</div>
+<div class="anchor" id="name-ListenAndServeTLS">	 func <a href="../../src/net/http/server.go.html#line-3128">ListenAndServeTLS</a>(addr, certFile, keyFile <a href="../builtin.html#name-string">string</a>, handler <a href="#name-Handler">Handler</a>) <a href="../builtin.html#name-error">error</a>
+		ListenAndServeTLS acts identically to ListenAndServe, except that it
+		expects HTTPS connections. Additionally, files containing a certificate and
+		matching private key for the server must be provided. If the certificate
+		is signed by a certificate authority, the certFile should be the concatenation
+		of the server's certificate, any intermediates, and the CA's certificate.</div>
+<div class="anchor" id="name-LocalAddrContextKey">	  var <a href="../../src/net/http/server.go.html#line-244">LocalAddrContextKey</a> *<a href="../../src/net/http/http.go.html#line-42">contextKey</a>
+		LocalAddrContextKey is a context key. It can be used in
+		HTTP handlers with Context.Value to access the local
+		address the connection arrived on.
+		The associated value will be of type net.Addr.</div>
+<div class="anchor" id="name-MaxBytesReader">	 func <a href="../../src/net/http/request.go.html#line-1110">MaxBytesReader</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r <a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a>, n <a href="../builtin.html#name-int64">int64</a>) <a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+		MaxBytesReader is similar to io.LimitReader but is intended for
+		limiting the size of incoming request bodies. In contrast to
+		io.LimitReader, MaxBytesReader's result is a ReadCloser, returns a
+		non-EOF error for a Read beyond the limit, and closes the
+		underlying reader when its Close method is called.
+
+		MaxBytesReader prevents clients from accidentally or maliciously
+		sending a large request and wasting server resources.</div>
+<div class="anchor" id="name-MethodConnect">	const <a href="../../src/net/http/method.go.html#line-17">MethodConnect</a> = "CONNECT"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodDelete">	const <a href="../../src/net/http/method.go.html#line-16">MethodDelete</a> = "DELETE"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodGet">	const <a href="../../src/net/http/method.go.html#line-11">MethodGet</a> = "GET"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodHead">	const <a href="../../src/net/http/method.go.html#line-12">MethodHead</a> = "HEAD"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodOptions">	const <a href="../../src/net/http/method.go.html#line-18">MethodOptions</a> = "OPTIONS"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodPatch">	const <a href="../../src/net/http/method.go.html#line-15">MethodPatch</a> = "PATCH" // RFC 5789
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodPost">	const <a href="../../src/net/http/method.go.html#line-13">MethodPost</a> = "POST"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodPut">	const <a href="../../src/net/http/method.go.html#line-14">MethodPut</a> = "PUT"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-MethodTrace">	const <a href="../../src/net/http/method.go.html#line-19">MethodTrace</a> = "TRACE"
+		Common HTTP methods.
+
+		Unless otherwise noted, these are defined in RFC 7231 section 4.3.</div>
+<div class="anchor" id="name-NewFileTransport">	 func <a href="../../src/net/http/filetransport.go.html#line-30">NewFileTransport</a>(fs <a href="#name-FileSystem">FileSystem</a>) <a href="#name-RoundTripper">RoundTripper</a>
+		NewFileTransport returns a new RoundTripper, serving the provided
+		FileSystem. The returned RoundTripper ignores the URL host in its
+		incoming requests, as well as most other properties of the
+		request.
+
+		The typical use case for NewFileTransport is to register the "file"
+		protocol with a Transport, as in:
+
+		  t := &amp;http.Transport{}
+		  t.RegisterProtocol("file", http.NewFileTransport(http.Dir("/")))
+		  c := &amp;http.Client{Transport: t}
+		  res, err := c.Get("file:///etc/passwd")
+		  ...</div>
+<div class="anchor" id="name-NewRequest">	 func <a href="../../src/net/http/request.go.html#line-812">NewRequest</a>(method, url <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<a href="#name-Request">Request</a>, <a href="../builtin.html#name-error">error</a>)
+		NewRequest wraps NewRequestWithContext using the background context.</div>
+<div class="anchor" id="name-NewRequestWithContext">	 func <a href="../../src/net/http/request.go.html#line-838">NewRequestWithContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, method, url <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<a href="#name-Request">Request</a>, <a href="../builtin.html#name-error">error</a>)
+		NewRequestWithContext returns a new Request given a method, URL, and
+		optional body.
+
+		If the provided body is also an io.Closer, the returned
+		Request.Body is set to body and will be closed by the Client
+		methods Do, Post, and PostForm, and Transport.RoundTrip.
+
+		NewRequestWithContext returns a Request suitable for use with
+		Client.Do or Transport.RoundTrip. To create a request for use with
+		testing a Server Handler, either use the NewRequest function in the
+		net/http/httptest package, use ReadRequest, or manually update the
+		Request fields. For an outgoing client request, the context
+		controls the entire lifetime of a request and its response:
+		obtaining a connection, sending the request, and reading the
+		response headers and body. See the Request type's documentation for
+		the difference between inbound and outbound request fields.
+
+		If body is of type *bytes.Buffer, *bytes.Reader, or
+		*strings.Reader, the returned request's ContentLength is set to its
+		exact value (instead of -1), GetBody is populated (so 307 and 308
+		redirects can replay the body), and Body is set to NoBody if the
+		ContentLength is 0.</div>
+<div class="anchor" id="name-NewServeMux">	 func <a href="../../src/net/http/server.go.html#line-2235">NewServeMux</a>() *<a href="#name-ServeMux">ServeMux</a>
+		NewServeMux allocates and returns a new ServeMux.</div>
+<div class="anchor" id="name-NoBody">	  var <a href="../../src/net/http/http.go.html#line-113">NoBody</a> <a href="../../src/net/http/http.go.html#line-115">noBody</a>
+		NoBody is an io.ReadCloser with no bytes. Read always returns EOF
+		and Close always returns nil. It can be used in an outgoing client
+		request to explicitly signal that a request has zero bytes.
+		An alternative, however, is to simply set Request.Body to nil.</div>
+<div class="anchor" id="name-NotFound">	 func <a href="../../src/net/http/server.go.html#line-2059">NotFound</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<a href="#name-Request">Request</a>)
+		NotFound replies to the request with an HTTP 404 not found error.</div>
+<div class="anchor" id="name-NotFoundHandler">	 func <a href="../../src/net/http/server.go.html#line-2063">NotFoundHandler</a>() <a href="#name-Handler">Handler</a>
+		NotFoundHandler returns a simple request handler
+		that replies to each request with a ``404 page not found'' reply.</div>
+<div class="anchor" id="name-ParseHTTPVersion">	 func <a href="../../src/net/http/request.go.html#line-768">ParseHTTPVersion</a>(vers <a href="../builtin.html#name-string">string</a>) (major, minor <a href="../builtin.html#name-int">int</a>, ok <a href="../builtin.html#name-bool">bool</a>)
+		ParseHTTPVersion parses an HTTP version string.
+		"HTTP/1.0" returns (1, 0, true).</div>
+<div class="anchor" id="name-ParseTime">	 func <a href="../../src/net/http/header.go.html#line-119">ParseTime</a>(text <a href="../builtin.html#name-string">string</a>) (t <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>, err <a href="../builtin.html#name-error">error</a>)
+		ParseTime parses a time header (such as the Date: header),
+		trying each of the three formats allowed by HTTP/1.1:
+		TimeFormat, time.RFC850, and time.ANSIC.</div>
+<div class="anchor" id="name-Post">	 func <a href="../../src/net/http/client.go.html#line-825">Post</a>(url, contentType <a href="../builtin.html#name-string">string</a>, body <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+		Post issues a POST to the specified URL.
+
+		Caller should close resp.Body when done reading from it.
+
+		If the provided body is an io.Closer, it is closed after the
+		request.
+
+		Post is a wrapper around DefaultClient.Post.
+
+		To set custom headers, use NewRequest and DefaultClient.Do.
+
+		See the Client.Do method documentation for details on how redirects
+		are handled.</div>
+<div class="anchor" id="name-PostForm">	 func <a href="../../src/net/http/client.go.html#line-862">PostForm</a>(url <a href="../builtin.html#name-string">string</a>, data <a href="url.html">url</a>.<a href="url.html#name-Values">Values</a>) (resp *<a href="#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+		PostForm issues a POST to the specified URL, with data's keys and
+		values URL-encoded as the request body.
+
+		The Content-Type header is set to application/x-www-form-urlencoded.
+		To set other headers, use NewRequest and DefaultClient.Do.
+
+		When err is nil, resp always contains a non-nil resp.Body.
+		Caller should close resp.Body when done reading from it.
+
+		PostForm is a wrapper around DefaultClient.PostForm.
+
+		See the Client.Do method documentation for details on how redirects
+		are handled.</div>
+<div class="anchor" id="name-ProxyFromEnvironment">	 func <a href="../../src/net/http/transport.go.html#line-427">ProxyFromEnvironment</a>(req *<a href="#name-Request">Request</a>) (*<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>, <a href="../builtin.html#name-error">error</a>)
+		ProxyFromEnvironment returns the URL of the proxy to use for a
+		given request, as indicated by the environment variables
+		HTTP_PROXY, HTTPS_PROXY and NO_PROXY (or the lowercase versions
+		thereof). HTTPS_PROXY takes precedence over HTTP_PROXY for https
+		requests.
+
+		The environment values may be either a complete URL or a
+		"host[:port]", in which case the "http" scheme is assumed.
+		An error is returned if the value is a different form.
+
+		A nil URL and nil error are returned if no proxy is defined in the
+		environment, or a proxy should not be used for the given request,
+		as defined by NO_PROXY.
+
+		As a special case, if req.URL.Host is "localhost" (with or without
+		a port number), then a nil URL and nil error will be returned.</div>
+<div class="anchor" id="name-ProxyURL">	 func <a href="../../src/net/http/transport.go.html#line-433">ProxyURL</a>(fixedURL *<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>) func(*<a href="#name-Request">Request</a>) (*<a href="url.html">url</a>.<a href="url.html#name-URL">URL</a>, <a href="../builtin.html#name-error">error</a>)
+		ProxyURL returns a proxy function (for use in a Transport)
+		that always returns the same URL.</div>
+<div class="anchor" id="name-ReadRequest">	 func <a href="../../src/net/http/request.go.html#line-996">ReadRequest</a>(b *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a>) (*<a href="#name-Request">Request</a>, <a href="../builtin.html#name-error">error</a>)
+		ReadRequest reads and parses an incoming request from b.
+
+		ReadRequest is a low-level function and should only be used for
+		specialized applications; most code should use the Server to read
+		requests and handle them via the Handler interface. ReadRequest
+		only supports HTTP/1.x requests. For HTTP/2, use golang.org/x/net/http2.</div>
+<div class="anchor" id="name-ReadResponse">	 func <a href="../../src/net/http/response.go.html#line-154">ReadResponse</a>(r *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a>, req *<a href="#name-Request">Request</a>) (*<a href="#name-Response">Response</a>, <a href="../builtin.html#name-error">error</a>)
+		ReadResponse reads and returns an HTTP response from r.
+		The req parameter optionally specifies the Request that corresponds
+		to this Response. If nil, a GET request is assumed.
+		Clients must call resp.Body.Close when finished reading resp.Body.
+		After that call, clients can inspect resp.Trailer to find key/value
+		pairs included in the response trailer.</div>
+<div class="anchor" id="name-Redirect">	 func <a href="../../src/net/http/server.go.html#line-2098">Redirect</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<a href="#name-Request">Request</a>, url <a href="../builtin.html#name-string">string</a>, code <a href="../builtin.html#name-int">int</a>)
+		Redirect replies to the request with a redirect to url,
+		which may be a path relative to the request path.
+
+		The provided code should be in the 3xx range and is usually
+		StatusMovedPermanently, StatusFound or StatusSeeOther.
+
+		If the Content-Type header has not been set, Redirect sets it
+		to "text/html; charset=utf-8" and writes a small HTML body.
+		Setting the Content-Type header to any value, including nil,
+		disables that behavior.</div>
+<div class="anchor" id="name-RedirectHandler">	 func <a href="../../src/net/http/server.go.html#line-2183">RedirectHandler</a>(url <a href="../builtin.html#name-string">string</a>, code <a href="../builtin.html#name-int">int</a>) <a href="#name-Handler">Handler</a>
+		RedirectHandler returns a request handler that redirects
+		each request it receives to the given url using the given
+		status code.
+
+		The provided code should be in the 3xx range and is usually
+		StatusMovedPermanently, StatusFound or StatusSeeOther.</div>
+<div class="anchor" id="name-SameSiteDefaultMode">	const <a href="../../src/net/http/cookie.go.html#line-49">SameSiteDefaultMode</a> <a href="#name-SameSite">SameSite</a> = 1</div>
+<div class="anchor" id="name-SameSiteLaxMode">	const <a href="../../src/net/http/cookie.go.html#line-50">SameSiteLaxMode</a> <a href="#name-SameSite">SameSite</a> = 2</div>
+<div class="anchor" id="name-SameSiteNoneMode">	const <a href="../../src/net/http/cookie.go.html#line-52">SameSiteNoneMode</a> <a href="#name-SameSite">SameSite</a> = 4</div>
+<div class="anchor" id="name-SameSiteStrictMode">	const <a href="../../src/net/http/cookie.go.html#line-51">SameSiteStrictMode</a> <a href="#name-SameSite">SameSite</a> = 3</div>
+<div class="anchor" id="name-Serve">	 func <a href="../../src/net/http/server.go.html#line-2496">Serve</a>(l <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, handler <a href="#name-Handler">Handler</a>) <a href="../builtin.html#name-error">error</a>
+		Serve accepts incoming HTTP connections on the listener l,
+		creating a new service goroutine for each. The service goroutines
+		read requests and then call handler to reply to them.
+
+		The handler is typically nil, in which case the DefaultServeMux is used.
+
+		HTTP/2 support is only enabled if the Listener returns *tls.Conn
+		connections and they were configured with "h2" in the TLS
+		Config.NextProtos.
+
+		Serve always returns a non-nil error.</div>
+<div class="anchor" id="name-ServeContent">	 func <a href="../../src/net/http/fs.go.html#line-155">ServeContent</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, req *<a href="#name-Request">Request</a>, name <a href="../builtin.html#name-string">string</a>, modtime <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>, content <a href="../io.html">io</a>.<a href="../io.html#name-ReadSeeker">ReadSeeker</a>)
+		ServeContent replies to the request using the content in the
+		provided ReadSeeker. The main benefit of ServeContent over io.Copy
+		is that it handles Range requests properly, sets the MIME type, and
+		handles If-Match, If-Unmodified-Since, If-None-Match, If-Modified-Since,
+		and If-Range requests.
+
+		If the response's Content-Type header is not set, ServeContent
+		first tries to deduce the type from name's file extension and,
+		if that fails, falls back to reading the first block of the content
+		and passing it to DetectContentType.
+		The name is otherwise unused; in particular it can be empty and is
+		never sent in the response.
+
+		If modtime is not the zero time or Unix epoch, ServeContent
+		includes it in a Last-Modified header in the response. If the
+		request includes an If-Modified-Since header, ServeContent uses
+		modtime to decide whether the content needs to be sent at all.
+
+		The content's Seek method must work: ServeContent uses
+		a seek to the end of the content to determine its size.
+
+		If the caller has set w's ETag header formatted per RFC 7232, section 2.3,
+		ServeContent uses it to handle requests using If-Match, If-None-Match, or If-Range.
+
+		Note that *os.File implements the io.ReadSeeker interface.</div>
+<div class="anchor" id="name-ServeFile">	 func <a href="../../src/net/http/fs.go.html#line-677">ServeFile</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, r *<a href="#name-Request">Request</a>, name <a href="../builtin.html#name-string">string</a>)
+		ServeFile replies to the request with the contents of the named
+		file or directory.
+
+		If the provided file or directory name is a relative path, it is
+		interpreted relative to the current directory and may ascend to
+		parent directories. If the provided name is constructed from user
+		input, it should be sanitized before calling ServeFile.
+
+		As a precaution, ServeFile will reject requests where r.URL.Path
+		contains a ".." path element; this protects against callers who
+		might unsafely use filepath.Join on r.URL.Path without sanitizing
+		it and then use that filepath.Join result as the name argument.
+
+		As another special case, ServeFile redirects any request where r.URL.Path
+		ends in "/index.html" to the same path, without the final
+		"index.html". To avoid such redirects either modify the path or
+		use ServeContent.
+
+		Outside of those two special cases, ServeFile does not use
+		r.URL.Path for selecting the file or directory to serve; only the
+		file or directory provided in the name argument is used.</div>
+<div class="anchor" id="name-ServerContextKey">	  var <a href="../../src/net/http/server.go.html#line-238">ServerContextKey</a> *<a href="../../src/net/http/http.go.html#line-42">contextKey</a>
+		ServerContextKey is a context key. It can be used in HTTP
+		handlers with Context.Value to access the server that
+		started the handler. The associated value will be of
+		type *Server.</div>
+<div class="anchor" id="name-ServeTLS">	 func <a href="../../src/net/http/server.go.html#line-2513">ServeTLS</a>(l <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, handler <a href="#name-Handler">Handler</a>, certFile, keyFile <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+		ServeTLS accepts incoming HTTPS connections on the listener l,
+		creating a new service goroutine for each. The service goroutines
+		read requests and then call handler to reply to them.
+
+		The handler is typically nil, in which case the DefaultServeMux is used.
+
+		Additionally, files containing a certificate and matching private key
+		for the server must be provided. If the certificate is signed by a
+		certificate authority, the certFile should be the concatenation
+		of the server's certificate, any intermediates, and the CA's certificate.
+
+		ServeTLS always returns a non-nil error.</div>
+<div class="anchor" id="name-SetCookie">	 func <a href="../../src/net/http/cookie.go.html#line-161">SetCookie</a>(w <a href="#name-ResponseWriter">ResponseWriter</a>, cookie *<a href="#name-Cookie">Cookie</a>)
+		SetCookie adds a Set-Cookie header to the provided ResponseWriter's headers.
+		The provided cookie must have a valid Name. Invalid cookies may be
+		silently dropped.</div>
+<div class="anchor" id="name-StateActive">	const <a href="../../src/net/http/server.go.html#line-2799">StateActive</a> <a href="#name-ConnState">ConnState</a> = 1
+		StateActive represents a connection that has read 1 or more
+		bytes of a request. The Server.ConnState hook for
+		StateActive fires before the request has entered a handler
+		and doesn't fire again until the request has been
+		handled. After the request is handled, the state
+		transitions to StateClosed, StateHijacked, or StateIdle.
+		For HTTP/2, StateActive fires on the transition from zero
+		to one active request, and only transitions away once all
+		active requests are complete. That means that ConnState
+		cannot be used to do per-request work; ConnState only notes
+		the overall state of the connection.</div>
+<div class="anchor" id="name-StateClosed">	const <a href="../../src/net/http/server.go.html#line-2814">StateClosed</a> <a href="#name-ConnState">ConnState</a> = 4
+		StateClosed represents a closed connection.
+		This is a terminal state. Hijacked connections do not
+		transition to StateClosed.</div>
+<div class="anchor" id="name-StateHijacked">	const <a href="../../src/net/http/server.go.html#line-2809">StateHijacked</a> <a href="#name-ConnState">ConnState</a> = 3
+		StateHijacked represents a hijacked connection.
+		This is a terminal state. It does not transition to StateClosed.</div>
+<div class="anchor" id="name-StateIdle">	const <a href="../../src/net/http/server.go.html#line-2805">StateIdle</a> <a href="#name-ConnState">ConnState</a> = 2
+		StateIdle represents a connection that has finished
+		handling a request and is in the keep-alive state, waiting
+		for a new request. Connections transition from StateIdle
+		to either StateActive or StateClosed.</div>
+<div class="anchor" id="name-StateNew">	const <a href="../../src/net/http/server.go.html#line-2786">StateNew</a> <a href="#name-ConnState">ConnState</a> = 0
+		StateNew represents a new connection that is expected to
+		send a request immediately. Connections begin at this
+		state and then transition to either StateActive or
+		StateClosed.</div>
+<div class="anchor" id="name-StatusAccepted">	const <a href="../../src/net/http/status.go.html#line-17">StatusAccepted</a> = 202 // RFC 7231, 6.3.3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusAlreadyReported">	const <a href="../../src/net/http/status.go.html#line-23">StatusAlreadyReported</a> = 208 // RFC 5842, 7.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusBadGateway">	const <a href="../../src/net/http/status.go.html#line-68">StatusBadGateway</a> = 502 // RFC 7231, 6.6.3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusBadRequest">	const <a href="../../src/net/http/status.go.html#line-36">StatusBadRequest</a> = 400 // RFC 7231, 6.5.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusConflict">	const <a href="../../src/net/http/status.go.html#line-45">StatusConflict</a> = 409 // RFC 7231, 6.5.8
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusContinue">	const <a href="../../src/net/http/status.go.html#line-10">StatusContinue</a> = 100 // RFC 7231, 6.2.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusCreated">	const <a href="../../src/net/http/status.go.html#line-16">StatusCreated</a> = 201 // RFC 7231, 6.3.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusEarlyHints">	const <a href="../../src/net/http/status.go.html#line-13">StatusEarlyHints</a> = 103 // RFC 8297
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusExpectationFailed">	const <a href="../../src/net/http/status.go.html#line-53">StatusExpectationFailed</a> = 417 // RFC 7231, 6.5.14
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusFailedDependency">	const <a href="../../src/net/http/status.go.html#line-58">StatusFailedDependency</a> = 424 // RFC 4918, 11.4
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusForbidden">	const <a href="../../src/net/http/status.go.html#line-39">StatusForbidden</a> = 403 // RFC 7231, 6.5.3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusFound">	const <a href="../../src/net/http/status.go.html#line-28">StatusFound</a> = 302 // RFC 7231, 6.4.3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusGatewayTimeout">	const <a href="../../src/net/http/status.go.html#line-70">StatusGatewayTimeout</a> = 504 // RFC 7231, 6.6.5
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusGone">	const <a href="../../src/net/http/status.go.html#line-46">StatusGone</a> = 410 // RFC 7231, 6.5.9
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusHTTPVersionNotSupported">	const <a href="../../src/net/http/status.go.html#line-71">StatusHTTPVersionNotSupported</a> = 505 // RFC 7231, 6.6.6
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusIMUsed">	const <a href="../../src/net/http/status.go.html#line-24">StatusIMUsed</a> = 226 // RFC 3229, 10.4.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusInsufficientStorage">	const <a href="../../src/net/http/status.go.html#line-73">StatusInsufficientStorage</a> = 507 // RFC 4918, 11.5
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusInternalServerError">	const <a href="../../src/net/http/status.go.html#line-66">StatusInternalServerError</a> = 500 // RFC 7231, 6.6.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusLengthRequired">	const <a href="../../src/net/http/status.go.html#line-47">StatusLengthRequired</a> = 411 // RFC 7231, 6.5.10
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusLocked">	const <a href="../../src/net/http/status.go.html#line-57">StatusLocked</a> = 423 // RFC 4918, 11.3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusLoopDetected">	const <a href="../../src/net/http/status.go.html#line-74">StatusLoopDetected</a> = 508 // RFC 5842, 7.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusMethodNotAllowed">	const <a href="../../src/net/http/status.go.html#line-41">StatusMethodNotAllowed</a> = 405 // RFC 7231, 6.5.5
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusMisdirectedRequest">	const <a href="../../src/net/http/status.go.html#line-55">StatusMisdirectedRequest</a> = 421 // RFC 7540, 9.1.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusMovedPermanently">	const <a href="../../src/net/http/status.go.html#line-27">StatusMovedPermanently</a> = 301 // RFC 7231, 6.4.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusMultipleChoices">	const <a href="../../src/net/http/status.go.html#line-26">StatusMultipleChoices</a> = 300 // RFC 7231, 6.4.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusMultiStatus">	const <a href="../../src/net/http/status.go.html#line-22">StatusMultiStatus</a> = 207 // RFC 4918, 11.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNetworkAuthenticationRequired">	const <a href="../../src/net/http/status.go.html#line-76">StatusNetworkAuthenticationRequired</a> = 511 // RFC 6585, 6
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNoContent">	const <a href="../../src/net/http/status.go.html#line-19">StatusNoContent</a> = 204 // RFC 7231, 6.3.5
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNonAuthoritativeInfo">	const <a href="../../src/net/http/status.go.html#line-18">StatusNonAuthoritativeInfo</a> = 203 // RFC 7231, 6.3.4
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNotAcceptable">	const <a href="../../src/net/http/status.go.html#line-42">StatusNotAcceptable</a> = 406 // RFC 7231, 6.5.6
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNotExtended">	const <a href="../../src/net/http/status.go.html#line-75">StatusNotExtended</a> = 510 // RFC 2774, 7
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNotFound">	const <a href="../../src/net/http/status.go.html#line-40">StatusNotFound</a> = 404 // RFC 7231, 6.5.4
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNotImplemented">	const <a href="../../src/net/http/status.go.html#line-67">StatusNotImplemented</a> = 501 // RFC 7231, 6.6.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusNotModified">	const <a href="../../src/net/http/status.go.html#line-30">StatusNotModified</a> = 304 // RFC 7232, 4.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusOK">	const <a href="../../src/net/http/status.go.html#line-15">StatusOK</a> = 200 // RFC 7231, 6.3.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusPartialContent">	const <a href="../../src/net/http/status.go.html#line-21">StatusPartialContent</a> = 206 // RFC 7233, 4.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusPaymentRequired">	const <a href="../../src/net/http/status.go.html#line-38">StatusPaymentRequired</a> = 402 // RFC 7231, 6.5.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusPermanentRedirect">	const <a href="../../src/net/http/status.go.html#line-34">StatusPermanentRedirect</a> = 308 // RFC 7538, 3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusPreconditionFailed">	const <a href="../../src/net/http/status.go.html#line-48">StatusPreconditionFailed</a> = 412 // RFC 7232, 4.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusPreconditionRequired">	const <a href="../../src/net/http/status.go.html#line-61">StatusPreconditionRequired</a> = 428 // RFC 6585, 3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusProcessing">	const <a href="../../src/net/http/status.go.html#line-12">StatusProcessing</a> = 102 // RFC 2518, 10.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusProxyAuthRequired">	const <a href="../../src/net/http/status.go.html#line-43">StatusProxyAuthRequired</a> = 407 // RFC 7235, 3.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusRequestedRangeNotSatisfiable">	const <a href="../../src/net/http/status.go.html#line-52">StatusRequestedRangeNotSatisfiable</a> = 416 // RFC 7233, 4.4
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusRequestEntityTooLarge">	const <a href="../../src/net/http/status.go.html#line-49">StatusRequestEntityTooLarge</a> = 413 // RFC 7231, 6.5.11
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusRequestHeaderFieldsTooLarge">	const <a href="../../src/net/http/status.go.html#line-63">StatusRequestHeaderFieldsTooLarge</a> = 431 // RFC 6585, 5
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusRequestTimeout">	const <a href="../../src/net/http/status.go.html#line-44">StatusRequestTimeout</a> = 408 // RFC 7231, 6.5.7
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusRequestURITooLong">	const <a href="../../src/net/http/status.go.html#line-50">StatusRequestURITooLong</a> = 414 // RFC 7231, 6.5.12
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusResetContent">	const <a href="../../src/net/http/status.go.html#line-20">StatusResetContent</a> = 205 // RFC 7231, 6.3.6
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusSeeOther">	const <a href="../../src/net/http/status.go.html#line-29">StatusSeeOther</a> = 303 // RFC 7231, 6.4.4
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusServiceUnavailable">	const <a href="../../src/net/http/status.go.html#line-69">StatusServiceUnavailable</a> = 503 // RFC 7231, 6.6.4
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusSwitchingProtocols">	const <a href="../../src/net/http/status.go.html#line-11">StatusSwitchingProtocols</a> = 101 // RFC 7231, 6.2.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusTeapot">	const <a href="../../src/net/http/status.go.html#line-54">StatusTeapot</a> = 418 // RFC 7168, 2.3.3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusTemporaryRedirect">	const <a href="../../src/net/http/status.go.html#line-33">StatusTemporaryRedirect</a> = 307 // RFC 7231, 6.4.7
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusText">	 func <a href="../../src/net/http/status.go.html#line-150">StatusText</a>(code <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-string">string</a>
+		StatusText returns a text for the HTTP status code. It returns the empty
+		string if the code is unknown.</div>
+<div class="anchor" id="name-StatusTooEarly">	const <a href="../../src/net/http/status.go.html#line-59">StatusTooEarly</a> = 425 // RFC 8470, 5.2.
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusTooManyRequests">	const <a href="../../src/net/http/status.go.html#line-62">StatusTooManyRequests</a> = 429 // RFC 6585, 4
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusUnauthorized">	const <a href="../../src/net/http/status.go.html#line-37">StatusUnauthorized</a> = 401 // RFC 7235, 3.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusUnavailableForLegalReasons">	const <a href="../../src/net/http/status.go.html#line-64">StatusUnavailableForLegalReasons</a> = 451 // RFC 7725, 3
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusUnprocessableEntity">	const <a href="../../src/net/http/status.go.html#line-56">StatusUnprocessableEntity</a> = 422 // RFC 4918, 11.2
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusUnsupportedMediaType">	const <a href="../../src/net/http/status.go.html#line-51">StatusUnsupportedMediaType</a> = 415 // RFC 7231, 6.5.13
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusUpgradeRequired">	const <a href="../../src/net/http/status.go.html#line-60">StatusUpgradeRequired</a> = 426 // RFC 7231, 6.5.15
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusUseProxy">	const <a href="../../src/net/http/status.go.html#line-31">StatusUseProxy</a> = 305 // RFC 7231, 6.4.5
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StatusVariantAlsoNegotiates">	const <a href="../../src/net/http/status.go.html#line-72">StatusVariantAlsoNegotiates</a> = 506 // RFC 2295, 8.1
+		HTTP status codes as registered with IANA.
+		See: https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml</div>
+<div class="anchor" id="name-StripPrefix">	 func <a href="../../src/net/http/server.go.html#line-2070">StripPrefix</a>(prefix <a href="../builtin.html#name-string">string</a>, h <a href="#name-Handler">Handler</a>) <a href="#name-Handler">Handler</a>
+		StripPrefix returns a handler that serves HTTP requests
+		by removing the given prefix from the request URL's Path
+		and invoking the handler h. StripPrefix handles a
+		request for a path that doesn't begin with prefix by
+		replying with an HTTP 404 not found error.</div>
+<div class="anchor" id="name-TimeFormat">	const <a href="../../src/net/http/server.go.html#line-928">TimeFormat</a> = "Mon, 02 Jan 2006 15:04:05 GMT"
+		TimeFormat is the time format to use when generating times in HTTP
+		headers. It is like time.RFC1123 but hard-codes GMT as the time
+		zone. The time being formatted must be in UTC for Format to
+		generate the correct format.
+
+		For parsing this time format, see ParseTime.</div>
+<div class="anchor" id="name-TimeoutHandler">	 func <a href="../../src/net/http/server.go.html#line-3222">TimeoutHandler</a>(h <a href="#name-Handler">Handler</a>, dt <a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a>, msg <a href="../builtin.html#name-string">string</a>) <a href="#name-Handler">Handler</a>
+		TimeoutHandler returns a Handler that runs h with the given time limit.
+
+		The new Handler calls h.ServeHTTP to handle each request, but if a
+		call runs for longer than its time limit, the handler responds with
+		a 503 Service Unavailable error and the given message in its body.
+		(If msg is empty, a suitable default message will be sent.)
+		After such a timeout, writes by h to its ResponseWriter will return
+		ErrHandlerTimeout.
+
+		TimeoutHandler supports the Pusher interface but does not support
+		the Hijacker or Flusher interfaces.</div>
+<div class="anchor" id="name-TrailerPrefix">	const <a href="../../src/net/http/server.go.html#line-499">TrailerPrefix</a> = "Trailer:"
+		TrailerPrefix is a magic prefix for ResponseWriter.Header map keys
+		that, if present, signals that the map entry is actually for
+		the response trailers, and not the response headers. The prefix
+		is stripped after the ServeHTTP call finishes and the values are
+		sent in the trailers.
+
+		This mechanism is intended only for trailers that are not known
+		prior to the headers being written. If the set of trailers is fixed
+		or known before the header is written, the normal Go trailers mechanism
+		is preferred:
+		   https://golang.org/pkg/net/http/#ResponseWriter
+		   https://golang.org/pkg/net/http/#example_ResponseWriter_trailers</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

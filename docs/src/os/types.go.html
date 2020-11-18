@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: types.go in package os</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	types.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/os.html">os</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package os</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"syscall"</code></span>
+<span class="codeline" id="line-9"><code>	"time"</code></span>
+<span class="codeline" id="line-10"><code>)</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>// Getpagesize returns the underlying system's memory page size.</code></span>
+<span class="codeline" id="line-13"><code>func Getpagesize() int { return syscall.Getpagesize() }</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>// File represents an open file descriptor.</code></span>
+<span class="codeline" id="line-16"><code>type File struct {</code></span>
+<span class="codeline" id="line-17"><code>	*file // os specific</code></span>
+<span class="codeline" id="line-18"><code>}</code></span>
+<span class="codeline" id="line-19"><code></code></span>
+<span class="codeline" id="line-20"><code>// A FileInfo describes a file and is returned by Stat and Lstat.</code></span>
+<span class="codeline" id="line-21"><code>type FileInfo interface {</code></span>
+<span class="codeline" id="line-22"><code>	Name() string       // base name of the file</code></span>
+<span class="codeline" id="line-23"><code>	Size() int64        // length in bytes for regular files; system-dependent for others</code></span>
+<span class="codeline" id="line-24"><code>	Mode() FileMode     // file mode bits</code></span>
+<span class="codeline" id="line-25"><code>	ModTime() time.Time // modification time</code></span>
+<span class="codeline" id="line-26"><code>	IsDir() bool        // abbreviation for Mode().IsDir()</code></span>
+<span class="codeline" id="line-27"><code>	Sys() interface{}   // underlying data source (can return nil)</code></span>
+<span class="codeline" id="line-28"><code>}</code></span>
+<span class="codeline" id="line-29"><code></code></span>
+<span class="codeline" id="line-30"><code>// A FileMode represents a file's mode and permission bits.</code></span>
+<span class="codeline" id="line-31"><code>// The bits have the same definition on all systems, so that</code></span>
+<span class="codeline" id="line-32"><code>// information about files can be moved from one system</code></span>
+<span class="codeline" id="line-33"><code>// to another portably. Not all bits apply to all systems.</code></span>
+<span class="codeline" id="line-34"><code>// The only required bit is ModeDir for directories.</code></span>
+<span class="codeline" id="line-35"><code>type FileMode uint32</code></span>
+<span class="codeline" id="line-36"><code></code></span>
+<span class="codeline" id="line-37"><code>// The defined file mode bits are the most significant bits of the FileMode.</code></span>
+<span class="codeline" id="line-38"><code>// The nine least-significant bits are the standard Unix rwxrwxrwx permissions.</code></span>
+<span class="codeline" id="line-39"><code>// The values of these bits should be considered part of the public API and</code></span>
+<span class="codeline" id="line-40"><code>// may be used in wire protocols or disk representations: they must not be</code></span>
+<span class="codeline" id="line-41"><code>// changed, although new bits might be added.</code></span>
+<span class="codeline" id="line-42"><code>const (</code></span>
+<span class="codeline" id="line-43"><code>	// The single letters are the abbreviations</code></span>
+<span class="codeline" id="line-44"><code>	// used by the String method's formatting.</code></span>
+<span class="codeline" id="line-45"><code>	ModeDir        FileMode = 1 &lt;&lt; (32 - 1 - iota) // d: is a directory</code></span>
+<span class="codeline" id="line-46"><code>	ModeAppend                                     // a: append-only</code></span>
+<span class="codeline" id="line-47"><code>	ModeExclusive                                  // l: exclusive use</code></span>
+<span class="codeline" id="line-48"><code>	ModeTemporary                                  // T: temporary file; Plan 9 only</code></span>
+<span class="codeline" id="line-49"><code>	ModeSymlink                                    // L: symbolic link</code></span>
+<span class="codeline" id="line-50"><code>	ModeDevice                                     // D: device file</code></span>
+<span class="codeline" id="line-51"><code>	ModeNamedPipe                                  // p: named pipe (FIFO)</code></span>
+<span class="codeline" id="line-52"><code>	ModeSocket                                     // S: Unix domain socket</code></span>
+<span class="codeline" id="line-53"><code>	ModeSetuid                                     // u: setuid</code></span>
+<span class="codeline" id="line-54"><code>	ModeSetgid                                     // g: setgid</code></span>
+<span class="codeline" id="line-55"><code>	ModeCharDevice                                 // c: Unix character device, when ModeDevice is set</code></span>
+<span class="codeline" id="line-56"><code>	ModeSticky                                     // t: sticky</code></span>
+<span class="codeline" id="line-57"><code>	ModeIrregular                                  // ?: non-regular file; nothing else is known about this file</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>	// Mask for the type bits. For regular files, none will be set.</code></span>
+<span class="codeline" id="line-60"><code>	ModeType = ModeDir | ModeSymlink | ModeNamedPipe | ModeSocket | ModeDevice | ModeCharDevice | ModeIrregular</code></span>
+<span class="codeline" id="line-61"><code></code></span>
+<span class="codeline" id="line-62"><code>	ModePerm FileMode = 0777 // Unix permission bits</code></span>
+<span class="codeline" id="line-63"><code>)</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>func (m FileMode) String() string {</code></span>
+<span class="codeline" id="line-66"><code>	const str = "dalTLDpSugct?"</code></span>
+<span class="codeline" id="line-67"><code>	var buf [32]byte // Mode is uint32.</code></span>
+<span class="codeline" id="line-68"><code>	w := 0</code></span>
+<span class="codeline" id="line-69"><code>	for i, c := range str {</code></span>
+<span class="codeline" id="line-70"><code>		if m&amp;(1&lt;&lt;uint(32-1-i)) != 0 {</code></span>
+<span class="codeline" id="line-71"><code>			buf[w] = byte(c)</code></span>
+<span class="codeline" id="line-72"><code>			w++</code></span>
+<span class="codeline" id="line-73"><code>		}</code></span>
+<span class="codeline" id="line-74"><code>	}</code></span>
+<span class="codeline" id="line-75"><code>	if w == 0 {</code></span>
+<span class="codeline" id="line-76"><code>		buf[w] = '-'</code></span>
+<span class="codeline" id="line-77"><code>		w++</code></span>
+<span class="codeline" id="line-78"><code>	}</code></span>
+<span class="codeline" id="line-79"><code>	const rwx = "rwxrwxrwx"</code></span>
+<span class="codeline" id="line-80"><code>	for i, c := range rwx {</code></span>
+<span class="codeline" id="line-81"><code>		if m&amp;(1&lt;&lt;uint(9-1-i)) != 0 {</code></span>
+<span class="codeline" id="line-82"><code>			buf[w] = byte(c)</code></span>
+<span class="codeline" id="line-83"><code>		} else {</code></span>
+<span class="codeline" id="line-84"><code>			buf[w] = '-'</code></span>
+<span class="codeline" id="line-85"><code>		}</code></span>
+<span class="codeline" id="line-86"><code>		w++</code></span>
+<span class="codeline" id="line-87"><code>	}</code></span>
+<span class="codeline" id="line-88"><code>	return string(buf[:w])</code></span>
+<span class="codeline" id="line-89"><code>}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>// IsDir reports whether m describes a directory.</code></span>
+<span class="codeline" id="line-92"><code>// That is, it tests for the ModeDir bit being set in m.</code></span>
+<span class="codeline" id="line-93"><code>func (m FileMode) IsDir() bool {</code></span>
+<span class="codeline" id="line-94"><code>	return m&amp;ModeDir != 0</code></span>
+<span class="codeline" id="line-95"><code>}</code></span>
+<span class="codeline" id="line-96"><code></code></span>
+<span class="codeline" id="line-97"><code>// IsRegular reports whether m describes a regular file.</code></span>
+<span class="codeline" id="line-98"><code>// That is, it tests that no mode type bits are set.</code></span>
+<span class="codeline" id="line-99"><code>func (m FileMode) IsRegular() bool {</code></span>
+<span class="codeline" id="line-100"><code>	return m&amp;ModeType == 0</code></span>
+<span class="codeline" id="line-101"><code>}</code></span>
+<span class="codeline" id="line-102"><code></code></span>
+<span class="codeline" id="line-103"><code>// Perm returns the Unix permission bits in m.</code></span>
+<span class="codeline" id="line-104"><code>func (m FileMode) Perm() FileMode {</code></span>
+<span class="codeline" id="line-105"><code>	return m &amp; ModePerm</code></span>
+<span class="codeline" id="line-106"><code>}</code></span>
+<span class="codeline" id="line-107"><code></code></span>
+<span class="codeline" id="line-108"><code>func (fs *fileStat) Name() string { return fs.name }</code></span>
+<span class="codeline" id="line-109"><code>func (fs *fileStat) IsDir() bool  { return fs.Mode().IsDir() }</code></span>
+<span class="codeline" id="line-110"><code></code></span>
+<span class="codeline" id="line-111"><code>// SameFile reports whether fi1 and fi2 describe the same file.</code></span>
+<span class="codeline" id="line-112"><code>// For example, on Unix this means that the device and inode fields</code></span>
+<span class="codeline" id="line-113"><code>// of the two underlying structures are identical; on other systems</code></span>
+<span class="codeline" id="line-114"><code>// the decision may be based on the path names.</code></span>
+<span class="codeline" id="line-115"><code>// SameFile only applies to results returned by this package's Stat.</code></span>
+<span class="codeline" id="line-116"><code>// It returns false in other cases.</code></span>
+<span class="codeline" id="line-117"><code>func SameFile(fi1, fi2 FileInfo) bool {</code></span>
+<span class="codeline" id="line-118"><code>	fs1, ok1 := fi1.(*fileStat)</code></span>
+<span class="codeline" id="line-119"><code>	fs2, ok2 := fi2.(*fileStat)</code></span>
+<span class="codeline" id="line-120"><code>	if !ok1 || !ok2 {</code></span>
+<span class="codeline" id="line-121"><code>		return false</code></span>
+<span class="codeline" id="line-122"><code>	}</code></span>
+<span class="codeline" id="line-123"><code>	return sameFile(fs1, fs2)</code></span>
+<span class="codeline" id="line-124"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

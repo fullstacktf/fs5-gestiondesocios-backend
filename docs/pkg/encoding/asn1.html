@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: encoding/asn1</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>asn1</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-encoding/asn1">encoding/asn1</a><i> (on <a href="https://golang.org/pkg/encoding/asn1/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/encoding/asn1" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/encoding/asn1.html">12 packages</a>, and imported by <a href="../../dep/encoding/asn1.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/encoding/asn1/asn1.go.html#doc">d-&gt;</a> <a href="../../src/encoding/asn1/asn1.go.html">asn1.go</a>
+	    <a href="../../src/encoding/asn1/common.go.html">common.go</a>
+	    <a href="../../src/encoding/asn1/marshal.go.html">marshal.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-BitString" data-popularity="135">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-159">BitString</a> <i>(struct)</i>
+		BitString is the structure to use when you want an ASN.1 BIT STRING type. A
+		bit string is padded up to the nearest byte in memory and the number of
+		valid bits is recorded. Padding bits will be zero.
+
+		<input type='checkbox' class="stat" id="BitString-stat-fields"><label for="BitString-stat-fields">Exported Fields (2)</label><span id='BitString-stat-fields-content' class="stat-content">
+			<a href="../../src/encoding/asn1/asn1.go.html#line-161">BitLength</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/encoding/asn1/asn1.go.html#line-160">Bytes</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="BitString-stat-methods"><label for="BitString-stat-methods">Exported Methods (2)</label><span id='BitString-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/encoding/asn1/asn1.go.html#line-166">At</a>(i <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-int">int</a>
+			 (T) <a href="../../src/encoding/asn1/asn1.go.html#line-177">RightAlign</a>() []<a href="../builtin.html#name-byte">byte</a></span>
+		<input type='checkbox' class="stat" id="BitString-stat-params"><label for="BitString-stat-params">As Inputs Of (1+)</label><span id='BitString-stat-params-content' class="stat-content">
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../vendor/golang.org/x/crypto/cryptobyte.html#name-String">String</a>).<a href="../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-471">ReadASN1BitString</a>(out *<b>BitString</b>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-Enumerated" data-popularity="0">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-295">Enumerated</a> <a href="../builtin.html#name-int">int</a>
+		An Enumerated is represented as a plain int.
+</div>
+<div class="anchor" id="name-Flag" data-popularity="0">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-300">Flag</a> <a href="../builtin.html#name-bool">bool</a>
+		A Flag accepts any data and is set to true if present.
+</div>
+<div class="anchor" id="name-ObjectIdentifier" data-popularity="255">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-222">ObjectIdentifier</a> <i>([])</i>
+		An ObjectIdentifier represents an ASN.1 OBJECT IDENTIFIER.
+
+		<input type='checkbox' class="stat" id="ObjectIdentifier-stat-methods"><label for="ObjectIdentifier-stat-methods">Exported Methods (2)</label><span id='ObjectIdentifier-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/encoding/asn1/asn1.go.html#line-225">Equal</a>(other <b>ObjectIdentifier</b>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/encoding/asn1/asn1.go.html#line-238">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ObjectIdentifier-stat-impls"><label for="ObjectIdentifier-stat-impls">Implements (1+)</label><span id='ObjectIdentifier-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="ObjectIdentifier-stat-params"><label for="ObjectIdentifier-stat-params">As Inputs Of (3+)</label><span id='ObjectIdentifier-stat-params-content' class="stat-content">
+			func <a href="#name-ObjectIdentifier">ObjectIdentifier</a>.<a href="../../src/encoding/asn1/asn1.go.html#line-225">Equal</a>(other <b>ObjectIdentifier</b>) <a href="../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../vendor/golang.org/x/crypto/cryptobyte.html#name-Builder">Builder</a>).<a href="../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-168">AddASN1ObjectIdentifier</a>(oid <b>ObjectIdentifier</b>)
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../vendor/golang.org/x/crypto/cryptobyte.html#name-String">String</a>).<a href="../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-413">ReadASN1ObjectIdentifier</a>(out *<b>ObjectIdentifier</b>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-RawContent" data-popularity="0">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-519">RawContent</a> <i>([])</i>
+		RawContent is used to signal that the undecoded, DER data needs to be
+		preserved for a struct. To use it, the first field of the struct must have
+		this type. It's an error for any of the other fields to have this type.
+</div>
+<div class="anchor" id="name-RawValue" data-popularity="5">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-509">RawValue</a> <i>(struct)</i>
+		A RawValue represents an undecoded ASN.1 object.
+
+		<input type='checkbox' class="stat" id="RawValue-stat-fields"><label for="RawValue-stat-fields">Exported Fields (5)</label><span id='RawValue-stat-fields-content' class="stat-content">
+			<a href="../../src/encoding/asn1/asn1.go.html#line-512">Bytes</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/encoding/asn1/asn1.go.html#line-510">Class</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/encoding/asn1/asn1.go.html#line-513">FullBytes</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/encoding/asn1/asn1.go.html#line-511">IsCompound</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/encoding/asn1/asn1.go.html#line-510">Tag</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="RawValue-stat-values"><label for="RawValue-stat-values">As Types Of (1+)</label><span id='RawValue-stat-values-content' class="stat-content">
+			  var <a href="#name-NullRawValue">NullRawValue</a></span></div>
+<div class="anchor" id="name-StructuralError" data-popularity="100">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-36">StructuralError</a> <i>(struct)</i>
+		A StructuralError suggests that the ASN.1 data is valid, but the Go type
+		which is receiving it doesn't match.
+
+		<input type='checkbox' class="stat" id="StructuralError-stat-fields"><label for="StructuralError-stat-fields">One Exported Field</label><span id='StructuralError-stat-fields-content' class="stat-content">
+			<a href="../../src/encoding/asn1/asn1.go.html#line-37">Msg</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="StructuralError-stat-methods"><label for="StructuralError-stat-methods">One Exported Method</label><span id='StructuralError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/encoding/asn1/asn1.go.html#line-40">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="StructuralError-stat-impls"><label for="StructuralError-stat-impls">Implements (1+)</label><span id='StructuralError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-SyntaxError" data-popularity="100">	 type <a href="../../src/encoding/asn1/asn1.go.html#line-43">SyntaxError</a> <i>(struct)</i>
+		A SyntaxError suggests that the ASN.1 data is invalid.
+
+		<input type='checkbox' class="stat" id="SyntaxError-stat-fields"><label for="SyntaxError-stat-fields">One Exported Field</label><span id='SyntaxError-stat-fields-content' class="stat-content">
+			<a href="../../src/encoding/asn1/asn1.go.html#line-37">Msg</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="SyntaxError-stat-methods"><label for="SyntaxError-stat-methods">One Exported Method</label><span id='SyntaxError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/encoding/asn1/asn1.go.html#line-47">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SyntaxError-stat-impls"><label for="SyntaxError-stat-impls">Implements (1+)</label><span id='SyntaxError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ClassApplication">	const <a href="../../src/encoding/asn1/common.go.html#line-46">ClassApplication</a> = 1
+		ASN.1 class types represent the namespace of the tag.</div>
+<div class="anchor" id="name-ClassContextSpecific">	const <a href="../../src/encoding/asn1/common.go.html#line-47">ClassContextSpecific</a> = 2
+		ASN.1 class types represent the namespace of the tag.</div>
+<div class="anchor" id="name-ClassPrivate">	const <a href="../../src/encoding/asn1/common.go.html#line-48">ClassPrivate</a> = 3
+		ASN.1 class types represent the namespace of the tag.</div>
+<div class="anchor" id="name-ClassUniversal">	const <a href="../../src/encoding/asn1/common.go.html#line-45">ClassUniversal</a> = 0
+		ASN.1 class types represent the namespace of the tag.</div>
+<div class="anchor" id="name-Marshal">	 func <a href="../../src/encoding/asn1/marshal.go.html#line-733">Marshal</a>(val interface{}) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		Marshal returns the ASN.1 encoding of val.
+
+		In addition to the struct tags recognised by Unmarshal, the following can be
+		used:
+
+			ia5:         causes strings to be marshaled as ASN.1, IA5String values
+			omitempty:   causes empty slices to be skipped
+			printable:   causes strings to be marshaled as ASN.1, PrintableString values
+			utf8:        causes strings to be marshaled as ASN.1, UTF8String values
+			utc:         causes time.Time to be marshaled as ASN.1, UTCTime values
+			generalized: causes time.Time to be marshaled as ASN.1, GeneralizedTime values</div>
+<div class="anchor" id="name-MarshalWithParams">	 func <a href="../../src/encoding/asn1/marshal.go.html#line-739">MarshalWithParams</a>(val interface{}, params <a href="../builtin.html#name-string">string</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		MarshalWithParams allows field parameters to be specified for the
+		top-level element. The form of the params is the same as the field tags.</div>
+<div class="anchor" id="name-NullBytes">	  var <a href="../../src/encoding/asn1/asn1.go.html#line-217">NullBytes</a> []<a href="../builtin.html#name-byte">byte</a>
+		NullBytes contains bytes representing the DER-encoded ASN.1 NULL type.</div>
+<div class="anchor" id="name-NullRawValue">	  var <a href="../../src/encoding/asn1/asn1.go.html#line-214">NullRawValue</a> <a href="#name-RawValue">RawValue</a>
+		NullRawValue is a RawValue with its Tag set to the ASN.1 NULL type tag (5).</div>
+<div class="anchor" id="name-TagBitString">	const <a href="../../src/encoding/asn1/common.go.html#line-25">TagBitString</a> = 3
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagBMPString">	const <a href="../../src/encoding/asn1/common.go.html#line-40">TagBMPString</a> = 30
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagBoolean">	const <a href="../../src/encoding/asn1/common.go.html#line-23">TagBoolean</a> = 1
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagEnum">	const <a href="../../src/encoding/asn1/common.go.html#line-29">TagEnum</a> = 10
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagGeneralizedTime">	const <a href="../../src/encoding/asn1/common.go.html#line-38">TagGeneralizedTime</a> = 24
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagGeneralString">	const <a href="../../src/encoding/asn1/common.go.html#line-39">TagGeneralString</a> = 27
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagIA5String">	const <a href="../../src/encoding/asn1/common.go.html#line-36">TagIA5String</a> = 22
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagInteger">	const <a href="../../src/encoding/asn1/common.go.html#line-24">TagInteger</a> = 2
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagNull">	const <a href="../../src/encoding/asn1/common.go.html#line-27">TagNull</a> = 5
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagNumericString">	const <a href="../../src/encoding/asn1/common.go.html#line-33">TagNumericString</a> = 18
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagOctetString">	const <a href="../../src/encoding/asn1/common.go.html#line-26">TagOctetString</a> = 4
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagOID">	const <a href="../../src/encoding/asn1/common.go.html#line-28">TagOID</a> = 6
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagPrintableString">	const <a href="../../src/encoding/asn1/common.go.html#line-34">TagPrintableString</a> = 19
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagSequence">	const <a href="../../src/encoding/asn1/common.go.html#line-31">TagSequence</a> = 16
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagSet">	const <a href="../../src/encoding/asn1/common.go.html#line-32">TagSet</a> = 17
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagT61String">	const <a href="../../src/encoding/asn1/common.go.html#line-35">TagT61String</a> = 20
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagUTCTime">	const <a href="../../src/encoding/asn1/common.go.html#line-37">TagUTCTime</a> = 23
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-TagUTF8String">	const <a href="../../src/encoding/asn1/common.go.html#line-30">TagUTF8String</a> = 12
+		ASN.1 tags represent the type of the following object.</div>
+<div class="anchor" id="name-Unmarshal">	 func <a href="../../src/encoding/asn1/asn1.go.html#line-1094">Unmarshal</a>(b []<a href="../builtin.html#name-byte">byte</a>, val interface{}) (rest []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+		Unmarshal parses the DER-encoded ASN.1 data structure b
+		and uses the reflect package to fill in an arbitrary value pointed at by val.
+		Because Unmarshal uses the reflect package, the structs
+		being written to must use upper case field names.
+
+		After parsing b, any bytes that were leftover and not used to fill
+		val will be returned in rest. When parsing a SEQUENCE into a struct,
+		any trailing elements of the SEQUENCE that do not have matching
+		fields in val will not be included in rest, as these are considered
+		valid elements of the SEQUENCE and not trailing data.
+
+		An ASN.1 INTEGER can be written to an int, int32, int64,
+		or *big.Int (from the math/big package).
+		If the encoded value does not fit in the Go type,
+		Unmarshal returns a parse error.
+
+		An ASN.1 BIT STRING can be written to a BitString.
+
+		An ASN.1 OCTET STRING can be written to a []byte.
+
+		An ASN.1 OBJECT IDENTIFIER can be written to an
+		ObjectIdentifier.
+
+		An ASN.1 ENUMERATED can be written to an Enumerated.
+
+		An ASN.1 UTCTIME or GENERALIZEDTIME can be written to a time.Time.
+
+		An ASN.1 PrintableString, IA5String, or NumericString can be written to a string.
+
+		Any of the above ASN.1 values can be written to an interface{}.
+		The value stored in the interface has the corresponding Go type.
+		For integers, that type is int64.
+
+		An ASN.1 SEQUENCE OF x or SET OF x can be written
+		to a slice if an x can be written to the slice's element type.
+
+		An ASN.1 SEQUENCE or SET can be written to a struct
+		if each of the elements in the sequence can be
+		written to the corresponding element in the struct.
+
+		The following tags on struct fields have special meaning to Unmarshal:
+
+			application specifies that an APPLICATION tag is used
+			private     specifies that a PRIVATE tag is used
+			default:x   sets the default value for optional integer fields (only used if optional is also present)
+			explicit    specifies that an additional, explicit tag wraps the implicit one
+			optional    marks the field as ASN.1 OPTIONAL
+			set         causes a SET, rather than a SEQUENCE type to be expected
+			tag:x       specifies the ASN.1 tag number; implies ASN.1 CONTEXT SPECIFIC
+
+		If the type of the first field of a structure is RawContent then the raw
+		ASN1 contents of the struct will be stored in it.
+
+		If the type name of a slice element ends with "SET" then it's treated as if
+		the "set" tag was set on it. This can be used with nested slices where a
+		struct tag cannot be given.
+
+		Other ASN.1 types are not supported; if it encounters them,
+		Unmarshal returns a parse error.</div>
+<div class="anchor" id="name-UnmarshalWithParams">	 func <a href="../../src/encoding/asn1/asn1.go.html#line-1100">UnmarshalWithParams</a>(b []<a href="../builtin.html#name-byte">byte</a>, val interface{}, params <a href="../builtin.html#name-string">string</a>) (rest []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+		UnmarshalWithParams allows field parameters to be specified for the
+		top-level element. The form of the params is the same as the field tags.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

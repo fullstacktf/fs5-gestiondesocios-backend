@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: bytes</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>bytes</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-bytes">bytes</a><i> (on <a href="https://golang.org/pkg/bytes/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/bytes" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/bytes.html">5 packages</a>, and imported by <a href="../dep/bytes.html#imported-by">23 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/bytes/buffer.go.html">buffer.go</a>
+	<a href="../src/bytes/bytes.go.html#doc">d-&gt;</a> <a href="../src/bytes/bytes.go.html">bytes.go</a>
+	    <a href="../src/bytes/reader.go.html">reader.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Buffer" data-popularity="2005">	 type <a href="../src/bytes/buffer.go.html#line-20">Buffer</a> <i>(struct)</i>
+		A Buffer is a variable-sized buffer of bytes with Read and Write methods.
+		The zero value for Buffer is an empty buffer ready to use.
+
+		<input type='checkbox' class="stat" id="Buffer-stat-methods"><label for="Buffer-stat-methods">Exported Methods (21)</label><span id='Buffer-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/bytes/buffer.go.html#line-54">Bytes</a>() []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-77">Cap</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-157">Grow</a>(n <a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-73">Len</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-318">Next</a>(n <a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-296">Read</a>(p []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-334">ReadByte</a>() (<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-408">ReadBytes</a>(delim <a href="builtin.html#name-byte">byte</a>) (line []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-199">ReadFrom</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-351">ReadRune</a>() (r <a href="builtin.html#name-rune">rune</a>, size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-436">ReadString</a>(delim <a href="builtin.html#name-byte">byte</a>) (line <a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-97">Reset</a>()
+			(*T) <a href="../src/bytes/buffer.go.html#line-60">String</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-82">Truncate</a>(n <a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-391">UnreadByte</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-374">UnreadRune</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-168">Write</a>(p []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-263">WriteByte</a>(c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bytes/buffer.go.html#line-277">WriteRune</a>(r <a href="builtin.html#name-rune">rune</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-180">WriteString</a>(s <a href="builtin.html#name-string">string</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/buffer.go.html#line-236">WriteTo</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Buffer-stat-impls"><label for="Buffer-stat-impls">Implements (14+)</label><span id='Buffer-stat-impls-content' class="stat-content">
+			*T : compress/flate.<a href="compress/flate.html#name-Reader">Reader</a>
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a>
+			*T : gorm.io/gorm/clause.<a href="gorm.io/gorm/clause.html#name-Writer">Writer</a>
+			*T : io.<a href="io.html#name-ByteReader">ByteReader</a>
+			*T : io.<a href="io.html#name-ByteScanner">ByteScanner</a>
+			*T : io.<a href="io.html#name-ByteWriter">ByteWriter</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ReaderFrom">ReaderFrom</a>
+			*T : io.<a href="io.html#name-ReadWriter">ReadWriter</a>
+			*T : io.<a href="io.html#name-RuneReader">RuneReader</a>
+			*T : io.<a href="io.html#name-RuneScanner">RuneScanner</a>
+			*T : io.<a href="io.html#name-StringWriter">StringWriter</a>
+			*T : io.<a href="io.html#name-Writer">Writer</a>
+			*T : io.<a href="io.html#name-WriterTo">WriterTo</a></span>
+		<input type='checkbox' class="stat" id="Buffer-stat-results"><label for="Buffer-stat-results">As Outputs Of (2+)</label><span id='Buffer-stat-results-content' class="stat-content">
+			func <a href="#name-NewBuffer">NewBuffer</a>(buf []<a href="builtin.html#name-byte">byte</a>) *<b>Buffer</b>
+			func <a href="#name-NewBufferString">NewBufferString</a>(s <a href="builtin.html#name-string">string</a>) *<b>Buffer</b></span>
+		<input type='checkbox' class="stat" id="Buffer-stat-params"><label for="Buffer-stat-params">As Inputs Of (3+)</label><span id='Buffer-stat-params-content' class="stat-content">
+			func encoding/json.<a href="encoding/json.html#name-Compact">Compact</a>(dst *<b>Buffer</b>, src []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			func encoding/json.<a href="encoding/json.html#name-HTMLEscape">HTMLEscape</a>(dst *<b>Buffer</b>, src []<a href="builtin.html#name-byte">byte</a>)
+			func encoding/json.<a href="encoding/json.html#name-Indent">Indent</a>(dst *<b>Buffer</b>, src []<a href="builtin.html#name-byte">byte</a>, prefix, indent <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Reader" data-popularity="1125">	 type <a href="../src/bytes/reader.go.html#line-18">Reader</a> <i>(struct)</i>
+		A Reader implements the io.Reader, io.ReaderAt, io.WriterTo, io.Seeker,
+		io.ByteScanner, and io.RuneScanner interfaces by reading from
+		a byte slice.
+		Unlike a Buffer, a Reader is read-only and supports seeking.
+		The zero value for Reader operates like a Reader of an empty slice.
+
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">Exported Methods (11)</label><span id='Reader-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/bytes/reader.go.html#line-26">Len</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bytes/reader.go.html#line-40">Read</a>(b []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/reader.go.html#line-51">ReadAt</a>(b []<a href="builtin.html#name-byte">byte</a>, off <a href="builtin.html#name-int64">int64</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/reader.go.html#line-67">ReadByte</a>() (<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/reader.go.html#line-88">ReadRune</a>() (ch <a href="builtin.html#name-rune">rune</a>, size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/reader.go.html#line-157">Reset</a>(b []<a href="builtin.html#name-byte">byte</a>)
+			(*T) <a href="../src/bytes/reader.go.html#line-117">Seek</a>(offset <a href="builtin.html#name-int64">int64</a>, whence <a href="builtin.html#name-int">int</a>) (<a href="builtin.html#name-int64">int64</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bytes/reader.go.html#line-37">Size</a>() <a href="builtin.html#name-int64">int64</a>
+			(*T) <a href="../src/bytes/reader.go.html#line-78">UnreadByte</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bytes/reader.go.html#line-104">UnreadRune</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bytes/reader.go.html#line-138">WriteTo</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-impls"><label for="Reader-stat-impls">Implements (10+)</label><span id='Reader-stat-impls-content' class="stat-content">
+			*T : compress/flate.<a href="compress/flate.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ByteReader">ByteReader</a>
+			*T : io.<a href="io.html#name-ByteScanner">ByteScanner</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ReaderAt">ReaderAt</a>
+			*T : io.<a href="io.html#name-ReadSeeker">ReadSeeker</a>
+			*T : io.<a href="io.html#name-RuneReader">RuneReader</a>
+			*T : io.<a href="io.html#name-RuneScanner">RuneScanner</a>
+			*T : io.<a href="io.html#name-Seeker">Seeker</a>
+			*T : io.<a href="io.html#name-WriterTo">WriterTo</a></span>
+		<input type='checkbox' class="stat" id="Reader-stat-results"><label for="Reader-stat-results">As Outputs Of (1+)</label><span id='Reader-stat-results-content' class="stat-content">
+			func <a href="#name-NewReader">NewReader</a>(b []<a href="builtin.html#name-byte">byte</a>) *<b>Reader</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Compare">	 func <a href="../src/bytes/bytes.go.html#line-26">Compare</a>(a, b []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		Compare returns an integer comparing two byte slices lexicographically.
+		The result will be 0 if a==b, -1 if a &lt; b, and +1 if a &gt; b.
+		A nil argument is equivalent to an empty slice.</div>
+<div class="anchor" id="name-Contains">	 func <a href="../src/bytes/bytes.go.html#line-75">Contains</a>(b, subslice []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-bool">bool</a>
+		Contains reports whether subslice is within b.</div>
+<div class="anchor" id="name-ContainsAny">	 func <a href="../src/bytes/bytes.go.html#line-80">ContainsAny</a>(b []<a href="builtin.html#name-byte">byte</a>, chars <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+		ContainsAny reports whether any of the UTF-8-encoded code points in chars are within b.</div>
+<div class="anchor" id="name-ContainsRune">	 func <a href="../src/bytes/bytes.go.html#line-85">ContainsRune</a>(b []<a href="builtin.html#name-byte">byte</a>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		ContainsRune reports whether the rune is contained in the UTF-8-encoded byte slice b.</div>
+<div class="anchor" id="name-Count">	 func <a href="../src/bytes/bytes.go.html#line-55">Count</a>(s, sep []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		Count counts the number of non-overlapping instances of sep in s.
+		If sep is an empty slice, Count returns 1 + the number of UTF-8-encoded code points in s.</div>
+<div class="anchor" id="name-Equal">	 func <a href="../src/bytes/bytes.go.html#line-18">Equal</a>(a, b []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-bool">bool</a>
+		Equal reports whether a and b
+		are the same length and contain the same bytes.
+		A nil argument is equivalent to an empty slice.</div>
+<div class="anchor" id="name-EqualFold">	 func <a href="../src/bytes/bytes.go.html#line-1037">EqualFold</a>(s, t []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-bool">bool</a>
+		EqualFold reports whether s and t, interpreted as UTF-8 strings,
+		are equal under Unicode case-folding, which is a more general
+		form of case-insensitivity.</div>
+<div class="anchor" id="name-ErrTooLarge">	  var <a href="../src/bytes/buffer.go.html#line-44">ErrTooLarge</a> <a href="builtin.html#name-error">error</a>
+		ErrTooLarge is passed to panic if memory cannot be allocated to store data in a buffer.</div>
+<div class="anchor" id="name-Fields">	 func <a href="../src/bytes/bytes.go.html#line-408">Fields</a>(s []<a href="builtin.html#name-byte">byte</a>) [][]<a href="builtin.html#name-byte">byte</a>
+		Fields interprets s as a sequence of UTF-8-encoded code points.
+		It splits the slice s around each instance of one or more consecutive white space
+		characters, as defined by unicode.IsSpace, returning a slice of subslices of s or an
+		empty slice if s contains only white space.</div>
+<div class="anchor" id="name-FieldsFunc">	 func <a href="../src/bytes/bytes.go.html#line-465">FieldsFunc</a>(s []<a href="builtin.html#name-byte">byte</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) [][]<a href="builtin.html#name-byte">byte</a>
+		FieldsFunc interprets s as a sequence of UTF-8-encoded code points.
+		It splits the slice s at each run of code points c satisfying f(c) and
+		returns a slice of subslices of s. If all code points in s satisfy f(c), or
+		len(s) == 0, an empty slice is returned.
+
+		FieldsFunc makes no guarantees about the order in which it calls f(c)
+		and assumes that f always returns the same value for a given c.</div>
+<div class="anchor" id="name-HasPrefix">	 func <a href="../src/bytes/bytes.go.html#line-537">HasPrefix</a>(s, prefix []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-bool">bool</a>
+		HasPrefix tests whether the byte slice s begins with prefix.</div>
+<div class="anchor" id="name-HasSuffix">	 func <a href="../src/bytes/bytes.go.html#line-542">HasSuffix</a>(s, suffix []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-bool">bool</a>
+		HasSuffix tests whether the byte slice s ends with suffix.</div>
+<div class="anchor" id="name-Index">	 func <a href="../src/bytes/bytes.go.html#line-1091">Index</a>(s, sep []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		Index returns the index of the first instance of sep in s, or -1 if sep is not present in s.</div>
+<div class="anchor" id="name-IndexAny">	 func <a href="../src/bytes/bytes.go.html#line-181">IndexAny</a>(s []<a href="builtin.html#name-byte">byte</a>, chars <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		IndexAny interprets s as a sequence of UTF-8-encoded Unicode code points.
+		It returns the byte index of the first occurrence in s of any of the Unicode
+		code points in chars. It returns -1 if chars is empty or if there is no code
+		point in common.</div>
+<div class="anchor" id="name-IndexByte">	 func <a href="../src/bytes/bytes.go.html#line-90">IndexByte</a>(b []<a href="builtin.html#name-byte">byte</a>, c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		IndexByte returns the index of the first instance of c in b, or -1 if c is not present in b.</div>
+<div class="anchor" id="name-IndexFunc">	 func <a href="../src/bytes/bytes.go.html#line-817">IndexFunc</a>(s []<a href="builtin.html#name-byte">byte</a>, f func(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-int">int</a>
+		IndexFunc interprets s as a sequence of UTF-8-encoded code points.
+		It returns the byte index in s of the first Unicode
+		code point satisfying f(c), or -1 if none do.</div>
+<div class="anchor" id="name-IndexRune">	 func <a href="../src/bytes/bytes.go.html#line-155">IndexRune</a>(s []<a href="builtin.html#name-byte">byte</a>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-int">int</a>
+		IndexRune interprets s as a sequence of UTF-8-encoded code points.
+		It returns the byte index of the first occurrence in s of the given rune.
+		It returns -1 if rune is not present in s.
+		If r is utf8.RuneError, it returns the first instance of any
+		invalid UTF-8 byte sequence.</div>
+<div class="anchor" id="name-Join">	 func <a href="../src/bytes/bytes.go.html#line-514">Join</a>(s [][]<a href="builtin.html#name-byte">byte</a>, sep []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		Join concatenates the elements of s to create a new byte slice. The separator
+		sep is placed between elements in the resulting slice.</div>
+<div class="anchor" id="name-LastIndex">	 func <a href="../src/bytes/bytes.go.html#line-104">LastIndex</a>(s, sep []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		LastIndex returns the index of the last instance of sep in s, or -1 if sep is not present in s.</div>
+<div class="anchor" id="name-LastIndexAny">	 func <a href="../src/bytes/bytes.go.html#line-259">LastIndexAny</a>(s []<a href="builtin.html#name-byte">byte</a>, chars <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		LastIndexAny interprets s as a sequence of UTF-8-encoded Unicode code
+		points. It returns the byte index of the last occurrence in s of any of
+		the Unicode code points in chars. It returns -1 if chars is empty or if
+		there is no code point in common.</div>
+<div class="anchor" id="name-LastIndexByte">	 func <a href="../src/bytes/bytes.go.html#line-141">LastIndexByte</a>(s []<a href="builtin.html#name-byte">byte</a>, c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		LastIndexByte returns the index of the last instance of c in s, or -1 if c is not present in s.</div>
+<div class="anchor" id="name-LastIndexFunc">	 func <a href="../src/bytes/bytes.go.html#line-824">LastIndexFunc</a>(s []<a href="builtin.html#name-byte">byte</a>, f func(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-int">int</a>
+		LastIndexFunc interprets s as a sequence of UTF-8-encoded code points.
+		It returns the byte index in s of the last Unicode
+		code point satisfying f(c), or -1 if none do.</div>
+<div class="anchor" id="name-Map">	 func <a href="../src/bytes/bytes.go.html#line-550">Map</a>(mapping func(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>, s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		Map returns a copy of the byte slice s with all its characters modified
+		according to the mapping function. If mapping returns a negative value, the character is
+		dropped from the byte slice with no replacement. The characters in s and the
+		output are interpreted as UTF-8-encoded code points.</div>
+<div class="anchor" id="name-MinRead">	const <a href="../src/bytes/buffer.go.html#line-193">MinRead</a> = 512
+		MinRead is the minimum slice size passed to a Read call by
+		Buffer.ReadFrom. As long as the Buffer has at least MinRead bytes beyond
+		what is required to hold the contents of r, ReadFrom will not grow the
+		underlying buffer.</div>
+<div class="anchor" id="name-NewBuffer">	 func <a href="../src/bytes/buffer.go.html#line-450">NewBuffer</a>(buf []<a href="builtin.html#name-byte">byte</a>) *<a href="#name-Buffer">Buffer</a>
+		NewBuffer creates and initializes a new Buffer using buf as its
+		initial contents. The new Buffer takes ownership of buf, and the
+		caller should not use buf after this call. NewBuffer is intended to
+		prepare a Buffer to read existing data. It can also be used to set
+		the initial size of the internal buffer for writing. To do that,
+		buf should have the desired capacity but a length of zero.
+
+		In most cases, new(Buffer) (or just declaring a Buffer variable) is
+		sufficient to initialize a Buffer.</div>
+<div class="anchor" id="name-NewBufferString">	 func <a href="../src/bytes/buffer.go.html#line-458">NewBufferString</a>(s <a href="builtin.html#name-string">string</a>) *<a href="#name-Buffer">Buffer</a>
+		NewBufferString creates and initializes a new Buffer using string s as its
+		initial contents. It is intended to prepare a buffer to read an existing
+		string.
+
+		In most cases, new(Buffer) (or just declaring a Buffer variable) is
+		sufficient to initialize a Buffer.</div>
+<div class="anchor" id="name-NewReader">	 func <a href="../src/bytes/reader.go.html#line-160">NewReader</a>(b []<a href="builtin.html#name-byte">byte</a>) *<a href="#name-Reader">Reader</a>
+		NewReader returns a new Reader reading from b.</div>
+<div class="anchor" id="name-Repeat">	 func <a href="../src/bytes/bytes.go.html#line-587">Repeat</a>(b []<a href="builtin.html#name-byte">byte</a>, count <a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-byte">byte</a>
+		Repeat returns a new byte slice consisting of count copies of b.
+
+		It panics if count is negative or if
+		the result of (len(b) * count) overflows.</div>
+<div class="anchor" id="name-Replace">	 func <a href="../src/bytes/bytes.go.html#line-989">Replace</a>(s, old, new []<a href="builtin.html#name-byte">byte</a>, n <a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-byte">byte</a>
+		Replace returns a copy of the slice s with the first n
+		non-overlapping instances of old replaced by new.
+		If old is empty, it matches at the beginning of the slice
+		and after each UTF-8 sequence, yielding up to k+1 replacements
+		for a k-rune slice.
+		If n &lt; 0, there is no limit on the number of replacements.</div>
+<div class="anchor" id="name-ReplaceAll">	 func <a href="../src/bytes/bytes.go.html#line-1030">ReplaceAll</a>(s, old, new []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ReplaceAll returns a copy of the slice s with all
+		non-overlapping instances of old replaced by new.
+		If old is empty, it matches at the beginning of the slice
+		and after each UTF-8 sequence, yielding up to k+1 replacements
+		for a k-rune slice.</div>
+<div class="anchor" id="name-Runes">	 func <a href="../src/bytes/bytes.go.html#line-971">Runes</a>(s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-rune">rune</a>
+		Runes interprets s as a sequence of UTF-8-encoded code points.
+		It returns a slice of runes (Unicode code points) equivalent to s.</div>
+<div class="anchor" id="name-Split">	 func <a href="../src/bytes/bytes.go.html#line-392">Split</a>(s, sep []<a href="builtin.html#name-byte">byte</a>) [][]<a href="builtin.html#name-byte">byte</a>
+		Split slices s into all subslices separated by sep and returns a slice of
+		the subslices between those separators.
+		If sep is empty, Split splits after each UTF-8 sequence.
+		It is equivalent to SplitN with a count of -1.</div>
+<div class="anchor" id="name-SplitAfter">	 func <a href="../src/bytes/bytes.go.html#line-398">SplitAfter</a>(s, sep []<a href="builtin.html#name-byte">byte</a>) [][]<a href="builtin.html#name-byte">byte</a>
+		SplitAfter slices s into all subslices after each instance of sep and
+		returns a slice of those subslices.
+		If sep is empty, SplitAfter splits after each UTF-8 sequence.
+		It is equivalent to SplitAfterN with a count of -1.</div>
+<div class="anchor" id="name-SplitAfterN">	 func <a href="../src/bytes/bytes.go.html#line-384">SplitAfterN</a>(s, sep []<a href="builtin.html#name-byte">byte</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-byte">byte</a>
+		SplitAfterN slices s into subslices after each instance of sep and
+		returns a slice of those subslices.
+		If sep is empty, SplitAfterN splits after each UTF-8 sequence.
+		The count determines the number of subslices to return:
+		  n &gt; 0: at most n subslices; the last subslice will be the unsplit remainder.
+		  n == 0: the result is nil (zero subslices)
+		  n &lt; 0: all subslices</div>
+<div class="anchor" id="name-SplitN">	 func <a href="../src/bytes/bytes.go.html#line-375">SplitN</a>(s, sep []<a href="builtin.html#name-byte">byte</a>, n <a href="builtin.html#name-int">int</a>) [][]<a href="builtin.html#name-byte">byte</a>
+		SplitN slices s into subslices separated by sep and returns a slice of
+		the subslices between those separators.
+		If sep is empty, SplitN splits after each UTF-8 sequence.
+		The count determines the number of subslices to return:
+		  n &gt; 0: at most n subslices; the last subslice will be the unsplit remainder.
+		  n == 0: the result is nil (zero subslices)
+		  n &lt; 0: all subslices</div>
+<div class="anchor" id="name-Title">	 func <a href="../src/bytes/bytes.go.html#line-750">Title</a>(s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		Title treats s as UTF-8-encoded bytes and returns a copy with all Unicode letters that begin
+		words mapped to their title case.
+
+		BUG(rsc): The rule Title uses for word boundaries does not handle Unicode punctuation properly.</div>
+<div class="anchor" id="name-ToLower">	 func <a href="../src/bytes/bytes.go.html#line-643">ToLower</a>(s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ToLower returns a copy of the byte slice s with all Unicode letters mapped to
+		their lower case.</div>
+<div class="anchor" id="name-ToLowerSpecial">	 func <a href="../src/bytes/bytes.go.html#line-682">ToLowerSpecial</a>(c <a href="unicode.html">unicode</a>.<a href="unicode.html#name-SpecialCase">SpecialCase</a>, s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ToLowerSpecial treats s as UTF-8-encoded bytes and returns a copy with all the Unicode letters mapped to their
+		lower case, giving priority to the special casing rules.</div>
+<div class="anchor" id="name-ToTitle">	 func <a href="../src/bytes/bytes.go.html#line-672">ToTitle</a>(s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ToTitle treats s as UTF-8-encoded bytes and returns a copy with all the Unicode letters mapped to their title case.</div>
+<div class="anchor" id="name-ToTitleSpecial">	 func <a href="../src/bytes/bytes.go.html#line-688">ToTitleSpecial</a>(c <a href="unicode.html">unicode</a>.<a href="unicode.html#name-SpecialCase">SpecialCase</a>, s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ToTitleSpecial treats s as UTF-8-encoded bytes and returns a copy with all the Unicode letters mapped to their
+		title case, giving priority to the special casing rules.</div>
+<div class="anchor" id="name-ToUpper">	 func <a href="../src/bytes/bytes.go.html#line-612">ToUpper</a>(s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ToUpper returns a copy of the byte slice s with all Unicode letters mapped to
+		their upper case.</div>
+<div class="anchor" id="name-ToUpperSpecial">	 func <a href="../src/bytes/bytes.go.html#line-676">ToUpperSpecial</a>(c <a href="unicode.html">unicode</a>.<a href="unicode.html#name-SpecialCase">SpecialCase</a>, s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ToUpperSpecial treats s as UTF-8-encoded bytes and returns a copy with all the Unicode letters mapped to their
+		upper case, giving priority to the special casing rules.</div>
+<div class="anchor" id="name-ToValidUTF8">	 func <a href="../src/bytes/bytes.go.html#line-694">ToValidUTF8</a>(s, replacement []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		ToValidUTF8 treats s as UTF-8-encoded bytes and returns a copy with each run of bytes
+		representing invalid UTF-8 replaced with the bytes in replacement, which may be empty.</div>
+<div class="anchor" id="name-Trim">	 func <a href="../src/bytes/bytes.go.html#line-913">Trim</a>(s []<a href="builtin.html#name-byte">byte</a>, cutset <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-byte">byte</a>
+		Trim returns a subslice of s by slicing off all leading and
+		trailing UTF-8-encoded code points contained in cutset.</div>
+<div class="anchor" id="name-TrimFunc">	 func <a href="../src/bytes/bytes.go.html#line-792">TrimFunc</a>(s []<a href="builtin.html#name-byte">byte</a>, f func(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimFunc returns a subslice of s by slicing off all leading and trailing
+		UTF-8-encoded code points c that satisfy f(c).</div>
+<div class="anchor" id="name-TrimLeft">	 func <a href="../src/bytes/bytes.go.html#line-919">TrimLeft</a>(s []<a href="builtin.html#name-byte">byte</a>, cutset <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimLeft returns a subslice of s by slicing off all leading
+		UTF-8-encoded code points contained in cutset.</div>
+<div class="anchor" id="name-TrimLeftFunc">	 func <a href="../src/bytes/bytes.go.html#line-769">TrimLeftFunc</a>(s []<a href="builtin.html#name-byte">byte</a>, f func(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimLeftFunc treats s as UTF-8-encoded bytes and returns a subslice of s by slicing off
+		all leading UTF-8-encoded code points c that satisfy f(c).</div>
+<div class="anchor" id="name-TrimPrefix">	 func <a href="../src/bytes/bytes.go.html#line-798">TrimPrefix</a>(s, prefix []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimPrefix returns s without the provided leading prefix string.
+		If s doesn't start with prefix, s is returned unchanged.</div>
+<div class="anchor" id="name-TrimRight">	 func <a href="../src/bytes/bytes.go.html#line-925">TrimRight</a>(s []<a href="builtin.html#name-byte">byte</a>, cutset <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimRight returns a subslice of s by slicing off all trailing
+		UTF-8-encoded code points that are contained in cutset.</div>
+<div class="anchor" id="name-TrimRightFunc">	 func <a href="../src/bytes/bytes.go.html#line-779">TrimRightFunc</a>(s []<a href="builtin.html#name-byte">byte</a>, f func(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimRightFunc returns a subslice of s by slicing off all trailing
+		UTF-8-encoded code points c that satisfy f(c).</div>
+<div class="anchor" id="name-TrimSpace">	 func <a href="../src/bytes/bytes.go.html#line-931">TrimSpace</a>(s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimSpace returns a subslice of s by slicing off all leading and
+		trailing white space, as defined by Unicode.</div>
+<div class="anchor" id="name-TrimSuffix">	 func <a href="../src/bytes/bytes.go.html#line-807">TrimSuffix</a>(s, suffix []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+		TrimSuffix returns s without the provided trailing suffix string.
+		If s doesn't end with suffix, s is returned unchanged.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

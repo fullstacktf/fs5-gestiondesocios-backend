@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: connector.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	connector.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2018 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"context"</code></span>
+<span class="codeline" id="line-13"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-14"><code>	"net"</code></span>
+<span class="codeline" id="line-15"><code>)</code></span>
+<span class="codeline" id="line-16"><code></code></span>
+<span class="codeline" id="line-17"><code>type connector struct {</code></span>
+<span class="codeline" id="line-18"><code>	cfg *Config // immutable private copy.</code></span>
+<span class="codeline" id="line-19"><code>}</code></span>
+<span class="codeline" id="line-20"><code></code></span>
+<span class="codeline" id="line-21"><code>// Connect implements driver.Connector interface.</code></span>
+<span class="codeline" id="line-22"><code>// Connect returns a connection to the database.</code></span>
+<span class="codeline" id="line-23"><code>func (c *connector) Connect(ctx context.Context) (driver.Conn, error) {</code></span>
+<span class="codeline" id="line-24"><code>	var err error</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>	// New mysqlConn</code></span>
+<span class="codeline" id="line-27"><code>	mc := &amp;mysqlConn{</code></span>
+<span class="codeline" id="line-28"><code>		maxAllowedPacket: maxPacketSize,</code></span>
+<span class="codeline" id="line-29"><code>		maxWriteSize:     maxPacketSize - 1,</code></span>
+<span class="codeline" id="line-30"><code>		closech:          make(chan struct{}),</code></span>
+<span class="codeline" id="line-31"><code>		cfg:              c.cfg,</code></span>
+<span class="codeline" id="line-32"><code>	}</code></span>
+<span class="codeline" id="line-33"><code>	mc.parseTime = mc.cfg.ParseTime</code></span>
+<span class="codeline" id="line-34"><code></code></span>
+<span class="codeline" id="line-35"><code>	// Connect to Server</code></span>
+<span class="codeline" id="line-36"><code>	dialsLock.RLock()</code></span>
+<span class="codeline" id="line-37"><code>	dial, ok := dials[mc.cfg.Net]</code></span>
+<span class="codeline" id="line-38"><code>	dialsLock.RUnlock()</code></span>
+<span class="codeline" id="line-39"><code>	if ok {</code></span>
+<span class="codeline" id="line-40"><code>		dctx := ctx</code></span>
+<span class="codeline" id="line-41"><code>		if mc.cfg.Timeout &gt; 0 {</code></span>
+<span class="codeline" id="line-42"><code>			var cancel context.CancelFunc</code></span>
+<span class="codeline" id="line-43"><code>			dctx, cancel = context.WithTimeout(ctx, c.cfg.Timeout)</code></span>
+<span class="codeline" id="line-44"><code>			defer cancel()</code></span>
+<span class="codeline" id="line-45"><code>		}</code></span>
+<span class="codeline" id="line-46"><code>		mc.netConn, err = dial(dctx, mc.cfg.Addr)</code></span>
+<span class="codeline" id="line-47"><code>	} else {</code></span>
+<span class="codeline" id="line-48"><code>		nd := net.Dialer{Timeout: mc.cfg.Timeout}</code></span>
+<span class="codeline" id="line-49"><code>		mc.netConn, err = nd.DialContext(ctx, mc.cfg.Net, mc.cfg.Addr)</code></span>
+<span class="codeline" id="line-50"><code>	}</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-53"><code>		return nil, err</code></span>
+<span class="codeline" id="line-54"><code>	}</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>	// Enable TCP Keepalives on TCP connections</code></span>
+<span class="codeline" id="line-57"><code>	if tc, ok := mc.netConn.(*net.TCPConn); ok {</code></span>
+<span class="codeline" id="line-58"><code>		if err := tc.SetKeepAlive(true); err != nil {</code></span>
+<span class="codeline" id="line-59"><code>			// Don't send COM_QUIT before handshake.</code></span>
+<span class="codeline" id="line-60"><code>			mc.netConn.Close()</code></span>
+<span class="codeline" id="line-61"><code>			mc.netConn = nil</code></span>
+<span class="codeline" id="line-62"><code>			return nil, err</code></span>
+<span class="codeline" id="line-63"><code>		}</code></span>
+<span class="codeline" id="line-64"><code>	}</code></span>
+<span class="codeline" id="line-65"><code></code></span>
+<span class="codeline" id="line-66"><code>	// Call startWatcher for context support (From Go 1.8)</code></span>
+<span class="codeline" id="line-67"><code>	mc.startWatcher()</code></span>
+<span class="codeline" id="line-68"><code>	if err := mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-69"><code>		mc.cleanup()</code></span>
+<span class="codeline" id="line-70"><code>		return nil, err</code></span>
+<span class="codeline" id="line-71"><code>	}</code></span>
+<span class="codeline" id="line-72"><code>	defer mc.finish()</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>	mc.buf = newBuffer(mc.netConn)</code></span>
+<span class="codeline" id="line-75"><code></code></span>
+<span class="codeline" id="line-76"><code>	// Set I/O timeouts</code></span>
+<span class="codeline" id="line-77"><code>	mc.buf.timeout = mc.cfg.ReadTimeout</code></span>
+<span class="codeline" id="line-78"><code>	mc.writeTimeout = mc.cfg.WriteTimeout</code></span>
+<span class="codeline" id="line-79"><code></code></span>
+<span class="codeline" id="line-80"><code>	// Reading Handshake Initialization Packet</code></span>
+<span class="codeline" id="line-81"><code>	authData, plugin, err := mc.readHandshakePacket()</code></span>
+<span class="codeline" id="line-82"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-83"><code>		mc.cleanup()</code></span>
+<span class="codeline" id="line-84"><code>		return nil, err</code></span>
+<span class="codeline" id="line-85"><code>	}</code></span>
+<span class="codeline" id="line-86"><code></code></span>
+<span class="codeline" id="line-87"><code>	if plugin == "" {</code></span>
+<span class="codeline" id="line-88"><code>		plugin = defaultAuthPlugin</code></span>
+<span class="codeline" id="line-89"><code>	}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>	// Send Client Authentication Packet</code></span>
+<span class="codeline" id="line-92"><code>	authResp, err := mc.auth(authData, plugin)</code></span>
+<span class="codeline" id="line-93"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-94"><code>		// try the default auth plugin, if using the requested plugin failed</code></span>
+<span class="codeline" id="line-95"><code>		errLog.Print("could not use requested auth plugin '"+plugin+"': ", err.Error())</code></span>
+<span class="codeline" id="line-96"><code>		plugin = defaultAuthPlugin</code></span>
+<span class="codeline" id="line-97"><code>		authResp, err = mc.auth(authData, plugin)</code></span>
+<span class="codeline" id="line-98"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-99"><code>			mc.cleanup()</code></span>
+<span class="codeline" id="line-100"><code>			return nil, err</code></span>
+<span class="codeline" id="line-101"><code>		}</code></span>
+<span class="codeline" id="line-102"><code>	}</code></span>
+<span class="codeline" id="line-103"><code>	if err = mc.writeHandshakeResponsePacket(authResp, plugin); err != nil {</code></span>
+<span class="codeline" id="line-104"><code>		mc.cleanup()</code></span>
+<span class="codeline" id="line-105"><code>		return nil, err</code></span>
+<span class="codeline" id="line-106"><code>	}</code></span>
+<span class="codeline" id="line-107"><code></code></span>
+<span class="codeline" id="line-108"><code>	// Handle response to auth packet, switch methods if possible</code></span>
+<span class="codeline" id="line-109"><code>	if err = mc.handleAuthResult(authData, plugin); err != nil {</code></span>
+<span class="codeline" id="line-110"><code>		// Authentication failed and MySQL has already closed the connection</code></span>
+<span class="codeline" id="line-111"><code>		// (https://dev.mysql.com/doc/internals/en/authentication-fails.html).</code></span>
+<span class="codeline" id="line-112"><code>		// Do not send COM_QUIT, just cleanup and return the error.</code></span>
+<span class="codeline" id="line-113"><code>		mc.cleanup()</code></span>
+<span class="codeline" id="line-114"><code>		return nil, err</code></span>
+<span class="codeline" id="line-115"><code>	}</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>	if mc.cfg.MaxAllowedPacket &gt; 0 {</code></span>
+<span class="codeline" id="line-118"><code>		mc.maxAllowedPacket = mc.cfg.MaxAllowedPacket</code></span>
+<span class="codeline" id="line-119"><code>	} else {</code></span>
+<span class="codeline" id="line-120"><code>		// Get max allowed packet size</code></span>
+<span class="codeline" id="line-121"><code>		maxap, err := mc.getSystemVar("max_allowed_packet")</code></span>
+<span class="codeline" id="line-122"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-123"><code>			mc.Close()</code></span>
+<span class="codeline" id="line-124"><code>			return nil, err</code></span>
+<span class="codeline" id="line-125"><code>		}</code></span>
+<span class="codeline" id="line-126"><code>		mc.maxAllowedPacket = stringToInt(maxap) - 1</code></span>
+<span class="codeline" id="line-127"><code>	}</code></span>
+<span class="codeline" id="line-128"><code>	if mc.maxAllowedPacket &lt; maxPacketSize {</code></span>
+<span class="codeline" id="line-129"><code>		mc.maxWriteSize = mc.maxAllowedPacket</code></span>
+<span class="codeline" id="line-130"><code>	}</code></span>
+<span class="codeline" id="line-131"><code></code></span>
+<span class="codeline" id="line-132"><code>	// Handle DSN Params</code></span>
+<span class="codeline" id="line-133"><code>	err = mc.handleParams()</code></span>
+<span class="codeline" id="line-134"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-135"><code>		mc.Close()</code></span>
+<span class="codeline" id="line-136"><code>		return nil, err</code></span>
+<span class="codeline" id="line-137"><code>	}</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>	return mc, nil</code></span>
+<span class="codeline" id="line-140"><code>}</code></span>
+<span class="codeline" id="line-141"><code></code></span>
+<span class="codeline" id="line-142"><code>// Driver implements driver.Connector interface.</code></span>
+<span class="codeline" id="line-143"><code>// Driver returns &amp;MySQLDriver{}.</code></span>
+<span class="codeline" id="line-144"><code>func (c *connector) Driver() driver.Driver {</code></span>
+<span class="codeline" id="line-145"><code>	return &amp;MySQLDriver{}</code></span>
+<span class="codeline" id="line-146"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

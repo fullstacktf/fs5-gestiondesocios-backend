@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: statement.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	statement.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2012 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-13"><code>	"fmt"</code></span>
+<span class="codeline" id="line-14"><code>	"io"</code></span>
+<span class="codeline" id="line-15"><code>	"reflect"</code></span>
+<span class="codeline" id="line-16"><code>)</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>type mysqlStmt struct {</code></span>
+<span class="codeline" id="line-19"><code>	mc         *mysqlConn</code></span>
+<span class="codeline" id="line-20"><code>	id         uint32</code></span>
+<span class="codeline" id="line-21"><code>	paramCount int</code></span>
+<span class="codeline" id="line-22"><code>}</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>func (stmt *mysqlStmt) Close() error {</code></span>
+<span class="codeline" id="line-25"><code>	if stmt.mc == nil || stmt.mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-26"><code>		// driver.Stmt.Close can be called more than once, thus this function</code></span>
+<span class="codeline" id="line-27"><code>		// has to be idempotent.</code></span>
+<span class="codeline" id="line-28"><code>		// See also Issue #450 and golang/go#16019.</code></span>
+<span class="codeline" id="line-29"><code>		//errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-30"><code>		return driver.ErrBadConn</code></span>
+<span class="codeline" id="line-31"><code>	}</code></span>
+<span class="codeline" id="line-32"><code></code></span>
+<span class="codeline" id="line-33"><code>	err := stmt.mc.writeCommandPacketUint32(comStmtClose, stmt.id)</code></span>
+<span class="codeline" id="line-34"><code>	stmt.mc = nil</code></span>
+<span class="codeline" id="line-35"><code>	return err</code></span>
+<span class="codeline" id="line-36"><code>}</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>func (stmt *mysqlStmt) NumInput() int {</code></span>
+<span class="codeline" id="line-39"><code>	return stmt.paramCount</code></span>
+<span class="codeline" id="line-40"><code>}</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>func (stmt *mysqlStmt) ColumnConverter(idx int) driver.ValueConverter {</code></span>
+<span class="codeline" id="line-43"><code>	return converter{}</code></span>
+<span class="codeline" id="line-44"><code>}</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>func (stmt *mysqlStmt) Exec(args []driver.Value) (driver.Result, error) {</code></span>
+<span class="codeline" id="line-47"><code>	if stmt.mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-48"><code>		errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-49"><code>		return nil, driver.ErrBadConn</code></span>
+<span class="codeline" id="line-50"><code>	}</code></span>
+<span class="codeline" id="line-51"><code>	// Send command</code></span>
+<span class="codeline" id="line-52"><code>	err := stmt.writeExecutePacket(args)</code></span>
+<span class="codeline" id="line-53"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-54"><code>		return nil, stmt.mc.markBadConn(err)</code></span>
+<span class="codeline" id="line-55"><code>	}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>	mc := stmt.mc</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>	mc.affectedRows = 0</code></span>
+<span class="codeline" id="line-60"><code>	mc.insertId = 0</code></span>
+<span class="codeline" id="line-61"><code></code></span>
+<span class="codeline" id="line-62"><code>	// Read Result</code></span>
+<span class="codeline" id="line-63"><code>	resLen, err := mc.readResultSetHeaderPacket()</code></span>
+<span class="codeline" id="line-64"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-65"><code>		return nil, err</code></span>
+<span class="codeline" id="line-66"><code>	}</code></span>
+<span class="codeline" id="line-67"><code></code></span>
+<span class="codeline" id="line-68"><code>	if resLen &gt; 0 {</code></span>
+<span class="codeline" id="line-69"><code>		// Columns</code></span>
+<span class="codeline" id="line-70"><code>		if err = mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-71"><code>			return nil, err</code></span>
+<span class="codeline" id="line-72"><code>		}</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>		// Rows</code></span>
+<span class="codeline" id="line-75"><code>		if err := mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-76"><code>			return nil, err</code></span>
+<span class="codeline" id="line-77"><code>		}</code></span>
+<span class="codeline" id="line-78"><code>	}</code></span>
+<span class="codeline" id="line-79"><code></code></span>
+<span class="codeline" id="line-80"><code>	if err := mc.discardResults(); err != nil {</code></span>
+<span class="codeline" id="line-81"><code>		return nil, err</code></span>
+<span class="codeline" id="line-82"><code>	}</code></span>
+<span class="codeline" id="line-83"><code></code></span>
+<span class="codeline" id="line-84"><code>	return &amp;mysqlResult{</code></span>
+<span class="codeline" id="line-85"><code>		affectedRows: int64(mc.affectedRows),</code></span>
+<span class="codeline" id="line-86"><code>		insertId:     int64(mc.insertId),</code></span>
+<span class="codeline" id="line-87"><code>	}, nil</code></span>
+<span class="codeline" id="line-88"><code>}</code></span>
+<span class="codeline" id="line-89"><code></code></span>
+<span class="codeline" id="line-90"><code>func (stmt *mysqlStmt) Query(args []driver.Value) (driver.Rows, error) {</code></span>
+<span class="codeline" id="line-91"><code>	return stmt.query(args)</code></span>
+<span class="codeline" id="line-92"><code>}</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>func (stmt *mysqlStmt) query(args []driver.Value) (*binaryRows, error) {</code></span>
+<span class="codeline" id="line-95"><code>	if stmt.mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-96"><code>		errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-97"><code>		return nil, driver.ErrBadConn</code></span>
+<span class="codeline" id="line-98"><code>	}</code></span>
+<span class="codeline" id="line-99"><code>	// Send command</code></span>
+<span class="codeline" id="line-100"><code>	err := stmt.writeExecutePacket(args)</code></span>
+<span class="codeline" id="line-101"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-102"><code>		return nil, stmt.mc.markBadConn(err)</code></span>
+<span class="codeline" id="line-103"><code>	}</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>	mc := stmt.mc</code></span>
+<span class="codeline" id="line-106"><code></code></span>
+<span class="codeline" id="line-107"><code>	// Read Result</code></span>
+<span class="codeline" id="line-108"><code>	resLen, err := mc.readResultSetHeaderPacket()</code></span>
+<span class="codeline" id="line-109"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-110"><code>		return nil, err</code></span>
+<span class="codeline" id="line-111"><code>	}</code></span>
+<span class="codeline" id="line-112"><code></code></span>
+<span class="codeline" id="line-113"><code>	rows := new(binaryRows)</code></span>
+<span class="codeline" id="line-114"><code></code></span>
+<span class="codeline" id="line-115"><code>	if resLen &gt; 0 {</code></span>
+<span class="codeline" id="line-116"><code>		rows.mc = mc</code></span>
+<span class="codeline" id="line-117"><code>		rows.rs.columns, err = mc.readColumns(resLen)</code></span>
+<span class="codeline" id="line-118"><code>	} else {</code></span>
+<span class="codeline" id="line-119"><code>		rows.rs.done = true</code></span>
+<span class="codeline" id="line-120"><code></code></span>
+<span class="codeline" id="line-121"><code>		switch err := rows.NextResultSet(); err {</code></span>
+<span class="codeline" id="line-122"><code>		case nil, io.EOF:</code></span>
+<span class="codeline" id="line-123"><code>			return rows, nil</code></span>
+<span class="codeline" id="line-124"><code>		default:</code></span>
+<span class="codeline" id="line-125"><code>			return nil, err</code></span>
+<span class="codeline" id="line-126"><code>		}</code></span>
+<span class="codeline" id="line-127"><code>	}</code></span>
+<span class="codeline" id="line-128"><code></code></span>
+<span class="codeline" id="line-129"><code>	return rows, err</code></span>
+<span class="codeline" id="line-130"><code>}</code></span>
+<span class="codeline" id="line-131"><code></code></span>
+<span class="codeline" id="line-132"><code>type converter struct{}</code></span>
+<span class="codeline" id="line-133"><code></code></span>
+<span class="codeline" id="line-134"><code>// ConvertValue mirrors the reference/default converter in database/sql/driver</code></span>
+<span class="codeline" id="line-135"><code>// with _one_ exception.  We support uint64 with their high bit and the default</code></span>
+<span class="codeline" id="line-136"><code>// implementation does not.  This function should be kept in sync with</code></span>
+<span class="codeline" id="line-137"><code>// database/sql/driver defaultConverter.ConvertValue() except for that</code></span>
+<span class="codeline" id="line-138"><code>// deliberate difference.</code></span>
+<span class="codeline" id="line-139"><code>func (c converter) ConvertValue(v interface{}) (driver.Value, error) {</code></span>
+<span class="codeline" id="line-140"><code>	if driver.IsValue(v) {</code></span>
+<span class="codeline" id="line-141"><code>		return v, nil</code></span>
+<span class="codeline" id="line-142"><code>	}</code></span>
+<span class="codeline" id="line-143"><code></code></span>
+<span class="codeline" id="line-144"><code>	if vr, ok := v.(driver.Valuer); ok {</code></span>
+<span class="codeline" id="line-145"><code>		sv, err := callValuerValue(vr)</code></span>
+<span class="codeline" id="line-146"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-147"><code>			return nil, err</code></span>
+<span class="codeline" id="line-148"><code>		}</code></span>
+<span class="codeline" id="line-149"><code>		if !driver.IsValue(sv) {</code></span>
+<span class="codeline" id="line-150"><code>			return nil, fmt.Errorf("non-Value type %T returned from Value", sv)</code></span>
+<span class="codeline" id="line-151"><code>		}</code></span>
+<span class="codeline" id="line-152"><code>		return sv, nil</code></span>
+<span class="codeline" id="line-153"><code>	}</code></span>
+<span class="codeline" id="line-154"><code></code></span>
+<span class="codeline" id="line-155"><code>	rv := reflect.ValueOf(v)</code></span>
+<span class="codeline" id="line-156"><code>	switch rv.Kind() {</code></span>
+<span class="codeline" id="line-157"><code>	case reflect.Ptr:</code></span>
+<span class="codeline" id="line-158"><code>		// indirect pointers</code></span>
+<span class="codeline" id="line-159"><code>		if rv.IsNil() {</code></span>
+<span class="codeline" id="line-160"><code>			return nil, nil</code></span>
+<span class="codeline" id="line-161"><code>		} else {</code></span>
+<span class="codeline" id="line-162"><code>			return c.ConvertValue(rv.Elem().Interface())</code></span>
+<span class="codeline" id="line-163"><code>		}</code></span>
+<span class="codeline" id="line-164"><code>	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:</code></span>
+<span class="codeline" id="line-165"><code>		return rv.Int(), nil</code></span>
+<span class="codeline" id="line-166"><code>	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:</code></span>
+<span class="codeline" id="line-167"><code>		return rv.Uint(), nil</code></span>
+<span class="codeline" id="line-168"><code>	case reflect.Float32, reflect.Float64:</code></span>
+<span class="codeline" id="line-169"><code>		return rv.Float(), nil</code></span>
+<span class="codeline" id="line-170"><code>	case reflect.Bool:</code></span>
+<span class="codeline" id="line-171"><code>		return rv.Bool(), nil</code></span>
+<span class="codeline" id="line-172"><code>	case reflect.Slice:</code></span>
+<span class="codeline" id="line-173"><code>		ek := rv.Type().Elem().Kind()</code></span>
+<span class="codeline" id="line-174"><code>		if ek == reflect.Uint8 {</code></span>
+<span class="codeline" id="line-175"><code>			return rv.Bytes(), nil</code></span>
+<span class="codeline" id="line-176"><code>		}</code></span>
+<span class="codeline" id="line-177"><code>		return nil, fmt.Errorf("unsupported type %T, a slice of %s", v, ek)</code></span>
+<span class="codeline" id="line-178"><code>	case reflect.String:</code></span>
+<span class="codeline" id="line-179"><code>		return rv.String(), nil</code></span>
+<span class="codeline" id="line-180"><code>	}</code></span>
+<span class="codeline" id="line-181"><code>	return nil, fmt.Errorf("unsupported type %T, a %s", v, rv.Kind())</code></span>
+<span class="codeline" id="line-182"><code>}</code></span>
+<span class="codeline" id="line-183"><code></code></span>
+<span class="codeline" id="line-184"><code>var valuerReflectType = reflect.TypeOf((*driver.Valuer)(nil)).Elem()</code></span>
+<span class="codeline" id="line-185"><code></code></span>
+<span class="codeline" id="line-186"><code>// callValuerValue returns vr.Value(), with one exception:</code></span>
+<span class="codeline" id="line-187"><code>// If vr.Value is an auto-generated method on a pointer type and the</code></span>
+<span class="codeline" id="line-188"><code>// pointer is nil, it would panic at runtime in the panicwrap</code></span>
+<span class="codeline" id="line-189"><code>// method. Treat it like nil instead.</code></span>
+<span class="codeline" id="line-190"><code>//</code></span>
+<span class="codeline" id="line-191"><code>// This is so people can implement driver.Value on value types and</code></span>
+<span class="codeline" id="line-192"><code>// still use nil pointers to those types to mean nil/NULL, just like</code></span>
+<span class="codeline" id="line-193"><code>// string/*string.</code></span>
+<span class="codeline" id="line-194"><code>//</code></span>
+<span class="codeline" id="line-195"><code>// This is an exact copy of the same-named unexported function from the</code></span>
+<span class="codeline" id="line-196"><code>// database/sql package.</code></span>
+<span class="codeline" id="line-197"><code>func callValuerValue(vr driver.Valuer) (v driver.Value, err error) {</code></span>
+<span class="codeline" id="line-198"><code>	if rv := reflect.ValueOf(vr); rv.Kind() == reflect.Ptr &amp;&amp;</code></span>
+<span class="codeline" id="line-199"><code>		rv.IsNil() &amp;&amp;</code></span>
+<span class="codeline" id="line-200"><code>		rv.Type().Elem().Implements(valuerReflectType) {</code></span>
+<span class="codeline" id="line-201"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-202"><code>	}</code></span>
+<span class="codeline" id="line-203"><code>	return vr.Value()</code></span>
+<span class="codeline" id="line-204"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

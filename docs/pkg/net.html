@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: net</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>net</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-net">net</a><i> (on <a href="https://golang.org/pkg/net/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/net" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/net.html">19 packages</a>, and imported by <a href="../dep/net.html#imported-by">8 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/net/addrselect.go.html">addrselect.go</a>
+	    <a href="../src/net/conf.go.html">conf.go</a>
+	    <a href="../src/net/dial.go.html">dial.go</a>
+	    <a href="../src/net/dnsclient.go.html">dnsclient.go</a>
+	    <a href="../src/net/dnsclient_unix.go.html">dnsclient_unix.go</a>
+	    <a href="../src/net/dnsconfig_unix.go.html">dnsconfig_unix.go</a>
+	    <a href="../src/net/error_posix.go.html">error_posix.go</a>
+	    <a href="../src/net/error_unix.go.html">error_unix.go</a>
+	    <a href="../src/net/fd_posix.go.html">fd_posix.go</a>
+	    <a href="../src/net/fd_unix.go.html">fd_unix.go</a>
+	    <a href="../src/net/file.go.html">file.go</a>
+	    <a href="../src/net/file_unix.go.html">file_unix.go</a>
+	    <a href="../src/net/hook.go.html">hook.go</a>
+	    <a href="../src/net/hook_unix.go.html">hook_unix.go</a>
+	    <a href="../src/net/hosts.go.html">hosts.go</a>
+	    <a href="../src/net/interface.go.html">interface.go</a>
+	    <a href="../src/net/interface_bsd.go.html">interface_bsd.go</a>
+	    <a href="../src/net/interface_darwin.go.html">interface_darwin.go</a>
+	    <a href="../src/net/ip.go.html">ip.go</a>
+	    <a href="../src/net/iprawsock.go.html">iprawsock.go</a>
+	    <a href="../src/net/iprawsock_posix.go.html">iprawsock_posix.go</a>
+	    <a href="../src/net/ipsock.go.html">ipsock.go</a>
+	    <a href="../src/net/ipsock_posix.go.html">ipsock_posix.go</a>
+	    <a href="../src/net/lookup.go.html">lookup.go</a>
+	    <a href="../src/net/lookup_unix.go.html">lookup_unix.go</a>
+	    <a href="../src/net/mac.go.html">mac.go</a>
+	<a href="../src/net/net.go.html#doc">d-&gt;</a> <a href="../src/net/net.go.html">net.go</a>
+	    <a href="../src/net/nss.go.html">nss.go</a>
+	    <a href="../src/net/parse.go.html">parse.go</a>
+	    <a href="../src/net/pipe.go.html">pipe.go</a>
+	    <a href="../src/net/port.go.html">port.go</a>
+	    <a href="../src/net/port_unix.go.html">port_unix.go</a>
+	    <a href="../src/net/rawconn.go.html">rawconn.go</a>
+	    <a href="../src/net/sendfile_stub.go.html">sendfile_stub.go</a>
+	    <a href="../src/net/sock_bsd.go.html">sock_bsd.go</a>
+	    <a href="../src/net/sock_posix.go.html">sock_posix.go</a>
+	    <a href="../src/net/sockaddr_posix.go.html">sockaddr_posix.go</a>
+	    <a href="../src/net/sockopt_bsd.go.html">sockopt_bsd.go</a>
+	    <a href="../src/net/sockopt_posix.go.html">sockopt_posix.go</a>
+	    <a href="../src/net/sockoptip_bsdvar.go.html">sockoptip_bsdvar.go</a>
+	    <a href="../src/net/sockoptip_posix.go.html">sockoptip_posix.go</a>
+	    <a href="../src/net/splice_stub.go.html">splice_stub.go</a>
+	    <a href="../src/net/sys_cloexec.go.html">sys_cloexec.go</a>
+	    <a href="../src/net/tcpsock.go.html">tcpsock.go</a>
+	    <a href="../src/net/tcpsock_posix.go.html">tcpsock_posix.go</a>
+	    <a href="../src/net/tcpsockopt_darwin.go.html">tcpsockopt_darwin.go</a>
+	    <a href="../src/net/tcpsockopt_posix.go.html">tcpsockopt_posix.go</a>
+	    <a href="../src/net/udpsock.go.html">udpsock.go</a>
+	    <a href="../src/net/udpsock_posix.go.html">udpsock_posix.go</a>
+	    <a href="../src/net/unixsock.go.html">unixsock.go</a>
+	    <a href="../src/net/unixsock_posix.go.html">unixsock_posix.go</a>
+	    <a href="../src/net/writev_unix.go.html">writev_unix.go</a>
+	    <a href="../src/net/cgo_bsd.go.html">cgo_bsd.go</a>
+	    <a href="../src/net/cgo_resnew.go.html">cgo_resnew.go</a>
+	    <a href="../src/net/cgo_sockold.go.html">cgo_sockold.go</a>
+	    <a href="../src/net/cgo_unix.go.html">cgo_unix.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Addr" data-popularity="2165">	 type <a href="../src/net/net.go.html#line-104">Addr</a> <b<i>(interface)</i></b>
+		Addr represents a network end point address.
+
+		The two methods Network and String conventionally return strings
+		that can be passed as the arguments to Dial, but the exact form
+		and meaning of the strings is up to the implementation.
+
+		<input type='checkbox' class="stat" id="Addr-stat-methods"><label for="Addr-stat-methods">Exported Methods (2)</label><span id='Addr-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/net.go.html#line-105">Network</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/net/net.go.html#line-106">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Addr-stat-impledby"><label for="Addr-stat-impledby">Implemented By (5+)</label><span id='Addr-stat-impledby-content' class="stat-content">
+			*<a href="#name-IPAddr">IPAddr</a>
+			*<a href="#name-IPNet">IPNet</a>
+			*<a href="#name-TCPAddr">TCPAddr</a>
+			*<a href="#name-UDPAddr">UDPAddr</a>
+			*<a href="#name-UnixAddr">UnixAddr</a></span>
+		<input type='checkbox' class="stat" id="Addr-stat-impls"><label for="Addr-stat-impls">Implements (1+)</label><span id='Addr-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Addr-stat-results"><label for="Addr-stat-results">As Outputs Of (15+)</label><span id='Addr-stat-results-content' class="stat-content">
+			func <a href="#name-InterfaceAddrs">InterfaceAddrs</a>() ([]<b>Addr</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Conn">Conn</a>.<a href="../src/net/net.go.html#line-128">LocalAddr</a>() <b>Addr</b>
+			func <a href="#name-Conn">Conn</a>.<a href="../src/net/net.go.html#line-131">RemoteAddr</a>() <b>Addr</b>
+			func (*<a href="#name-Interface">Interface</a>).<a href="../src/net/interface.go.html#line-74">Addrs</a>() ([]<b>Addr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-Interface">Interface</a>).<a href="../src/net/interface.go.html#line-87">MulticastAddrs</a>() ([]<b>Addr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-IPConn">IPConn</a>).<a href="../src/net/iprawsock.go.html#line-125">ReadFrom</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <b>Addr</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Listener">Listener</a>.<a href="../src/net/net.go.html#line-392">Addr</a>() <b>Addr</b>
+			func <a href="#name-PacketConn">PacketConn</a>.<a href="../src/net/net.go.html#line-331">LocalAddr</a>() <b>Addr</b>
+			func <a href="#name-PacketConn">PacketConn</a>.<a href="../src/net/net.go.html#line-318">ReadFrom</a>(p []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, addr <b>Addr</b>, err <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-TCPListener">TCPListener</a>).<a href="../src/net/tcpsock.go.html#line-283">Addr</a>() <b>Addr</b>
+			func (*<a href="#name-UDPConn">UDPConn</a>).<a href="../src/net/udpsock.go.html#line-114">ReadFrom</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <b>Addr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixConn">UnixConn</a>).<a href="../src/net/unixsock.go.html#line-118">ReadFrom</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <b>Addr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixListener">UnixListener</a>).<a href="../src/net/unixsock.go.html#line-282">Addr</a>() <b>Addr</b>
+			func crypto/tls.(*<a href="crypto/tls.html#name-Conn">Conn</a>).<a href="../src/crypto/tls/conn.go.html#line-124">LocalAddr</a>() <b>Addr</b>
+			func crypto/tls.(*<a href="crypto/tls.html#name-Conn">Conn</a>).<a href="../src/crypto/tls/conn.go.html#line-129">RemoteAddr</a>() <b>Addr</b></span>
+		<input type='checkbox' class="stat" id="Addr-stat-params"><label for="Addr-stat-params">As Inputs Of (4+)</label><span id='Addr-stat-params-content' class="stat-content">
+			func (*<a href="#name-IPConn">IPConn</a>).<a href="../src/net/iprawsock.go.html#line-170">WriteTo</a>(b []<a href="builtin.html#name-byte">byte</a>, addr <b>Addr</b>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-PacketConn">PacketConn</a>.<a href="../src/net/net.go.html#line-324">WriteTo</a>(p []<a href="builtin.html#name-byte">byte</a>, addr <b>Addr</b>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UDPConn">UDPConn</a>).<a href="../src/net/udpsock.go.html#line-159">WriteTo</a>(b []<a href="builtin.html#name-byte">byte</a>, addr <b>Addr</b>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixConn">UnixConn</a>).<a href="../src/net/unixsock.go.html#line-163">WriteTo</a>(b []<a href="builtin.html#name-byte">byte</a>, addr <b>Addr</b>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-AddrError" data-popularity="250">	 type <a href="../src/net/net.go.html#line-541">AddrError</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="AddrError-stat-fields"><label for="AddrError-stat-fields">Exported Fields (2)</label><span id='AddrError-stat-fields-content' class="stat-content">
+			<a href="../src/net/net.go.html#line-543">Addr</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/net.go.html#line-542">Err</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="AddrError-stat-methods"><label for="AddrError-stat-methods">Exported Methods (3)</label><span id='AddrError-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-546">Error</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/net.go.html#line-558">Temporary</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/net/net.go.html#line-557">Timeout</a>() <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="AddrError-stat-impls"><label for="AddrError-stat-impls">Implements (2+)</label><span id='AddrError-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Error">Error</a>
+			*T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Buffers" data-popularity="200">	 type <a href="../src/net/net.go.html#line-680">Buffers</a> <i>([])</i>
+		Buffers contains zero or more runs of bytes to write.
+
+		On certain machines, for certain types of connections, this is
+		optimized into an OS-specific batch write operation (such as
+		"writev").
+
+		<input type='checkbox' class="stat" id="Buffers-stat-methods"><label for="Buffers-stat-methods">Exported Methods (2)</label><span id='Buffers-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-703">Read</a>(p []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-687">WriteTo</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Buffers-stat-impls"><label for="Buffers-stat-impls">Implements (2+)</label><span id='Buffers-stat-impls-content' class="stat-content">
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-WriterTo">WriterTo</a></span></div>
+<div class="anchor" id="name-Conn" data-popularity="2545">	 type <a href="../src/net/net.go.html#line-112">Conn</a> <b<i>(interface)</i></b>
+		Conn is a generic stream-oriented network connection.
+
+		Multiple goroutines may invoke methods on a Conn simultaneously.
+
+		<input type='checkbox' class="stat" id="Conn-stat-methods"><label for="Conn-stat-methods">Exported Methods (8)</label><span id='Conn-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/net.go.html#line-125">Close</a>() <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-128">LocalAddr</a>() <a href="#name-Addr">Addr</a>
+			 (T) <a href="../src/net/net.go.html#line-116">Read</a>(b []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/net/net.go.html#line-131">RemoteAddr</a>() <a href="#name-Addr">Addr</a>
+			 (T) <a href="../src/net/net.go.html#line-154">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-159">SetReadDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-166">SetWriteDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-121">Write</a>(b []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Conn-stat-impledby"><label for="Conn-stat-impledby">Implemented By (5+)</label><span id='Conn-stat-impledby-content' class="stat-content">
+			*<a href="#name-IPConn">IPConn</a>
+			*<a href="#name-TCPConn">TCPConn</a>
+			*<a href="#name-UDPConn">UDPConn</a>
+			*<a href="#name-UnixConn">UnixConn</a>
+			crypto/tls.(*<a href="crypto/tls.html#name-Conn">Conn</a>)</span>
+		<input type='checkbox' class="stat" id="Conn-stat-impls"><label for="Conn-stat-impls">Implements (7+)</label><span id='Conn-stat-impls-content' class="stat-content">
+			 T : io.<a href="io.html#name-Closer">Closer</a>
+			 T : io.<a href="io.html#name-ReadCloser">ReadCloser</a>
+			 T : io.<a href="io.html#name-Reader">Reader</a>
+			 T : io.<a href="io.html#name-ReadWriteCloser">ReadWriteCloser</a>
+			 T : io.<a href="io.html#name-ReadWriter">ReadWriter</a>
+			 T : io.<a href="io.html#name-WriteCloser">WriteCloser</a>
+			 T : io.<a href="io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Conn-stat-results"><label for="Conn-stat-results">As Outputs Of (13+)</label><span id='Conn-stat-results-content' class="stat-content">
+			func <a href="#name-Dial">Dial</a>(network, address <a href="builtin.html#name-string">string</a>) (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-DialTimeout">DialTimeout</a>(network, address <a href="builtin.html#name-string">string</a>, timeout <a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a>) (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-FileConn">FileConn</a>(f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>) (c <b>Conn</b>, err <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Pipe">Pipe</a>() (<b>Conn</b>, <b>Conn</b>)
+			func <a href="#name-Pipe">Pipe</a>() (<b>Conn</b>, <b>Conn</b>)
+			func (*<a href="#name-Dialer">Dialer</a>).<a href="../src/net/dial.go.html#line-347">Dial</a>(network, address <a href="builtin.html#name-string">string</a>) (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-Dialer">Dialer</a>).<a href="../src/net/dial.go.html#line-369">DialContext</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, address <a href="builtin.html#name-string">string</a>) (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Listener">Listener</a>.<a href="../src/net/net.go.html#line-385">Accept</a>() (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-TCPListener">TCPListener</a>).<a href="../src/net/tcpsock.go.html#line-257">Accept</a>() (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixListener">UnixListener</a>).<a href="../src/net/unixsock.go.html#line-256">Accept</a>() (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func net/http.<a href="net/http.html#name-Hijacker">Hijacker</a>.<a href="../src/net/http/server.go.html#line-200">Hijack</a>() (<b>Conn</b>, *<a href="bufio.html">bufio</a>.<a href="bufio.html#name-ReadWriter">ReadWriter</a>, <a href="builtin.html#name-error">error</a>)
+			func crypto/tls.(*<a href="crypto/tls.html#name-Dialer">Dialer</a>).<a href="../src/crypto/tls/tls.go.html#line-227">Dial</a>(network, addr <a href="builtin.html#name-string">string</a>) (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)
+			func crypto/tls.(*<a href="crypto/tls.html#name-Dialer">Dialer</a>).<a href="../src/crypto/tls/tls.go.html#line-247">DialContext</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, addr <a href="builtin.html#name-string">string</a>) (<b>Conn</b>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Conn-stat-params"><label for="Conn-stat-params">As Inputs Of (2+)</label><span id='Conn-stat-params-content' class="stat-content">
+			func crypto/tls.<a href="crypto/tls.html#name-Client">Client</a>(conn <b>Conn</b>, config *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Config">Config</a>) *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Conn">Conn</a>
+			func crypto/tls.<a href="crypto/tls.html#name-Server">Server</a>(conn <b>Conn</b>, config *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Config">Config</a>) *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Conn">Conn</a></span></div>
+<div class="anchor" id="name-Dialer" data-popularity="135">	 type <a href="../src/net/dial.go.html#line-27">Dialer</a> <i>(struct)</i>
+		A Dialer contains options for connecting to an address.
+
+		The zero value for each field is equivalent to dialing
+		without that option. Dialing with the zero value of Dialer
+		is therefore equivalent to just calling the Dial function.
+
+		It is safe to call Dialer's methods concurrently.
+
+		<input type='checkbox' class="stat" id="Dialer-stat-fields"><label for="Dialer-stat-fields">Exported Fields (9)</label><span id='Dialer-stat-fields-content' class="stat-content">
+			<a href="../src/net/dial.go.html#line-90">Cancel</a> <i>&lt;-chan struct{}</i>
+			<a href="../src/net/dial.go.html#line-98">Control</a> <i>func(network, address <a href="builtin.html#name-string">string</a>, c <a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>) <a href="builtin.html#name-error">error</a></i>
+			<a href="../src/net/dial.go.html#line-46">Deadline</a> <i><a href="time.html">time</a>.<a href="time.html#name-Time">Time</a></i>
+			<a href="../src/net/dial.go.html#line-61">DualStack</a> <i><a href="builtin.html#name-bool">bool</a></i>
+			<a href="../src/net/dial.go.html#line-71">FallbackDelay</a> <i><a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a></i>
+			<a href="../src/net/dial.go.html#line-80">KeepAlive</a> <i><a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a></i>
+			<a href="../src/net/dial.go.html#line-52">LocalAddr</a> <i><a href="#name-Addr">Addr</a></i>
+			<a href="../src/net/dial.go.html#line-83">Resolver</a> <i>*<a href="#name-Resolver">Resolver</a></i>
+			<a href="../src/net/dial.go.html#line-40">Timeout</a> <i><a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a></i></span>
+		<input type='checkbox' class="stat" id="Dialer-stat-methods"><label for="Dialer-stat-methods">Exported Methods (2)</label><span id='Dialer-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/dial.go.html#line-347">Dial</a>(network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/dial.go.html#line-369">DialContext</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Dialer-stat-params"><label for="Dialer-stat-params">As Inputs Of (1+)</label><span id='Dialer-stat-params-content' class="stat-content">
+			func crypto/tls.<a href="crypto/tls.html#name-DialWithDialer">DialWithDialer</a>(dialer *<b>Dialer</b>, network, addr <a href="builtin.html#name-string">string</a>, config *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Config">Config</a>) (*<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-DNSConfigError" data-popularity="300">	 type <a href="../src/net/net.go.html#line-589">DNSConfigError</a> <i>(struct)</i>
+		DNSConfigError represents an error reading the machine's DNS configuration.
+		(No longer used; kept for compatibility.)
+
+		<input type='checkbox' class="stat" id="DNSConfigError-stat-fields"><label for="DNSConfigError-stat-fields">One Exported Field</label><span id='DNSConfigError-stat-fields-content' class="stat-content">
+			<a href="../src/net/net.go.html#line-590">Err</a> <i><a href="builtin.html#name-error">error</a></i></span>
+		<input type='checkbox' class="stat" id="DNSConfigError-stat-methods"><label for="DNSConfigError-stat-methods">Exported Methods (4)</label><span id='DNSConfigError-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-594">Error</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/net.go.html#line-596">Temporary</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/net/net.go.html#line-595">Timeout</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/net/net.go.html#line-593">Unwrap</a>() <a href="builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="DNSConfigError-stat-impls"><label for="DNSConfigError-stat-impls">Implements (2+)</label><span id='DNSConfigError-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Error">Error</a>
+			*T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-DNSError" data-popularity="250">	 type <a href="../src/net/net.go.html#line-604">DNSError</a> <i>(struct)</i>
+		DNSError represents a DNS lookup error.
+
+		<input type='checkbox' class="stat" id="DNSError-stat-fields"><label for="DNSError-stat-fields">Exported Fields (6)</label><span id='DNSError-stat-fields-content' class="stat-content">
+			<a href="../src/net/net.go.html#line-605">Err</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/net.go.html#line-610">IsNotFound</a> <i><a href="builtin.html#name-bool">bool</a></i>
+			<a href="../src/net/net.go.html#line-609">IsTemporary</a> <i><a href="builtin.html#name-bool">bool</a></i>
+			<a href="../src/net/net.go.html#line-608">IsTimeout</a> <i><a href="builtin.html#name-bool">bool</a></i>
+			<a href="../src/net/net.go.html#line-606">Name</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/net.go.html#line-607">Server</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="DNSError-stat-methods"><label for="DNSError-stat-methods">Exported Methods (3)</label><span id='DNSError-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-613">Error</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/net.go.html#line-633">Temporary</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/net/net.go.html#line-628">Timeout</a>() <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="DNSError-stat-impls"><label for="DNSError-stat-impls">Implements (2+)</label><span id='DNSError-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Error">Error</a>
+			*T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Error" data-popularity="1550">	 type <a href="../src/net/net.go.html#line-396">Error</a> <b<i>(interface)</i></b>
+		An Error represents a network error.
+
+		<input type='checkbox' class="stat" id="Error-stat-methods"><label for="Error-stat-methods">Exported Methods (3)</label><span id='Error-stat-methods-content' class="stat-content">
+			 (T) <a href="builtin.html#name-error">Error</a>() <a href="builtin.html">builtin</a>.<a href="../src/builtin/builtin.go.html#line-71">string</a>
+			 (T) <a href="../src/net/net.go.html#line-399">Temporary</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/net.go.html#line-398">Timeout</a>() <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="Error-stat-impledby"><label for="Error-stat-impledby">Implemented By (9+)</label><span id='Error-stat-impledby-content' class="stat-content">
+			*<a href="#name-AddrError">AddrError</a>
+			*<a href="#name-DNSConfigError">DNSConfigError</a>
+			*<a href="#name-DNSError">DNSError</a>
+			<a href="#name-InvalidAddrError">InvalidAddrError</a>
+			*<a href="#name-OpError">OpError</a>
+			<a href="#name-UnknownNetworkError">UnknownNetworkError</a>
+			net/url.(*<a href="net/url.html#name-Error">Error</a>)
+			internal/poll.(*<a href="internal/poll.html#name-DeadlineExceededError">DeadlineExceededError</a>)
+			syscall.<a href="syscall.html#name-Errno">Errno</a></span>
+		<input type='checkbox' class="stat" id="Error-stat-impls"><label for="Error-stat-impls">Implements (1+)</label><span id='Error-stat-impls-content' class="stat-content">
+			 T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Flags" data-popularity="115">	 type <a href="../src/net/interface.go.html#line-38">Flags</a> <a href="builtin.html#name-uint">uint</a>
+
+		<input type='checkbox' class="stat" id="Flags-stat-methods"><label for="Flags-stat-methods">One Exported Method</label><span id='Flags-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/interface.go.html#line-56">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Flags-stat-impls"><label for="Flags-stat-impls">Implements (1+)</label><span id='Flags-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Flags-stat-values"><label for="Flags-stat-values">As Types Of (5+)</label><span id='Flags-stat-values-content' class="stat-content">
+			const <a href="#name-FlagBroadcast">FlagBroadcast</a>
+			const <a href="#name-FlagLoopback">FlagLoopback</a>
+			const <a href="#name-FlagMulticast">FlagMulticast</a>
+			const <a href="#name-FlagPointToPoint">FlagPointToPoint</a>
+			const <a href="#name-FlagUp">FlagUp</a></span></div>
+<div class="anchor" id="name-HardwareAddr" data-popularity="175">	 type <a href="../src/net/mac.go.html#line-10">HardwareAddr</a> <i>([])</i>
+		A HardwareAddr represents a physical hardware address.
+
+		<input type='checkbox' class="stat" id="HardwareAddr-stat-methods"><label for="HardwareAddr-stat-methods">One Exported Method</label><span id='HardwareAddr-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/mac.go.html#line-12">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="HardwareAddr-stat-impls"><label for="HardwareAddr-stat-impls">Implements (1+)</label><span id='HardwareAddr-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="HardwareAddr-stat-results"><label for="HardwareAddr-stat-results">As Outputs Of (1+)</label><span id='HardwareAddr-stat-results-content' class="stat-content">
+			func <a href="#name-ParseMAC">ParseMAC</a>(s <a href="builtin.html#name-string">string</a>) (hw <b>HardwareAddr</b>, err <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Interface" data-popularity="360">	 type <a href="../src/net/interface.go.html#line-30">Interface</a> <i>(struct)</i>
+		Interface represents a mapping between network interface name
+		and index. It also represents network interface facility
+		information.
+
+		<input type='checkbox' class="stat" id="Interface-stat-fields"><label for="Interface-stat-fields">Exported Fields (5)</label><span id='Interface-stat-fields-content' class="stat-content">
+			<a href="../src/net/interface.go.html#line-35">Flags</a> <i><a href="#name-Flags">Flags</a></i>
+			<a href="../src/net/interface.go.html#line-34">HardwareAddr</a> <i><a href="#name-HardwareAddr">HardwareAddr</a></i>
+			<a href="../src/net/interface.go.html#line-31">Index</a> <i><a href="builtin.html#name-int">int</a></i>
+			<a href="../src/net/interface.go.html#line-32">MTU</a> <i><a href="builtin.html#name-int">int</a></i>
+			<a href="../src/net/interface.go.html#line-33">Name</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Interface-stat-methods"><label for="Interface-stat-methods">Exported Methods (2)</label><span id='Interface-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/interface.go.html#line-74">Addrs</a>() ([]<a href="#name-Addr">Addr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/interface.go.html#line-87">MulticastAddrs</a>() ([]<a href="#name-Addr">Addr</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Interface-stat-results"><label for="Interface-stat-results">As Outputs Of (3+)</label><span id='Interface-stat-results-content' class="stat-content">
+			func <a href="#name-InterfaceByIndex">InterfaceByIndex</a>(index <a href="builtin.html#name-int">int</a>) (*<b>Interface</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-InterfaceByName">InterfaceByName</a>(name <a href="builtin.html#name-string">string</a>) (*<b>Interface</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Interfaces">Interfaces</a>() ([]<b>Interface</b>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Interface-stat-params"><label for="Interface-stat-params">As Inputs Of (1+)</label><span id='Interface-stat-params-content' class="stat-content">
+			func <a href="#name-ListenMulticastUDP">ListenMulticastUDP</a>(network <a href="builtin.html#name-string">string</a>, ifi *<b>Interface</b>, gaddr *<a href="#name-UDPAddr">UDPAddr</a>) (*<a href="#name-UDPConn">UDPConn</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-InvalidAddrError" data-popularity="250">	 type <a href="../src/net/net.go.html#line-566">InvalidAddrError</a> <a href="builtin.html#name-string">string</a>
+
+		<input type='checkbox' class="stat" id="InvalidAddrError-stat-methods"><label for="InvalidAddrError-stat-methods">Exported Methods (3)</label><span id='InvalidAddrError-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/net.go.html#line-568">Error</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/net/net.go.html#line-570">Temporary</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/net.go.html#line-569">Timeout</a>() <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="InvalidAddrError-stat-impls"><label for="InvalidAddrError-stat-impls">Implements (2+)</label><span id='InvalidAddrError-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Error">Error</a>
+			 T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-IP" data-popularity="1585">	 type <a href="../src/net/ip.go.html#line-32">IP</a> <i>([])</i>
+		An IP is a single IP address, a slice of bytes.
+		Functions in this package accept either 4-byte (IPv4)
+		or 16-byte (IPv6) slices as input.
+
+		Note that in this documentation, referring to an
+		IP address as an IPv4 address or an IPv6 address
+		is a semantic property of the address, not just the
+		length of the byte slice: a 16-byte slice can still
+		be an IPv4 address.
+
+		<input type='checkbox' class="stat" id="IP-stat-methods"><label for="IP-stat-methods">Exported Methods (15)</label><span id='IP-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/ip.go.html#line-224">DefaultMask</a>() <a href="#name-IPMask">IPMask</a>
+			 (T) <a href="../src/net/ip.go.html#line-410">Equal</a>(x <b>IP</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-168">IsGlobalUnicast</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-138">IsInterfaceLocalMulticast</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-144">IsLinkLocalMulticast</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-153">IsLinkLocalUnicast</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-121">IsLoopback</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-129">IsMulticast</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-116">IsUnspecified</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/ip.go.html#line-381">MarshalText</a>() ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/net/ip.go.html#line-248">Mask</a>(mask <a href="#name-IPMask">IPMask</a>) <b>IP</b>
+			 (T) <a href="../src/net/ip.go.html#line-291">String</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/net/ip.go.html#line-204">To16</a>() <b>IP</b>
+			 (T) <a href="../src/net/ip.go.html#line-189">To4</a>() <b>IP</b>
+			(*T) <a href="../src/net/ip.go.html#line-393">UnmarshalText</a>(text []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="IP-stat-impls"><label for="IP-stat-impls">Implements (3+)</label><span id='IP-stat-impls-content' class="stat-content">
+			 T : encoding.<a href="encoding.html#name-TextMarshaler">TextMarshaler</a>
+			*T : encoding.<a href="encoding.html#name-TextUnmarshaler">TextUnmarshaler</a>
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="IP-stat-results"><label for="IP-stat-results">As Outputs Of (8+)</label><span id='IP-stat-results-content' class="stat-content">
+			func <a href="#name-IPv4">IPv4</a>(a, b, c, d <a href="builtin.html#name-byte">byte</a>) <b>IP</b>
+			func <a href="#name-LookupIP">LookupIP</a>(host <a href="builtin.html#name-string">string</a>) ([]<b>IP</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ParseCIDR">ParseCIDR</a>(s <a href="builtin.html#name-string">string</a>) (<b>IP</b>, *<a href="#name-IPNet">IPNet</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ParseIP">ParseIP</a>(s <a href="builtin.html#name-string">string</a>) <b>IP</b>
+			func <a href="#name-IP">IP</a>.<a href="../src/net/ip.go.html#line-248">Mask</a>(mask <a href="#name-IPMask">IPMask</a>) <b>IP</b>
+			func <a href="#name-IP">IP</a>.<a href="../src/net/ip.go.html#line-204">To16</a>() <b>IP</b>
+			func <a href="#name-IP">IP</a>.<a href="../src/net/ip.go.html#line-189">To4</a>() <b>IP</b>
+			func (*<a href="#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-211">LookupIP</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, host <a href="builtin.html#name-string">string</a>) ([]<b>IP</b>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="IP-stat-params"><label for="IP-stat-params">As Inputs Of (2+)</label><span id='IP-stat-params-content' class="stat-content">
+			func <a href="#name-IP">IP</a>.<a href="../src/net/ip.go.html#line-410">Equal</a>(x <b>IP</b>) <a href="builtin.html#name-bool">bool</a>
+			func (*<a href="#name-IPNet">IPNet</a>).<a href="../src/net/ip.go.html#line-499">Contains</a>(ip <b>IP</b>) <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="IP-stat-values"><label for="IP-stat-values">As Types Of (10+)</label><span id='IP-stat-values-content' class="stat-content">
+			  var <a href="#name-IPv4allrouter">IPv4allrouter</a>
+			  var <a href="#name-IPv4allsys">IPv4allsys</a>
+			  var <a href="#name-IPv4bcast">IPv4bcast</a>
+			  var <a href="#name-IPv4zero">IPv4zero</a>
+			  var <a href="#name-IPv6interfacelocalallnodes">IPv6interfacelocalallnodes</a>
+			  var <a href="#name-IPv6linklocalallnodes">IPv6linklocalallnodes</a>
+			  var <a href="#name-IPv6linklocalallrouters">IPv6linklocalallrouters</a>
+			  var <a href="#name-IPv6loopback">IPv6loopback</a>
+			  var <a href="#name-IPv6unspecified">IPv6unspecified</a>
+			  var <a href="#name-IPv6zero">IPv6zero</a></span></div>
+<div class="anchor" id="name-IPAddr" data-popularity="640">	 type <a href="../src/net/iprawsock.go.html#line-31">IPAddr</a> <i>(struct)</i>
+		IPAddr represents the address of an IP end point.
+
+		<input type='checkbox' class="stat" id="IPAddr-stat-fields"><label for="IPAddr-stat-fields">Exported Fields (2)</label><span id='IPAddr-stat-fields-content' class="stat-content">
+			<a href="../src/net/iprawsock.go.html#line-32">IP</a> <i><a href="#name-IP">IP</a></i>
+			<a href="../src/net/iprawsock.go.html#line-33">Zone</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="IPAddr-stat-methods"><label for="IPAddr-stat-methods">Exported Methods (2)</label><span id='IPAddr-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/iprawsock.go.html#line-37">Network</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/iprawsock.go.html#line-39">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="IPAddr-stat-impls"><label for="IPAddr-stat-impls">Implements (2+)</label><span id='IPAddr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a>
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="IPAddr-stat-results"><label for="IPAddr-stat-results">As Outputs Of (4+)</label><span id='IPAddr-stat-results-content' class="stat-content">
+			func <a href="#name-ResolveIPAddr">ResolveIPAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<b>IPAddr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-IPConn">IPConn</a>).<a href="../src/net/iprawsock.go.html#line-113">ReadFromIP</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, *<b>IPAddr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-IPConn">IPConn</a>).<a href="../src/net/iprawsock.go.html#line-146">ReadMsgIP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>) (n, oobn, flags <a href="builtin.html#name-int">int</a>, addr *<b>IPAddr</b>, err <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-203">LookupIPAddr</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, host <a href="builtin.html#name-string">string</a>) ([]<b>IPAddr</b>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="IPAddr-stat-params"><label for="IPAddr-stat-params">As Inputs Of (4+)</label><span id='IPAddr-stat-params-content' class="stat-content">
+			func <a href="#name-DialIP">DialIP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<b>IPAddr</b>) (*<a href="#name-IPConn">IPConn</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenIP">ListenIP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<b>IPAddr</b>) (*<a href="#name-IPConn">IPConn</a>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-IPConn">IPConn</a>).<a href="../src/net/iprawsock.go.html#line-191">WriteMsgIP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>, addr *<b>IPAddr</b>) (n, oobn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-IPConn">IPConn</a>).<a href="../src/net/iprawsock.go.html#line-158">WriteToIP</a>(b []<a href="builtin.html#name-byte">byte</a>, addr *<b>IPAddr</b>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-IPConn" data-popularity="1550">	 type <a href="../src/net/iprawsock.go.html#line-99">IPConn</a> <i>(struct)</i>
+		IPConn is the implementation of the Conn and PacketConn interfaces
+		for IP network connections.
+
+		<input type='checkbox' class="stat" id="IPConn-stat-methods"><label for="IPConn-stat-methods">Exported Methods (18)</label><span id='IPConn-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-202">Close</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-297">File</a>() (f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-216">LocalAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-178">Read</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/iprawsock.go.html#line-125">ReadFrom</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="#name-Addr">Addr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/iprawsock.go.html#line-113">ReadFromIP</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, *<a href="#name-IPAddr">IPAddr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/iprawsock.go.html#line-146">ReadMsgIP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>) (n, oobn, flags <a href="builtin.html#name-int">int</a>, addr *<a href="#name-IPAddr">IPAddr</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-226">RemoteAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-234">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-268">SetReadBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-245">SetReadDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-280">SetWriteBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-256">SetWriteDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/iprawsock.go.html#line-105">SyscallConn</a>() (<a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-190">Write</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/iprawsock.go.html#line-191">WriteMsgIP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>, addr *<a href="#name-IPAddr">IPAddr</a>) (n, oobn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/iprawsock.go.html#line-170">WriteTo</a>(b []<a href="builtin.html#name-byte">byte</a>, addr <a href="#name-Addr">Addr</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/iprawsock.go.html#line-158">WriteToIP</a>(b []<a href="builtin.html#name-byte">byte</a>, addr *<a href="#name-IPAddr">IPAddr</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="IPConn-stat-impls"><label for="IPConn-stat-impls">Implements (10+)</label><span id='IPConn-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Conn">Conn</a>
+			*T : <a href="#name-PacketConn">PacketConn</a>
+			*T : io.<a href="io.html#name-Closer">Closer</a>
+			*T : io.<a href="io.html#name-ReadCloser">ReadCloser</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ReadWriteCloser">ReadWriteCloser</a>
+			*T : io.<a href="io.html#name-ReadWriter">ReadWriter</a>
+			*T : io.<a href="io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="io.html#name-Writer">Writer</a>
+			*T : syscall.<a href="syscall.html#name-Conn">Conn</a></span>
+		<input type='checkbox' class="stat" id="IPConn-stat-results"><label for="IPConn-stat-results">As Outputs Of (2+)</label><span id='IPConn-stat-results-content' class="stat-content">
+			func <a href="#name-DialIP">DialIP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-IPAddr">IPAddr</a>) (*<b>IPConn</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenIP">ListenIP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-IPAddr">IPAddr</a>) (*<b>IPConn</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-IPMask" data-popularity="410">	 type <a href="../src/net/ip.go.html#line-38">IPMask</a> <i>([])</i>
+		An IPMask is a bitmask that can be used to manipulate
+		IP addresses for IP addressing and routing.
+
+		See type IPNet and func ParseCIDR for details.
+
+		<input type='checkbox' class="stat" id="IPMask-stat-methods"><label for="IPMask-stat-methods">Exported Methods (2)</label><span id='IPMask-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/ip.go.html#line-459">Size</a>() (ones, bits <a href="builtin.html#name-int">int</a>)
+			 (T) <a href="../src/net/ip.go.html#line-468">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="IPMask-stat-impls"><label for="IPMask-stat-impls">Implements (1+)</label><span id='IPMask-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="IPMask-stat-results"><label for="IPMask-stat-results">As Outputs Of (3+)</label><span id='IPMask-stat-results-content' class="stat-content">
+			func <a href="#name-CIDRMask">CIDRMask</a>(ones, bits <a href="builtin.html#name-int">int</a>) <b>IPMask</b>
+			func <a href="#name-IPv4Mask">IPv4Mask</a>(a, b, c, d <a href="builtin.html#name-byte">byte</a>) <b>IPMask</b>
+			func <a href="#name-IP">IP</a>.<a href="../src/net/ip.go.html#line-224">DefaultMask</a>() <b>IPMask</b></span>
+		<input type='checkbox' class="stat" id="IPMask-stat-params"><label for="IPMask-stat-params">As Inputs Of (1+)</label><span id='IPMask-stat-params-content' class="stat-content">
+			func <a href="#name-IP">IP</a>.<a href="../src/net/ip.go.html#line-248">Mask</a>(mask <b>IPMask</b>) <a href="#name-IP">IP</a></span></div>
+<div class="anchor" id="name-IPNet" data-popularity="325">	 type <a href="../src/net/ip.go.html#line-41">IPNet</a> <i>(struct)</i>
+		An IPNet represents an IP network.
+
+		<input type='checkbox' class="stat" id="IPNet-stat-fields"><label for="IPNet-stat-fields">Exported Fields (2)</label><span id='IPNet-stat-fields-content' class="stat-content">
+			<a href="../src/net/ip.go.html#line-42">IP</a> <i><a href="#name-IP">IP</a></i>
+			<a href="../src/net/ip.go.html#line-43">Mask</a> <i><a href="#name-IPMask">IPMask</a></i></span>
+		<input type='checkbox' class="stat" id="IPNet-stat-methods"><label for="IPNet-stat-methods">Exported Methods (3)</label><span id='IPNet-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/ip.go.html#line-499">Contains</a>(ip <a href="#name-IP">IP</a>) <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/net/ip.go.html#line-517">Network</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/ip.go.html#line-525">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="IPNet-stat-impls"><label for="IPNet-stat-impls">Implements (2+)</label><span id='IPNet-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a>
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="IPNet-stat-results"><label for="IPNet-stat-results">As Outputs Of (1+)</label><span id='IPNet-stat-results-content' class="stat-content">
+			func <a href="#name-ParseCIDR">ParseCIDR</a>(s <a href="builtin.html#name-string">string</a>) (<a href="#name-IP">IP</a>, *<b>IPNet</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ListenConfig" data-popularity="100">	 type <a href="../src/net/dial.go.html#line-600">ListenConfig</a> <i>(struct)</i>
+		ListenConfig contains options for listening to an address.
+
+		<input type='checkbox' class="stat" id="ListenConfig-stat-fields"><label for="ListenConfig-stat-fields">Exported Fields (2)</label><span id='ListenConfig-stat-fields-content' class="stat-content">
+			<a href="../src/net/dial.go.html#line-607">Control</a> <i>func(network, address <a href="builtin.html#name-string">string</a>, c <a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>) <a href="builtin.html#name-error">error</a></i>
+			<a href="../src/net/dial.go.html#line-615">KeepAlive</a> <i><a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a></i></span>
+		<input type='checkbox' class="stat" id="ListenConfig-stat-methods"><label for="ListenConfig-stat-methods">Exported Methods (2)</label><span id='ListenConfig-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/dial.go.html#line-622">Listen</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-Listener">Listener</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/dial.go.html#line-652">ListenPacket</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-PacketConn">PacketConn</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Listener" data-popularity="1050">	 type <a href="../src/net/net.go.html#line-383">Listener</a> <b<i>(interface)</i></b>
+		A Listener is a generic network listener for stream-oriented protocols.
+
+		Multiple goroutines may invoke methods on a Listener simultaneously.
+
+		<input type='checkbox' class="stat" id="Listener-stat-methods"><label for="Listener-stat-methods">Exported Methods (3)</label><span id='Listener-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/net.go.html#line-385">Accept</a>() (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/net/net.go.html#line-392">Addr</a>() <a href="#name-Addr">Addr</a>
+			 (T) <a href="../src/net/net.go.html#line-389">Close</a>() <a href="builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Listener-stat-impledby"><label for="Listener-stat-impledby">Implemented By (2+)</label><span id='Listener-stat-impledby-content' class="stat-content">
+			*<a href="#name-TCPListener">TCPListener</a>
+			*<a href="#name-UnixListener">UnixListener</a></span>
+		<input type='checkbox' class="stat" id="Listener-stat-impls"><label for="Listener-stat-impls">Implements (1+)</label><span id='Listener-stat-impls-content' class="stat-content">
+			 T : io.<a href="io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Listener-stat-results"><label for="Listener-stat-results">As Outputs Of (5+)</label><span id='Listener-stat-results-content' class="stat-content">
+			func <a href="#name-FileListener">FileListener</a>(f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>) (ln <b>Listener</b>, err <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Listen">Listen</a>(network, address <a href="builtin.html#name-string">string</a>) (<b>Listener</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-ListenConfig">ListenConfig</a>).<a href="../src/net/dial.go.html#line-622">Listen</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, address <a href="builtin.html#name-string">string</a>) (<b>Listener</b>, <a href="builtin.html#name-error">error</a>)
+			func crypto/tls.<a href="crypto/tls.html#name-Listen">Listen</a>(network, laddr <a href="builtin.html#name-string">string</a>, config *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Config">Config</a>) (<b>Listener</b>, <a href="builtin.html#name-error">error</a>)
+			func crypto/tls.<a href="crypto/tls.html#name-NewListener">NewListener</a>(inner <b>Listener</b>, config *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Config">Config</a>) <b>Listener</b></span>
+		<input type='checkbox' class="stat" id="Listener-stat-params"><label for="Listener-stat-params">As Inputs Of (5+)</label><span id='Listener-stat-params-content' class="stat-content">
+			func net/http.<a href="net/http.html#name-Serve">Serve</a>(l <b>Listener</b>, handler <a href="net/http.html">http</a>.<a href="net/http.html#name-Handler">Handler</a>) <a href="builtin.html#name-error">error</a>
+			func net/http.<a href="net/http.html#name-ServeTLS">ServeTLS</a>(l <b>Listener</b>, handler <a href="net/http.html">http</a>.<a href="net/http.html#name-Handler">Handler</a>, certFile, keyFile <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-error">error</a>
+			func net/http.(*<a href="net/http.html#name-Server">Server</a>).<a href="../src/net/http/server.go.html#line-2907">Serve</a>(l <b>Listener</b>) <a href="builtin.html#name-error">error</a>
+			func net/http.(*<a href="net/http.html#name-Server">Server</a>).<a href="../src/net/http/server.go.html#line-2986">ServeTLS</a>(l <b>Listener</b>, certFile, keyFile <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-error">error</a>
+			func crypto/tls.<a href="crypto/tls.html#name-NewListener">NewListener</a>(inner <b>Listener</b>, config *<a href="crypto/tls.html">tls</a>.<a href="crypto/tls.html#name-Config">Config</a>) <b>Listener</b></span></div>
+<div class="anchor" id="name-MX" data-popularity="150">	 type <a href="../src/net/dnsclient.go.html#line-194">MX</a> <i>(struct)</i>
+		An MX represents a single DNS MX record.
+
+		<input type='checkbox' class="stat" id="MX-stat-fields"><label for="MX-stat-fields">Exported Fields (2)</label><span id='MX-stat-fields-content' class="stat-content">
+			<a href="../src/net/dnsclient.go.html#line-195">Host</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/dnsclient.go.html#line-196">Pref</a> <i><a href="builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="MX-stat-results"><label for="MX-stat-results">As Outputs Of (2+)</label><span id='MX-stat-results-content' class="stat-content">
+			func <a href="#name-LookupMX">LookupMX</a>(name <a href="builtin.html#name-string">string</a>) ([]*<b>MX</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-442">LookupMX</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, name <a href="builtin.html#name-string">string</a>) ([]*<b>MX</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-NS" data-popularity="150">	 type <a href="../src/net/dnsclient.go.html#line-216">NS</a> <i>(struct)</i>
+		An NS represents a single DNS NS record.
+
+		<input type='checkbox' class="stat" id="NS-stat-fields"><label for="NS-stat-fields">One Exported Field</label><span id='NS-stat-fields-content' class="stat-content">
+			<a href="../src/net/dnsclient.go.html#line-217">Host</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="NS-stat-results"><label for="NS-stat-results">As Outputs Of (2+)</label><span id='NS-stat-results-content' class="stat-content">
+			func <a href="#name-LookupNS">LookupNS</a>(name <a href="builtin.html#name-string">string</a>) ([]*<b>NS</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-452">LookupNS</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, name <a href="builtin.html#name-string">string</a>) ([]*<b>NS</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-OpError" data-popularity="300">	 type <a href="../src/net/net.go.html#line-434">OpError</a> <i>(struct)</i>
+		OpError is the error type usually returned by functions in the net
+		package. It describes the operation, network type, and address of
+		an error.
+
+		<input type='checkbox' class="stat" id="OpError-stat-fields"><label for="OpError-stat-fields">Exported Fields (5)</label><span id='OpError-stat-fields-content' class="stat-content">
+			<a href="../src/net/net.go.html#line-454">Addr</a> <i><a href="#name-Addr">Addr</a></i>
+			<a href="../src/net/net.go.html#line-458">Err</a> <i><a href="builtin.html#name-error">error</a></i>
+			<a href="../src/net/net.go.html#line-441">Net</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/net.go.html#line-437">Op</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/net.go.html#line-446">Source</a> <i><a href="#name-Addr">Addr</a></i></span>
+		<input type='checkbox' class="stat" id="OpError-stat-methods"><label for="OpError-stat-methods">Exported Methods (4)</label><span id='OpError-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-463">Error</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/net.go.html#line-514">Temporary</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/net/net.go.html#line-501">Timeout</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/net/net.go.html#line-461">Unwrap</a>() <a href="builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="OpError-stat-impls"><label for="OpError-stat-impls">Implements (2+)</label><span id='OpError-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Error">Error</a>
+			*T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-PacketConn" data-popularity="1075">	 type <a href="../src/net/net.go.html#line-308">PacketConn</a> <b<i>(interface)</i></b>
+		PacketConn is a generic packet-oriented network connection.
+
+		Multiple goroutines may invoke methods on a PacketConn simultaneously.
+
+		<input type='checkbox' class="stat" id="PacketConn-stat-methods"><label for="PacketConn-stat-methods">Exported Methods (7)</label><span id='PacketConn-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/net.go.html#line-328">Close</a>() <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-331">LocalAddr</a>() <a href="#name-Addr">Addr</a>
+			 (T) <a href="../src/net/net.go.html#line-318">ReadFrom</a>(p []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, addr <a href="#name-Addr">Addr</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/net/net.go.html#line-354">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-359">SetReadDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-366">SetWriteDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/net/net.go.html#line-324">WriteTo</a>(p []<a href="builtin.html#name-byte">byte</a>, addr <a href="#name-Addr">Addr</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PacketConn-stat-impledby"><label for="PacketConn-stat-impledby">Implemented By (3+)</label><span id='PacketConn-stat-impledby-content' class="stat-content">
+			*<a href="#name-IPConn">IPConn</a>
+			*<a href="#name-UDPConn">UDPConn</a>
+			*<a href="#name-UnixConn">UnixConn</a></span>
+		<input type='checkbox' class="stat" id="PacketConn-stat-impls"><label for="PacketConn-stat-impls">Implements (1+)</label><span id='PacketConn-stat-impls-content' class="stat-content">
+			 T : io.<a href="io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="PacketConn-stat-results"><label for="PacketConn-stat-results">As Outputs Of (3+)</label><span id='PacketConn-stat-results-content' class="stat-content">
+			func <a href="#name-FilePacketConn">FilePacketConn</a>(f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>) (c <b>PacketConn</b>, err <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenPacket">ListenPacket</a>(network, address <a href="builtin.html#name-string">string</a>) (<b>PacketConn</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-ListenConfig">ListenConfig</a>).<a href="../src/net/dial.go.html#line-652">ListenPacket</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, address <a href="builtin.html#name-string">string</a>) (<b>PacketConn</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ParseError" data-popularity="100">	 type <a href="../src/net/net.go.html#line-530">ParseError</a> <i>(struct)</i>
+		A ParseError is the error type of literal network address parsers.
+
+		<input type='checkbox' class="stat" id="ParseError-stat-fields"><label for="ParseError-stat-fields">Exported Fields (2)</label><span id='ParseError-stat-fields-content' class="stat-content">
+			<a href="../src/net/net.go.html#line-536">Text</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/net.go.html#line-533">Type</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="ParseError-stat-methods"><label for="ParseError-stat-methods">One Exported Method</label><span id='ParseError-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-539">Error</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ParseError-stat-impls"><label for="ParseError-stat-impls">Implements (1+)</label><span id='ParseError-stat-impls-content' class="stat-content">
+			*T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Resolver" data-popularity="505">	 type <a href="../src/net/lookup.go.html#line-119">Resolver</a> <i>(struct)</i>
+		A Resolver looks up names and numbers.
+
+		A nil *Resolver is equivalent to a zero Resolver.
+
+		<input type='checkbox' class="stat" id="Resolver-stat-fields"><label for="Resolver-stat-fields">Exported Fields (3)</label><span id='Resolver-stat-fields-content' class="stat-content">
+			<a href="../src/net/lookup.go.html#line-146">Dial</a> <i>func(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)</i>
+			<a href="../src/net/lookup.go.html#line-123">PreferGo</a> <i><a href="builtin.html#name-bool">bool</a></i>
+			<a href="../src/net/lookup.go.html#line-133">StrictErrors</a> <i><a href="builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Resolver-stat-methods"><label for="Resolver-stat-methods">Exported Methods (10)</label><span id='Resolver-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/lookup.go.html#line-477">LookupAddr</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, addr <a href="builtin.html#name-string">string</a>) (names []<a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-406">LookupCNAME</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, host <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-175">LookupHost</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, host <a href="builtin.html#name-string">string</a>) (addrs []<a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-211">LookupIP</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, host <a href="builtin.html#name-string">string</a>) ([]<a href="#name-IP">IP</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-203">LookupIPAddr</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, host <a href="builtin.html#name-string">string</a>) ([]<a href="#name-IPAddr">IPAddr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-442">LookupMX</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, name <a href="builtin.html#name-string">string</a>) ([]*<a href="#name-MX">MX</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-452">LookupNS</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, name <a href="builtin.html#name-string">string</a>) ([]*<a href="#name-NS">NS</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-361">LookupPort</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, network, service <a href="builtin.html#name-string">string</a>) (port <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-432">LookupSRV</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, service, proto, name <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, addrs []*<a href="#name-SRV">SRV</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/lookup.go.html#line-462">LookupTXT</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, name <a href="builtin.html#name-string">string</a>) ([]<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Resolver-stat-values"><label for="Resolver-stat-values">As Types Of (1+)</label><span id='Resolver-stat-values-content' class="stat-content">
+			  var <a href="#name-DefaultResolver">DefaultResolver</a> *Resolver</span></div>
+<div class="anchor" id="name-SRV" data-popularity="150">	 type <a href="../src/net/dnsclient.go.html#line-140">SRV</a> <i>(struct)</i>
+		An SRV represents a single DNS SRV record.
+
+		<input type='checkbox' class="stat" id="SRV-stat-fields"><label for="SRV-stat-fields">Exported Fields (4)</label><span id='SRV-stat-fields-content' class="stat-content">
+			<a href="../src/net/dnsclient.go.html#line-142">Port</a> <i><a href="builtin.html#name-uint16">uint16</a></i>
+			<a href="../src/net/dnsclient.go.html#line-143">Priority</a> <i><a href="builtin.html#name-uint16">uint16</a></i>
+			<a href="../src/net/dnsclient.go.html#line-141">Target</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/dnsclient.go.html#line-144">Weight</a> <i><a href="builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="SRV-stat-results"><label for="SRV-stat-results">As Outputs Of (2+)</label><span id='SRV-stat-results-content' class="stat-content">
+			func <a href="#name-LookupSRV">LookupSRV</a>(service, proto, name <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, addrs []*<b>SRV</b>, err <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-432">LookupSRV</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, service, proto, name <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, addrs []*<b>SRV</b>, err <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-TCPAddr" data-popularity="345">	 type <a href="../src/net/tcpsock.go.html#line-19">TCPAddr</a> <i>(struct)</i>
+		TCPAddr represents the address of a TCP end point.
+
+		<input type='checkbox' class="stat" id="TCPAddr-stat-fields"><label for="TCPAddr-stat-fields">Exported Fields (3)</label><span id='TCPAddr-stat-fields-content' class="stat-content">
+			<a href="../src/net/tcpsock.go.html#line-20">IP</a> <i><a href="#name-IP">IP</a></i>
+			<a href="../src/net/tcpsock.go.html#line-21">Port</a> <i><a href="builtin.html#name-int">int</a></i>
+			<a href="../src/net/tcpsock.go.html#line-22">Zone</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="TCPAddr-stat-methods"><label for="TCPAddr-stat-methods">Exported Methods (2)</label><span id='TCPAddr-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/tcpsock.go.html#line-26">Network</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-28">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="TCPAddr-stat-impls"><label for="TCPAddr-stat-impls">Implements (2+)</label><span id='TCPAddr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a>
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="TCPAddr-stat-results"><label for="TCPAddr-stat-results">As Outputs Of (1+)</label><span id='TCPAddr-stat-results-content' class="stat-content">
+			func <a href="#name-ResolveTCPAddr">ResolveTCPAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<b>TCPAddr</b>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="TCPAddr-stat-params"><label for="TCPAddr-stat-params">As Inputs Of (2+)</label><span id='TCPAddr-stat-params-content' class="stat-content">
+			func <a href="#name-DialTCP">DialTCP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<b>TCPAddr</b>) (*<a href="#name-TCPConn">TCPConn</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenTCP">ListenTCP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<b>TCPAddr</b>) (*<a href="#name-TCPListener">TCPListener</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-TCPConn" data-popularity="1600">	 type <a href="../src/net/tcpsock.go.html#line-85">TCPConn</a> <i>(struct)</i>
+		TCPConn is an implementation of the Conn interface for TCP network
+		connections.
+
+		<input type='checkbox' class="stat" id="TCPConn-stat-methods"><label for="TCPConn-stat-methods">Exported Methods (19)</label><span id='TCPConn-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-202">Close</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-112">CloseRead</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-124">CloseWrite</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-297">File</a>() (f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-216">LocalAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-178">Read</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/tcpsock.go.html#line-99">ReadFrom</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) (<a href="builtin.html#name-int64">int64</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-226">RemoteAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-234">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-158">SetKeepAlive</a>(keepalive <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-169">SetKeepAlivePeriod</a>(d <a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-146">SetLinger</a>(sec <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-183">SetNoDelay</a>(noDelay <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-268">SetReadBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-245">SetReadDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-280">SetWriteBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-256">SetWriteDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-91">SyscallConn</a>() (<a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-190">Write</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="TCPConn-stat-impls"><label for="TCPConn-stat-impls">Implements (10+)</label><span id='TCPConn-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Conn">Conn</a>
+			*T : io.<a href="io.html#name-Closer">Closer</a>
+			*T : io.<a href="io.html#name-ReadCloser">ReadCloser</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ReaderFrom">ReaderFrom</a>
+			*T : io.<a href="io.html#name-ReadWriteCloser">ReadWriteCloser</a>
+			*T : io.<a href="io.html#name-ReadWriter">ReadWriter</a>
+			*T : io.<a href="io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="io.html#name-Writer">Writer</a>
+			*T : syscall.<a href="syscall.html#name-Conn">Conn</a></span>
+		<input type='checkbox' class="stat" id="TCPConn-stat-results"><label for="TCPConn-stat-results">As Outputs Of (2+)</label><span id='TCPConn-stat-results-content' class="stat-content">
+			func <a href="#name-DialTCP">DialTCP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-TCPAddr">TCPAddr</a>) (*<b>TCPConn</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-TCPListener">TCPListener</a>).<a href="../src/net/tcpsock.go.html#line-244">AcceptTCP</a>() (*<b>TCPConn</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-TCPListener" data-popularity="575">	 type <a href="../src/net/tcpsock.go.html#line-225">TCPListener</a> <i>(struct)</i>
+		TCPListener is a TCP network listener. Clients should typically
+		use variables of type Listener instead of assuming TCP.
+
+		<input type='checkbox' class="stat" id="TCPListener-stat-methods"><label for="TCPListener-stat-methods">Exported Methods (7)</label><span id='TCPListener-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/tcpsock.go.html#line-257">Accept</a>() (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/tcpsock.go.html#line-244">AcceptTCP</a>() (*<a href="#name-TCPConn">TCPConn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/tcpsock.go.html#line-283">Addr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-270">Close</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-304">File</a>() (f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/tcpsock.go.html#line-287">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/tcpsock.go.html#line-235">SyscallConn</a>() (<a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="TCPListener-stat-impls"><label for="TCPListener-stat-impls">Implements (3+)</label><span id='TCPListener-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Listener">Listener</a>
+			*T : io.<a href="io.html#name-Closer">Closer</a>
+			*T : syscall.<a href="syscall.html#name-Conn">Conn</a></span>
+		<input type='checkbox' class="stat" id="TCPListener-stat-results"><label for="TCPListener-stat-results">As Outputs Of (1+)</label><span id='TCPListener-stat-results-content' class="stat-content">
+			func <a href="#name-ListenTCP">ListenTCP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-TCPAddr">TCPAddr</a>) (*<b>TCPListener</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-UDPAddr" data-popularity="600">	 type <a href="../src/net/udpsock.go.html#line-22">UDPAddr</a> <i>(struct)</i>
+		UDPAddr represents the address of a UDP end point.
+
+		<input type='checkbox' class="stat" id="UDPAddr-stat-fields"><label for="UDPAddr-stat-fields">Exported Fields (3)</label><span id='UDPAddr-stat-fields-content' class="stat-content">
+			<a href="../src/net/tcpsock.go.html#line-20">IP</a> <i><a href="#name-IP">IP</a></i>
+			<a href="../src/net/tcpsock.go.html#line-21">Port</a> <i><a href="builtin.html#name-int">int</a></i>
+			<a href="../src/net/tcpsock.go.html#line-22">Zone</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="UDPAddr-stat-methods"><label for="UDPAddr-stat-methods">Exported Methods (2)</label><span id='UDPAddr-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/udpsock.go.html#line-29">Network</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/udpsock.go.html#line-31">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="UDPAddr-stat-impls"><label for="UDPAddr-stat-impls">Implements (2+)</label><span id='UDPAddr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a>
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="UDPAddr-stat-results"><label for="UDPAddr-stat-results">As Outputs Of (3+)</label><span id='UDPAddr-stat-results-content' class="stat-content">
+			func <a href="#name-ResolveUDPAddr">ResolveUDPAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<b>UDPAddr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UDPConn">UDPConn</a>).<a href="../src/net/udpsock.go.html#line-102">ReadFromUDP</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, *<b>UDPAddr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UDPConn">UDPConn</a>).<a href="../src/net/udpsock.go.html#line-135">ReadMsgUDP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>) (n, oobn, flags <a href="builtin.html#name-int">int</a>, addr *<b>UDPAddr</b>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="UDPAddr-stat-params"><label for="UDPAddr-stat-params">As Inputs Of (5+)</label><span id='UDPAddr-stat-params-content' class="stat-content">
+			func <a href="#name-DialUDP">DialUDP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<b>UDPAddr</b>) (*<a href="#name-UDPConn">UDPConn</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenMulticastUDP">ListenMulticastUDP</a>(network <a href="builtin.html#name-string">string</a>, ifi *<a href="#name-Interface">Interface</a>, gaddr *<b>UDPAddr</b>) (*<a href="#name-UDPConn">UDPConn</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenUDP">ListenUDP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<b>UDPAddr</b>) (*<a href="#name-UDPConn">UDPConn</a>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UDPConn">UDPConn</a>).<a href="../src/net/udpsock.go.html#line-182">WriteMsgUDP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>, addr *<b>UDPAddr</b>) (n, oobn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UDPConn">UDPConn</a>).<a href="../src/net/udpsock.go.html#line-147">WriteToUDP</a>(b []<a href="builtin.html#name-byte">byte</a>, addr *<b>UDPAddr</b>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-UDPConn" data-popularity="1625">	 type <a href="../src/net/udpsock.go.html#line-88">UDPConn</a> <i>(struct)</i>
+		UDPConn is the implementation of the Conn and PacketConn interfaces
+		for UDP network connections.
+
+		<input type='checkbox' class="stat" id="UDPConn-stat-methods"><label for="UDPConn-stat-methods">Exported Methods (18)</label><span id='UDPConn-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-202">Close</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-297">File</a>() (f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-216">LocalAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-178">Read</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/udpsock.go.html#line-114">ReadFrom</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="#name-Addr">Addr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/udpsock.go.html#line-102">ReadFromUDP</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, *<a href="#name-UDPAddr">UDPAddr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/udpsock.go.html#line-135">ReadMsgUDP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>) (n, oobn, flags <a href="builtin.html#name-int">int</a>, addr *<a href="#name-UDPAddr">UDPAddr</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-226">RemoteAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-234">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-268">SetReadBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-245">SetReadDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-280">SetWriteBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-256">SetWriteDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/udpsock.go.html#line-94">SyscallConn</a>() (<a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-190">Write</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/udpsock.go.html#line-182">WriteMsgUDP</a>(b, oob []<a href="builtin.html#name-byte">byte</a>, addr *<a href="#name-UDPAddr">UDPAddr</a>) (n, oobn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/udpsock.go.html#line-159">WriteTo</a>(b []<a href="builtin.html#name-byte">byte</a>, addr <a href="#name-Addr">Addr</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/udpsock.go.html#line-147">WriteToUDP</a>(b []<a href="builtin.html#name-byte">byte</a>, addr *<a href="#name-UDPAddr">UDPAddr</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="UDPConn-stat-impls"><label for="UDPConn-stat-impls">Implements (10+)</label><span id='UDPConn-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Conn">Conn</a>
+			*T : <a href="#name-PacketConn">PacketConn</a>
+			*T : io.<a href="io.html#name-Closer">Closer</a>
+			*T : io.<a href="io.html#name-ReadCloser">ReadCloser</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ReadWriteCloser">ReadWriteCloser</a>
+			*T : io.<a href="io.html#name-ReadWriter">ReadWriter</a>
+			*T : io.<a href="io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="io.html#name-Writer">Writer</a>
+			*T : syscall.<a href="syscall.html#name-Conn">Conn</a></span>
+		<input type='checkbox' class="stat" id="UDPConn-stat-results"><label for="UDPConn-stat-results">As Outputs Of (3+)</label><span id='UDPConn-stat-results-content' class="stat-content">
+			func <a href="#name-DialUDP">DialUDP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-UDPAddr">UDPAddr</a>) (*<b>UDPConn</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenMulticastUDP">ListenMulticastUDP</a>(network <a href="builtin.html#name-string">string</a>, ifi *<a href="#name-Interface">Interface</a>, gaddr *<a href="#name-UDPAddr">UDPAddr</a>) (*<b>UDPConn</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenUDP">ListenUDP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-UDPAddr">UDPAddr</a>) (*<b>UDPConn</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-UnixAddr" data-popularity="600">	 type <a href="../src/net/unixsock.go.html#line-22">UnixAddr</a> <i>(struct)</i>
+		UnixAddr represents the address of a Unix domain socket end point.
+
+		<input type='checkbox' class="stat" id="UnixAddr-stat-fields"><label for="UnixAddr-stat-fields">Exported Fields (2)</label><span id='UnixAddr-stat-fields-content' class="stat-content">
+			<a href="../src/net/unixsock.go.html#line-23">Name</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/net/unixsock.go.html#line-24">Net</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="UnixAddr-stat-methods"><label for="UnixAddr-stat-methods">Exported Methods (2)</label><span id='UnixAddr-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/unixsock.go.html#line-29">Network</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/net/unixsock.go.html#line-33">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="UnixAddr-stat-impls"><label for="UnixAddr-stat-impls">Implements (2+)</label><span id='UnixAddr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a>
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="UnixAddr-stat-results"><label for="UnixAddr-stat-results">As Outputs Of (3+)</label><span id='UnixAddr-stat-results-content' class="stat-content">
+			func <a href="#name-ResolveUnixAddr">ResolveUnixAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<b>UnixAddr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixConn">UnixConn</a>).<a href="../src/net/unixsock.go.html#line-106">ReadFromUnix</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, *<b>UnixAddr</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixConn">UnixConn</a>).<a href="../src/net/unixsock.go.html#line-139">ReadMsgUnix</a>(b, oob []<a href="builtin.html#name-byte">byte</a>) (n, oobn, flags <a href="builtin.html#name-int">int</a>, addr *<b>UnixAddr</b>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="UnixAddr-stat-params"><label for="UnixAddr-stat-params">As Inputs Of (5+)</label><span id='UnixAddr-stat-params-content' class="stat-content">
+			func <a href="#name-DialUnix">DialUnix</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<b>UnixAddr</b>) (*<a href="#name-UnixConn">UnixConn</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenUnix">ListenUnix</a>(network <a href="builtin.html#name-string">string</a>, laddr *<b>UnixAddr</b>) (*<a href="#name-UnixListener">UnixListener</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenUnixgram">ListenUnixgram</a>(network <a href="builtin.html#name-string">string</a>, laddr *<b>UnixAddr</b>) (*<a href="#name-UnixConn">UnixConn</a>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixConn">UnixConn</a>).<a href="../src/net/unixsock.go.html#line-184">WriteMsgUnix</a>(b, oob []<a href="builtin.html#name-byte">byte</a>, addr *<b>UnixAddr</b>) (n, oobn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixConn">UnixConn</a>).<a href="../src/net/unixsock.go.html#line-151">WriteToUnix</a>(b []<a href="builtin.html#name-byte">byte</a>, addr *<b>UnixAddr</b>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-UnixConn" data-popularity="1725">	 type <a href="../src/net/unixsock.go.html#line-68">UnixConn</a> <i>(struct)</i>
+		UnixConn is an implementation of the Conn interface for connections
+		to Unix domain sockets.
+
+		<input type='checkbox' class="stat" id="UnixConn-stat-methods"><label for="UnixConn-stat-methods">Exported Methods (20)</label><span id='UnixConn-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/net.go.html#line-202">Close</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/unixsock.go.html#line-83">CloseRead</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/unixsock.go.html#line-95">CloseWrite</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-297">File</a>() (f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-216">LocalAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-178">Read</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-118">ReadFrom</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="#name-Addr">Addr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-106">ReadFromUnix</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, *<a href="#name-UnixAddr">UnixAddr</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-139">ReadMsgUnix</a>(b, oob []<a href="builtin.html#name-byte">byte</a>) (n, oobn, flags <a href="builtin.html#name-int">int</a>, addr *<a href="#name-UnixAddr">UnixAddr</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-226">RemoteAddr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/net.go.html#line-234">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-268">SetReadBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-245">SetReadDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-280">SetWriteBuffer</a>(bytes <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/net.go.html#line-256">SetWriteDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/unixsock.go.html#line-74">SyscallConn</a>() (<a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/net.go.html#line-190">Write</a>(b []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-184">WriteMsgUnix</a>(b, oob []<a href="builtin.html#name-byte">byte</a>, addr *<a href="#name-UnixAddr">UnixAddr</a>) (n, oobn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-163">WriteTo</a>(b []<a href="builtin.html#name-byte">byte</a>, addr <a href="#name-Addr">Addr</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-151">WriteToUnix</a>(b []<a href="builtin.html#name-byte">byte</a>, addr *<a href="#name-UnixAddr">UnixAddr</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="UnixConn-stat-impls"><label for="UnixConn-stat-impls">Implements (10+)</label><span id='UnixConn-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Conn">Conn</a>
+			*T : <a href="#name-PacketConn">PacketConn</a>
+			*T : io.<a href="io.html#name-Closer">Closer</a>
+			*T : io.<a href="io.html#name-ReadCloser">ReadCloser</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ReadWriteCloser">ReadWriteCloser</a>
+			*T : io.<a href="io.html#name-ReadWriter">ReadWriter</a>
+			*T : io.<a href="io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="io.html#name-Writer">Writer</a>
+			*T : syscall.<a href="syscall.html#name-Conn">Conn</a></span>
+		<input type='checkbox' class="stat" id="UnixConn-stat-results"><label for="UnixConn-stat-results">As Outputs Of (3+)</label><span id='UnixConn-stat-results-content' class="stat-content">
+			func <a href="#name-DialUnix">DialUnix</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-UnixAddr">UnixAddr</a>) (*<b>UnixConn</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ListenUnixgram">ListenUnixgram</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-UnixAddr">UnixAddr</a>) (*<b>UnixConn</b>, <a href="builtin.html#name-error">error</a>)
+			func (*<a href="#name-UnixListener">UnixListener</a>).<a href="../src/net/unixsock.go.html#line-243">AcceptUnix</a>() (*<b>UnixConn</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-UnixListener" data-popularity="625">	 type <a href="../src/net/unixsock.go.html#line-220">UnixListener</a> <i>(struct)</i>
+		UnixListener is a Unix domain socket listener. Clients should
+		typically use variables of type Listener instead of assuming Unix
+		domain sockets.
+
+		<input type='checkbox' class="stat" id="UnixListener-stat-methods"><label for="UnixListener-stat-methods">Exported Methods (8)</label><span id='UnixListener-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/net/unixsock.go.html#line-256">Accept</a>() (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-243">AcceptUnix</a>() (*<a href="#name-UnixConn">UnixConn</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-282">Addr</a>() <a href="#name-Addr">Addr</a>
+			(*T) <a href="../src/net/unixsock.go.html#line-269">Close</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/unixsock.go.html#line-303">File</a>() (f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-286">SetDeadline</a>(t <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/net/unixsock_posix.go.html#line-205">SetUnlinkOnClose</a>(unlink <a href="builtin.html#name-bool">bool</a>)
+			(*T) <a href="../src/net/unixsock.go.html#line-234">SyscallConn</a>() (<a href="syscall.html">syscall</a>.<a href="syscall.html#name-RawConn">RawConn</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="UnixListener-stat-impls"><label for="UnixListener-stat-impls">Implements (3+)</label><span id='UnixListener-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Listener">Listener</a>
+			*T : io.<a href="io.html#name-Closer">Closer</a>
+			*T : syscall.<a href="syscall.html#name-Conn">Conn</a></span>
+		<input type='checkbox' class="stat" id="UnixListener-stat-results"><label for="UnixListener-stat-results">As Outputs Of (1+)</label><span id='UnixListener-stat-results-content' class="stat-content">
+			func <a href="#name-ListenUnix">ListenUnix</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-UnixAddr">UnixAddr</a>) (*<b>UnixListener</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-UnknownNetworkError" data-popularity="250">	 type <a href="../src/net/net.go.html#line-560">UnknownNetworkError</a> <a href="builtin.html#name-string">string</a>
+
+		<input type='checkbox' class="stat" id="UnknownNetworkError-stat-methods"><label for="UnknownNetworkError-stat-methods">Exported Methods (3)</label><span id='UnknownNetworkError-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/net/net.go.html#line-562">Error</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/net/net.go.html#line-564">Temporary</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/net/net.go.html#line-563">Timeout</a>() <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="UnknownNetworkError-stat-impls"><label for="UnknownNetworkError-stat-impls">Implements (2+)</label><span id='UnknownNetworkError-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Error">Error</a>
+			 T : <a href="builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-CIDRMask">	 func <a href="../src/net/ip.go.html#line-74">CIDRMask</a>(ones, bits <a href="builtin.html#name-int">int</a>) <a href="#name-IPMask">IPMask</a>
+		CIDRMask returns an IPMask consisting of 'ones' 1 bits
+		followed by 0s up to a total length of 'bits' bits.
+		For a mask of this form, CIDRMask is the inverse of IPMask.Size.</div>
+<div class="anchor" id="name-DefaultResolver">	  var <a href="../src/net/lookup.go.html#line-114">DefaultResolver</a> *<a href="#name-Resolver">Resolver</a>
+		DefaultResolver is the resolver used by the package-level Lookup
+		functions and by Dialers without a specified Resolver.</div>
+<div class="anchor" id="name-Dial">	 func <a href="../src/net/dial.go.html#line-317">Dial</a>(network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+		Dial connects to the address on the named network.
+
+		Known networks are "tcp", "tcp4" (IPv4-only), "tcp6" (IPv6-only),
+		"udp", "udp4" (IPv4-only), "udp6" (IPv6-only), "ip", "ip4"
+		(IPv4-only), "ip6" (IPv6-only), "unix", "unixgram" and
+		"unixpacket".
+
+		For TCP and UDP networks, the address has the form "host:port".
+		The host must be a literal IP address, or a host name that can be
+		resolved to IP addresses.
+		The port must be a literal port number or a service name.
+		If the host is a literal IPv6 address it must be enclosed in square
+		brackets, as in "[2001:db8::1]:80" or "[fe80::1%zone]:80".
+		The zone specifies the scope of the literal IPv6 address as defined
+		in RFC 4007.
+		The functions JoinHostPort and SplitHostPort manipulate a pair of
+		host and port in this form.
+		When using TCP, and the host resolves to multiple IP addresses,
+		Dial will try each IP address in order until one succeeds.
+
+		Examples:
+			Dial("tcp", "golang.org:http")
+			Dial("tcp", "192.0.2.1:http")
+			Dial("tcp", "198.51.100.1:80")
+			Dial("udp", "[2001:db8::1]:domain")
+			Dial("udp", "[fe80::1%lo0]:53")
+			Dial("tcp", ":80")
+
+		For IP networks, the network must be "ip", "ip4" or "ip6" followed
+		by a colon and a literal protocol number or a protocol name, and
+		the address has the form "host". The host must be a literal IP
+		address or a literal IPv6 address with zone.
+		It depends on each operating system how the operating system
+		behaves with a non-well known protocol number such as "0" or "255".
+
+		Examples:
+			Dial("ip4:1", "192.0.2.1")
+			Dial("ip6:ipv6-icmp", "2001:db8::1")
+			Dial("ip6:58", "fe80::1%lo0")
+
+		For TCP, UDP and IP networks, if the host is empty or a literal
+		unspecified IP address, as in ":80", "0.0.0.0:80" or "[::]:80" for
+		TCP and UDP, "", "0.0.0.0" or "::" for IP, the local system is
+		assumed.
+
+		For Unix networks, the address must be a file system path.</div>
+<div class="anchor" id="name-DialIP">	 func <a href="../src/net/iprawsock.go.html#line-211">DialIP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-IPAddr">IPAddr</a>) (*<a href="#name-IPConn">IPConn</a>, <a href="builtin.html#name-error">error</a>)
+		DialIP acts like Dial for IP networks.
+
+		The network must be an IP network name; see func Dial for details.
+
+		If laddr is nil, a local address is automatically chosen.
+		If the IP field of raddr is nil or an unspecified IP address, the
+		local system is assumed.</div>
+<div class="anchor" id="name-DialTCP">	 func <a href="../src/net/tcpsock.go.html#line-206">DialTCP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-TCPAddr">TCPAddr</a>) (*<a href="#name-TCPConn">TCPConn</a>, <a href="builtin.html#name-error">error</a>)
+		DialTCP acts like Dial for TCP networks.
+
+		The network must be a TCP network name; see func Dial for details.
+
+		If laddr is nil, a local address is automatically chosen.
+		If the IP field of raddr is nil or an unspecified IP address, the
+		local system is assumed.</div>
+<div class="anchor" id="name-DialTimeout">	 func <a href="../src/net/dial.go.html#line-332">DialTimeout</a>(network, address <a href="builtin.html#name-string">string</a>, timeout <a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a>) (<a href="#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+		DialTimeout acts like Dial but takes a timeout.
+
+		The timeout includes name resolution, if required.
+		When using TCP, and the host in the address parameter resolves to
+		multiple IP addresses, the timeout is spread over each consecutive
+		dial, such that each is given an appropriate fraction of the time
+		to connect.
+
+		See func Dial for a description of the network and address
+		parameters.</div>
+<div class="anchor" id="name-DialUDP">	 func <a href="../src/net/udpsock.go.html#line-202">DialUDP</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-UDPAddr">UDPAddr</a>) (*<a href="#name-UDPConn">UDPConn</a>, <a href="builtin.html#name-error">error</a>)
+		DialUDP acts like Dial for UDP networks.
+
+		The network must be a UDP network name; see func Dial for details.
+
+		If laddr is nil, a local address is automatically chosen.
+		If the IP field of raddr is nil or an unspecified IP address, the
+		local system is assumed.</div>
+<div class="anchor" id="name-DialUnix">	 func <a href="../src/net/unixsock.go.html#line-203">DialUnix</a>(network <a href="builtin.html#name-string">string</a>, laddr, raddr *<a href="#name-UnixAddr">UnixAddr</a>) (*<a href="#name-UnixConn">UnixConn</a>, <a href="builtin.html#name-error">error</a>)
+		DialUnix acts like Dial for Unix networks.
+
+		The network must be a Unix network name; see func Dial for details.
+
+		If laddr is non-nil, it is used as the local address for the
+		connection.</div>
+<div class="anchor" id="name-ErrWriteToConnected">	  var <a href="../src/net/net.go.html#line-412">ErrWriteToConnected</a> <a href="builtin.html#name-error">error</a>
+		Various errors contained in OpError.</div>
+<div class="anchor" id="name-FileConn">	 func <a href="../src/net/file.go.html#line-21">FileConn</a>(f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>) (c <a href="#name-Conn">Conn</a>, err <a href="builtin.html#name-error">error</a>)
+		FileConn returns a copy of the network connection corresponding to
+		the open file f.
+		It is the caller's responsibility to close f when finished.
+		Closing c does not affect f, and closing f does not affect c.</div>
+<div class="anchor" id="name-FileListener">	 func <a href="../src/net/file.go.html#line-33">FileListener</a>(f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>) (ln <a href="#name-Listener">Listener</a>, err <a href="builtin.html#name-error">error</a>)
+		FileListener returns a copy of the network listener corresponding
+		to the open file f.
+		It is the caller's responsibility to close ln when finished.
+		Closing ln does not affect f, and closing f does not affect ln.</div>
+<div class="anchor" id="name-FilePacketConn">	 func <a href="../src/net/file.go.html#line-45">FilePacketConn</a>(f *<a href="os.html">os</a>.<a href="os.html#name-File">File</a>) (c <a href="#name-PacketConn">PacketConn</a>, err <a href="builtin.html#name-error">error</a>)
+		FilePacketConn returns a copy of the packet network connection
+		corresponding to the open file f.
+		It is the caller's responsibility to close f when finished.
+		Closing c does not affect f, and closing f does not affect c.</div>
+<div class="anchor" id="name-FlagBroadcast">	const <a href="../src/net/interface.go.html#line-42">FlagBroadcast</a> <a href="#name-Flags">Flags</a> = 2 // interface supports broadcast access capability</div>
+<div class="anchor" id="name-FlagLoopback">	const <a href="../src/net/interface.go.html#line-43">FlagLoopback</a> <a href="#name-Flags">Flags</a> = 4 // interface is a loopback interface</div>
+<div class="anchor" id="name-FlagMulticast">	const <a href="../src/net/interface.go.html#line-45">FlagMulticast</a> <a href="#name-Flags">Flags</a> = 16 // interface supports multicast access capability</div>
+<div class="anchor" id="name-FlagPointToPoint">	const <a href="../src/net/interface.go.html#line-44">FlagPointToPoint</a> <a href="#name-Flags">Flags</a> = 8 // interface belongs to a point-to-point link</div>
+<div class="anchor" id="name-FlagUp">	const <a href="../src/net/interface.go.html#line-41">FlagUp</a> <a href="#name-Flags">Flags</a> = 1 // interface is up</div>
+<div class="anchor" id="name-InterfaceAddrs">	 func <a href="../src/net/interface.go.html#line-115">InterfaceAddrs</a>() ([]<a href="#name-Addr">Addr</a>, <a href="builtin.html#name-error">error</a>)
+		InterfaceAddrs returns a list of the system's unicast interface
+		addresses.
+
+		The returned list does not identify the associated interface; use
+		Interfaces and Interface.Addrs for more detail.</div>
+<div class="anchor" id="name-InterfaceByIndex">	 func <a href="../src/net/interface.go.html#line-128">InterfaceByIndex</a>(index <a href="builtin.html#name-int">int</a>) (*<a href="#name-Interface">Interface</a>, <a href="builtin.html#name-error">error</a>)
+		InterfaceByIndex returns the interface specified by index.
+
+		On Solaris, it returns one of the logical network interfaces
+		sharing the logical data link; for more precision use
+		InterfaceByName.</div>
+<div class="anchor" id="name-InterfaceByName">	 func <a href="../src/net/interface.go.html#line-153">InterfaceByName</a>(name <a href="builtin.html#name-string">string</a>) (*<a href="#name-Interface">Interface</a>, <a href="builtin.html#name-error">error</a>)
+		InterfaceByName returns the interface specified by name.</div>
+<div class="anchor" id="name-Interfaces">	 func <a href="../src/net/interface.go.html#line-99">Interfaces</a>() ([]<a href="#name-Interface">Interface</a>, <a href="builtin.html#name-error">error</a>)
+		Interfaces returns a list of the system's network interfaces.</div>
+<div class="anchor" id="name-IPv4">	 func <a href="../src/net/ip.go.html#line-48">IPv4</a>(a, b, c, d <a href="builtin.html#name-byte">byte</a>) <a href="#name-IP">IP</a>
+		IPv4 returns the IP address (in 16-byte form) of the
+		IPv4 address a.b.c.d.</div>
+<div class="anchor" id="name-IPv4allrouter">	  var <a href="../src/net/ip.go.html#line-100">IPv4allrouter</a> <a href="#name-IP">IP</a> // all routers
+		Well-known IPv4 addresses</div>
+<div class="anchor" id="name-IPv4allsys">	  var <a href="../src/net/ip.go.html#line-99">IPv4allsys</a> <a href="#name-IP">IP</a> // all systems
+		Well-known IPv4 addresses</div>
+<div class="anchor" id="name-IPv4bcast">	  var <a href="../src/net/ip.go.html#line-98">IPv4bcast</a> <a href="#name-IP">IP</a> // limited broadcast
+		Well-known IPv4 addresses</div>
+<div class="anchor" id="name-IPv4len">	const <a href="../src/net/ip.go.html#line-19">IPv4len</a> = 4
+		IP address lengths (bytes).</div>
+<div class="anchor" id="name-IPv4Mask">	 func <a href="../src/net/ip.go.html#line-62">IPv4Mask</a>(a, b, c, d <a href="builtin.html#name-byte">byte</a>) <a href="#name-IPMask">IPMask</a>
+		IPv4Mask returns the IP mask (in 4-byte form) of the
+		IPv4 mask a.b.c.d.</div>
+<div class="anchor" id="name-IPv4zero">	  var <a href="../src/net/ip.go.html#line-101">IPv4zero</a> <a href="#name-IP">IP</a> // all zeros
+		Well-known IPv4 addresses</div>
+<div class="anchor" id="name-IPv6interfacelocalallnodes">	  var <a href="../src/net/ip.go.html#line-109">IPv6interfacelocalallnodes</a> <a href="#name-IP">IP</a>
+		Well-known IPv6 addresses</div>
+<div class="anchor" id="name-IPv6len">	const <a href="../src/net/ip.go.html#line-20">IPv6len</a> = 16
+		IP address lengths (bytes).</div>
+<div class="anchor" id="name-IPv6linklocalallnodes">	  var <a href="../src/net/ip.go.html#line-110">IPv6linklocalallnodes</a> <a href="#name-IP">IP</a>
+		Well-known IPv6 addresses</div>
+<div class="anchor" id="name-IPv6linklocalallrouters">	  var <a href="../src/net/ip.go.html#line-111">IPv6linklocalallrouters</a> <a href="#name-IP">IP</a>
+		Well-known IPv6 addresses</div>
+<div class="anchor" id="name-IPv6loopback">	  var <a href="../src/net/ip.go.html#line-108">IPv6loopback</a> <a href="#name-IP">IP</a>
+		Well-known IPv6 addresses</div>
+<div class="anchor" id="name-IPv6unspecified">	  var <a href="../src/net/ip.go.html#line-107">IPv6unspecified</a> <a href="#name-IP">IP</a>
+		Well-known IPv6 addresses</div>
+<div class="anchor" id="name-IPv6zero">	  var <a href="../src/net/ip.go.html#line-106">IPv6zero</a> <a href="#name-IP">IP</a>
+		Well-known IPv6 addresses</div>
+<div class="anchor" id="name-JoinHostPort">	 func <a href="../src/net/ipsock.go.html#line-227">JoinHostPort</a>(host, port <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		JoinHostPort combines host and port into a network address of the
+		form "host:port". If host contains a colon, as found in literal
+		IPv6 addresses, then JoinHostPort returns "[host]:port".
+
+		See func Dial for a description of the host and port parameters.</div>
+<div class="anchor" id="name-Listen">	 func <a href="../src/net/dial.go.html#line-704">Listen</a>(network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-Listener">Listener</a>, <a href="builtin.html#name-error">error</a>)
+		Listen announces on the local network address.
+
+		The network must be "tcp", "tcp4", "tcp6", "unix" or "unixpacket".
+
+		For TCP networks, if the host in the address parameter is empty or
+		a literal unspecified IP address, Listen listens on all available
+		unicast and anycast IP addresses of the local system.
+		To only use IPv4, use network "tcp4".
+		The address can use a host name, but this is not recommended,
+		because it will create a listener for at most one of the host's IP
+		addresses.
+		If the port in the address parameter is empty or "0", as in
+		"127.0.0.1:" or "[::1]:0", a port number is automatically chosen.
+		The Addr method of Listener can be used to discover the chosen
+		port.
+
+		See func Dial for a description of the network and address
+		parameters.</div>
+<div class="anchor" id="name-ListenIP">	 func <a href="../src/net/iprawsock.go.html#line-230">ListenIP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-IPAddr">IPAddr</a>) (*<a href="#name-IPConn">IPConn</a>, <a href="builtin.html#name-error">error</a>)
+		ListenIP acts like ListenPacket for IP networks.
+
+		The network must be an IP network name; see func Dial for details.
+
+		If the IP field of laddr is nil or an unspecified IP address,
+		ListenIP listens on all available IP addresses of the local system
+		except multicast IP addresses.</div>
+<div class="anchor" id="name-ListenMulticastUDP">	 func <a href="../src/net/udpsock.go.html#line-262">ListenMulticastUDP</a>(network <a href="builtin.html#name-string">string</a>, ifi *<a href="#name-Interface">Interface</a>, gaddr *<a href="#name-UDPAddr">UDPAddr</a>) (*<a href="#name-UDPConn">UDPConn</a>, <a href="builtin.html#name-error">error</a>)
+		ListenMulticastUDP acts like ListenPacket for UDP networks but
+		takes a group address on a specific network interface.
+
+		The network must be a UDP network name; see func Dial for details.
+
+		ListenMulticastUDP listens on all available IP addresses of the
+		local system including the group, multicast IP address.
+		If ifi is nil, ListenMulticastUDP uses the system-assigned
+		multicast interface, although this is not recommended because the
+		assignment depends on platforms and sometimes it might require
+		routing configuration.
+		If the Port field of gaddr is 0, a port number is automatically
+		chosen.
+
+		ListenMulticastUDP is just for convenience of simple, small
+		applications. There are golang.org/x/net/ipv4 and
+		golang.org/x/net/ipv6 packages for general purpose uses.</div>
+<div class="anchor" id="name-ListenPacket">	 func <a href="../src/net/dial.go.html#line-731">ListenPacket</a>(network, address <a href="builtin.html#name-string">string</a>) (<a href="#name-PacketConn">PacketConn</a>, <a href="builtin.html#name-error">error</a>)
+		ListenPacket announces on the local network address.
+
+		The network must be "udp", "udp4", "udp6", "unixgram", or an IP
+		transport. The IP transports are "ip", "ip4", or "ip6" followed by
+		a colon and a literal protocol number or a protocol name, as in
+		"ip:1" or "ip:icmp".
+
+		For UDP and IP networks, if the host in the address parameter is
+		empty or a literal unspecified IP address, ListenPacket listens on
+		all available IP addresses of the local system except multicast IP
+		addresses.
+		To only use IPv4, use network "udp4" or "ip4:proto".
+		The address can use a host name, but this is not recommended,
+		because it will create a listener for at most one of the host's IP
+		addresses.
+		If the port in the address parameter is empty or "0", as in
+		"127.0.0.1:" or "[::1]:0", a port number is automatically chosen.
+		The LocalAddr method of PacketConn can be used to discover the
+		chosen port.
+
+		See func Dial for a description of the network and address
+		parameters.</div>
+<div class="anchor" id="name-ListenTCP">	 func <a href="../src/net/tcpsock.go.html#line-324">ListenTCP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-TCPAddr">TCPAddr</a>) (*<a href="#name-TCPListener">TCPListener</a>, <a href="builtin.html#name-error">error</a>)
+		ListenTCP acts like Listen for TCP networks.
+
+		The network must be a TCP network name; see func Dial for details.
+
+		If the IP field of laddr is nil or an unspecified IP address,
+		ListenTCP listens on all available unicast and anycast IP addresses
+		of the local system.
+		If the Port field of laddr is 0, a port number is automatically
+		chosen.</div>
+<div class="anchor" id="name-ListenUDP">	 func <a href="../src/net/udpsock.go.html#line-228">ListenUDP</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-UDPAddr">UDPAddr</a>) (*<a href="#name-UDPConn">UDPConn</a>, <a href="builtin.html#name-error">error</a>)
+		ListenUDP acts like ListenPacket for UDP networks.
+
+		The network must be a UDP network name; see func Dial for details.
+
+		If the IP field of laddr is nil or an unspecified IP address,
+		ListenUDP listens on all available IP addresses of the local system
+		except multicast IP addresses.
+		If the Port field of laddr is 0, a port number is automatically
+		chosen.</div>
+<div class="anchor" id="name-ListenUnix">	 func <a href="../src/net/unixsock.go.html#line-317">ListenUnix</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-UnixAddr">UnixAddr</a>) (*<a href="#name-UnixListener">UnixListener</a>, <a href="builtin.html#name-error">error</a>)
+		ListenUnix acts like Listen for Unix networks.
+
+		The network must be "unix" or "unixpacket".</div>
+<div class="anchor" id="name-ListenUnixgram">	 func <a href="../src/net/unixsock.go.html#line-337">ListenUnixgram</a>(network <a href="builtin.html#name-string">string</a>, laddr *<a href="#name-UnixAddr">UnixAddr</a>) (*<a href="#name-UnixConn">UnixConn</a>, <a href="builtin.html#name-error">error</a>)
+		ListenUnixgram acts like ListenPacket for Unix networks.
+
+		The network must be "unixgram".</div>
+<div class="anchor" id="name-LookupAddr">	 func <a href="../src/net/lookup.go.html#line-471">LookupAddr</a>(addr <a href="builtin.html#name-string">string</a>) (names []<a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+		LookupAddr performs a reverse lookup for the given address, returning a list
+		of names mapping to that address.
+
+		When using the host C library resolver, at most one result will be
+		returned. To bypass the host resolver, use a custom Resolver.</div>
+<div class="anchor" id="name-LookupCNAME">	 func <a href="../src/net/lookup.go.html#line-392">LookupCNAME</a>(host <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+		LookupCNAME returns the canonical name for the given host.
+		Callers that do not care about the canonical name can call
+		LookupHost or LookupIP directly; both take care of resolving
+		the canonical name as part of the lookup.
+
+		A canonical name is the final name after following zero
+		or more CNAME records.
+		LookupCNAME does not return an error if host does not
+		contain DNS "CNAME" records, as long as host resolves to
+		address records.</div>
+<div class="anchor" id="name-LookupHost">	 func <a href="../src/net/lookup.go.html#line-169">LookupHost</a>(host <a href="builtin.html#name-string">string</a>) (addrs []<a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+		LookupHost looks up the given host using the local resolver.
+		It returns a slice of that host's addresses.</div>
+<div class="anchor" id="name-LookupIP">	 func <a href="../src/net/lookup.go.html#line-189">LookupIP</a>(host <a href="builtin.html#name-string">string</a>) ([]<a href="#name-IP">IP</a>, <a href="builtin.html#name-error">error</a>)
+		LookupIP looks up host using the local resolver.
+		It returns a slice of that host's IPv4 and IPv6 addresses.</div>
+<div class="anchor" id="name-LookupMX">	 func <a href="../src/net/lookup.go.html#line-437">LookupMX</a>(name <a href="builtin.html#name-string">string</a>) ([]*<a href="#name-MX">MX</a>, <a href="builtin.html#name-error">error</a>)
+		LookupMX returns the DNS MX records for the given domain name sorted by preference.</div>
+<div class="anchor" id="name-LookupNS">	 func <a href="../src/net/lookup.go.html#line-447">LookupNS</a>(name <a href="builtin.html#name-string">string</a>) ([]*<a href="#name-NS">NS</a>, <a href="builtin.html#name-error">error</a>)
+		LookupNS returns the DNS NS records for the given domain name.</div>
+<div class="anchor" id="name-LookupPort">	 func <a href="../src/net/lookup.go.html#line-356">LookupPort</a>(network, service <a href="builtin.html#name-string">string</a>) (port <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		LookupPort looks up the port for the given network and service.</div>
+<div class="anchor" id="name-LookupSRV">	 func <a href="../src/net/lookup.go.html#line-419">LookupSRV</a>(service, proto, name <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, addrs []*<a href="#name-SRV">SRV</a>, err <a href="builtin.html#name-error">error</a>)
+		LookupSRV tries to resolve an SRV query of the given service,
+		protocol, and domain name. The proto is "tcp" or "udp".
+		The returned records are sorted by priority and randomized
+		by weight within a priority.
+
+		LookupSRV constructs the DNS name to look up following RFC 2782.
+		That is, it looks up _service._proto.name. To accommodate services
+		publishing SRV records under non-standard names, if both service
+		and proto are empty strings, LookupSRV looks up name directly.</div>
+<div class="anchor" id="name-LookupTXT">	 func <a href="../src/net/lookup.go.html#line-457">LookupTXT</a>(name <a href="builtin.html#name-string">string</a>) ([]<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)
+		LookupTXT returns the DNS TXT records for the given domain name.</div>
+<div class="anchor" id="name-ParseCIDR">	 func <a href="../src/net/ip.go.html#line-712">ParseCIDR</a>(s <a href="builtin.html#name-string">string</a>) (<a href="#name-IP">IP</a>, *<a href="#name-IPNet">IPNet</a>, <a href="builtin.html#name-error">error</a>)
+		ParseCIDR parses s as a CIDR notation IP address and prefix length,
+		like "192.0.2.0/24" or "2001:db8::/32", as defined in
+		RFC 4632 and RFC 4291.
+
+		It returns the IP address and the network implied by the IP and
+		prefix length.
+		For example, ParseCIDR("192.0.2.1/24") returns the IP address
+		192.0.2.1 and the network 192.0.2.0/24.</div>
+<div class="anchor" id="name-ParseIP">	 func <a href="../src/net/ip.go.html#line-678">ParseIP</a>(s <a href="builtin.html#name-string">string</a>) <a href="#name-IP">IP</a>
+		ParseIP parses s as an IP address, returning the result.
+		The string s can be in IPv4 dotted decimal ("192.0.2.1"), IPv6
+		("2001:db8::68"), or IPv4-mapped IPv6 ("::ffff:192.0.2.1") form.
+		If s is not a valid textual representation of an IP address,
+		ParseIP returns nil.</div>
+<div class="anchor" id="name-ParseMAC">	 func <a href="../src/net/mac.go.html#line-38">ParseMAC</a>(s <a href="builtin.html#name-string">string</a>) (hw <a href="#name-HardwareAddr">HardwareAddr</a>, err <a href="builtin.html#name-error">error</a>)
+		ParseMAC parses s as an IEEE 802 MAC-48, EUI-48, EUI-64, or a 20-octet
+		IP over InfiniBand link-layer address using one of the following formats:
+			00:00:5e:00:53:01
+			02:00:5e:10:00:00:00:01
+			00:00:00:00:fe:80:00:00:00:00:00:00:02:00:5e:10:00:00:00:01
+			00-00-5e-00-53-01
+			02-00-5e-10-00-00-00-01
+			00-00-00-00-fe-80-00-00-00-00-00-00-02-00-5e-10-00-00-00-01
+			0000.5e00.5301
+			0200.5e10.0000.0001
+			0000.0000.fe80.0000.0000.0000.0200.5e10.0000.0001</div>
+<div class="anchor" id="name-Pipe">	 func <a href="../src/net/pipe.go.html#line-113">Pipe</a>() (<a href="#name-Conn">Conn</a>, <a href="#name-Conn">Conn</a>)
+		Pipe creates a synchronous, in-memory, full duplex
+		network connection; both ends implement the Conn interface.
+		Reads on one end are matched with writes on the other,
+		copying data directly between the two; there is no internal
+		buffering.</div>
+<div class="anchor" id="name-ResolveIPAddr">	 func <a href="../src/net/iprawsock.go.html#line-77">ResolveIPAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<a href="#name-IPAddr">IPAddr</a>, <a href="builtin.html#name-error">error</a>)
+		ResolveIPAddr returns an address of IP end point.
+
+		The network must be an IP network name.
+
+		If the host in the address parameter is not a literal IP address,
+		ResolveIPAddr resolves the address to an address of IP end point.
+		Otherwise, it parses the address as a literal IP address.
+		The address parameter can use a host name, but this is not
+		recommended, because it will return at most one of the host name's
+		IP addresses.
+
+		See func Dial for a description of the network and address
+		parameters.</div>
+<div class="anchor" id="name-ResolveTCPAddr">	 func <a href="../src/net/tcpsock.go.html#line-68">ResolveTCPAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<a href="#name-TCPAddr">TCPAddr</a>, <a href="builtin.html#name-error">error</a>)
+		ResolveTCPAddr returns an address of TCP end point.
+
+		The network must be a TCP network name.
+
+		If the host in the address parameter is not a literal IP address or
+		the port is not a literal port number, ResolveTCPAddr resolves the
+		address to an address of TCP end point.
+		Otherwise, it parses the address as a pair of literal IP address
+		and port number.
+		The address parameter can use a host name, but this is not
+		recommended, because it will return at most one of the host name's
+		IP addresses.
+
+		See func Dial for a description of the network and address
+		parameters.</div>
+<div class="anchor" id="name-ResolveUDPAddr">	 func <a href="../src/net/udpsock.go.html#line-71">ResolveUDPAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<a href="#name-UDPAddr">UDPAddr</a>, <a href="builtin.html#name-error">error</a>)
+		ResolveUDPAddr returns an address of UDP end point.
+
+		The network must be a UDP network name.
+
+		If the host in the address parameter is not a literal IP address or
+		the port is not a literal port number, ResolveUDPAddr resolves the
+		address to an address of UDP end point.
+		Otherwise, it parses the address as a pair of literal IP address
+		and port number.
+		The address parameter can use a host name, but this is not
+		recommended, because it will return at most one of the host name's
+		IP addresses.
+
+		See func Dial for a description of the network and address
+		parameters.</div>
+<div class="anchor" id="name-ResolveUnixAddr">	 func <a href="../src/net/unixsock.go.html#line-57">ResolveUnixAddr</a>(network, address <a href="builtin.html#name-string">string</a>) (*<a href="#name-UnixAddr">UnixAddr</a>, <a href="builtin.html#name-error">error</a>)
+		ResolveUnixAddr returns an address of Unix domain socket end point.
+
+		The network must be a Unix network name.
+
+		See func Dial for a description of the network and address
+		parameters.</div>
+<div class="anchor" id="name-SplitHostPort">	 func <a href="../src/net/ipsock.go.html#line-156">SplitHostPort</a>(hostport <a href="builtin.html#name-string">string</a>) (host, port <a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+		SplitHostPort splits a network address of the form "host:port",
+		"host%zone:port", "[host]:port" or "[host%zone]:port" into host or
+		host%zone and port.
+
+		A literal IPv6 address in hostport must be enclosed in square
+		brackets, as in "[::1]:80", "[::1%lo0]:80".
+
+		See func Dial for a description of the hostport parameter, and host
+		and port results.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

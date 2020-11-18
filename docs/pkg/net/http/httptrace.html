@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: net/http/httptrace</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>httptrace</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-net/http/httptrace">net/http/httptrace</a><i> (on <a href="https://golang.org/pkg/net/http/httptrace/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/net/http/httptrace" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/net/http/httptrace.html">7 packages</a>, and imported by <a href="../../../dep/net/http/httptrace.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../src/net/http/httptrace/trace.go.html#doc">d-&gt;</a> <a href="../../../src/net/http/httptrace/trace.go.html">trace.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-ClientTrace" data-popularity="110">	 type <a href="../../../src/net/http/httptrace/trace.go.html#line-80">ClientTrace</a> <i>(struct)</i>
+		ClientTrace is a set of hooks to run at various stages of an outgoing
+		HTTP request. Any particular hook may be nil. Functions may be
+		called concurrently from different goroutines and some may be called
+		after the request has completed or failed.
+
+		ClientTrace currently traces a single HTTP request &amp; response
+		during a single round trip and has no hooks that span a series
+		of redirected requests.
+
+		See https://blog.golang.org/http-tracing for more.
+
+		<input type='checkbox' class="stat" id="ClientTrace-stat-fields"><label for="ClientTrace-stat-fields">Exported Fields (16)</label><span id='ClientTrace-stat-fields-content' class="stat-content">
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-133">ConnectDone</a> <i>func(network, addr <a href="../../builtin.html#name-string">string</a>, err <a href="../../builtin.html#name-error">error</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-126">ConnectStart</a> <i>func(network, addr <a href="../../builtin.html#name-string">string</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-121">DNSDone</a> <i>func(<a href="#name-DNSDoneInfo">DNSDoneInfo</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-118">DNSStart</a> <i>func(<a href="#name-DNSStartInfo">DNSStartInfo</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-85">GetConn</a> <i>func(hostPort <a href="../../builtin.html#name-string">string</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-109">Got100Continue</a> <i>func()</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-115">Got1xxResponse</a> <i>func(code <a href="../../builtin.html#name-int">int</a>, header <a href="../textproto.html">textproto</a>.<a href="../textproto.html#name-MIMEHeader">MIMEHeader</a>) <a href="../../builtin.html#name-error">error</a></i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-91">GotConn</a> <i>func(<a href="#name-GotConnInfo">GotConnInfo</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-105">GotFirstResponseByte</a> <i>func()</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-101">PutIdleConn</a> <i>func(err <a href="../../builtin.html#name-error">error</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-143">TLSHandshakeDone</a> <i>func(<a href="../../crypto/tls.html">tls</a>.<a href="../../crypto/tls.html#name-ConnectionState">ConnectionState</a>, <a href="../../builtin.html#name-error">error</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-138">TLSHandshakeStart</a> <i>func()</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-158">Wait100Continue</a> <i>func()</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-148">WroteHeaderField</a> <i>func(key <a href="../../builtin.html#name-string">string</a>, value []<a href="../../builtin.html#name-string">string</a>)</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-152">WroteHeaders</a> <i>func()</i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-163">WroteRequest</a> <i>func(<a href="#name-WroteRequestInfo">WroteRequestInfo</a>)</i></span>
+		<input type='checkbox' class="stat" id="ClientTrace-stat-results"><label for="ClientTrace-stat-results">As Outputs Of (1+)</label><span id='ClientTrace-stat-results-content' class="stat-content">
+			func <a href="#name-ContextClientTrace">ContextClientTrace</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>) *<b>ClientTrace</b></span>
+		<input type='checkbox' class="stat" id="ClientTrace-stat-params"><label for="ClientTrace-stat-params">As Inputs Of (1+)</label><span id='ClientTrace-stat-params-content' class="stat-content">
+			func <a href="#name-WithClientTrace">WithClientTrace</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, trace *<b>ClientTrace</b>) <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a></span></div>
+<div class="anchor" id="name-DNSDoneInfo" data-popularity="0">	 type <a href="../../../src/net/http/httptrace/trace.go.html#line-216">DNSDoneInfo</a> <i>(struct)</i>
+		DNSDoneInfo contains information about the results of a DNS lookup.
+
+		<input type='checkbox' class="stat" id="DNSDoneInfo-stat-fields"><label for="DNSDoneInfo-stat-fields">Exported Fields (3)</label><span id='DNSDoneInfo-stat-fields-content' class="stat-content">
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-219">Addrs</a> <i>[]<a href="../../net.html">net</a>.<a href="../../net.html#name-IPAddr">IPAddr</a></i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-226">Coalesced</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-222">Err</a> <i><a href="../../builtin.html#name-error">error</a></i></span></div>
+<div class="anchor" id="name-DNSStartInfo" data-popularity="0">	 type <a href="../../../src/net/http/httptrace/trace.go.html#line-211">DNSStartInfo</a> <i>(struct)</i>
+		DNSStartInfo contains information about a DNS request.
+
+		<input type='checkbox' class="stat" id="DNSStartInfo-stat-fields"><label for="DNSStartInfo-stat-fields">One Exported Field</label><span id='DNSStartInfo-stat-fields-content' class="stat-content">
+			<a href="../../../src/net/dnsclient.go.html#line-217">Host</a> <i><a href="../../builtin.html#name-string">string</a></i></span></div>
+<div class="anchor" id="name-GotConnInfo" data-popularity="0">	 type <a href="../../../src/net/http/httptrace/trace.go.html#line-238">GotConnInfo</a> <i>(struct)</i>
+		GotConnInfo is the argument to the ClientTrace.GotConn function and
+		contains information about the obtained connection.
+
+		<input type='checkbox' class="stat" id="GotConnInfo-stat-fields"><label for="GotConnInfo-stat-fields">Exported Fields (4)</label><span id='GotConnInfo-stat-fields-content' class="stat-content">
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-242">Conn</a> <i><a href="../../net.html">net</a>.<a href="../../net.html#name-Conn">Conn</a></i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-254">IdleTime</a> <i><a href="../../time.html">time</a>.<a href="../../time.html#name-Duration">Duration</a></i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-246">Reused</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/net/http/httptrace/trace.go.html#line-250">WasIdle</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span></div>
+<div class="anchor" id="name-WroteRequestInfo" data-popularity="0">	 type <a href="../../../src/net/http/httptrace/trace.go.html#line-168">WroteRequestInfo</a> <i>(struct)</i>
+		WroteRequestInfo contains information provided to the WroteRequest
+		hook.
+
+		<input type='checkbox' class="stat" id="WroteRequestInfo-stat-fields"><label for="WroteRequestInfo-stat-fields">One Exported Field</label><span id='WroteRequestInfo-stat-fields-content' class="stat-content">
+			<a href="../../../src/net/net.go.html#line-590">Err</a> <i><a href="../../builtin.html#name-error">error</a></i></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ContextClientTrace">	 func <a href="../../../src/net/http/httptrace/trace.go.html#line-24">ContextClientTrace</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>) *<a href="#name-ClientTrace">ClientTrace</a>
+		ContextClientTrace returns the ClientTrace associated with the
+		provided context. If none, it returns nil.</div>
+<div class="anchor" id="name-WithClientTrace">	 func <a href="../../../src/net/http/httptrace/trace.go.html#line-34">WithClientTrace</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, trace *<a href="#name-ClientTrace">ClientTrace</a>) <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>
+		WithClientTrace returns a new context based on the provided parent
+		ctx. HTTP client requests made with the returned context will use
+		the provided trace hooks, in addition to any previous hooks
+		registered with ctx. Any hooks defined in the provided trace will
+		be called first.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

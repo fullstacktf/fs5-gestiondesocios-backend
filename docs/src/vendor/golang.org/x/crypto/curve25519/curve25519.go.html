@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: curve25519.go in package vendor/golang.org/x/crypto/curve25519</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	curve25519.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../pkg/vendor/golang.org/x/crypto/curve25519.html">vendor/golang.org/x/crypto/curve25519</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2019 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<div class="anchor" id="doc"><span class="codeline" id="line-5"><code>// Package curve25519 provides an implementation of the X25519 function, which</code></span>
+<span class="codeline" id="line-6"><code>// performs scalar multiplication on the elliptic curve known as Curve25519.</code></span>
+<span class="codeline" id="line-7"><code>// See RFC 7748.</code></span></div><span class="codeline" id="line-8"><code>package curve25519 // import "golang.org/x/crypto/curve25519"</code></span>
+<span class="codeline" id="line-9"><code></code></span>
+<span class="codeline" id="line-10"><code>import (</code></span>
+<span class="codeline" id="line-11"><code>	"crypto/subtle"</code></span>
+<span class="codeline" id="line-12"><code>	"fmt"</code></span>
+<span class="codeline" id="line-13"><code>)</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>// ScalarMult sets dst to the product scalar * point.</code></span>
+<span class="codeline" id="line-16"><code>//</code></span>
+<span class="codeline" id="line-17"><code>// Deprecated: when provided a low-order point, ScalarMult will set dst to all</code></span>
+<span class="codeline" id="line-18"><code>// zeroes, irrespective of the scalar. Instead, use the X25519 function, which</code></span>
+<span class="codeline" id="line-19"><code>// will return an error.</code></span>
+<span class="codeline" id="line-20"><code>func ScalarMult(dst, scalar, point *[32]byte) {</code></span>
+<span class="codeline" id="line-21"><code>	scalarMult(dst, scalar, point)</code></span>
+<span class="codeline" id="line-22"><code>}</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>// ScalarBaseMult sets dst to the product scalar * base where base is the</code></span>
+<span class="codeline" id="line-25"><code>// standard generator.</code></span>
+<span class="codeline" id="line-26"><code>//</code></span>
+<span class="codeline" id="line-27"><code>// It is recommended to use the X25519 function with Basepoint instead, as</code></span>
+<span class="codeline" id="line-28"><code>// copying into fixed size arrays can lead to unexpected bugs.</code></span>
+<span class="codeline" id="line-29"><code>func ScalarBaseMult(dst, scalar *[32]byte) {</code></span>
+<span class="codeline" id="line-30"><code>	ScalarMult(dst, scalar, &amp;basePoint)</code></span>
+<span class="codeline" id="line-31"><code>}</code></span>
+<span class="codeline" id="line-32"><code></code></span>
+<span class="codeline" id="line-33"><code>const (</code></span>
+<span class="codeline" id="line-34"><code>	// ScalarSize is the size of the scalar input to X25519.</code></span>
+<span class="codeline" id="line-35"><code>	ScalarSize = 32</code></span>
+<span class="codeline" id="line-36"><code>	// PointSize is the size of the point input to X25519.</code></span>
+<span class="codeline" id="line-37"><code>	PointSize = 32</code></span>
+<span class="codeline" id="line-38"><code>)</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>// Basepoint is the canonical Curve25519 generator.</code></span>
+<span class="codeline" id="line-41"><code>var Basepoint []byte</code></span>
+<span class="codeline" id="line-42"><code></code></span>
+<span class="codeline" id="line-43"><code>var basePoint = [32]byte{9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</code></span>
+<span class="codeline" id="line-44"><code></code></span>
+<span class="codeline" id="line-45"><code>func init() { Basepoint = basePoint[:] }</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>func checkBasepoint() {</code></span>
+<span class="codeline" id="line-48"><code>	if subtle.ConstantTimeCompare(Basepoint, []byte{</code></span>
+<span class="codeline" id="line-49"><code>		0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</code></span>
+<span class="codeline" id="line-50"><code>		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</code></span>
+<span class="codeline" id="line-51"><code>		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</code></span>
+<span class="codeline" id="line-52"><code>		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,</code></span>
+<span class="codeline" id="line-53"><code>	}) != 1 {</code></span>
+<span class="codeline" id="line-54"><code>		panic("curve25519: global Basepoint value was modified")</code></span>
+<span class="codeline" id="line-55"><code>	}</code></span>
+<span class="codeline" id="line-56"><code>}</code></span>
+<span class="codeline" id="line-57"><code></code></span>
+<span class="codeline" id="line-58"><code>// X25519 returns the result of the scalar multiplication (scalar * point),</code></span>
+<span class="codeline" id="line-59"><code>// according to RFC 7748, Section 5. scalar, point and the return value are</code></span>
+<span class="codeline" id="line-60"><code>// slices of 32 bytes.</code></span>
+<span class="codeline" id="line-61"><code>//</code></span>
+<span class="codeline" id="line-62"><code>// scalar can be generated at random, for example with crypto/rand. point should</code></span>
+<span class="codeline" id="line-63"><code>// be either Basepoint or the output of another X25519 call.</code></span>
+<span class="codeline" id="line-64"><code>//</code></span>
+<span class="codeline" id="line-65"><code>// If point is Basepoint (but not if it's a different slice with the same</code></span>
+<span class="codeline" id="line-66"><code>// contents) a precomputed implementation might be used for performance.</code></span>
+<span class="codeline" id="line-67"><code>func X25519(scalar, point []byte) ([]byte, error) {</code></span>
+<span class="codeline" id="line-68"><code>	// Outline the body of function, to let the allocation be inlined in the</code></span>
+<span class="codeline" id="line-69"><code>	// caller, and possibly avoid escaping to the heap.</code></span>
+<span class="codeline" id="line-70"><code>	var dst [32]byte</code></span>
+<span class="codeline" id="line-71"><code>	return x25519(&amp;dst, scalar, point)</code></span>
+<span class="codeline" id="line-72"><code>}</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>func x25519(dst *[32]byte, scalar, point []byte) ([]byte, error) {</code></span>
+<span class="codeline" id="line-75"><code>	var in [32]byte</code></span>
+<span class="codeline" id="line-76"><code>	if l := len(scalar); l != 32 {</code></span>
+<span class="codeline" id="line-77"><code>		return nil, fmt.Errorf("bad scalar length: %d, expected %d", l, 32)</code></span>
+<span class="codeline" id="line-78"><code>	}</code></span>
+<span class="codeline" id="line-79"><code>	if l := len(point); l != 32 {</code></span>
+<span class="codeline" id="line-80"><code>		return nil, fmt.Errorf("bad point length: %d, expected %d", l, 32)</code></span>
+<span class="codeline" id="line-81"><code>	}</code></span>
+<span class="codeline" id="line-82"><code>	copy(in[:], scalar)</code></span>
+<span class="codeline" id="line-83"><code>	if &amp;point[0] == &amp;Basepoint[0] {</code></span>
+<span class="codeline" id="line-84"><code>		checkBasepoint()</code></span>
+<span class="codeline" id="line-85"><code>		ScalarBaseMult(dst, &amp;in)</code></span>
+<span class="codeline" id="line-86"><code>	} else {</code></span>
+<span class="codeline" id="line-87"><code>		var base, zero [32]byte</code></span>
+<span class="codeline" id="line-88"><code>		copy(base[:], point)</code></span>
+<span class="codeline" id="line-89"><code>		ScalarMult(dst, &amp;in, &amp;base)</code></span>
+<span class="codeline" id="line-90"><code>		if subtle.ConstantTimeCompare(dst[:], zero[:]) == 1 {</code></span>
+<span class="codeline" id="line-91"><code>			return nil, fmt.Errorf("bad input point: low order point")</code></span>
+<span class="codeline" id="line-92"><code>		}</code></span>
+<span class="codeline" id="line-93"><code>	}</code></span>
+<span class="codeline" id="line-94"><code>	return dst[:], nil</code></span>
+<span class="codeline" id="line-95"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

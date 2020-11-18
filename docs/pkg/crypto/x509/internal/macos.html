@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/x509/internal/macos</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>macOS</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../index.html#pkg-crypto/x509/internal/macos">crypto/x509/internal/macos</a><i> (on <a href="https://golang.org/pkg/crypto/x509/internal/macos/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/x509/internal/macos" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../dep/crypto/x509/internal/macos.html">5 packages</a>, and imported by <a href="../../../../dep/crypto/x509/internal/macos.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#doc">d-&gt;</a> <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html">corefoundation.go</a>
+	    <a href="../../../../src/crypto/x509/internal/macos/security.go.html">security.go</a>
+	    <a href="../../../../src/crypto/x509/internal/macos/corefoundation.s.html">corefoundation.s</a>
+	    <a href="../../../../src/crypto/x509/internal/macos/security.s.html">security.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-CFRef" data-popularity="870">	 type <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-21">CFRef</a> <a href="../../../builtin.html#name-uintptr">uintptr</a>
+		CFRef is an opaque reference to a Core Foundation object. It is a pointer,
+		but to memory not owned by Go, so not an unsafe.Pointer.
+
+		<input type='checkbox' class="stat" id="CFRef-stat-results"><label for="CFRef-stat-results">As Outputs Of (6+)</label><span id='CFRef-stat-results-content' class="stat-content">
+			func <a href="#name-CFArrayGetValueAtIndex">CFArrayGetValueAtIndex</a>(array <b>CFRef</b>, index <a href="../../../builtin.html#name-int">int</a>) <b>CFRef</b>
+			func <a href="#name-CFDictionaryGetValueIfPresent">CFDictionaryGetValueIfPresent</a>(dict <b>CFRef</b>, key <a href="#name-CFString">CFString</a>) (value <b>CFRef</b>, ok <a href="../../../builtin.html#name-bool">bool</a>)
+			func <a href="#name-SecItemExport">SecItemExport</a>(cert <b>CFRef</b>) (data <b>CFRef</b>, err <a href="../../../builtin.html#name-error">error</a>)
+			func <a href="#name-SecPolicyCopyProperties">SecPolicyCopyProperties</a>(policy <b>CFRef</b>) <b>CFRef</b>
+			func <a href="#name-SecTrustSettingsCopyCertificates">SecTrustSettingsCopyCertificates</a>(domain <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a>) (certArray <b>CFRef</b>, err <a href="../../../builtin.html#name-error">error</a>)
+			func <a href="#name-SecTrustSettingsCopyTrustSettings">SecTrustSettingsCopyTrustSettings</a>(cert <b>CFRef</b>, domain <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a>) (trustSettings <b>CFRef</b>, err <a href="../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="CFRef-stat-params"><label for="CFRef-stat-params">As Inputs Of (12+)</label><span id='CFRef-stat-params-content' class="stat-content">
+			func <a href="#name-CFArrayGetCount">CFArrayGetCount</a>(array <b>CFRef</b>) <a href="../../../builtin.html#name-int">int</a>
+			func <a href="#name-CFArrayGetValueAtIndex">CFArrayGetValueAtIndex</a>(array <b>CFRef</b>, index <a href="../../../builtin.html#name-int">int</a>) <b>CFRef</b>
+			func <a href="#name-CFDataGetBytePtr">CFDataGetBytePtr</a>(data <b>CFRef</b>) <a href="../../../builtin.html#name-uintptr">uintptr</a>
+			func <a href="#name-CFDataGetLength">CFDataGetLength</a>(data <b>CFRef</b>) <a href="../../../builtin.html#name-int">int</a>
+			func <a href="#name-CFDataToSlice">CFDataToSlice</a>(data <b>CFRef</b>) []<a href="../../../builtin.html#name-byte">byte</a>
+			func <a href="#name-CFDictionaryGetValueIfPresent">CFDictionaryGetValueIfPresent</a>(dict <b>CFRef</b>, key <a href="#name-CFString">CFString</a>) (value <b>CFRef</b>, ok <a href="../../../builtin.html#name-bool">bool</a>)
+			func <a href="#name-CFEqual">CFEqual</a>(a, b <b>CFRef</b>) <a href="../../../builtin.html#name-bool">bool</a>
+			func <a href="#name-CFNumberGetValue">CFNumberGetValue</a>(num <b>CFRef</b>) (<a href="../../../builtin.html#name-int32">int32</a>, <a href="../../../builtin.html#name-error">error</a>)
+			func <a href="#name-CFRelease">CFRelease</a>(ref <b>CFRef</b>)
+			func <a href="#name-SecItemExport">SecItemExport</a>(cert <b>CFRef</b>) (data <b>CFRef</b>, err <a href="../../../builtin.html#name-error">error</a>)
+			func <a href="#name-SecPolicyCopyProperties">SecPolicyCopyProperties</a>(policy <b>CFRef</b>) <b>CFRef</b>
+			func <a href="#name-SecTrustSettingsCopyTrustSettings">SecTrustSettingsCopyTrustSettings</a>(cert <b>CFRef</b>, domain <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a>) (trustSettings <b>CFRef</b>, err <a href="../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-CFString" data-popularity="125">	 type <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-33">CFString</a> <a href="#name-CFRef">CFRef</a>
+
+		<input type='checkbox' class="stat" id="CFString-stat-results"><label for="CFString-stat-results">As Outputs Of (1+)</label><span id='CFString-stat-results-content' class="stat-content">
+			func <a href="#name-StringToCFString">StringToCFString</a>(s <a href="../../../builtin.html#name-string">string</a>) <b>CFString</b></span>
+		<input type='checkbox' class="stat" id="CFString-stat-params"><label for="CFString-stat-params">As Inputs Of (1+)</label><span id='CFString-stat-params-content' class="stat-content">
+			func <a href="#name-CFDictionaryGetValueIfPresent">CFDictionaryGetValueIfPresent</a>(dict <a href="#name-CFRef">CFRef</a>, key <b>CFString</b>) (value <a href="#name-CFRef">CFRef</a>, ok <a href="../../../builtin.html#name-bool">bool</a>)</span>
+		<input type='checkbox' class="stat" id="CFString-stat-values"><label for="CFString-stat-values">As Types Of (5+)</label><span id='CFString-stat-values-content' class="stat-content">
+			  var <a href="#name-SecPolicyAppleSSL">SecPolicyAppleSSL</a>
+			  var <a href="#name-SecPolicyOid">SecPolicyOid</a>
+			  var <a href="#name-SecTrustSettingsPolicy">SecTrustSettingsPolicy</a>
+			  var <a href="#name-SecTrustSettingsPolicyString">SecTrustSettingsPolicyString</a>
+			  var <a href="#name-SecTrustSettingsResultKey">SecTrustSettingsResultKey</a></span></div>
+<div class="anchor" id="name-OSStatus" data-popularity="100">	 type <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-35">OSStatus</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="OSStatus-stat-methods"><label for="OSStatus-stat-methods">One Exported Method</label><span id='OSStatus-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-40">Error</a>() <a href="../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="OSStatus-stat-impls"><label for="OSStatus-stat-impls">Implements (1+)</label><span id='OSStatus-stat-impls-content' class="stat-content">
+			 T : <a href="../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-SecTrustSettingsDomain" data-popularity="85">	 type <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-27">SecTrustSettingsDomain</a> <a href="../../../builtin.html#name-int32">int32</a>
+
+		<input type='checkbox' class="stat" id="SecTrustSettingsDomain-stat-params"><label for="SecTrustSettingsDomain-stat-params">As Inputs Of (2+)</label><span id='SecTrustSettingsDomain-stat-params-content' class="stat-content">
+			func <a href="#name-SecTrustSettingsCopyCertificates">SecTrustSettingsCopyCertificates</a>(domain <b>SecTrustSettingsDomain</b>) (certArray <a href="#name-CFRef">CFRef</a>, err <a href="../../../builtin.html#name-error">error</a>)
+			func <a href="#name-SecTrustSettingsCopyTrustSettings">SecTrustSettingsCopyTrustSettings</a>(cert <a href="#name-CFRef">CFRef</a>, domain <b>SecTrustSettingsDomain</b>) (trustSettings <a href="#name-CFRef">CFRef</a>, err <a href="../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="SecTrustSettingsDomain-stat-values"><label for="SecTrustSettingsDomain-stat-values">As Types Of (3+)</label><span id='SecTrustSettingsDomain-stat-values-content' class="stat-content">
+			const <a href="#name-SecTrustSettingsDomainAdmin">SecTrustSettingsDomainAdmin</a>
+			const <a href="#name-SecTrustSettingsDomainSystem">SecTrustSettingsDomainSystem</a>
+			const <a href="#name-SecTrustSettingsDomainUser">SecTrustSettingsDomainUser</a></span></div>
+<div class="anchor" id="name-SecTrustSettingsResult" data-popularity="15">	 type <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-17">SecTrustSettingsResult</a> <a href="../../../builtin.html#name-int32">int32</a>
+
+		<input type='checkbox' class="stat" id="SecTrustSettingsResult-stat-values"><label for="SecTrustSettingsResult-stat-values">As Types Of (5+)</label><span id='SecTrustSettingsResult-stat-values-content' class="stat-content">
+			const <a href="#name-SecTrustSettingsResultDeny">SecTrustSettingsResultDeny</a>
+			const <a href="#name-SecTrustSettingsResultInvalid">SecTrustSettingsResultInvalid</a>
+			const <a href="#name-SecTrustSettingsResultTrustAsRoot">SecTrustSettingsResultTrustAsRoot</a>
+			const <a href="#name-SecTrustSettingsResultTrustRoot">SecTrustSettingsResultTrustRoot</a>
+			const <a href="#name-SecTrustSettingsResultUnspecified">SecTrustSettingsResultUnspecified</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-CFArrayGetCount">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-101">CFArrayGetCount</a>(array <a href="#name-CFRef">CFRef</a>) <a href="../../../builtin.html#name-int">int</a></div>
+<div class="anchor" id="name-CFArrayGetValueAtIndex">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-110">CFArrayGetValueAtIndex</a>(array <a href="#name-CFRef">CFRef</a>, index <a href="../../../builtin.html#name-int">int</a>) <a href="#name-CFRef">CFRef</a></div>
+<div class="anchor" id="name-CFDataGetBytePtr">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-92">CFDataGetBytePtr</a>(data <a href="#name-CFRef">CFRef</a>) <a href="../../../builtin.html#name-uintptr">uintptr</a></div>
+<div class="anchor" id="name-CFDataGetLength">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-83">CFDataGetLength</a>(data <a href="#name-CFRef">CFRef</a>) <a href="../../../builtin.html#name-int">int</a></div>
+<div class="anchor" id="name-CFDataToSlice">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-24">CFDataToSlice</a>(data <a href="#name-CFRef">CFRef</a>) []<a href="../../../builtin.html#name-byte">byte</a>
+		CFDataToSlice returns a copy of the contents of data as a bytes slice.</div>
+<div class="anchor" id="name-CFDictionaryGetValueIfPresent">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-54">CFDictionaryGetValueIfPresent</a>(dict <a href="#name-CFRef">CFRef</a>, key <a href="#name-CFString">CFString</a>) (value <a href="#name-CFRef">CFRef</a>, ok <a href="../../../builtin.html#name-bool">bool</a>)</div>
+<div class="anchor" id="name-CFEqual">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-119">CFEqual</a>(a, b <a href="#name-CFRef">CFRef</a>) <a href="../../../builtin.html#name-bool">bool</a></div>
+<div class="anchor" id="name-CFNumberGetValue">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-69">CFNumberGetValue</a>(num <a href="#name-CFRef">CFRef</a>) (<a href="../../../builtin.html#name-int32">int32</a>, <a href="../../../builtin.html#name-error">error</a>)</div>
+<div class="anchor" id="name-CFRelease">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-128">CFRelease</a>(ref <a href="#name-CFRef">CFRef</a>)</div>
+<div class="anchor" id="name-ErrNoTrustSettings">	  var <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-58">ErrNoTrustSettings</a> <a href="../../../builtin.html#name-error">error</a></div>
+<div class="anchor" id="name-SecItemExport">	 func <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-82">SecItemExport</a>(cert <a href="#name-CFRef">CFRef</a>) (data <a href="#name-CFRef">CFRef</a>, err <a href="../../../builtin.html#name-error">error</a>)</div>
+<div class="anchor" id="name-SecPolicyAppleSSL">	  var <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-56">SecPolicyAppleSSL</a> <a href="#name-CFString">CFString</a> // defined by POLICYMACRO</div>
+<div class="anchor" id="name-SecPolicyCopyProperties">	 func <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-112">SecPolicyCopyProperties</a>(policy <a href="#name-CFRef">CFRef</a>) <a href="#name-CFRef">CFRef</a></div>
+<div class="anchor" id="name-SecPolicyOid">	  var <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-55">SecPolicyOid</a> <a href="#name-CFString">CFString</a></div>
+<div class="anchor" id="name-SecTrustSettingsCopyCertificates">	 func <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-65">SecTrustSettingsCopyCertificates</a>(domain <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a>) (certArray <a href="#name-CFRef">CFRef</a>, err <a href="../../../builtin.html#name-error">error</a>)</div>
+<div class="anchor" id="name-SecTrustSettingsCopyTrustSettings">	 func <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-97">SecTrustSettingsCopyTrustSettings</a>(cert <a href="#name-CFRef">CFRef</a>, domain <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a>) (trustSettings <a href="#name-CFRef">CFRef</a>, err <a href="../../../builtin.html#name-error">error</a>)</div>
+<div class="anchor" id="name-SecTrustSettingsDomainAdmin">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-31">SecTrustSettingsDomainAdmin</a> <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a> = 1</div>
+<div class="anchor" id="name-SecTrustSettingsDomainSystem">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-32">SecTrustSettingsDomainSystem</a> <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a> = 2</div>
+<div class="anchor" id="name-SecTrustSettingsDomainUser">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-30">SecTrustSettingsDomainUser</a> <a href="#name-SecTrustSettingsDomain">SecTrustSettingsDomain</a> = 0</div>
+<div class="anchor" id="name-SecTrustSettingsPolicy">	  var <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-53">SecTrustSettingsPolicy</a> <a href="#name-CFString">CFString</a></div>
+<div class="anchor" id="name-SecTrustSettingsPolicyString">	  var <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-54">SecTrustSettingsPolicyString</a> <a href="#name-CFString">CFString</a></div>
+<div class="anchor" id="name-SecTrustSettingsResultDeny">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-23">SecTrustSettingsResultDeny</a> <a href="#name-SecTrustSettingsResult">SecTrustSettingsResult</a> = 3</div>
+<div class="anchor" id="name-SecTrustSettingsResultInvalid">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-20">SecTrustSettingsResultInvalid</a> <a href="#name-SecTrustSettingsResult">SecTrustSettingsResult</a> = 0</div>
+<div class="anchor" id="name-SecTrustSettingsResultKey">	  var <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-52">SecTrustSettingsResultKey</a> <a href="#name-CFString">CFString</a></div>
+<div class="anchor" id="name-SecTrustSettingsResultTrustAsRoot">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-22">SecTrustSettingsResultTrustAsRoot</a> <a href="#name-SecTrustSettingsResult">SecTrustSettingsResult</a> = 2</div>
+<div class="anchor" id="name-SecTrustSettingsResultTrustRoot">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-21">SecTrustSettingsResultTrustRoot</a> <a href="#name-SecTrustSettingsResult">SecTrustSettingsResult</a> = 1</div>
+<div class="anchor" id="name-SecTrustSettingsResultUnspecified">	const <a href="../../../../src/crypto/x509/internal/macos/security.go.html#line-24">SecTrustSettingsResultUnspecified</a> <a href="#name-SecTrustSettingsResult">SecTrustSettingsResult</a> = 4</div>
+<div class="anchor" id="name-StringToCFString">	 func <a href="../../../../src/crypto/x509/internal/macos/corefoundation.go.html#line-42">StringToCFString</a>(s <a href="../../../builtin.html#name-string">string</a>) <a href="#name-CFString">CFString</a>
+		StringToCFString returns a copy of the UTF-8 contents of s as a new CFString.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

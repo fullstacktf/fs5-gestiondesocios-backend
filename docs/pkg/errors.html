@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: errors</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>errors</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-errors">errors</a><i> (on <a href="https://golang.org/pkg/errors/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/errors" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/errors.html">one package</a>, and imported by <a href="../dep/errors.html#imported-by">60 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../src/errors/errors.go.html#doc">d-&gt;</a> <a href="../src/errors/errors.go.html">errors.go</a>
+	    <a href="../src/errors/wrap.go.html">wrap.go</a>
+
+<span class="title">Exported Type Names</span>
+
+	(none)
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-As">	 func <a href="../src/errors/wrap.go.html#line-77">As</a>(err <a href="builtin.html#name-error">error</a>, target interface{}) <a href="builtin.html#name-bool">bool</a>
+		As finds the first error in err's chain that matches target, and if so, sets
+		target to that error value and returns true. Otherwise, it returns false.
+
+		The chain consists of err itself followed by the sequence of errors obtained by
+		repeatedly calling Unwrap.
+
+		An error matches target if the error's concrete value is assignable to the value
+		pointed to by target, or if the error has a method As(interface{}) bool such that
+		As(target) returns true. In the latter case, the As method is responsible for
+		setting target.
+
+		An error type might provide an As method so it can be treated as if it were a
+		different error type.
+
+		As panics if target is not a non-nil pointer to either a type that implements
+		error, or to any interface type.</div>
+<div class="anchor" id="name-Is">	 func <a href="../src/errors/wrap.go.html#line-39">Is</a>(err, target <a href="builtin.html#name-error">error</a>) <a href="builtin.html#name-bool">bool</a>
+		Is reports whether any error in err's chain matches target.
+
+		The chain consists of err itself followed by the sequence of errors obtained by
+		repeatedly calling Unwrap.
+
+		An error is considered to match a target if it is equal to that target or if
+		it implements a method Is(error) bool such that Is(target) returns true.
+
+		An error type might provide an Is method so it can be treated as equivalent
+		to an existing error. For example, if MyError defines
+
+			func (m MyError) Is(target error) bool { return target == os.ErrExist }
+
+		then Is(MyError{}, os.ErrExist) returns true. See syscall.Errno.Is for
+		an example in the standard library.</div>
+<div class="anchor" id="name-New">	 func <a href="../src/errors/errors.go.html#line-58">New</a>(text <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-error">error</a>
+		New returns an error that formats as the given text.
+		Each call to New returns a distinct error value even if the text is identical.</div>
+<div class="anchor" id="name-Unwrap">	 func <a href="../src/errors/wrap.go.html#line-14">Unwrap</a>(err <a href="builtin.html#name-error">error</a>) <a href="builtin.html#name-error">error</a>
+		Unwrap returns the result of calling the Unwrap method on err, if err's
+		type contains an Unwrap method returning error.
+		Otherwise, Unwrap returns nil.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

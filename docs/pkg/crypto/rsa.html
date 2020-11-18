@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/rsa</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>rsa</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/rsa">crypto/rsa</a><i> (on <a href="https://golang.org/pkg/crypto/rsa/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/rsa" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/rsa.html">10 packages</a>, and imported by <a href="../../dep/crypto/rsa.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/crypto/rsa/pkcs1v15.go.html">pkcs1v15.go</a>
+	    <a href="../../src/crypto/rsa/pss.go.html">pss.go</a>
+	<a href="../../src/crypto/rsa/rsa.go.html#doc">d-&gt;</a> <a href="../../src/crypto/rsa/rsa.go.html">rsa.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-CRTValue" data-popularity="0">	 type <a href="../../src/crypto/rsa/rsa.go.html#line-195">CRTValue</a> <i>(struct)</i>
+		CRTValue contains the precomputed Chinese remainder theorem values.
+
+		<input type='checkbox' class="stat" id="CRTValue-stat-fields"><label for="CRTValue-stat-fields">Exported Fields (3)</label><span id='CRTValue-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/rsa/rsa.go.html#line-197">Coeff</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-196">Exp</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-198">R</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span></div>
+<div class="anchor" id="name-OAEPOptions" data-popularity="0">	 type <a href="../../src/crypto/rsa/rsa.go.html#line-67">OAEPOptions</a> <i>(struct)</i>
+		OAEPOptions is an interface for passing options to OAEP decryption using the
+		crypto.Decrypter interface.
+
+		<input type='checkbox' class="stat" id="OAEPOptions-stat-fields"><label for="OAEPOptions-stat-fields">Exported Fields (2)</label><span id='OAEPOptions-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/rsa/rsa.go.html#line-69">Hash</a> <i><a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-72">Label</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i></span></div>
+<div class="anchor" id="name-PKCS1v15DecryptOptions" data-popularity="0">	 type <a href="../../src/crypto/rsa/pkcs1v15.go.html#line-21">PKCS1v15DecryptOptions</a> <i>(struct)</i>
+		PKCS1v15DecrypterOpts is for passing options to PKCS #1 v1.5 decryption using
+		the crypto.Decrypter interface.
+
+		<input type='checkbox' class="stat" id="PKCS1v15DecryptOptions-stat-fields"><label for="PKCS1v15DecryptOptions-stat-fields">One Exported Field</label><span id='PKCS1v15DecryptOptions-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/rsa/pkcs1v15.go.html#line-26">SessionKeyLen</a> <i><a href="../builtin.html#name-int">int</a></i></span></div>
+<div class="anchor" id="name-PrecomputedValues" data-popularity="0">	 type <a href="../../src/crypto/rsa/rsa.go.html#line-183">PrecomputedValues</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="PrecomputedValues-stat-fields"><label for="PrecomputedValues-stat-fields">Exported Fields (4)</label><span id='PrecomputedValues-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/rsa/rsa.go.html#line-191">CRTValues</a> <i>[]<a href="#name-CRTValue">CRTValue</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-184">Dp</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-184">Dq</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-185">Qinv</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span></div>
+<div class="anchor" id="name-PrivateKey" data-popularity="885">	 type <a href="../../src/crypto/rsa/rsa.go.html#line-100">PrivateKey</a> <i>(struct)</i>
+		A PrivateKey represents an RSA key
+
+		<input type='checkbox' class="stat" id="PrivateKey-stat-fields"><label for="PrivateKey-stat-fields">Exported Fields (6)</label><span id='PrivateKey-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/rsa/rsa.go.html#line-102">D</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-107">Precomputed</a> <i><a href="#name-PrecomputedValues">PrecomputedValues</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-103">Primes</a> <i>[]*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-101">PublicKey</a> <i><a href="#name-PublicKey">PublicKey</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-101" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/rsa/rsa.go.html#line-44">E</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-101" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/rsa/rsa.go.html#line-43">N</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-methods"><label for="PrivateKey-stat-methods">Exported Methods (7)</label><span id='PrivateKey-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-155">Decrypt</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, ciphertext []<a href="../builtin.html#name-byte">byte</a>, opts <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-DecrypterOpts">DecrypterOpts</a>) (plaintext []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-117">Equal</a>(x <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PrivateKey">PrivateKey</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-458">Precompute</a>()
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-111">Public</a>() <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PublicKey">PublicKey</a>
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-144">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, digest []<a href="../builtin.html#name-byte">byte</a>, opts <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-SignerOpts">SignerOpts</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-52">Size</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-203">Validate</a>() <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-impls"><label for="PrivateKey-stat-impls">Implements (2+)</label><span id='PrivateKey-stat-impls-content' class="stat-content">
+			*T : crypto.<a href="../crypto.html#name-Decrypter">Decrypter</a>
+			*T : crypto.<a href="../crypto.html#name-Signer">Signer</a></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-results"><label for="PrivateKey-stat-results">As Outputs Of (3+)</label><span id='PrivateKey-stat-results-content' class="stat-content">
+			func <a href="#name-GenerateKey">GenerateKey</a>(random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, bits <a href="../builtin.html#name-int">int</a>) (*<b>PrivateKey</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-GenerateMultiPrimeKey">GenerateMultiPrimeKey</a>(random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, nprimes <a href="../builtin.html#name-int">int</a>, bits <a href="../builtin.html#name-int">int</a>) (*<b>PrivateKey</b>, <a href="../builtin.html#name-error">error</a>)
+			func crypto/x509.<a href="x509.html#name-ParsePKCS1PrivateKey">ParsePKCS1PrivateKey</a>(der []<a href="../builtin.html#name-byte">byte</a>) (*<b>PrivateKey</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-params"><label for="PrivateKey-stat-params">As Inputs Of (6+)</label><span id='PrivateKey-stat-params-content' class="stat-content">
+			func <a href="#name-DecryptOAEP">DecryptOAEP</a>(hash <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>, random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, ciphertext []<a href="../builtin.html#name-byte">byte</a>, label []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-DecryptPKCS1v15">DecryptPKCS1v15</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, ciphertext []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-DecryptPKCS1v15SessionKey">DecryptPKCS1v15SessionKey</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, ciphertext []<a href="../builtin.html#name-byte">byte</a>, key []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-SignPKCS1v15">SignPKCS1v15</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, hashed []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-SignPSS">SignPSS</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, digest []<a href="../builtin.html#name-byte">byte</a>, opts *<a href="#name-PSSOptions">PSSOptions</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func crypto/x509.<a href="x509.html#name-MarshalPKCS1PrivateKey">MarshalPKCS1PrivateKey</a>(key *<b>PrivateKey</b>) []<a href="../builtin.html#name-byte">byte</a></span></div>
+<div class="anchor" id="name-PSSOptions" data-popularity="170">	 type <a href="../../src/crypto/rsa/pss.go.html#line-235">PSSOptions</a> <i>(struct)</i>
+		PSSOptions contains options for creating and verifying PSS signatures.
+
+		<input type='checkbox' class="stat" id="PSSOptions-stat-fields"><label for="PSSOptions-stat-fields">Exported Fields (2)</label><span id='PSSOptions-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/rsa/pss.go.html#line-244">Hash</a> <i><a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a></i>
+			<a href="../../src/crypto/rsa/pss.go.html#line-239">SaltLength</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="PSSOptions-stat-methods"><label for="PSSOptions-stat-methods">One Exported Method</label><span id='PSSOptions-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/rsa/pss.go.html#line-248">HashFunc</a>() <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a></span>
+		<input type='checkbox' class="stat" id="PSSOptions-stat-impls"><label for="PSSOptions-stat-impls">Implements (1+)</label><span id='PSSOptions-stat-impls-content' class="stat-content">
+			*T : crypto.<a href="../crypto.html#name-SignerOpts">SignerOpts</a></span>
+		<input type='checkbox' class="stat" id="PSSOptions-stat-params"><label for="PSSOptions-stat-params">As Inputs Of (2+)</label><span id='PSSOptions-stat-params-content' class="stat-content">
+			func <a href="#name-SignPSS">SignPSS</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, digest []<a href="../builtin.html#name-byte">byte</a>, opts *<b>PSSOptions</b>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-VerifyPSS">VerifyPSS</a>(pub *<a href="#name-PublicKey">PublicKey</a>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, digest []<a href="../builtin.html#name-byte">byte</a>, sig []<a href="../builtin.html#name-byte">byte</a>, opts *<b>PSSOptions</b>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-PublicKey" data-popularity="385">	 type <a href="../../src/crypto/rsa/rsa.go.html#line-42">PublicKey</a> <i>(struct)</i>
+		A PublicKey represents the public part of an RSA key.
+
+		<input type='checkbox' class="stat" id="PublicKey-stat-fields"><label for="PublicKey-stat-fields">Exported Fields (2)</label><span id='PublicKey-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/rsa/rsa.go.html#line-44">E</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/crypto/rsa/rsa.go.html#line-43">N</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-methods"><label for="PublicKey-stat-methods">Exported Methods (2)</label><span id='PublicKey-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-57">Equal</a>(x <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PublicKey">PublicKey</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/crypto/rsa/rsa.go.html#line-52">Size</a>() <a href="../builtin.html#name-int">int</a></span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-results"><label for="PublicKey-stat-results">As Outputs Of (1+)</label><span id='PublicKey-stat-results-content' class="stat-content">
+			func crypto/x509.<a href="x509.html#name-ParsePKCS1PublicKey">ParsePKCS1PublicKey</a>(der []<a href="../builtin.html#name-byte">byte</a>) (*<b>PublicKey</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-params"><label for="PublicKey-stat-params">As Inputs Of (6+)</label><span id='PublicKey-stat-params-content' class="stat-content">
+			func <a href="#name-EncryptOAEP">EncryptOAEP</a>(hash <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>, random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, pub *<b>PublicKey</b>, msg []<a href="../builtin.html#name-byte">byte</a>, label []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-EncryptPKCS1v15">EncryptPKCS1v15</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, pub *<b>PublicKey</b>, msg []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-VerifyPKCS1v15">VerifyPKCS1v15</a>(pub *<b>PublicKey</b>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, hashed []<a href="../builtin.html#name-byte">byte</a>, sig []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-VerifyPSS">VerifyPSS</a>(pub *<b>PublicKey</b>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, digest []<a href="../builtin.html#name-byte">byte</a>, sig []<a href="../builtin.html#name-byte">byte</a>, opts *<a href="#name-PSSOptions">PSSOptions</a>) <a href="../builtin.html#name-error">error</a>
+			func crypto/x509.<a href="x509.html#name-MarshalPKCS1PublicKey">MarshalPKCS1PublicKey</a>(key *<b>PublicKey</b>) []<a href="../builtin.html#name-byte">byte</a>
+			func github.com/go-sql-driver/mysql.<a href="../github.com/go-sql-driver/mysql.html#name-RegisterServerPubKey">RegisterServerPubKey</a>(name <a href="../builtin.html#name-string">string</a>, pubKey *<b>PublicKey</b>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-DecryptOAEP">	 func <a href="../../src/crypto/rsa/rsa.go.html#line-596">DecryptOAEP</a>(hash <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>, random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, ciphertext []<a href="../builtin.html#name-byte">byte</a>, label []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		DecryptOAEP decrypts ciphertext using RSA-OAEP.
+
+		OAEP is parameterised by a hash function that is used as a random oracle.
+		Encryption and decryption of a given message must use the same hash function
+		and sha256.New() is a reasonable choice.
+
+		The random parameter, if not nil, is used to blind the private-key operation
+		and avoid timing side-channel attacks. Blinding is purely internal to this
+		function – the random data need not match that used when encrypting.
+
+		The label parameter must match the value given when encrypting. See
+		EncryptOAEP for details.</div>
+<div class="anchor" id="name-DecryptPKCS1v15">	 func <a href="../../src/crypto/rsa/pkcs1v15.go.html#line-75">DecryptPKCS1v15</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, ciphertext []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		DecryptPKCS1v15 decrypts a plaintext using RSA and the padding scheme from PKCS #1 v1.5.
+		If rand != nil, it uses RSA blinding to avoid timing side-channel attacks.
+
+		Note that whether this function returns an error or not discloses secret
+		information. If an attacker can cause this function to run repeatedly and
+		learn whether each instance returned an error then they can decrypt and
+		forge signatures as if they had the private key. See
+		DecryptPKCS1v15SessionKey for a way of solving this problem.</div>
+<div class="anchor" id="name-DecryptPKCS1v15SessionKey">	 func <a href="../../src/crypto/rsa/pkcs1v15.go.html#line-108">DecryptPKCS1v15SessionKey</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, ciphertext []<a href="../builtin.html#name-byte">byte</a>, key []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+		DecryptPKCS1v15SessionKey decrypts a session key using RSA and the padding scheme from PKCS #1 v1.5.
+		If rand != nil, it uses RSA blinding to avoid timing side-channel attacks.
+		It returns an error if the ciphertext is the wrong length or if the
+		ciphertext is greater than the public modulus. Otherwise, no error is
+		returned. If the padding is valid, the resulting plaintext message is copied
+		into key. Otherwise, key is unchanged. These alternatives occur in constant
+		time. It is intended that the user of this function generate a random
+		session key beforehand and continue the protocol with the resulting value.
+		This will remove any possibility that an attacker can learn any information
+		about the plaintext.
+		See ``Chosen Ciphertext Attacks Against Protocols Based on the RSA
+		Encryption Standard PKCS #1'', Daniel Bleichenbacher, Advances in Cryptology
+		(Crypto '98).
+
+		Note that if the session key is too small then it may be possible for an
+		attacker to brute-force it. If they can do that then they can learn whether
+		a random value was used (because it'll be different for the same ciphertext)
+		and thus whether the padding was correct. This defeats the point of this
+		function. Using at least a 16-byte key will protect against this attack.</div>
+<div class="anchor" id="name-EncryptOAEP">	 func <a href="../../src/crypto/rsa/rsa.go.html#line-410">EncryptOAEP</a>(hash <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>, random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, pub *<a href="#name-PublicKey">PublicKey</a>, msg []<a href="../builtin.html#name-byte">byte</a>, label []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		EncryptOAEP encrypts the given message with RSA-OAEP.
+
+		OAEP is parameterised by a hash function that is used as a random oracle.
+		Encryption and decryption of a given message must use the same hash function
+		and sha256.New() is a reasonable choice.
+
+		The random parameter is used as a source of entropy to ensure that
+		encrypting the same message twice doesn't result in the same ciphertext.
+
+		The label parameter may contain arbitrary data that will not be encrypted,
+		but which gives important context to the message. For example, if a given
+		public key is used to decrypt two types of messages then distinct label
+		values could be used to ensure that a ciphertext for one purpose cannot be
+		used for another by an attacker. If not required it can be empty.
+
+		The message must be no longer than the length of the public modulus minus
+		twice the hash length, minus a further 2.</div>
+<div class="anchor" id="name-EncryptPKCS1v15">	 func <a href="../../src/crypto/rsa/pkcs1v15.go.html#line-39">EncryptPKCS1v15</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, pub *<a href="#name-PublicKey">PublicKey</a>, msg []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		EncryptPKCS1v15 encrypts the given message with RSA and the padding
+		scheme from PKCS #1 v1.5.  The message must be no longer than the
+		length of the public modulus minus 11 bytes.
+
+		The rand parameter is used as a source of entropy to ensure that
+		encrypting the same message twice doesn't result in the same
+		ciphertext.
+
+		WARNING: use of this function to encrypt plaintexts other than
+		session keys is dangerous. Use RSA OAEP in new protocols.</div>
+<div class="anchor" id="name-ErrDecryption">	  var <a href="../../src/crypto/rsa/rsa.go.html#line-450">ErrDecryption</a> <a href="../builtin.html#name-error">error</a>
+		ErrDecryption represents a failure to decrypt a message.
+		It is deliberately vague to avoid adaptive attacks.</div>
+<div class="anchor" id="name-ErrMessageTooLong">	  var <a href="../../src/crypto/rsa/rsa.go.html#line-385">ErrMessageTooLong</a> <a href="../builtin.html#name-error">error</a>
+		ErrMessageTooLong is returned when attempting to encrypt a message which is
+		too large for the size of the public key.</div>
+<div class="anchor" id="name-ErrVerification">	  var <a href="../../src/crypto/rsa/rsa.go.html#line-454">ErrVerification</a> <a href="../builtin.html#name-error">error</a>
+		ErrVerification represents a failure to verify a signature.
+		It is deliberately vague to avoid adaptive attacks.</div>
+<div class="anchor" id="name-GenerateKey">	 func <a href="../../src/crypto/rsa/rsa.go.html#line-241">GenerateKey</a>(random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, bits <a href="../builtin.html#name-int">int</a>) (*<a href="#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)
+		GenerateKey generates an RSA keypair of the given bit size using the
+		random source random (for example, crypto/rand.Reader).</div>
+<div class="anchor" id="name-GenerateMultiPrimeKey">	 func <a href="../../src/crypto/rsa/rsa.go.html#line-256">GenerateMultiPrimeKey</a>(random <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, nprimes <a href="../builtin.html#name-int">int</a>, bits <a href="../builtin.html#name-int">int</a>) (*<a href="#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)
+		GenerateMultiPrimeKey generates a multi-prime RSA keypair of the given bit
+		size and the given random source, as suggested in [1]. Although the public
+		keys are compatible (actually, indistinguishable) from the 2-prime case,
+		the private keys are not. Thus it may not be possible to export multi-prime
+		private keys in certain formats or to subsequently import them into other
+		code.
+
+		Table 1 in [2] suggests maximum numbers of primes for a given size.
+
+		[1] US patent 4405829 (1972, expired)
+		[2] http://www.cacr.math.uwaterloo.ca/techreports/2006/cacr2006-16.pdf</div>
+<div class="anchor" id="name-PSSSaltLengthAuto">	const <a href="../../src/crypto/rsa/pss.go.html#line-228">PSSSaltLengthAuto</a> = 0
+		PSSSaltLengthAuto causes the salt in a PSS signature to be as large
+		as possible when signing, and to be auto-detected when verifying.</div>
+<div class="anchor" id="name-PSSSaltLengthEqualsHash">	const <a href="../../src/crypto/rsa/pss.go.html#line-231">PSSSaltLengthEqualsHash</a> = -1
+		PSSSaltLengthEqualsHash causes the salt length to equal the length
+		of the hash used in the signature.</div>
+<div class="anchor" id="name-SignPKCS1v15">	 func <a href="../../src/crypto/rsa/pkcs1v15.go.html#line-231">SignPKCS1v15</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, hashed []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		SignPKCS1v15 calculates the signature of hashed using
+		RSASSA-PKCS1-V1_5-SIGN from RSA PKCS #1 v1.5.  Note that hashed must
+		be the result of hashing the input message using the given hash
+		function. If hash is zero, hashed is signed directly. This isn't
+		advisable except for interoperability.
+
+		If rand is not nil then RSA blinding will be used to avoid timing
+		side-channel attacks.
+
+		This function is deterministic. Thus, if the set of possible
+		messages is small, an attacker may be able to build a map from
+		messages to signatures and identify the signed messages. As ever,
+		signatures provide authenticity, not confidentiality.</div>
+<div class="anchor" id="name-SignPSS">	 func <a href="../../src/crypto/rsa/pss.go.html#line-264">SignPSS</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, digest []<a href="../builtin.html#name-byte">byte</a>, opts *<a href="#name-PSSOptions">PSSOptions</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		SignPSS calculates the signature of digest using PSS.
+
+		digest must be the result of hashing the input message using the given hash
+		function. The opts argument may be nil, in which case sensible defaults are
+		used. If opts.Hash is set, it overrides hash.</div>
+<div class="anchor" id="name-VerifyPKCS1v15">	 func <a href="../../src/crypto/rsa/pkcs1v15.go.html#line-266">VerifyPKCS1v15</a>(pub *<a href="#name-PublicKey">PublicKey</a>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, hashed []<a href="../builtin.html#name-byte">byte</a>, sig []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+		VerifyPKCS1v15 verifies an RSA PKCS #1 v1.5 signature.
+		hashed is the result of hashing the input message using the given hash
+		function and sig is the signature. A valid signature is indicated by
+		returning a nil error. If hash is zero then hashed is used directly. This
+		isn't advisable except for interoperability.</div>
+<div class="anchor" id="name-VerifyPSS">	 func <a href="../../src/crypto/rsa/pss.go.html#line-290">VerifyPSS</a>(pub *<a href="#name-PublicKey">PublicKey</a>, hash <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Hash">Hash</a>, digest []<a href="../builtin.html#name-byte">byte</a>, sig []<a href="../builtin.html#name-byte">byte</a>, opts *<a href="#name-PSSOptions">PSSOptions</a>) <a href="../builtin.html#name-error">error</a>
+		VerifyPSS verifies a PSS signature.
+
+		A valid signature is indicated by returning a nil error. digest must be the
+		result of hashing the input message using the given hash function. The opts
+		argument may be nil, in which case sensible defaults are used. opts.Hash is
+		ignored.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

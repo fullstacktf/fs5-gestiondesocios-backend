@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: util.go in package crypto/rand</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	util.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/rand.html">crypto/rand</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package rand</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"errors"</code></span>
+<span class="codeline" id="line-9"><code>	"io"</code></span>
+<span class="codeline" id="line-10"><code>	"math/big"</code></span>
+<span class="codeline" id="line-11"><code>)</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>// smallPrimes is a list of small, prime numbers that allows us to rapidly</code></span>
+<span class="codeline" id="line-14"><code>// exclude some fraction of composite candidates when searching for a random</code></span>
+<span class="codeline" id="line-15"><code>// prime. This list is truncated at the point where smallPrimesProduct exceeds</code></span>
+<span class="codeline" id="line-16"><code>// a uint64. It does not include two because we ensure that the candidates are</code></span>
+<span class="codeline" id="line-17"><code>// odd by construction.</code></span>
+<span class="codeline" id="line-18"><code>var smallPrimes = []uint8{</code></span>
+<span class="codeline" id="line-19"><code>	3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53,</code></span>
+<span class="codeline" id="line-20"><code>}</code></span>
+<span class="codeline" id="line-21"><code></code></span>
+<span class="codeline" id="line-22"><code>// smallPrimesProduct is the product of the values in smallPrimes and allows us</code></span>
+<span class="codeline" id="line-23"><code>// to reduce a candidate prime by this number and then determine whether it's</code></span>
+<span class="codeline" id="line-24"><code>// coprime to all the elements of smallPrimes without further big.Int</code></span>
+<span class="codeline" id="line-25"><code>// operations.</code></span>
+<span class="codeline" id="line-26"><code>var smallPrimesProduct = new(big.Int).SetUint64(16294579238595022365)</code></span>
+<span class="codeline" id="line-27"><code></code></span>
+<span class="codeline" id="line-28"><code>// Prime returns a number, p, of the given size, such that p is prime</code></span>
+<span class="codeline" id="line-29"><code>// with high probability.</code></span>
+<span class="codeline" id="line-30"><code>// Prime will return error for any error returned by rand.Read or if bits &lt; 2.</code></span>
+<span class="codeline" id="line-31"><code>func Prime(rand io.Reader, bits int) (p *big.Int, err error) {</code></span>
+<span class="codeline" id="line-32"><code>	if bits &lt; 2 {</code></span>
+<span class="codeline" id="line-33"><code>		err = errors.New("crypto/rand: prime size must be at least 2-bit")</code></span>
+<span class="codeline" id="line-34"><code>		return</code></span>
+<span class="codeline" id="line-35"><code>	}</code></span>
+<span class="codeline" id="line-36"><code></code></span>
+<span class="codeline" id="line-37"><code>	b := uint(bits % 8)</code></span>
+<span class="codeline" id="line-38"><code>	if b == 0 {</code></span>
+<span class="codeline" id="line-39"><code>		b = 8</code></span>
+<span class="codeline" id="line-40"><code>	}</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>	bytes := make([]byte, (bits+7)/8)</code></span>
+<span class="codeline" id="line-43"><code>	p = new(big.Int)</code></span>
+<span class="codeline" id="line-44"><code></code></span>
+<span class="codeline" id="line-45"><code>	bigMod := new(big.Int)</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>	for {</code></span>
+<span class="codeline" id="line-48"><code>		_, err = io.ReadFull(rand, bytes)</code></span>
+<span class="codeline" id="line-49"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-50"><code>			return nil, err</code></span>
+<span class="codeline" id="line-51"><code>		}</code></span>
+<span class="codeline" id="line-52"><code></code></span>
+<span class="codeline" id="line-53"><code>		// Clear bits in the first byte to make sure the candidate has a size &lt;= bits.</code></span>
+<span class="codeline" id="line-54"><code>		bytes[0] &amp;= uint8(int(1&lt;&lt;b) - 1)</code></span>
+<span class="codeline" id="line-55"><code>		// Don't let the value be too small, i.e, set the most significant two bits.</code></span>
+<span class="codeline" id="line-56"><code>		// Setting the top two bits, rather than just the top bit,</code></span>
+<span class="codeline" id="line-57"><code>		// means that when two of these values are multiplied together,</code></span>
+<span class="codeline" id="line-58"><code>		// the result isn't ever one bit short.</code></span>
+<span class="codeline" id="line-59"><code>		if b &gt;= 2 {</code></span>
+<span class="codeline" id="line-60"><code>			bytes[0] |= 3 &lt;&lt; (b - 2)</code></span>
+<span class="codeline" id="line-61"><code>		} else {</code></span>
+<span class="codeline" id="line-62"><code>			// Here b==1, because b cannot be zero.</code></span>
+<span class="codeline" id="line-63"><code>			bytes[0] |= 1</code></span>
+<span class="codeline" id="line-64"><code>			if len(bytes) &gt; 1 {</code></span>
+<span class="codeline" id="line-65"><code>				bytes[1] |= 0x80</code></span>
+<span class="codeline" id="line-66"><code>			}</code></span>
+<span class="codeline" id="line-67"><code>		}</code></span>
+<span class="codeline" id="line-68"><code>		// Make the value odd since an even number this large certainly isn't prime.</code></span>
+<span class="codeline" id="line-69"><code>		bytes[len(bytes)-1] |= 1</code></span>
+<span class="codeline" id="line-70"><code></code></span>
+<span class="codeline" id="line-71"><code>		p.SetBytes(bytes)</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>		// Calculate the value mod the product of smallPrimes. If it's</code></span>
+<span class="codeline" id="line-74"><code>		// a multiple of any of these primes we add two until it isn't.</code></span>
+<span class="codeline" id="line-75"><code>		// The probability of overflowing is minimal and can be ignored</code></span>
+<span class="codeline" id="line-76"><code>		// because we still perform Miller-Rabin tests on the result.</code></span>
+<span class="codeline" id="line-77"><code>		bigMod.Mod(p, smallPrimesProduct)</code></span>
+<span class="codeline" id="line-78"><code>		mod := bigMod.Uint64()</code></span>
+<span class="codeline" id="line-79"><code></code></span>
+<span class="codeline" id="line-80"><code>	NextDelta:</code></span>
+<span class="codeline" id="line-81"><code>		for delta := uint64(0); delta &lt; 1&lt;&lt;20; delta += 2 {</code></span>
+<span class="codeline" id="line-82"><code>			m := mod + delta</code></span>
+<span class="codeline" id="line-83"><code>			for _, prime := range smallPrimes {</code></span>
+<span class="codeline" id="line-84"><code>				if m%uint64(prime) == 0 &amp;&amp; (bits &gt; 6 || m != uint64(prime)) {</code></span>
+<span class="codeline" id="line-85"><code>					continue NextDelta</code></span>
+<span class="codeline" id="line-86"><code>				}</code></span>
+<span class="codeline" id="line-87"><code>			}</code></span>
+<span class="codeline" id="line-88"><code></code></span>
+<span class="codeline" id="line-89"><code>			if delta &gt; 0 {</code></span>
+<span class="codeline" id="line-90"><code>				bigMod.SetUint64(delta)</code></span>
+<span class="codeline" id="line-91"><code>				p.Add(p, bigMod)</code></span>
+<span class="codeline" id="line-92"><code>			}</code></span>
+<span class="codeline" id="line-93"><code>			break</code></span>
+<span class="codeline" id="line-94"><code>		}</code></span>
+<span class="codeline" id="line-95"><code></code></span>
+<span class="codeline" id="line-96"><code>		// There is a tiny possibility that, by adding delta, we caused</code></span>
+<span class="codeline" id="line-97"><code>		// the number to be one bit too long. Thus we check BitLen</code></span>
+<span class="codeline" id="line-98"><code>		// here.</code></span>
+<span class="codeline" id="line-99"><code>		if p.ProbablyPrime(20) &amp;&amp; p.BitLen() == bits {</code></span>
+<span class="codeline" id="line-100"><code>			return</code></span>
+<span class="codeline" id="line-101"><code>		}</code></span>
+<span class="codeline" id="line-102"><code>	}</code></span>
+<span class="codeline" id="line-103"><code>}</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>// Int returns a uniform random value in [0, max). It panics if max &lt;= 0.</code></span>
+<span class="codeline" id="line-106"><code>func Int(rand io.Reader, max *big.Int) (n *big.Int, err error) {</code></span>
+<span class="codeline" id="line-107"><code>	if max.Sign() &lt;= 0 {</code></span>
+<span class="codeline" id="line-108"><code>		panic("crypto/rand: argument to Int is &lt;= 0")</code></span>
+<span class="codeline" id="line-109"><code>	}</code></span>
+<span class="codeline" id="line-110"><code>	n = new(big.Int)</code></span>
+<span class="codeline" id="line-111"><code>	n.Sub(max, n.SetUint64(1))</code></span>
+<span class="codeline" id="line-112"><code>	// bitLen is the maximum bit length needed to encode a value &lt; max.</code></span>
+<span class="codeline" id="line-113"><code>	bitLen := n.BitLen()</code></span>
+<span class="codeline" id="line-114"><code>	if bitLen == 0 {</code></span>
+<span class="codeline" id="line-115"><code>		// the only valid result is 0</code></span>
+<span class="codeline" id="line-116"><code>		return</code></span>
+<span class="codeline" id="line-117"><code>	}</code></span>
+<span class="codeline" id="line-118"><code>	// k is the maximum byte length needed to encode a value &lt; max.</code></span>
+<span class="codeline" id="line-119"><code>	k := (bitLen + 7) / 8</code></span>
+<span class="codeline" id="line-120"><code>	// b is the number of bits in the most significant byte of max-1.</code></span>
+<span class="codeline" id="line-121"><code>	b := uint(bitLen % 8)</code></span>
+<span class="codeline" id="line-122"><code>	if b == 0 {</code></span>
+<span class="codeline" id="line-123"><code>		b = 8</code></span>
+<span class="codeline" id="line-124"><code>	}</code></span>
+<span class="codeline" id="line-125"><code></code></span>
+<span class="codeline" id="line-126"><code>	bytes := make([]byte, k)</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>	for {</code></span>
+<span class="codeline" id="line-129"><code>		_, err = io.ReadFull(rand, bytes)</code></span>
+<span class="codeline" id="line-130"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-131"><code>			return nil, err</code></span>
+<span class="codeline" id="line-132"><code>		}</code></span>
+<span class="codeline" id="line-133"><code></code></span>
+<span class="codeline" id="line-134"><code>		// Clear bits in the first byte to increase the probability</code></span>
+<span class="codeline" id="line-135"><code>		// that the candidate is &lt; max.</code></span>
+<span class="codeline" id="line-136"><code>		bytes[0] &amp;= uint8(int(1&lt;&lt;b) - 1)</code></span>
+<span class="codeline" id="line-137"><code></code></span>
+<span class="codeline" id="line-138"><code>		n.SetBytes(bytes)</code></span>
+<span class="codeline" id="line-139"><code>		if n.Cmp(max) &lt; 0 {</code></span>
+<span class="codeline" id="line-140"><code>			return</code></span>
+<span class="codeline" id="line-141"><code>		}</code></span>
+<span class="codeline" id="line-142"><code>	}</code></span>
+<span class="codeline" id="line-143"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

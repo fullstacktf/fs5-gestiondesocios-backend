@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: internal/singleflight</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>singleflight</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-internal/singleflight">internal/singleflight</a><i> (on <a href="https://golang.org/pkg/internal/singleflight/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/internal/singleflight" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/internal/singleflight.html">one package</a>, and imported by <a href="../../dep/internal/singleflight.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/internal/singleflight/singleflight.go.html#doc">d-&gt;</a> <a href="../../src/internal/singleflight/singleflight.go.html">singleflight.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Group" data-popularity="150">	 type <a href="../../src/internal/singleflight/singleflight.go.html#line-29">Group</a> <i>(struct)</i>
+		Group represents a class of work and forms a namespace in
+		which units of work can be executed with duplicate suppression.
+
+		<input type='checkbox' class="stat" id="Group-stat-methods"><label for="Group-stat-methods">Exported Methods (3)</label><span id='Group-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/internal/singleflight/singleflight.go.html#line-47">Do</a>(key <a href="../builtin.html#name-string">string</a>, fn func() (interface{}, <a href="../builtin.html#name-error">error</a>)) (v interface{}, err <a href="../builtin.html#name-error">error</a>, shared <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/internal/singleflight/singleflight.go.html#line-71">DoChan</a>(key <a href="../builtin.html#name-string">string</a>, fn func() (interface{}, <a href="../builtin.html#name-error">error</a>)) (&lt;-chan <a href="#name-Result">Result</a>, <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/internal/singleflight/singleflight.go.html#line-111">ForgetUnshared</a>(key <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-Result" data-popularity="75">	 type <a href="../../src/internal/singleflight/singleflight.go.html#line-36">Result</a> <i>(struct)</i>
+		Result holds the results of Do, so they can be passed
+		on a channel.
+
+		<input type='checkbox' class="stat" id="Result-stat-fields"><label for="Result-stat-fields">Exported Fields (3)</label><span id='Result-stat-fields-content' class="stat-content">
+			<a href="../../src/internal/singleflight/singleflight.go.html#line-38">Err</a> <i><a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/internal/singleflight/singleflight.go.html#line-39">Shared</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/internal/singleflight/singleflight.go.html#line-37">Val</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Result-stat-results"><label for="Result-stat-results">As Outputs Of (1+)</label><span id='Result-stat-results-content' class="stat-content">
+			func (*<a href="#name-Group">Group</a>).<a href="../../src/internal/singleflight/singleflight.go.html#line-71">DoChan</a>(key <a href="../builtin.html#name-string">string</a>, fn func() (interface{}, <a href="../builtin.html#name-error">error</a>)) (&lt;-chan <b>Result</b>, <a href="../builtin.html#name-bool">bool</a>)</span></div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/dsa</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>dsa</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/dsa">crypto/dsa</a><i> (on <a href="https://golang.org/pkg/crypto/dsa/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/dsa" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/dsa.html">4 packages</a>, and imported by <a href="../../dep/crypto/dsa.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/crypto/dsa/dsa.go.html#doc">d-&gt;</a> <a href="../../src/crypto/dsa/dsa.go.html">dsa.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Parameters" data-popularity="35">	 type <a href="../../src/crypto/dsa/dsa.go.html#line-20">Parameters</a> <i>(struct)</i>
+		Parameters represents the domain parameters for a key. These parameters can
+		be shared across many keys. The bit length of Q must be a multiple of 8.
+
+		<input type='checkbox' class="stat" id="Parameters-stat-fields"><label for="Parameters-stat-fields">Exported Fields (3)</label><span id='Parameters-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/dsa/dsa.go.html#line-21">G</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-21">P</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-21">Q</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="Parameters-stat-params"><label for="Parameters-stat-params">As Inputs Of (1+)</label><span id='Parameters-stat-params-content' class="stat-content">
+			func <a href="#name-GenerateParameters">GenerateParameters</a>(params *<b>Parameters</b>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, sizes <a href="#name-ParameterSizes">ParameterSizes</a>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-ParameterSizes" data-popularity="50">	 type <a href="../../src/crypto/dsa/dsa.go.html#line-44">ParameterSizes</a> <a href="../builtin.html#name-int">int</a>
+		ParameterSizes is an enumeration of the acceptable bit lengths of the primes
+		in a set of DSA parameters. See FIPS 186-3, section 4.2.
+
+		<input type='checkbox' class="stat" id="ParameterSizes-stat-params"><label for="ParameterSizes-stat-params">As Inputs Of (1+)</label><span id='ParameterSizes-stat-params-content' class="stat-content">
+			func <a href="#name-GenerateParameters">GenerateParameters</a>(params *<a href="#name-Parameters">Parameters</a>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, sizes <b>ParameterSizes</b>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="ParameterSizes-stat-values"><label for="ParameterSizes-stat-values">As Types Of (4+)</label><span id='ParameterSizes-stat-values-content' class="stat-content">
+			const <a href="#name-L1024N160">L1024N160</a>
+			const <a href="#name-L2048N224">L2048N224</a>
+			const <a href="#name-L2048N256">L2048N256</a>
+			const <a href="#name-L3072N256">L3072N256</a></span></div>
+<div class="anchor" id="name-PrivateKey" data-popularity="70">	 type <a href="../../src/crypto/dsa/dsa.go.html#line-31">PrivateKey</a> <i>(struct)</i>
+		PrivateKey represents a DSA private key.
+
+		<input type='checkbox' class="stat" id="PrivateKey-stat-fields"><label for="PrivateKey-stat-fields">Exported Fields (7)</label><span id='PrivateKey-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/dsa/dsa.go.html#line-32">PublicKey</a> <i><a href="#name-PublicKey">PublicKey</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-32" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-26">Parameters</a> <i><a href="#name-Parameters">Parameters</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-32" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-26" class="path-duplicate">Parameters</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-21">G</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-32" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-26" class="path-duplicate">Parameters</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-21">P</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-32" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-26" class="path-duplicate">Parameters</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-21">Q</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-32" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-27">Y</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-33">X</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-params"><label for="PrivateKey-stat-params">As Inputs Of (2+)</label><span id='PrivateKey-stat-params-content' class="stat-content">
+			func <a href="#name-GenerateKey">GenerateKey</a>(priv *<b>PrivateKey</b>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-Sign">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, hash []<a href="../builtin.html#name-byte">byte</a>) (r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-PublicKey" data-popularity="35">	 type <a href="../../src/crypto/dsa/dsa.go.html#line-25">PublicKey</a> <i>(struct)</i>
+		PublicKey represents a DSA public key.
+
+		<input type='checkbox' class="stat" id="PublicKey-stat-fields"><label for="PublicKey-stat-fields">Exported Fields (5)</label><span id='PublicKey-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/dsa/dsa.go.html#line-26">Parameters</a> <i><a href="#name-Parameters">Parameters</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-26" class="path-duplicate">Parameters</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-21">G</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-26" class="path-duplicate">Parameters</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-21">P</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-26" class="path-duplicate">Parameters</a>.<a href="../../src/crypto/dsa/dsa.go.html#line-21">Q</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/dsa/dsa.go.html#line-27">Y</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-params"><label for="PublicKey-stat-params">As Inputs Of (1+)</label><span id='PublicKey-stat-params-content' class="stat-content">
+			func <a href="#name-Verify">Verify</a>(pub *<b>PublicKey</b>, hash []<a href="../builtin.html#name-byte">byte</a>, r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ErrInvalidPublicKey">	  var <a href="../../src/crypto/dsa/dsa.go.html#line-40">ErrInvalidPublicKey</a> <a href="../builtin.html#name-error">error</a>
+		ErrInvalidPublicKey results when a public key is not usable by this code.
+		FIPS is quite strict about the format of DSA keys, but other code may be
+		less so. Thus, when using keys which may have been generated by other code,
+		this error must be handled.</div>
+<div class="anchor" id="name-GenerateKey">	 func <a href="../../src/crypto/dsa/dsa.go.html#line-153">GenerateKey</a>(priv *<a href="#name-PrivateKey">PrivateKey</a>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) <a href="../builtin.html#name-error">error</a>
+		GenerateKey generates a public&amp;private key pair. The Parameters of the
+		PrivateKey must already be valid (see GenerateParameters).</div>
+<div class="anchor" id="name-GenerateParameters">	 func <a href="../../src/crypto/dsa/dsa.go.html#line-59">GenerateParameters</a>(params *<a href="#name-Parameters">Parameters</a>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, sizes <a href="#name-ParameterSizes">ParameterSizes</a>) <a href="../builtin.html#name-error">error</a>
+		GenerateParameters puts a random, valid set of DSA parameters into params.
+		This function can take many seconds, even on fast machines.</div>
+<div class="anchor" id="name-L1024N160">	const <a href="../../src/crypto/dsa/dsa.go.html#line-47">L1024N160</a> <a href="#name-ParameterSizes">ParameterSizes</a> = 0</div>
+<div class="anchor" id="name-L2048N224">	const <a href="../../src/crypto/dsa/dsa.go.html#line-48">L2048N224</a> <a href="#name-ParameterSizes">ParameterSizes</a> = 1</div>
+<div class="anchor" id="name-L2048N256">	const <a href="../../src/crypto/dsa/dsa.go.html#line-49">L2048N256</a> <a href="#name-ParameterSizes">ParameterSizes</a> = 2</div>
+<div class="anchor" id="name-L3072N256">	const <a href="../../src/crypto/dsa/dsa.go.html#line-50">L3072N256</a> <a href="#name-ParameterSizes">ParameterSizes</a> = 3</div>
+<div class="anchor" id="name-Sign">	 func <a href="../../src/crypto/dsa/dsa.go.html#line-199">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>) (r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)
+		Sign signs an arbitrary length hash (which should be the result of hashing a
+		larger message) using the private key, priv. It returns the signature as a
+		pair of integers. The security of the private key depends on the entropy of
+		rand.
+
+		Note that FIPS 186-3 section 4.6 specifies that the hash should be truncated
+		to the byte-length of the subgroup. This function does not perform that
+		truncation itself.
+
+		Be aware that calling Sign with an attacker-controlled PrivateKey may
+		require an arbitrary amount of CPU.</div>
+<div class="anchor" id="name-Verify">	 func <a href="../../src/crypto/dsa/dsa.go.html#line-267">Verify</a>(pub *<a href="#name-PublicKey">PublicKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>, r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a>
+		Verify verifies the signature in r, s of hash using the public key, pub. It
+		reports whether the signature is valid.
+
+		Note that FIPS 186-3 section 4.6 specifies that the hash should be truncated
+		to the byte-length of the subgroup. This function does not perform that
+		truncation itself.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

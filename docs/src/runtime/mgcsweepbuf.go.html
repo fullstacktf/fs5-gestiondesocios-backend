@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: mgcsweepbuf.go in package runtime</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	mgcsweepbuf.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/runtime.html">runtime</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2016 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package runtime</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"internal/cpu"</code></span>
+<span class="codeline" id="line-9"><code>	"runtime/internal/atomic"</code></span>
+<span class="codeline" id="line-10"><code>	"runtime/internal/sys"</code></span>
+<span class="codeline" id="line-11"><code>	"unsafe"</code></span>
+<span class="codeline" id="line-12"><code>)</code></span>
+<span class="codeline" id="line-13"><code></code></span>
+<span class="codeline" id="line-14"><code>// A gcSweepBuf is a set of *mspans.</code></span>
+<span class="codeline" id="line-15"><code>//</code></span>
+<span class="codeline" id="line-16"><code>// gcSweepBuf is safe for concurrent push operations *or* concurrent</code></span>
+<span class="codeline" id="line-17"><code>// pop operations, but not both simultaneously.</code></span>
+<span class="codeline" id="line-18"><code>type gcSweepBuf struct {</code></span>
+<span class="codeline" id="line-19"><code>	// A gcSweepBuf is a two-level data structure consisting of a</code></span>
+<span class="codeline" id="line-20"><code>	// growable spine that points to fixed-sized blocks. The spine</code></span>
+<span class="codeline" id="line-21"><code>	// can be accessed without locks, but adding a block or</code></span>
+<span class="codeline" id="line-22"><code>	// growing it requires taking the spine lock.</code></span>
+<span class="codeline" id="line-23"><code>	//</code></span>
+<span class="codeline" id="line-24"><code>	// Because each mspan covers at least 8K of heap and takes at</code></span>
+<span class="codeline" id="line-25"><code>	// most 8 bytes in the gcSweepBuf, the growth of the spine is</code></span>
+<span class="codeline" id="line-26"><code>	// quite limited.</code></span>
+<span class="codeline" id="line-27"><code>	//</code></span>
+<span class="codeline" id="line-28"><code>	// The spine and all blocks are allocated off-heap, which</code></span>
+<span class="codeline" id="line-29"><code>	// allows this to be used in the memory manager and avoids the</code></span>
+<span class="codeline" id="line-30"><code>	// need for write barriers on all of these. We never release</code></span>
+<span class="codeline" id="line-31"><code>	// this memory because there could be concurrent lock-free</code></span>
+<span class="codeline" id="line-32"><code>	// access and we're likely to reuse it anyway. (In principle,</code></span>
+<span class="codeline" id="line-33"><code>	// we could do this during STW.)</code></span>
+<span class="codeline" id="line-34"><code></code></span>
+<span class="codeline" id="line-35"><code>	spineLock mutex</code></span>
+<span class="codeline" id="line-36"><code>	spine     unsafe.Pointer // *[N]*gcSweepBlock, accessed atomically</code></span>
+<span class="codeline" id="line-37"><code>	spineLen  uintptr        // Spine array length, accessed atomically</code></span>
+<span class="codeline" id="line-38"><code>	spineCap  uintptr        // Spine array cap, accessed under lock</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>	// index is the first unused slot in the logical concatenation</code></span>
+<span class="codeline" id="line-41"><code>	// of all blocks. It is accessed atomically.</code></span>
+<span class="codeline" id="line-42"><code>	index uint32</code></span>
+<span class="codeline" id="line-43"><code>}</code></span>
+<span class="codeline" id="line-44"><code></code></span>
+<span class="codeline" id="line-45"><code>const (</code></span>
+<span class="codeline" id="line-46"><code>	gcSweepBlockEntries    = 512 // 4KB on 64-bit</code></span>
+<span class="codeline" id="line-47"><code>	gcSweepBufInitSpineCap = 256 // Enough for 1GB heap on 64-bit</code></span>
+<span class="codeline" id="line-48"><code>)</code></span>
+<span class="codeline" id="line-49"><code></code></span>
+<span class="codeline" id="line-50"><code>type gcSweepBlock struct {</code></span>
+<span class="codeline" id="line-51"><code>	spans [gcSweepBlockEntries]*mspan</code></span>
+<span class="codeline" id="line-52"><code>}</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>// push adds span s to buffer b. push is safe to call concurrently</code></span>
+<span class="codeline" id="line-55"><code>// with other push operations, but NOT to call concurrently with pop.</code></span>
+<span class="codeline" id="line-56"><code>func (b *gcSweepBuf) push(s *mspan) {</code></span>
+<span class="codeline" id="line-57"><code>	// Obtain our slot.</code></span>
+<span class="codeline" id="line-58"><code>	cursor := uintptr(atomic.Xadd(&amp;b.index, +1) - 1)</code></span>
+<span class="codeline" id="line-59"><code>	top, bottom := cursor/gcSweepBlockEntries, cursor%gcSweepBlockEntries</code></span>
+<span class="codeline" id="line-60"><code></code></span>
+<span class="codeline" id="line-61"><code>	// Do we need to add a block?</code></span>
+<span class="codeline" id="line-62"><code>	spineLen := atomic.Loaduintptr(&amp;b.spineLen)</code></span>
+<span class="codeline" id="line-63"><code>	var block *gcSweepBlock</code></span>
+<span class="codeline" id="line-64"><code>retry:</code></span>
+<span class="codeline" id="line-65"><code>	if top &lt; spineLen {</code></span>
+<span class="codeline" id="line-66"><code>		spine := atomic.Loadp(unsafe.Pointer(&amp;b.spine))</code></span>
+<span class="codeline" id="line-67"><code>		blockp := add(spine, sys.PtrSize*top)</code></span>
+<span class="codeline" id="line-68"><code>		block = (*gcSweepBlock)(atomic.Loadp(blockp))</code></span>
+<span class="codeline" id="line-69"><code>	} else {</code></span>
+<span class="codeline" id="line-70"><code>		// Add a new block to the spine, potentially growing</code></span>
+<span class="codeline" id="line-71"><code>		// the spine.</code></span>
+<span class="codeline" id="line-72"><code>		lock(&amp;b.spineLock)</code></span>
+<span class="codeline" id="line-73"><code>		// spineLen cannot change until we release the lock,</code></span>
+<span class="codeline" id="line-74"><code>		// but may have changed while we were waiting.</code></span>
+<span class="codeline" id="line-75"><code>		spineLen = atomic.Loaduintptr(&amp;b.spineLen)</code></span>
+<span class="codeline" id="line-76"><code>		if top &lt; spineLen {</code></span>
+<span class="codeline" id="line-77"><code>			unlock(&amp;b.spineLock)</code></span>
+<span class="codeline" id="line-78"><code>			goto retry</code></span>
+<span class="codeline" id="line-79"><code>		}</code></span>
+<span class="codeline" id="line-80"><code></code></span>
+<span class="codeline" id="line-81"><code>		if spineLen == b.spineCap {</code></span>
+<span class="codeline" id="line-82"><code>			// Grow the spine.</code></span>
+<span class="codeline" id="line-83"><code>			newCap := b.spineCap * 2</code></span>
+<span class="codeline" id="line-84"><code>			if newCap == 0 {</code></span>
+<span class="codeline" id="line-85"><code>				newCap = gcSweepBufInitSpineCap</code></span>
+<span class="codeline" id="line-86"><code>			}</code></span>
+<span class="codeline" id="line-87"><code>			newSpine := persistentalloc(newCap*sys.PtrSize, cpu.CacheLineSize, &amp;memstats.gc_sys)</code></span>
+<span class="codeline" id="line-88"><code>			if b.spineCap != 0 {</code></span>
+<span class="codeline" id="line-89"><code>				// Blocks are allocated off-heap, so</code></span>
+<span class="codeline" id="line-90"><code>				// no write barriers.</code></span>
+<span class="codeline" id="line-91"><code>				memmove(newSpine, b.spine, b.spineCap*sys.PtrSize)</code></span>
+<span class="codeline" id="line-92"><code>			}</code></span>
+<span class="codeline" id="line-93"><code>			// Spine is allocated off-heap, so no write barrier.</code></span>
+<span class="codeline" id="line-94"><code>			atomic.StorepNoWB(unsafe.Pointer(&amp;b.spine), newSpine)</code></span>
+<span class="codeline" id="line-95"><code>			b.spineCap = newCap</code></span>
+<span class="codeline" id="line-96"><code>			// We can't immediately free the old spine</code></span>
+<span class="codeline" id="line-97"><code>			// since a concurrent push with a lower index</code></span>
+<span class="codeline" id="line-98"><code>			// could still be reading from it. We let it</code></span>
+<span class="codeline" id="line-99"><code>			// leak because even a 1TB heap would waste</code></span>
+<span class="codeline" id="line-100"><code>			// less than 2MB of memory on old spines. If</code></span>
+<span class="codeline" id="line-101"><code>			// this is a problem, we could free old spines</code></span>
+<span class="codeline" id="line-102"><code>			// during STW.</code></span>
+<span class="codeline" id="line-103"><code>		}</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>		// Allocate a new block and add it to the spine.</code></span>
+<span class="codeline" id="line-106"><code>		block = (*gcSweepBlock)(persistentalloc(unsafe.Sizeof(gcSweepBlock{}), cpu.CacheLineSize, &amp;memstats.gc_sys))</code></span>
+<span class="codeline" id="line-107"><code>		blockp := add(b.spine, sys.PtrSize*top)</code></span>
+<span class="codeline" id="line-108"><code>		// Blocks are allocated off-heap, so no write barrier.</code></span>
+<span class="codeline" id="line-109"><code>		atomic.StorepNoWB(blockp, unsafe.Pointer(block))</code></span>
+<span class="codeline" id="line-110"><code>		atomic.Storeuintptr(&amp;b.spineLen, spineLen+1)</code></span>
+<span class="codeline" id="line-111"><code>		unlock(&amp;b.spineLock)</code></span>
+<span class="codeline" id="line-112"><code>	}</code></span>
+<span class="codeline" id="line-113"><code></code></span>
+<span class="codeline" id="line-114"><code>	// We have a block. Insert the span atomically, since there may be</code></span>
+<span class="codeline" id="line-115"><code>	// concurrent readers via the block API.</code></span>
+<span class="codeline" id="line-116"><code>	atomic.StorepNoWB(unsafe.Pointer(&amp;block.spans[bottom]), unsafe.Pointer(s))</code></span>
+<span class="codeline" id="line-117"><code>}</code></span>
+<span class="codeline" id="line-118"><code></code></span>
+<span class="codeline" id="line-119"><code>// pop removes and returns a span from buffer b, or nil if b is empty.</code></span>
+<span class="codeline" id="line-120"><code>// pop is safe to call concurrently with other pop operations, but NOT</code></span>
+<span class="codeline" id="line-121"><code>// to call concurrently with push.</code></span>
+<span class="codeline" id="line-122"><code>func (b *gcSweepBuf) pop() *mspan {</code></span>
+<span class="codeline" id="line-123"><code>	cursor := atomic.Xadd(&amp;b.index, -1)</code></span>
+<span class="codeline" id="line-124"><code>	if int32(cursor) &lt; 0 {</code></span>
+<span class="codeline" id="line-125"><code>		atomic.Xadd(&amp;b.index, +1)</code></span>
+<span class="codeline" id="line-126"><code>		return nil</code></span>
+<span class="codeline" id="line-127"><code>	}</code></span>
+<span class="codeline" id="line-128"><code></code></span>
+<span class="codeline" id="line-129"><code>	// There are no concurrent spine or block modifications during</code></span>
+<span class="codeline" id="line-130"><code>	// pop, so we can omit the atomics.</code></span>
+<span class="codeline" id="line-131"><code>	top, bottom := cursor/gcSweepBlockEntries, cursor%gcSweepBlockEntries</code></span>
+<span class="codeline" id="line-132"><code>	blockp := (**gcSweepBlock)(add(b.spine, sys.PtrSize*uintptr(top)))</code></span>
+<span class="codeline" id="line-133"><code>	block := *blockp</code></span>
+<span class="codeline" id="line-134"><code>	s := block.spans[bottom]</code></span>
+<span class="codeline" id="line-135"><code>	// Clear the pointer for block(i).</code></span>
+<span class="codeline" id="line-136"><code>	block.spans[bottom] = nil</code></span>
+<span class="codeline" id="line-137"><code>	return s</code></span>
+<span class="codeline" id="line-138"><code>}</code></span>
+<span class="codeline" id="line-139"><code></code></span>
+<span class="codeline" id="line-140"><code>// numBlocks returns the number of blocks in buffer b. numBlocks is</code></span>
+<span class="codeline" id="line-141"><code>// safe to call concurrently with any other operation. Spans that have</code></span>
+<span class="codeline" id="line-142"><code>// been pushed prior to the call to numBlocks are guaranteed to appear</code></span>
+<span class="codeline" id="line-143"><code>// in some block in the range [0, numBlocks()), assuming there are no</code></span>
+<span class="codeline" id="line-144"><code>// intervening pops. Spans that are pushed after the call may also</code></span>
+<span class="codeline" id="line-145"><code>// appear in these blocks.</code></span>
+<span class="codeline" id="line-146"><code>func (b *gcSweepBuf) numBlocks() int {</code></span>
+<span class="codeline" id="line-147"><code>	return int(divRoundUp(uintptr(atomic.Load(&amp;b.index)), gcSweepBlockEntries))</code></span>
+<span class="codeline" id="line-148"><code>}</code></span>
+<span class="codeline" id="line-149"><code></code></span>
+<span class="codeline" id="line-150"><code>// block returns the spans in the i'th block of buffer b. block is</code></span>
+<span class="codeline" id="line-151"><code>// safe to call concurrently with push. The block may contain nil</code></span>
+<span class="codeline" id="line-152"><code>// pointers that must be ignored, and each entry in the block must be</code></span>
+<span class="codeline" id="line-153"><code>// loaded atomically.</code></span>
+<span class="codeline" id="line-154"><code>func (b *gcSweepBuf) block(i int) []*mspan {</code></span>
+<span class="codeline" id="line-155"><code>	// Perform bounds check before loading spine address since</code></span>
+<span class="codeline" id="line-156"><code>	// push ensures the allocated length is at least spineLen.</code></span>
+<span class="codeline" id="line-157"><code>	if i &lt; 0 || uintptr(i) &gt;= atomic.Loaduintptr(&amp;b.spineLen) {</code></span>
+<span class="codeline" id="line-158"><code>		throw("block index out of range")</code></span>
+<span class="codeline" id="line-159"><code>	}</code></span>
+<span class="codeline" id="line-160"><code></code></span>
+<span class="codeline" id="line-161"><code>	// Get block i.</code></span>
+<span class="codeline" id="line-162"><code>	spine := atomic.Loadp(unsafe.Pointer(&amp;b.spine))</code></span>
+<span class="codeline" id="line-163"><code>	blockp := add(spine, sys.PtrSize*uintptr(i))</code></span>
+<span class="codeline" id="line-164"><code>	block := (*gcSweepBlock)(atomic.Loadp(blockp))</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>	// Slice the block if necessary.</code></span>
+<span class="codeline" id="line-167"><code>	cursor := uintptr(atomic.Load(&amp;b.index))</code></span>
+<span class="codeline" id="line-168"><code>	top, bottom := cursor/gcSweepBlockEntries, cursor%gcSweepBlockEntries</code></span>
+<span class="codeline" id="line-169"><code>	var spans []*mspan</code></span>
+<span class="codeline" id="line-170"><code>	if uintptr(i) &lt; top {</code></span>
+<span class="codeline" id="line-171"><code>		spans = block.spans[:]</code></span>
+<span class="codeline" id="line-172"><code>	} else {</code></span>
+<span class="codeline" id="line-173"><code>		spans = block.spans[:bottom]</code></span>
+<span class="codeline" id="line-174"><code>	}</code></span>
+<span class="codeline" id="line-175"><code>	return spans</code></span>
+<span class="codeline" id="line-176"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

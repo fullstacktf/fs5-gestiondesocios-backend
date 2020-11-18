@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: net/http/internal</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>internal</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-net/http/internal">net/http/internal</a><i> (on <a href="https://golang.org/pkg/net/http/internal/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/net/http/internal" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/net/http/internal.html">6 packages</a>, and imported by <a href="../../../dep/net/http/internal.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../src/net/http/internal/chunked.go.html#doc">d-&gt;</a> <a href="../../../src/net/http/internal/chunked.go.html">chunked.go</a>
+	    <a href="../../../src/net/http/internal/testcert.go.html">testcert.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-FlushAfterChunkWriter" data-popularity="750">	 type <a href="../../../src/net/http/internal/chunked.go.html#line-232">FlushAfterChunkWriter</a> <i>(struct)</i>
+		FlushAfterChunkWriter signals from the caller of NewChunkedWriter
+		that each chunk should be followed by a flush. It is used by the
+		http.Transport code to keep the buffering behavior for headers and
+		trailers, but flush out chunks aggressively in the middle for
+		request bodies which may be generated slowly. See Issue 6574.
+
+		<input type='checkbox' class="stat" id="FlushAfterChunkWriter-stat-fields"><label for="FlushAfterChunkWriter-stat-fields">One Exported Field</label><span id='FlushAfterChunkWriter-stat-fields-content' class="stat-content">
+			<a href="../../../src/net/http/internal/chunked.go.html#line-233">Writer</a> <i>*<a href="../../bufio.html">bufio</a>.<a href="../../bufio.html#name-Writer">Writer</a></i></span>
+		<input type='checkbox' class="stat" id="FlushAfterChunkWriter-stat-methods"><label for="FlushAfterChunkWriter-stat-methods">Exported Methods (10)</label><span id='FlushAfterChunkWriter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-624">Available</a>() <a href="../../builtin.html#name-int">int</a>
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-627">Buffered</a>() <a href="../../builtin.html#name-int">int</a>
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-600">Flush</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-724">ReadFrom</a>(r <a href="../../io.html">io</a>.<a href="../../io.html#name-Reader">Reader</a>) (n <a href="../../builtin.html#name-int64">int64</a>, err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-593">Reset</a>(w <a href="../../io.html">io</a>.<a href="../../io.html#name-Writer">Writer</a>)
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-589">Size</a>() <a href="../../builtin.html#name-int">int</a>
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-633">Write</a>(p []<a href="../../builtin.html#name-byte">byte</a>) (nn <a href="../../builtin.html#name-int">int</a>, err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-658">WriteByte</a>(c <a href="../../builtin.html#name-byte">byte</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-672">WriteRune</a>(r <a href="../../builtin.html#name-rune">rune</a>) (size <a href="../../builtin.html#name-int">int</a>, err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/bufio/bufio.go.html#line-703">WriteString</a>(s <a href="../../builtin.html#name-string">string</a>) (<a href="../../builtin.html#name-int">int</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="FlushAfterChunkWriter-stat-impls"><label for="FlushAfterChunkWriter-stat-impls">Implements (5+)</label><span id='FlushAfterChunkWriter-stat-impls-content' class="stat-content">
+			 T : gorm.io/gorm/clause.<a href="../../gorm.io/gorm/clause.html#name-Writer">Writer</a>
+			 T : io.<a href="../../io.html#name-ByteWriter">ByteWriter</a>
+			 T : io.<a href="../../io.html#name-ReaderFrom">ReaderFrom</a>
+			 T : io.<a href="../../io.html#name-StringWriter">StringWriter</a>
+			 T : io.<a href="../../io.html#name-Writer">Writer</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ErrLineTooLong">	  var <a href="../../../src/net/http/internal/chunked.go.html#line-21">ErrLineTooLong</a> <a href="../../builtin.html#name-error">error</a></div>
+<div class="anchor" id="name-LocalhostCert">	  var <a href="../../../src/net/http/internal/testcert.go.html#line-13">LocalhostCert</a> []<a href="../../builtin.html#name-byte">byte</a>
+		LocalhostCert is a PEM-encoded TLS cert with SAN IPs
+		"127.0.0.1" and "[::1]", expiring at Jan 29 16:00:00 2084 GMT.
+		generated from src/crypto/tls:
+		go run generate_cert.go  --rsa-bits 1024 --host 127.0.0.1,::1,example.com --ca --start-date "Jan 1 00:00:00 1970" --duration=1000000h</div>
+<div class="anchor" id="name-LocalhostKey">	  var <a href="../../../src/net/http/internal/testcert.go.html#line-29">LocalhostKey</a> []<a href="../../builtin.html#name-byte">byte</a>
+		LocalhostKey is the private key for localhostCert.</div>
+<div class="anchor" id="name-NewChunkedReader">	 func <a href="../../../src/net/http/internal/chunked.go.html#line-29">NewChunkedReader</a>(r <a href="../../io.html">io</a>.<a href="../../io.html#name-Reader">Reader</a>) <a href="../../io.html">io</a>.<a href="../../io.html#name-Reader">Reader</a>
+		NewChunkedReader returns a new chunkedReader that translates the data read from r
+		out of HTTP "chunked" format before returning it.
+		The chunkedReader returns io.EOF when the final 0-length chunk is read.
+
+		NewChunkedReader is not needed by normal applications. The http package
+		automatically decodes chunking when reading response bodies.</div>
+<div class="anchor" id="name-NewChunkedWriter">	 func <a href="../../../src/net/http/internal/chunked.go.html#line-183">NewChunkedWriter</a>(w <a href="../../io.html">io</a>.<a href="../../io.html#name-Writer">Writer</a>) <a href="../../io.html">io</a>.<a href="../../io.html#name-WriteCloser">WriteCloser</a>
+		NewChunkedWriter returns a new chunkedWriter that translates writes into HTTP
+		"chunked" format before writing them to w. Closing the returned chunkedWriter
+		sends the final 0-length chunk that marks the end of the stream but does
+		not send the final CRLF that appears after trailers; trailers and the last
+		CRLF must be written separately.
+
+		NewChunkedWriter is not needed by normal applications. The http
+		package adds chunking automatically if handlers don't set a
+		Content-Length header. Using newChunkedWriter inside a handler
+		would result in double chunking or chunking with a Content-Length
+		length, both of which are wrong.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

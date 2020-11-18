@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: utils.go in package gorm.io/gorm/utils</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	utils.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/gorm.io/gorm/utils.html">gorm.io/gorm/utils</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>package utils</code></span>
+<span class="codeline" id="line-2"><code></code></span>
+<span class="codeline" id="line-3"><code>import (</code></span>
+<span class="codeline" id="line-4"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-5"><code>	"fmt"</code></span>
+<span class="codeline" id="line-6"><code>	"reflect"</code></span>
+<span class="codeline" id="line-7"><code>	"regexp"</code></span>
+<span class="codeline" id="line-8"><code>	"runtime"</code></span>
+<span class="codeline" id="line-9"><code>	"strconv"</code></span>
+<span class="codeline" id="line-10"><code>	"strings"</code></span>
+<span class="codeline" id="line-11"><code>	"unicode"</code></span>
+<span class="codeline" id="line-12"><code>)</code></span>
+<span class="codeline" id="line-13"><code></code></span>
+<span class="codeline" id="line-14"><code>var gormSourceDir string</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>func init() {</code></span>
+<span class="codeline" id="line-17"><code>	_, file, _, _ := runtime.Caller(0)</code></span>
+<span class="codeline" id="line-18"><code>	gormSourceDir = regexp.MustCompile(`utils.utils\.go`).ReplaceAllString(file, "")</code></span>
+<span class="codeline" id="line-19"><code>}</code></span>
+<span class="codeline" id="line-20"><code></code></span>
+<span class="codeline" id="line-21"><code>func FileWithLineNum() string {</code></span>
+<span class="codeline" id="line-22"><code>	for i := 2; i &lt; 15; i++ {</code></span>
+<span class="codeline" id="line-23"><code>		_, file, line, ok := runtime.Caller(i)</code></span>
+<span class="codeline" id="line-24"><code></code></span>
+<span class="codeline" id="line-25"><code>		if ok &amp;&amp; (!strings.HasPrefix(file, gormSourceDir) || strings.HasSuffix(file, "_test.go")) {</code></span>
+<span class="codeline" id="line-26"><code>			return file + ":" + strconv.FormatInt(int64(line), 10)</code></span>
+<span class="codeline" id="line-27"><code>		}</code></span>
+<span class="codeline" id="line-28"><code>	}</code></span>
+<span class="codeline" id="line-29"><code>	return ""</code></span>
+<span class="codeline" id="line-30"><code>}</code></span>
+<span class="codeline" id="line-31"><code></code></span>
+<span class="codeline" id="line-32"><code>func IsValidDBNameChar(c rune) bool {</code></span>
+<span class="codeline" id="line-33"><code>	return !unicode.IsLetter(c) &amp;&amp; !unicode.IsNumber(c) &amp;&amp; c != '.' &amp;&amp; c != '*' &amp;&amp; c != '_' &amp;&amp; c != '$' &amp;&amp; c != '@'</code></span>
+<span class="codeline" id="line-34"><code>}</code></span>
+<span class="codeline" id="line-35"><code></code></span>
+<span class="codeline" id="line-36"><code>func CheckTruth(val interface{}) bool {</code></span>
+<span class="codeline" id="line-37"><code>	if v, ok := val.(bool); ok {</code></span>
+<span class="codeline" id="line-38"><code>		return v</code></span>
+<span class="codeline" id="line-39"><code>	}</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>	if v, ok := val.(string); ok {</code></span>
+<span class="codeline" id="line-42"><code>		v = strings.ToLower(v)</code></span>
+<span class="codeline" id="line-43"><code>		return v != "false"</code></span>
+<span class="codeline" id="line-44"><code>	}</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>	return !reflect.ValueOf(val).IsZero()</code></span>
+<span class="codeline" id="line-47"><code>}</code></span>
+<span class="codeline" id="line-48"><code></code></span>
+<span class="codeline" id="line-49"><code>func ToStringKey(values ...interface{}) string {</code></span>
+<span class="codeline" id="line-50"><code>	results := make([]string, len(values))</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>	for idx, value := range values {</code></span>
+<span class="codeline" id="line-53"><code>		if valuer, ok := value.(driver.Valuer); ok {</code></span>
+<span class="codeline" id="line-54"><code>			value, _ = valuer.Value()</code></span>
+<span class="codeline" id="line-55"><code>		}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>		switch v := value.(type) {</code></span>
+<span class="codeline" id="line-58"><code>		case string:</code></span>
+<span class="codeline" id="line-59"><code>			results[idx] = v</code></span>
+<span class="codeline" id="line-60"><code>		case []byte:</code></span>
+<span class="codeline" id="line-61"><code>			results[idx] = string(v)</code></span>
+<span class="codeline" id="line-62"><code>		case uint:</code></span>
+<span class="codeline" id="line-63"><code>			results[idx] = strconv.FormatUint(uint64(v), 10)</code></span>
+<span class="codeline" id="line-64"><code>		default:</code></span>
+<span class="codeline" id="line-65"><code>			results[idx] = fmt.Sprint(reflect.Indirect(reflect.ValueOf(v)).Interface())</code></span>
+<span class="codeline" id="line-66"><code>		}</code></span>
+<span class="codeline" id="line-67"><code>	}</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>	return strings.Join(results, "_")</code></span>
+<span class="codeline" id="line-70"><code>}</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>func AssertEqual(src, dst interface{}) bool {</code></span>
+<span class="codeline" id="line-73"><code>	if !reflect.DeepEqual(src, dst) {</code></span>
+<span class="codeline" id="line-74"><code>		if valuer, ok := src.(driver.Valuer); ok {</code></span>
+<span class="codeline" id="line-75"><code>			src, _ = valuer.Value()</code></span>
+<span class="codeline" id="line-76"><code>		}</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>		if valuer, ok := dst.(driver.Valuer); ok {</code></span>
+<span class="codeline" id="line-79"><code>			dst, _ = valuer.Value()</code></span>
+<span class="codeline" id="line-80"><code>		}</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>		return reflect.DeepEqual(src, dst)</code></span>
+<span class="codeline" id="line-83"><code>	}</code></span>
+<span class="codeline" id="line-84"><code>	return true</code></span>
+<span class="codeline" id="line-85"><code>}</code></span>
+<span class="codeline" id="line-86"><code></code></span>
+<span class="codeline" id="line-87"><code>func ToString(value interface{}) string {</code></span>
+<span class="codeline" id="line-88"><code>	switch v := value.(type) {</code></span>
+<span class="codeline" id="line-89"><code>	case string:</code></span>
+<span class="codeline" id="line-90"><code>		return v</code></span>
+<span class="codeline" id="line-91"><code>	case int:</code></span>
+<span class="codeline" id="line-92"><code>		return strconv.FormatInt(int64(v), 10)</code></span>
+<span class="codeline" id="line-93"><code>	case int8:</code></span>
+<span class="codeline" id="line-94"><code>		return strconv.FormatInt(int64(v), 10)</code></span>
+<span class="codeline" id="line-95"><code>	case int16:</code></span>
+<span class="codeline" id="line-96"><code>		return strconv.FormatInt(int64(v), 10)</code></span>
+<span class="codeline" id="line-97"><code>	case int32:</code></span>
+<span class="codeline" id="line-98"><code>		return strconv.FormatInt(int64(v), 10)</code></span>
+<span class="codeline" id="line-99"><code>	case int64:</code></span>
+<span class="codeline" id="line-100"><code>		return strconv.FormatInt(v, 10)</code></span>
+<span class="codeline" id="line-101"><code>	case uint:</code></span>
+<span class="codeline" id="line-102"><code>		return strconv.FormatUint(uint64(v), 10)</code></span>
+<span class="codeline" id="line-103"><code>	case uint8:</code></span>
+<span class="codeline" id="line-104"><code>		return strconv.FormatUint(uint64(v), 10)</code></span>
+<span class="codeline" id="line-105"><code>	case uint16:</code></span>
+<span class="codeline" id="line-106"><code>		return strconv.FormatUint(uint64(v), 10)</code></span>
+<span class="codeline" id="line-107"><code>	case uint32:</code></span>
+<span class="codeline" id="line-108"><code>		return strconv.FormatUint(uint64(v), 10)</code></span>
+<span class="codeline" id="line-109"><code>	case uint64:</code></span>
+<span class="codeline" id="line-110"><code>		return strconv.FormatUint(v, 10)</code></span>
+<span class="codeline" id="line-111"><code>	}</code></span>
+<span class="codeline" id="line-112"><code>	return ""</code></span>
+<span class="codeline" id="line-113"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

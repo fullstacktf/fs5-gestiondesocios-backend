@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/ed25519</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>ed25519</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/ed25519">crypto/ed25519</a><i> (on <a href="https://golang.org/pkg/crypto/ed25519/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/ed25519" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/ed25519.html">8 packages</a>, and imported by <a href="../../dep/crypto/ed25519.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/crypto/ed25519/ed25519.go.html#doc">d-&gt;</a> <a href="../../src/crypto/ed25519/ed25519.go.html">ed25519.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-PrivateKey" data-popularity="435">	 type <a href="../../src/crypto/ed25519/ed25519.go.html#line-56">PrivateKey</a> <i>([])</i>
+		PrivateKey is the type of Ed25519 private keys. It implements crypto.Signer.
+
+		<input type='checkbox' class="stat" id="PrivateKey-stat-methods"><label for="PrivateKey-stat-methods">Exported Methods (4)</label><span id='PrivateKey-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/ed25519/ed25519.go.html#line-66">Equal</a>(x <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PrivateKey">PrivateKey</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/crypto/ed25519/ed25519.go.html#line-59">Public</a>() <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PublicKey">PublicKey</a>
+			 (T) <a href="../../src/crypto/ed25519/ed25519.go.html#line-77">Seed</a>() []<a href="../builtin.html#name-byte">byte</a>
+			 (T) <a href="../../src/crypto/ed25519/ed25519.go.html#line-88">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, message []<a href="../builtin.html#name-byte">byte</a>, opts <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-SignerOpts">SignerOpts</a>) (signature []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-impls"><label for="PrivateKey-stat-impls">Implements (1+)</label><span id='PrivateKey-stat-impls-content' class="stat-content">
+			 T : crypto.<a href="../crypto.html#name-Signer">Signer</a></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-results"><label for="PrivateKey-stat-results">As Outputs Of (2+)</label><span id='PrivateKey-stat-results-content' class="stat-content">
+			func <a href="#name-GenerateKey">GenerateKey</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (<a href="#name-PublicKey">PublicKey</a>, <b>PrivateKey</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-NewKeyFromSeed">NewKeyFromSeed</a>(seed []<a href="../builtin.html#name-byte">byte</a>) <b>PrivateKey</b></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-params"><label for="PrivateKey-stat-params">As Inputs Of (1+)</label><span id='PrivateKey-stat-params-content' class="stat-content">
+			func <a href="#name-Sign">Sign</a>(privateKey <b>PrivateKey</b>, message []<a href="../builtin.html#name-byte">byte</a>) []<a href="../builtin.html#name-byte">byte</a></span></div>
+<div class="anchor" id="name-PublicKey" data-popularity="160">	 type <a href="../../src/crypto/ed25519/ed25519.go.html#line-41">PublicKey</a> <i>([])</i>
+		PublicKey is the type of Ed25519 public keys.
+
+		<input type='checkbox' class="stat" id="PublicKey-stat-methods"><label for="PublicKey-stat-methods">One Exported Method</label><span id='PublicKey-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/ed25519/ed25519.go.html#line-47">Equal</a>(x <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PublicKey">PublicKey</a>) <a href="../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-results"><label for="PublicKey-stat-results">As Outputs Of (1+)</label><span id='PublicKey-stat-results-content' class="stat-content">
+			func <a href="#name-GenerateKey">GenerateKey</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (<b>PublicKey</b>, <a href="#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-params"><label for="PublicKey-stat-params">As Inputs Of (1+)</label><span id='PublicKey-stat-params-content' class="stat-content">
+			func <a href="#name-Verify">Verify</a>(publicKey <b>PublicKey</b>, message, sig []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-GenerateKey">	 func <a href="../../src/crypto/ed25519/ed25519.go.html#line-98">GenerateKey</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (<a href="#name-PublicKey">PublicKey</a>, <a href="#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)
+		GenerateKey generates a public/private key pair using entropy from rand.
+		If rand is nil, crypto/rand.Reader will be used.</div>
+<div class="anchor" id="name-NewKeyFromSeed">	 func <a href="../../src/crypto/ed25519/ed25519.go.html#line-119">NewKeyFromSeed</a>(seed []<a href="../builtin.html#name-byte">byte</a>) <a href="#name-PrivateKey">PrivateKey</a>
+		NewKeyFromSeed calculates a private key from a seed. It will panic if
+		len(seed) is not SeedSize. This function is provided for interoperability
+		with RFC 8032. RFC 8032's private keys correspond to seeds in this
+		package.</div>
+<div class="anchor" id="name-PrivateKeySize">	const <a href="../../src/crypto/ed25519/ed25519.go.html#line-33">PrivateKeySize</a> = 64
+		PrivateKeySize is the size, in bytes, of private keys as used in this package.</div>
+<div class="anchor" id="name-PublicKeySize">	const <a href="../../src/crypto/ed25519/ed25519.go.html#line-31">PublicKeySize</a> = 32
+		PublicKeySize is the size, in bytes, of public keys as used in this package.</div>
+<div class="anchor" id="name-SeedSize">	const <a href="../../src/crypto/ed25519/ed25519.go.html#line-37">SeedSize</a> = 32
+		SeedSize is the size, in bytes, of private key seeds. These are the private key representations used by RFC 8032.</div>
+<div class="anchor" id="name-Sign">	 func <a href="../../src/crypto/ed25519/ed25519.go.html#line-149">Sign</a>(privateKey <a href="#name-PrivateKey">PrivateKey</a>, message []<a href="../builtin.html#name-byte">byte</a>) []<a href="../builtin.html#name-byte">byte</a>
+		Sign signs the message with privateKey and returns a signature. It will
+		panic if len(privateKey) is not PrivateKeySize.</div>
+<div class="anchor" id="name-SignatureSize">	const <a href="../../src/crypto/ed25519/ed25519.go.html#line-35">SignatureSize</a> = 64
+		SignatureSize is the size, in bytes, of signatures generated and verified by this package.</div>
+<div class="anchor" id="name-Verify">	 func <a href="../../src/crypto/ed25519/ed25519.go.html#line-203">Verify</a>(publicKey <a href="#name-PublicKey">PublicKey</a>, message, sig []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a>
+		Verify reports whether sig is a valid signature of message by publicKey. It
+		will panic if len(publicKey) is not PublicKeySize.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

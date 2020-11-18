@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: rows.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	rows.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2012 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-13"><code>	"io"</code></span>
+<span class="codeline" id="line-14"><code>	"math"</code></span>
+<span class="codeline" id="line-15"><code>	"reflect"</code></span>
+<span class="codeline" id="line-16"><code>)</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>type resultSet struct {</code></span>
+<span class="codeline" id="line-19"><code>	columns     []mysqlField</code></span>
+<span class="codeline" id="line-20"><code>	columnNames []string</code></span>
+<span class="codeline" id="line-21"><code>	done        bool</code></span>
+<span class="codeline" id="line-22"><code>}</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>type mysqlRows struct {</code></span>
+<span class="codeline" id="line-25"><code>	mc     *mysqlConn</code></span>
+<span class="codeline" id="line-26"><code>	rs     resultSet</code></span>
+<span class="codeline" id="line-27"><code>	finish func()</code></span>
+<span class="codeline" id="line-28"><code>}</code></span>
+<span class="codeline" id="line-29"><code></code></span>
+<span class="codeline" id="line-30"><code>type binaryRows struct {</code></span>
+<span class="codeline" id="line-31"><code>	mysqlRows</code></span>
+<span class="codeline" id="line-32"><code>}</code></span>
+<span class="codeline" id="line-33"><code></code></span>
+<span class="codeline" id="line-34"><code>type textRows struct {</code></span>
+<span class="codeline" id="line-35"><code>	mysqlRows</code></span>
+<span class="codeline" id="line-36"><code>}</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>func (rows *mysqlRows) Columns() []string {</code></span>
+<span class="codeline" id="line-39"><code>	if rows.rs.columnNames != nil {</code></span>
+<span class="codeline" id="line-40"><code>		return rows.rs.columnNames</code></span>
+<span class="codeline" id="line-41"><code>	}</code></span>
+<span class="codeline" id="line-42"><code></code></span>
+<span class="codeline" id="line-43"><code>	columns := make([]string, len(rows.rs.columns))</code></span>
+<span class="codeline" id="line-44"><code>	if rows.mc != nil &amp;&amp; rows.mc.cfg.ColumnsWithAlias {</code></span>
+<span class="codeline" id="line-45"><code>		for i := range columns {</code></span>
+<span class="codeline" id="line-46"><code>			if tableName := rows.rs.columns[i].tableName; len(tableName) &gt; 0 {</code></span>
+<span class="codeline" id="line-47"><code>				columns[i] = tableName + "." + rows.rs.columns[i].name</code></span>
+<span class="codeline" id="line-48"><code>			} else {</code></span>
+<span class="codeline" id="line-49"><code>				columns[i] = rows.rs.columns[i].name</code></span>
+<span class="codeline" id="line-50"><code>			}</code></span>
+<span class="codeline" id="line-51"><code>		}</code></span>
+<span class="codeline" id="line-52"><code>	} else {</code></span>
+<span class="codeline" id="line-53"><code>		for i := range columns {</code></span>
+<span class="codeline" id="line-54"><code>			columns[i] = rows.rs.columns[i].name</code></span>
+<span class="codeline" id="line-55"><code>		}</code></span>
+<span class="codeline" id="line-56"><code>	}</code></span>
+<span class="codeline" id="line-57"><code></code></span>
+<span class="codeline" id="line-58"><code>	rows.rs.columnNames = columns</code></span>
+<span class="codeline" id="line-59"><code>	return columns</code></span>
+<span class="codeline" id="line-60"><code>}</code></span>
+<span class="codeline" id="line-61"><code></code></span>
+<span class="codeline" id="line-62"><code>func (rows *mysqlRows) ColumnTypeDatabaseTypeName(i int) string {</code></span>
+<span class="codeline" id="line-63"><code>	return rows.rs.columns[i].typeDatabaseName()</code></span>
+<span class="codeline" id="line-64"><code>}</code></span>
+<span class="codeline" id="line-65"><code></code></span>
+<span class="codeline" id="line-66"><code>// func (rows *mysqlRows) ColumnTypeLength(i int) (length int64, ok bool) {</code></span>
+<span class="codeline" id="line-67"><code>// 	return int64(rows.rs.columns[i].length), true</code></span>
+<span class="codeline" id="line-68"><code>// }</code></span>
+<span class="codeline" id="line-69"><code></code></span>
+<span class="codeline" id="line-70"><code>func (rows *mysqlRows) ColumnTypeNullable(i int) (nullable, ok bool) {</code></span>
+<span class="codeline" id="line-71"><code>	return rows.rs.columns[i].flags&amp;flagNotNULL == 0, true</code></span>
+<span class="codeline" id="line-72"><code>}</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>func (rows *mysqlRows) ColumnTypePrecisionScale(i int) (int64, int64, bool) {</code></span>
+<span class="codeline" id="line-75"><code>	column := rows.rs.columns[i]</code></span>
+<span class="codeline" id="line-76"><code>	decimals := int64(column.decimals)</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>	switch column.fieldType {</code></span>
+<span class="codeline" id="line-79"><code>	case fieldTypeDecimal, fieldTypeNewDecimal:</code></span>
+<span class="codeline" id="line-80"><code>		if decimals &gt; 0 {</code></span>
+<span class="codeline" id="line-81"><code>			return int64(column.length) - 2, decimals, true</code></span>
+<span class="codeline" id="line-82"><code>		}</code></span>
+<span class="codeline" id="line-83"><code>		return int64(column.length) - 1, decimals, true</code></span>
+<span class="codeline" id="line-84"><code>	case fieldTypeTimestamp, fieldTypeDateTime, fieldTypeTime:</code></span>
+<span class="codeline" id="line-85"><code>		return decimals, decimals, true</code></span>
+<span class="codeline" id="line-86"><code>	case fieldTypeFloat, fieldTypeDouble:</code></span>
+<span class="codeline" id="line-87"><code>		if decimals == 0x1f {</code></span>
+<span class="codeline" id="line-88"><code>			return math.MaxInt64, math.MaxInt64, true</code></span>
+<span class="codeline" id="line-89"><code>		}</code></span>
+<span class="codeline" id="line-90"><code>		return math.MaxInt64, decimals, true</code></span>
+<span class="codeline" id="line-91"><code>	}</code></span>
+<span class="codeline" id="line-92"><code></code></span>
+<span class="codeline" id="line-93"><code>	return 0, 0, false</code></span>
+<span class="codeline" id="line-94"><code>}</code></span>
+<span class="codeline" id="line-95"><code></code></span>
+<span class="codeline" id="line-96"><code>func (rows *mysqlRows) ColumnTypeScanType(i int) reflect.Type {</code></span>
+<span class="codeline" id="line-97"><code>	return rows.rs.columns[i].scanType()</code></span>
+<span class="codeline" id="line-98"><code>}</code></span>
+<span class="codeline" id="line-99"><code></code></span>
+<span class="codeline" id="line-100"><code>func (rows *mysqlRows) Close() (err error) {</code></span>
+<span class="codeline" id="line-101"><code>	if f := rows.finish; f != nil {</code></span>
+<span class="codeline" id="line-102"><code>		f()</code></span>
+<span class="codeline" id="line-103"><code>		rows.finish = nil</code></span>
+<span class="codeline" id="line-104"><code>	}</code></span>
+<span class="codeline" id="line-105"><code></code></span>
+<span class="codeline" id="line-106"><code>	mc := rows.mc</code></span>
+<span class="codeline" id="line-107"><code>	if mc == nil {</code></span>
+<span class="codeline" id="line-108"><code>		return nil</code></span>
+<span class="codeline" id="line-109"><code>	}</code></span>
+<span class="codeline" id="line-110"><code>	if err := mc.error(); err != nil {</code></span>
+<span class="codeline" id="line-111"><code>		return err</code></span>
+<span class="codeline" id="line-112"><code>	}</code></span>
+<span class="codeline" id="line-113"><code></code></span>
+<span class="codeline" id="line-114"><code>	// flip the buffer for this connection if we need to drain it.</code></span>
+<span class="codeline" id="line-115"><code>	// note that for a successful query (i.e. one where rows.next()</code></span>
+<span class="codeline" id="line-116"><code>	// has been called until it returns false), `rows.mc` will be nil</code></span>
+<span class="codeline" id="line-117"><code>	// by the time the user calls `(*Rows).Close`, so we won't reach this</code></span>
+<span class="codeline" id="line-118"><code>	// see: https://github.com/golang/go/commit/651ddbdb5056ded455f47f9c494c67b389622a47</code></span>
+<span class="codeline" id="line-119"><code>	mc.buf.flip()</code></span>
+<span class="codeline" id="line-120"><code></code></span>
+<span class="codeline" id="line-121"><code>	// Remove unread packets from stream</code></span>
+<span class="codeline" id="line-122"><code>	if !rows.rs.done {</code></span>
+<span class="codeline" id="line-123"><code>		err = mc.readUntilEOF()</code></span>
+<span class="codeline" id="line-124"><code>	}</code></span>
+<span class="codeline" id="line-125"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-126"><code>		if err = mc.discardResults(); err != nil {</code></span>
+<span class="codeline" id="line-127"><code>			return err</code></span>
+<span class="codeline" id="line-128"><code>		}</code></span>
+<span class="codeline" id="line-129"><code>	}</code></span>
+<span class="codeline" id="line-130"><code></code></span>
+<span class="codeline" id="line-131"><code>	rows.mc = nil</code></span>
+<span class="codeline" id="line-132"><code>	return err</code></span>
+<span class="codeline" id="line-133"><code>}</code></span>
+<span class="codeline" id="line-134"><code></code></span>
+<span class="codeline" id="line-135"><code>func (rows *mysqlRows) HasNextResultSet() (b bool) {</code></span>
+<span class="codeline" id="line-136"><code>	if rows.mc == nil {</code></span>
+<span class="codeline" id="line-137"><code>		return false</code></span>
+<span class="codeline" id="line-138"><code>	}</code></span>
+<span class="codeline" id="line-139"><code>	return rows.mc.status&amp;statusMoreResultsExists != 0</code></span>
+<span class="codeline" id="line-140"><code>}</code></span>
+<span class="codeline" id="line-141"><code></code></span>
+<span class="codeline" id="line-142"><code>func (rows *mysqlRows) nextResultSet() (int, error) {</code></span>
+<span class="codeline" id="line-143"><code>	if rows.mc == nil {</code></span>
+<span class="codeline" id="line-144"><code>		return 0, io.EOF</code></span>
+<span class="codeline" id="line-145"><code>	}</code></span>
+<span class="codeline" id="line-146"><code>	if err := rows.mc.error(); err != nil {</code></span>
+<span class="codeline" id="line-147"><code>		return 0, err</code></span>
+<span class="codeline" id="line-148"><code>	}</code></span>
+<span class="codeline" id="line-149"><code></code></span>
+<span class="codeline" id="line-150"><code>	// Remove unread packets from stream</code></span>
+<span class="codeline" id="line-151"><code>	if !rows.rs.done {</code></span>
+<span class="codeline" id="line-152"><code>		if err := rows.mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-153"><code>			return 0, err</code></span>
+<span class="codeline" id="line-154"><code>		}</code></span>
+<span class="codeline" id="line-155"><code>		rows.rs.done = true</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code></code></span>
+<span class="codeline" id="line-158"><code>	if !rows.HasNextResultSet() {</code></span>
+<span class="codeline" id="line-159"><code>		rows.mc = nil</code></span>
+<span class="codeline" id="line-160"><code>		return 0, io.EOF</code></span>
+<span class="codeline" id="line-161"><code>	}</code></span>
+<span class="codeline" id="line-162"><code>	rows.rs = resultSet{}</code></span>
+<span class="codeline" id="line-163"><code>	return rows.mc.readResultSetHeaderPacket()</code></span>
+<span class="codeline" id="line-164"><code>}</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>func (rows *mysqlRows) nextNotEmptyResultSet() (int, error) {</code></span>
+<span class="codeline" id="line-167"><code>	for {</code></span>
+<span class="codeline" id="line-168"><code>		resLen, err := rows.nextResultSet()</code></span>
+<span class="codeline" id="line-169"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-170"><code>			return 0, err</code></span>
+<span class="codeline" id="line-171"><code>		}</code></span>
+<span class="codeline" id="line-172"><code></code></span>
+<span class="codeline" id="line-173"><code>		if resLen &gt; 0 {</code></span>
+<span class="codeline" id="line-174"><code>			return resLen, nil</code></span>
+<span class="codeline" id="line-175"><code>		}</code></span>
+<span class="codeline" id="line-176"><code></code></span>
+<span class="codeline" id="line-177"><code>		rows.rs.done = true</code></span>
+<span class="codeline" id="line-178"><code>	}</code></span>
+<span class="codeline" id="line-179"><code>}</code></span>
+<span class="codeline" id="line-180"><code></code></span>
+<span class="codeline" id="line-181"><code>func (rows *binaryRows) NextResultSet() error {</code></span>
+<span class="codeline" id="line-182"><code>	resLen, err := rows.nextNotEmptyResultSet()</code></span>
+<span class="codeline" id="line-183"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-184"><code>		return err</code></span>
+<span class="codeline" id="line-185"><code>	}</code></span>
+<span class="codeline" id="line-186"><code></code></span>
+<span class="codeline" id="line-187"><code>	rows.rs.columns, err = rows.mc.readColumns(resLen)</code></span>
+<span class="codeline" id="line-188"><code>	return err</code></span>
+<span class="codeline" id="line-189"><code>}</code></span>
+<span class="codeline" id="line-190"><code></code></span>
+<span class="codeline" id="line-191"><code>func (rows *binaryRows) Next(dest []driver.Value) error {</code></span>
+<span class="codeline" id="line-192"><code>	if mc := rows.mc; mc != nil {</code></span>
+<span class="codeline" id="line-193"><code>		if err := mc.error(); err != nil {</code></span>
+<span class="codeline" id="line-194"><code>			return err</code></span>
+<span class="codeline" id="line-195"><code>		}</code></span>
+<span class="codeline" id="line-196"><code></code></span>
+<span class="codeline" id="line-197"><code>		// Fetch next row from stream</code></span>
+<span class="codeline" id="line-198"><code>		return rows.readRow(dest)</code></span>
+<span class="codeline" id="line-199"><code>	}</code></span>
+<span class="codeline" id="line-200"><code>	return io.EOF</code></span>
+<span class="codeline" id="line-201"><code>}</code></span>
+<span class="codeline" id="line-202"><code></code></span>
+<span class="codeline" id="line-203"><code>func (rows *textRows) NextResultSet() (err error) {</code></span>
+<span class="codeline" id="line-204"><code>	resLen, err := rows.nextNotEmptyResultSet()</code></span>
+<span class="codeline" id="line-205"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-206"><code>		return err</code></span>
+<span class="codeline" id="line-207"><code>	}</code></span>
+<span class="codeline" id="line-208"><code></code></span>
+<span class="codeline" id="line-209"><code>	rows.rs.columns, err = rows.mc.readColumns(resLen)</code></span>
+<span class="codeline" id="line-210"><code>	return err</code></span>
+<span class="codeline" id="line-211"><code>}</code></span>
+<span class="codeline" id="line-212"><code></code></span>
+<span class="codeline" id="line-213"><code>func (rows *textRows) Next(dest []driver.Value) error {</code></span>
+<span class="codeline" id="line-214"><code>	if mc := rows.mc; mc != nil {</code></span>
+<span class="codeline" id="line-215"><code>		if err := mc.error(); err != nil {</code></span>
+<span class="codeline" id="line-216"><code>			return err</code></span>
+<span class="codeline" id="line-217"><code>		}</code></span>
+<span class="codeline" id="line-218"><code></code></span>
+<span class="codeline" id="line-219"><code>		// Fetch next row from stream</code></span>
+<span class="codeline" id="line-220"><code>		return rows.readRow(dest)</code></span>
+<span class="codeline" id="line-221"><code>	}</code></span>
+<span class="codeline" id="line-222"><code>	return io.EOF</code></span>
+<span class="codeline" id="line-223"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: strings</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>strings</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-strings">strings</a><i> (on <a href="https://golang.org/pkg/strings/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/strings" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/strings.html">7 packages</a>, and imported by <a href="../dep/strings.html#imported-by">34 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/strings/builder.go.html">builder.go</a>
+	    <a href="../src/strings/compare.go.html">compare.go</a>
+	    <a href="../src/strings/reader.go.html">reader.go</a>
+	    <a href="../src/strings/replace.go.html">replace.go</a>
+	    <a href="../src/strings/search.go.html">search.go</a>
+	<a href="../src/strings/strings.go.html#doc">d-&gt;</a> <a href="../src/strings/strings.go.html">strings.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Builder" data-popularity="700">	 type <a href="../src/strings/builder.go.html#line-15">Builder</a> <i>(struct)</i>
+		A Builder is used to efficiently build a string using Write methods.
+		It minimizes memory copying. The zero value is ready to use.
+		Do not copy a non-zero Builder.
+
+		<input type='checkbox' class="stat" id="Builder-stat-methods"><label for="Builder-stat-methods">Exported Methods (9)</label><span id='Builder-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/strings/builder.go.html#line-57">Cap</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/strings/builder.go.html#line-76">Grow</a>(n <a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/strings/builder.go.html#line-52">Len</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/strings/builder.go.html#line-60">Reset</a>()
+			(*T) <a href="../src/strings/builder.go.html#line-47">String</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/strings/builder.go.html#line-88">Write</a>(p []<a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/strings/builder.go.html#line-96">WriteByte</a>(c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/strings/builder.go.html#line-104">WriteRune</a>(r <a href="builtin.html#name-rune">rune</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/strings/builder.go.html#line-121">WriteString</a>(s <a href="builtin.html#name-string">string</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Builder-stat-impls"><label for="Builder-stat-impls">Implements (5+)</label><span id='Builder-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a>
+			*T : gorm.io/gorm/clause.<a href="gorm.io/gorm/clause.html#name-Writer">Writer</a>
+			*T : io.<a href="io.html#name-ByteWriter">ByteWriter</a>
+			*T : io.<a href="io.html#name-StringWriter">StringWriter</a>
+			*T : io.<a href="io.html#name-Writer">Writer</a></span></div>
+<div class="anchor" id="name-Reader" data-popularity="1125">	 type <a href="../src/strings/reader.go.html#line-17">Reader</a> <i>(struct)</i>
+		A Reader implements the io.Reader, io.ReaderAt, io.Seeker, io.WriterTo,
+		io.ByteScanner, and io.RuneScanner interfaces by reading
+		from a string.
+		The zero value for Reader operates like a Reader of an empty string.
+
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">Exported Methods (11)</label><span id='Reader-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/strings/reader.go.html#line-25">Len</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/strings/reader.go.html#line-38">Read</a>(b []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/strings/reader.go.html#line-48">ReadAt</a>(b []<a href="builtin.html#name-byte">byte</a>, off <a href="builtin.html#name-int64">int64</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/strings/reader.go.html#line-63">ReadByte</a>() (<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/strings/reader.go.html#line-82">ReadRune</a>() (ch <a href="builtin.html#name-rune">rune</a>, size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/strings/reader.go.html#line-150">Reset</a>(s <a href="builtin.html#name-string">string</a>)
+			(*T) <a href="../src/strings/reader.go.html#line-110">Seek</a>(offset <a href="builtin.html#name-int64">int64</a>, whence <a href="builtin.html#name-int">int</a>) (<a href="builtin.html#name-int64">int64</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/strings/reader.go.html#line-36">Size</a>() <a href="builtin.html#name-int64">int64</a>
+			(*T) <a href="../src/strings/reader.go.html#line-73">UnreadByte</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/strings/reader.go.html#line-97">UnreadRune</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/strings/reader.go.html#line-131">WriteTo</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-impls"><label for="Reader-stat-impls">Implements (10+)</label><span id='Reader-stat-impls-content' class="stat-content">
+			*T : compress/flate.<a href="compress/flate.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ByteReader">ByteReader</a>
+			*T : io.<a href="io.html#name-ByteScanner">ByteScanner</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ReaderAt">ReaderAt</a>
+			*T : io.<a href="io.html#name-ReadSeeker">ReadSeeker</a>
+			*T : io.<a href="io.html#name-RuneReader">RuneReader</a>
+			*T : io.<a href="io.html#name-RuneScanner">RuneScanner</a>
+			*T : io.<a href="io.html#name-Seeker">Seeker</a>
+			*T : io.<a href="io.html#name-WriterTo">WriterTo</a></span>
+		<input type='checkbox' class="stat" id="Reader-stat-results"><label for="Reader-stat-results">As Outputs Of (1+)</label><span id='Reader-stat-results-content' class="stat-content">
+			func <a href="#name-NewReader">NewReader</a>(s <a href="builtin.html#name-string">string</a>) *<b>Reader</b></span></div>
+<div class="anchor" id="name-Replacer" data-popularity="175">	 type <a href="../src/strings/replace.go.html#line-14">Replacer</a> <i>(struct)</i>
+		Replacer replaces a list of strings with replacements.
+		It is safe for concurrent use by multiple goroutines.
+
+		<input type='checkbox' class="stat" id="Replacer-stat-methods"><label for="Replacer-stat-methods">Exported Methods (2)</label><span id='Replacer-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/strings/replace.go.html#line-95">Replace</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/strings/replace.go.html#line-101">WriteString</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, s <a href="builtin.html#name-string">string</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Replacer-stat-results"><label for="Replacer-stat-results">As Outputs Of (1+)</label><span id='Replacer-stat-results-content' class="stat-content">
+			func <a href="#name-NewReplacer">NewReplacer</a>(oldnew ...<a href="builtin.html#name-string">string</a>) *<b>Replacer</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Compare">	 func <a href="../src/strings/compare.go.html#line-13">Compare</a>(a, b <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		Compare returns an integer comparing two strings lexicographically.
+		The result will be 0 if a==b, -1 if a &lt; b, and +1 if a &gt; b.
+
+		Compare is included only for symmetry with package bytes.
+		It is usually clearer and always faster to use the built-in
+		string comparison operators ==, &lt;, &gt;, and so on.</div>
+<div class="anchor" id="name-Contains">	 func <a href="../src/strings/strings.go.html#line-61">Contains</a>(s, substr <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+		Contains reports whether substr is within s.</div>
+<div class="anchor" id="name-ContainsAny">	 func <a href="../src/strings/strings.go.html#line-66">ContainsAny</a>(s, chars <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+		ContainsAny reports whether any Unicode code points in chars are within s.</div>
+<div class="anchor" id="name-ContainsRune">	 func <a href="../src/strings/strings.go.html#line-71">ContainsRune</a>(s <a href="builtin.html#name-string">string</a>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		ContainsRune reports whether the Unicode code point r is within s.</div>
+<div class="anchor" id="name-Count">	 func <a href="../src/strings/strings.go.html#line-41">Count</a>(s, substr <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		Count counts the number of non-overlapping instances of substr in s.
+		If substr is an empty string, Count returns 1 + the number of Unicode code points in s.</div>
+<div class="anchor" id="name-EqualFold">	 func <a href="../src/strings/strings.go.html#line-970">EqualFold</a>(s, t <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+		EqualFold reports whether s and t, interpreted as UTF-8 strings,
+		are equal under Unicode case-folding, which is a more general
+		form of case-insensitivity.</div>
+<div class="anchor" id="name-Fields">	 func <a href="../src/strings/strings.go.html#line-320">Fields</a>(s <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-string">string</a>
+		Fields splits the string s around each instance of one or more consecutive white space
+		characters, as defined by unicode.IsSpace, returning a slice of substrings of s or an
+		empty slice if s contains only white space.</div>
+<div class="anchor" id="name-FieldsFunc">	 func <a href="../src/strings/strings.go.html#line-375">FieldsFunc</a>(s <a href="builtin.html#name-string">string</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) []<a href="builtin.html#name-string">string</a>
+		FieldsFunc splits the string s at each run of Unicode code points c satisfying f(c)
+		and returns an array of slices of s. If all code points in s satisfy f(c) or the
+		string is empty, an empty slice is returned.
+
+		FieldsFunc makes no guarantees about the order in which it calls f(c)
+		and assumes that f always returns the same value for a given c.</div>
+<div class="anchor" id="name-HasPrefix">	 func <a href="../src/strings/strings.go.html#line-444">HasPrefix</a>(s, prefix <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+		HasPrefix tests whether the string s begins with prefix.</div>
+<div class="anchor" id="name-HasSuffix">	 func <a href="../src/strings/strings.go.html#line-449">HasSuffix</a>(s, suffix <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+		HasSuffix tests whether the string s ends with suffix.</div>
+<div class="anchor" id="name-Index">	 func <a href="../src/strings/strings.go.html#line-1024">Index</a>(s, substr <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		Index returns the index of the first instance of substr in s, or -1 if substr is not present in s.</div>
+<div class="anchor" id="name-IndexAny">	 func <a href="../src/strings/strings.go.html#line-141">IndexAny</a>(s, chars <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		IndexAny returns the index of the first instance of any Unicode code point
+		from chars in s, or -1 if no Unicode code point from chars is present in s.</div>
+<div class="anchor" id="name-IndexByte">	 func <a href="../src/strings/strings.go.html#line-113">IndexByte</a>(s <a href="builtin.html#name-string">string</a>, c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		IndexByte returns the index of the first instance of c in s, or -1 if c is not present in s.</div>
+<div class="anchor" id="name-IndexFunc">	 func <a href="../src/strings/strings.go.html#line-758">IndexFunc</a>(s <a href="builtin.html#name-string">string</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-int">int</a>
+		IndexFunc returns the index into s of the first Unicode
+		code point satisfying f(c), or -1 if none do.</div>
+<div class="anchor" id="name-IndexRune">	 func <a href="../src/strings/strings.go.html#line-121">IndexRune</a>(s <a href="builtin.html#name-string">string</a>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-int">int</a>
+		IndexRune returns the index of the first instance of the Unicode code point
+		r, or -1 if rune is not present in s.
+		If r is utf8.RuneError, it returns the first instance of any
+		invalid UTF-8 byte sequence.</div>
+<div class="anchor" id="name-Join">	 func <a href="../src/strings/strings.go.html#line-421">Join</a>(elems []<a href="builtin.html#name-string">string</a>, sep <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		Join concatenates the elements of its first argument to create a single string. The separator
+		string sep is placed between elements in the resulting string.</div>
+<div class="anchor" id="name-LastIndex">	 func <a href="../src/strings/strings.go.html#line-76">LastIndex</a>(s, substr <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		LastIndex returns the index of the last instance of substr in s, or -1 if substr is not present in s.</div>
+<div class="anchor" id="name-LastIndexAny">	 func <a href="../src/strings/strings.go.html#line-175">LastIndexAny</a>(s, chars <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		LastIndexAny returns the index of the last instance of any Unicode code
+		point from chars in s, or -1 if no Unicode code point from chars is
+		present in s.</div>
+<div class="anchor" id="name-LastIndexByte">	 func <a href="../src/strings/strings.go.html#line-225">LastIndexByte</a>(s <a href="builtin.html#name-string">string</a>, c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-int">int</a>
+		LastIndexByte returns the index of the last instance of c in s, or -1 if c is not present in s.</div>
+<div class="anchor" id="name-LastIndexFunc">	 func <a href="../src/strings/strings.go.html#line-764">LastIndexFunc</a>(s <a href="builtin.html#name-string">string</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-int">int</a>
+		LastIndexFunc returns the index into s of the last
+		Unicode code point satisfying f(c), or -1 if none do.</div>
+<div class="anchor" id="name-Map">	 func <a href="../src/strings/strings.go.html#line-456">Map</a>(mapping func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		Map returns a copy of the string s with all its characters modified
+		according to the mapping function. If mapping returns a negative value, the character is
+		dropped from the string with no replacement.</div>
+<div class="anchor" id="name-NewReader">	 func <a href="../src/strings/reader.go.html#line-154">NewReader</a>(s <a href="builtin.html#name-string">string</a>) *<a href="#name-Reader">Reader</a>
+		NewReader returns a new Reader reading from s.
+		It is similar to bytes.NewBufferString but more efficient and read-only.</div>
+<div class="anchor" id="name-NewReplacer">	 func <a href="../src/strings/replace.go.html#line-32">NewReplacer</a>(oldnew ...<a href="builtin.html#name-string">string</a>) *<a href="#name-Replacer">Replacer</a>
+		NewReplacer returns a new Replacer from a list of old, new string
+		pairs. Replacements are performed in the order they appear in the
+		target string, without overlapping matches. The old string
+		comparisons are done in argument order.
+
+		NewReplacer panics if given an odd number of arguments.</div>
+<div class="anchor" id="name-Repeat">	 func <a href="../src/strings/strings.go.html#line-519">Repeat</a>(s <a href="builtin.html#name-string">string</a>, count <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-string">string</a>
+		Repeat returns a new string consisting of count copies of the string s.
+
+		It panics if count is negative or if
+		the result of (len(s) * count) overflows.</div>
+<div class="anchor" id="name-Replace">	 func <a href="../src/strings/strings.go.html#line-924">Replace</a>(s, old, new <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-string">string</a>
+		Replace returns a copy of the string s with the first n
+		non-overlapping instances of old replaced by new.
+		If old is empty, it matches at the beginning of the string
+		and after each UTF-8 sequence, yielding up to k+1 replacements
+		for a k-rune string.
+		If n &lt; 0, there is no limit on the number of replacements.</div>
+<div class="anchor" id="name-ReplaceAll">	 func <a href="../src/strings/strings.go.html#line-963">ReplaceAll</a>(s, old, new <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ReplaceAll returns a copy of the string s with all
+		non-overlapping instances of old replaced by new.
+		If old is empty, it matches at the beginning of the string
+		and after each UTF-8 sequence, yielding up to k+1 replacements
+		for a k-rune string.</div>
+<div class="anchor" id="name-Split">	 func <a href="../src/strings/strings.go.html#line-299">Split</a>(s, sep <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-string">string</a>
+		Split slices s into all substrings separated by sep and returns a slice of
+		the substrings between those separators.
+
+		If s does not contain sep and sep is not empty, Split returns a
+		slice of length 1 whose only element is s.
+
+		If sep is empty, Split splits after each UTF-8 sequence. If both s
+		and sep are empty, Split returns an empty slice.
+
+		It is equivalent to SplitN with a count of -1.</div>
+<div class="anchor" id="name-SplitAfter">	 func <a href="../src/strings/strings.go.html#line-311">SplitAfter</a>(s, sep <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-string">string</a>
+		SplitAfter slices s into all substrings after each instance of sep and
+		returns a slice of those substrings.
+
+		If s does not contain sep and sep is not empty, SplitAfter returns
+		a slice of length 1 whose only element is s.
+
+		If sep is empty, SplitAfter splits after each UTF-8 sequence. If
+		both s and sep are empty, SplitAfter returns an empty slice.
+
+		It is equivalent to SplitAfterN with a count of -1.</div>
+<div class="anchor" id="name-SplitAfterN">	 func <a href="../src/strings/strings.go.html#line-285">SplitAfterN</a>(s, sep <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-string">string</a>
+		SplitAfterN slices s into substrings after each instance of sep and
+		returns a slice of those substrings.
+
+		The count determines the number of substrings to return:
+		  n &gt; 0: at most n substrings; the last substring will be the unsplit remainder.
+		  n == 0: the result is nil (zero substrings)
+		  n &lt; 0: all substrings
+
+		Edge cases for s and sep (for example, empty strings) are handled
+		as described in the documentation for SplitAfter.</div>
+<div class="anchor" id="name-SplitN">	 func <a href="../src/strings/strings.go.html#line-273">SplitN</a>(s, sep <a href="builtin.html#name-string">string</a>, n <a href="builtin.html#name-int">int</a>) []<a href="builtin.html#name-string">string</a>
+		SplitN slices s into substrings separated by sep and returns a slice of
+		the substrings between those separators.
+
+		The count determines the number of substrings to return:
+		  n &gt; 0: at most n substrings; the last substring will be the unsplit remainder.
+		  n == 0: the result is nil (zero substrings)
+		  n &lt; 0: all substrings
+
+		Edge cases for s and sep (for example, empty strings) are handled
+		as described in the documentation for Split.</div>
+<div class="anchor" id="name-Title">	 func <a href="../src/strings/strings.go.html#line-710">Title</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		Title returns a copy of the string s with all Unicode letters that begin words
+		mapped to their Unicode title case.
+
+		BUG(rsc): The rule Title uses for word boundaries does not handle Unicode punctuation properly.</div>
+<div class="anchor" id="name-ToLower">	 func <a href="../src/strings/strings.go.html#line-580">ToLower</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ToLower returns s with all Unicode letters mapped to their lower case.</div>
+<div class="anchor" id="name-ToLowerSpecial">	 func <a href="../src/strings/strings.go.html#line-621">ToLowerSpecial</a>(c <a href="unicode.html">unicode</a>.<a href="unicode.html#name-SpecialCase">SpecialCase</a>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ToLowerSpecial returns a copy of the string s with all Unicode letters mapped to their
+		lower case using the case mapping specified by c.</div>
+<div class="anchor" id="name-ToTitle">	 func <a href="../src/strings/strings.go.html#line-611">ToTitle</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ToTitle returns a copy of the string s with all Unicode letters mapped to
+		their Unicode title case.</div>
+<div class="anchor" id="name-ToTitleSpecial">	 func <a href="../src/strings/strings.go.html#line-627">ToTitleSpecial</a>(c <a href="unicode.html">unicode</a>.<a href="unicode.html#name-SpecialCase">SpecialCase</a>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ToTitleSpecial returns a copy of the string s with all Unicode letters mapped to their
+		Unicode title case, giving priority to the special casing rules.</div>
+<div class="anchor" id="name-ToUpper">	 func <a href="../src/strings/strings.go.html#line-550">ToUpper</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ToUpper returns s with all Unicode letters mapped to their upper case.</div>
+<div class="anchor" id="name-ToUpperSpecial">	 func <a href="../src/strings/strings.go.html#line-615">ToUpperSpecial</a>(c <a href="unicode.html">unicode</a>.<a href="unicode.html#name-SpecialCase">SpecialCase</a>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ToUpperSpecial returns a copy of the string s with all Unicode letters mapped to their
+		upper case using the case mapping specified by c.</div>
+<div class="anchor" id="name-ToValidUTF8">	 func <a href="../src/strings/strings.go.html#line-633">ToValidUTF8</a>(s, replacement <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		ToValidUTF8 returns a copy of the string s with each run of invalid UTF-8 byte sequences
+		replaced by the replacement string, which may be empty.</div>
+<div class="anchor" id="name-Trim">	 func <a href="../src/strings/strings.go.html#line-836">Trim</a>(s, cutset <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		Trim returns a slice of the string s with all leading and
+		trailing Unicode code points contained in cutset removed.</div>
+<div class="anchor" id="name-TrimFunc">	 func <a href="../src/strings/strings.go.html#line-752">TrimFunc</a>(s <a href="builtin.html#name-string">string</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-string">string</a>
+		TrimFunc returns a slice of the string s with all leading
+		and trailing Unicode code points c satisfying f(c) removed.</div>
+<div class="anchor" id="name-TrimLeft">	 func <a href="../src/strings/strings.go.html#line-847">TrimLeft</a>(s, cutset <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		TrimLeft returns a slice of the string s with all leading
+		Unicode code points contained in cutset removed.
+
+		To remove a prefix, use TrimPrefix instead.</div>
+<div class="anchor" id="name-TrimLeftFunc">	 func <a href="../src/strings/strings.go.html#line-729">TrimLeftFunc</a>(s <a href="builtin.html#name-string">string</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-string">string</a>
+		TrimLeftFunc returns a slice of the string s with all leading
+		Unicode code points c satisfying f(c) removed.</div>
+<div class="anchor" id="name-TrimPrefix">	 func <a href="../src/strings/strings.go.html#line-902">TrimPrefix</a>(s, prefix <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		TrimPrefix returns s without the provided leading prefix string.
+		If s doesn't start with prefix, s is returned unchanged.</div>
+<div class="anchor" id="name-TrimRight">	 func <a href="../src/strings/strings.go.html#line-858">TrimRight</a>(s, cutset <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		TrimRight returns a slice of the string s, with all trailing
+		Unicode code points contained in cutset removed.
+
+		To remove a suffix, use TrimSuffix instead.</div>
+<div class="anchor" id="name-TrimRightFunc">	 func <a href="../src/strings/strings.go.html#line-739">TrimRightFunc</a>(s <a href="builtin.html#name-string">string</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-string">string</a>
+		TrimRightFunc returns a slice of the string s with all trailing
+		Unicode code points c satisfying f(c) removed.</div>
+<div class="anchor" id="name-TrimSpace">	 func <a href="../src/strings/strings.go.html#line-867">TrimSpace</a>(s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		TrimSpace returns a slice of the string s, with all leading
+		and trailing white space removed, as defined by Unicode.</div>
+<div class="anchor" id="name-TrimSuffix">	 func <a href="../src/strings/strings.go.html#line-911">TrimSuffix</a>(s, suffix <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		TrimSuffix returns s without the provided trailing suffix string.
+		If s doesn't end with suffix, s is returned unchanged.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

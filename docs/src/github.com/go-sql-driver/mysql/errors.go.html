@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: errors.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	errors.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2013 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"errors"</code></span>
+<span class="codeline" id="line-13"><code>	"fmt"</code></span>
+<span class="codeline" id="line-14"><code>	"log"</code></span>
+<span class="codeline" id="line-15"><code>	"os"</code></span>
+<span class="codeline" id="line-16"><code>)</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>// Various errors the driver might return. Can change between driver versions.</code></span>
+<span class="codeline" id="line-19"><code>var (</code></span>
+<span class="codeline" id="line-20"><code>	ErrInvalidConn       = errors.New("invalid connection")</code></span>
+<span class="codeline" id="line-21"><code>	ErrMalformPkt        = errors.New("malformed packet")</code></span>
+<span class="codeline" id="line-22"><code>	ErrNoTLS             = errors.New("TLS requested but server does not support TLS")</code></span>
+<span class="codeline" id="line-23"><code>	ErrCleartextPassword = errors.New("this user requires clear text authentication. If you still want to use it, please add 'allowCleartextPasswords=1' to your DSN")</code></span>
+<span class="codeline" id="line-24"><code>	ErrNativePassword    = errors.New("this user requires mysql native password authentication.")</code></span>
+<span class="codeline" id="line-25"><code>	ErrOldPassword       = errors.New("this user requires old password authentication. If you still want to use it, please add 'allowOldPasswords=1' to your DSN. See also https://github.com/go-sql-driver/mysql/wiki/old_passwords")</code></span>
+<span class="codeline" id="line-26"><code>	ErrUnknownPlugin     = errors.New("this authentication plugin is not supported")</code></span>
+<span class="codeline" id="line-27"><code>	ErrOldProtocol       = errors.New("MySQL server does not support required protocol 41+")</code></span>
+<span class="codeline" id="line-28"><code>	ErrPktSync           = errors.New("commands out of sync. You can't run this command now")</code></span>
+<span class="codeline" id="line-29"><code>	ErrPktSyncMul        = errors.New("commands out of sync. Did you run multiple statements at once?")</code></span>
+<span class="codeline" id="line-30"><code>	ErrPktTooLarge       = errors.New("packet for query is too large. Try adjusting the 'max_allowed_packet' variable on the server")</code></span>
+<span class="codeline" id="line-31"><code>	ErrBusyBuffer        = errors.New("busy buffer")</code></span>
+<span class="codeline" id="line-32"><code></code></span>
+<span class="codeline" id="line-33"><code>	// errBadConnNoWrite is used for connection errors where nothing was sent to the database yet.</code></span>
+<span class="codeline" id="line-34"><code>	// If this happens first in a function starting a database interaction, it should be replaced by driver.ErrBadConn</code></span>
+<span class="codeline" id="line-35"><code>	// to trigger a resend.</code></span>
+<span class="codeline" id="line-36"><code>	// See https://github.com/go-sql-driver/mysql/pull/302</code></span>
+<span class="codeline" id="line-37"><code>	errBadConnNoWrite = errors.New("bad connection")</code></span>
+<span class="codeline" id="line-38"><code>)</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>var errLog = Logger(log.New(os.Stderr, "[mysql] ", log.Ldate|log.Ltime|log.Lshortfile))</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>// Logger is used to log critical error messages.</code></span>
+<span class="codeline" id="line-43"><code>type Logger interface {</code></span>
+<span class="codeline" id="line-44"><code>	Print(v ...interface{})</code></span>
+<span class="codeline" id="line-45"><code>}</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>// SetLogger is used to set the logger for critical errors.</code></span>
+<span class="codeline" id="line-48"><code>// The initial logger is os.Stderr.</code></span>
+<span class="codeline" id="line-49"><code>func SetLogger(logger Logger) error {</code></span>
+<span class="codeline" id="line-50"><code>	if logger == nil {</code></span>
+<span class="codeline" id="line-51"><code>		return errors.New("logger is nil")</code></span>
+<span class="codeline" id="line-52"><code>	}</code></span>
+<span class="codeline" id="line-53"><code>	errLog = logger</code></span>
+<span class="codeline" id="line-54"><code>	return nil</code></span>
+<span class="codeline" id="line-55"><code>}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>// MySQLError is an error type which represents a single MySQL error</code></span>
+<span class="codeline" id="line-58"><code>type MySQLError struct {</code></span>
+<span class="codeline" id="line-59"><code>	Number  uint16</code></span>
+<span class="codeline" id="line-60"><code>	Message string</code></span>
+<span class="codeline" id="line-61"><code>}</code></span>
+<span class="codeline" id="line-62"><code></code></span>
+<span class="codeline" id="line-63"><code>func (me *MySQLError) Error() string {</code></span>
+<span class="codeline" id="line-64"><code>	return fmt.Sprintf("Error %d: %s", me.Number, me.Message)</code></span>
+<span class="codeline" id="line-65"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

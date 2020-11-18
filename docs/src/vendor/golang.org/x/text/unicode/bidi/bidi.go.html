@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: bidi.go in package vendor/golang.org/x/text/unicode/bidi</title>
+<link href="../../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	bidi.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../../pkg/vendor/golang.org/x/text/unicode/bidi.html">vendor/golang.org/x/text/unicode/bidi</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2015 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>//go:generate go run gen.go gen_trieval.go gen_ranges.go</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<div class="anchor" id="doc"><span class="codeline" id="line-7"><code>// Package bidi contains functionality for bidirectional text support.</code></span>
+<span class="codeline" id="line-8"><code>//</code></span>
+<span class="codeline" id="line-9"><code>// See https://www.unicode.org/reports/tr9.</code></span>
+<span class="codeline" id="line-10"><code>//</code></span>
+<span class="codeline" id="line-11"><code>// NOTE: UNDER CONSTRUCTION. This API may change in backwards incompatible ways</code></span>
+<span class="codeline" id="line-12"><code>// and without notice.</code></span></div><span class="codeline" id="line-13"><code>package bidi // import "golang.org/x/text/unicode/bidi"</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>// TODO:</code></span>
+<span class="codeline" id="line-16"><code>// The following functionality would not be hard to implement, but hinges on</code></span>
+<span class="codeline" id="line-17"><code>// the definition of a Segmenter interface. For now this is up to the user.</code></span>
+<span class="codeline" id="line-18"><code>// - Iterate over paragraphs</code></span>
+<span class="codeline" id="line-19"><code>// - Segmenter to iterate over runs directly from a given text.</code></span>
+<span class="codeline" id="line-20"><code>// Also:</code></span>
+<span class="codeline" id="line-21"><code>// - Transformer for reordering?</code></span>
+<span class="codeline" id="line-22"><code>// - Transformer (validator, really) for Bidi Rule.</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>// This API tries to avoid dealing with embedding levels for now. Under the hood</code></span>
+<span class="codeline" id="line-25"><code>// these will be computed, but the question is to which extent the user should</code></span>
+<span class="codeline" id="line-26"><code>// know they exist. We should at some point allow the user to specify an</code></span>
+<span class="codeline" id="line-27"><code>// embedding hierarchy, though.</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>// A Direction indicates the overall flow of text.</code></span>
+<span class="codeline" id="line-30"><code>type Direction int</code></span>
+<span class="codeline" id="line-31"><code></code></span>
+<span class="codeline" id="line-32"><code>const (</code></span>
+<span class="codeline" id="line-33"><code>	// LeftToRight indicates the text contains no right-to-left characters and</code></span>
+<span class="codeline" id="line-34"><code>	// that either there are some left-to-right characters or the option</code></span>
+<span class="codeline" id="line-35"><code>	// DefaultDirection(LeftToRight) was passed.</code></span>
+<span class="codeline" id="line-36"><code>	LeftToRight Direction = iota</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>	// RightToLeft indicates the text contains no left-to-right characters and</code></span>
+<span class="codeline" id="line-39"><code>	// that either there are some right-to-left characters or the option</code></span>
+<span class="codeline" id="line-40"><code>	// DefaultDirection(RightToLeft) was passed.</code></span>
+<span class="codeline" id="line-41"><code>	RightToLeft</code></span>
+<span class="codeline" id="line-42"><code></code></span>
+<span class="codeline" id="line-43"><code>	// Mixed indicates text contains both left-to-right and right-to-left</code></span>
+<span class="codeline" id="line-44"><code>	// characters.</code></span>
+<span class="codeline" id="line-45"><code>	Mixed</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>	// Neutral means that text contains no left-to-right and right-to-left</code></span>
+<span class="codeline" id="line-48"><code>	// characters and that no default direction has been set.</code></span>
+<span class="codeline" id="line-49"><code>	Neutral</code></span>
+<span class="codeline" id="line-50"><code>)</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>type options struct{}</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>// An Option is an option for Bidi processing.</code></span>
+<span class="codeline" id="line-55"><code>type Option func(*options)</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>// ICU allows the user to define embedding levels. This may be used, for example,</code></span>
+<span class="codeline" id="line-58"><code>// to use hierarchical structure of markup languages to define embeddings.</code></span>
+<span class="codeline" id="line-59"><code>// The following option may be a way to expose this functionality in this API.</code></span>
+<span class="codeline" id="line-60"><code>// // LevelFunc sets a function that associates nesting levels with the given text.</code></span>
+<span class="codeline" id="line-61"><code>// // The levels function will be called with monotonically increasing values for p.</code></span>
+<span class="codeline" id="line-62"><code>// func LevelFunc(levels func(p int) int) Option {</code></span>
+<span class="codeline" id="line-63"><code>// 	panic("unimplemented")</code></span>
+<span class="codeline" id="line-64"><code>// }</code></span>
+<span class="codeline" id="line-65"><code></code></span>
+<span class="codeline" id="line-66"><code>// DefaultDirection sets the default direction for a Paragraph. The direction is</code></span>
+<span class="codeline" id="line-67"><code>// overridden if the text contains directional characters.</code></span>
+<span class="codeline" id="line-68"><code>func DefaultDirection(d Direction) Option {</code></span>
+<span class="codeline" id="line-69"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-70"><code>}</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>// A Paragraph holds a single Paragraph for Bidi processing.</code></span>
+<span class="codeline" id="line-73"><code>type Paragraph struct {</code></span>
+<span class="codeline" id="line-74"><code>	// buffers</code></span>
+<span class="codeline" id="line-75"><code>}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>// SetBytes configures p for the given paragraph text. It replaces text</code></span>
+<span class="codeline" id="line-78"><code>// previously set by SetBytes or SetString. If b contains a paragraph separator</code></span>
+<span class="codeline" id="line-79"><code>// it will only process the first paragraph and report the number of bytes</code></span>
+<span class="codeline" id="line-80"><code>// consumed from b including this separator. Error may be non-nil if options are</code></span>
+<span class="codeline" id="line-81"><code>// given.</code></span>
+<span class="codeline" id="line-82"><code>func (p *Paragraph) SetBytes(b []byte, opts ...Option) (n int, err error) {</code></span>
+<span class="codeline" id="line-83"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-84"><code>}</code></span>
+<span class="codeline" id="line-85"><code></code></span>
+<span class="codeline" id="line-86"><code>// SetString configures p for the given paragraph text. It replaces text</code></span>
+<span class="codeline" id="line-87"><code>// previously set by SetBytes or SetString. If b contains a paragraph separator</code></span>
+<span class="codeline" id="line-88"><code>// it will only process the first paragraph and report the number of bytes</code></span>
+<span class="codeline" id="line-89"><code>// consumed from b including this separator. Error may be non-nil if options are</code></span>
+<span class="codeline" id="line-90"><code>// given.</code></span>
+<span class="codeline" id="line-91"><code>func (p *Paragraph) SetString(s string, opts ...Option) (n int, err error) {</code></span>
+<span class="codeline" id="line-92"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-93"><code>}</code></span>
+<span class="codeline" id="line-94"><code></code></span>
+<span class="codeline" id="line-95"><code>// IsLeftToRight reports whether the principle direction of rendering for this</code></span>
+<span class="codeline" id="line-96"><code>// paragraphs is left-to-right. If this returns false, the principle direction</code></span>
+<span class="codeline" id="line-97"><code>// of rendering is right-to-left.</code></span>
+<span class="codeline" id="line-98"><code>func (p *Paragraph) IsLeftToRight() bool {</code></span>
+<span class="codeline" id="line-99"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-100"><code>}</code></span>
+<span class="codeline" id="line-101"><code></code></span>
+<span class="codeline" id="line-102"><code>// Direction returns the direction of the text of this paragraph.</code></span>
+<span class="codeline" id="line-103"><code>//</code></span>
+<span class="codeline" id="line-104"><code>// The direction may be LeftToRight, RightToLeft, Mixed, or Neutral.</code></span>
+<span class="codeline" id="line-105"><code>func (p *Paragraph) Direction() Direction {</code></span>
+<span class="codeline" id="line-106"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-107"><code>}</code></span>
+<span class="codeline" id="line-108"><code></code></span>
+<span class="codeline" id="line-109"><code>// RunAt reports the Run at the given position of the input text.</code></span>
+<span class="codeline" id="line-110"><code>//</code></span>
+<span class="codeline" id="line-111"><code>// This method can be used for computing line breaks on paragraphs.</code></span>
+<span class="codeline" id="line-112"><code>func (p *Paragraph) RunAt(pos int) Run {</code></span>
+<span class="codeline" id="line-113"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-114"><code>}</code></span>
+<span class="codeline" id="line-115"><code></code></span>
+<span class="codeline" id="line-116"><code>// Order computes the visual ordering of all the runs in a Paragraph.</code></span>
+<span class="codeline" id="line-117"><code>func (p *Paragraph) Order() (Ordering, error) {</code></span>
+<span class="codeline" id="line-118"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-119"><code>}</code></span>
+<span class="codeline" id="line-120"><code></code></span>
+<span class="codeline" id="line-121"><code>// Line computes the visual ordering of runs for a single line starting and</code></span>
+<span class="codeline" id="line-122"><code>// ending at the given positions in the original text.</code></span>
+<span class="codeline" id="line-123"><code>func (p *Paragraph) Line(start, end int) (Ordering, error) {</code></span>
+<span class="codeline" id="line-124"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-125"><code>}</code></span>
+<span class="codeline" id="line-126"><code></code></span>
+<span class="codeline" id="line-127"><code>// An Ordering holds the computed visual order of runs of a Paragraph. Calling</code></span>
+<span class="codeline" id="line-128"><code>// SetBytes or SetString on the originating Paragraph invalidates an Ordering.</code></span>
+<span class="codeline" id="line-129"><code>// The methods of an Ordering should only be called by one goroutine at a time.</code></span>
+<span class="codeline" id="line-130"><code>type Ordering struct{}</code></span>
+<span class="codeline" id="line-131"><code></code></span>
+<span class="codeline" id="line-132"><code>// Direction reports the directionality of the runs.</code></span>
+<span class="codeline" id="line-133"><code>//</code></span>
+<span class="codeline" id="line-134"><code>// The direction may be LeftToRight, RightToLeft, Mixed, or Neutral.</code></span>
+<span class="codeline" id="line-135"><code>func (o *Ordering) Direction() Direction {</code></span>
+<span class="codeline" id="line-136"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-137"><code>}</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>// NumRuns returns the number of runs.</code></span>
+<span class="codeline" id="line-140"><code>func (o *Ordering) NumRuns() int {</code></span>
+<span class="codeline" id="line-141"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-142"><code>}</code></span>
+<span class="codeline" id="line-143"><code></code></span>
+<span class="codeline" id="line-144"><code>// Run returns the ith run within the ordering.</code></span>
+<span class="codeline" id="line-145"><code>func (o *Ordering) Run(i int) Run {</code></span>
+<span class="codeline" id="line-146"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-147"><code>}</code></span>
+<span class="codeline" id="line-148"><code></code></span>
+<span class="codeline" id="line-149"><code>// TODO: perhaps with options.</code></span>
+<span class="codeline" id="line-150"><code>// // Reorder creates a reader that reads the runes in visual order per character.</code></span>
+<span class="codeline" id="line-151"><code>// // Modifiers remain after the runes they modify.</code></span>
+<span class="codeline" id="line-152"><code>// func (l *Runs) Reorder() io.Reader {</code></span>
+<span class="codeline" id="line-153"><code>// 	panic("unimplemented")</code></span>
+<span class="codeline" id="line-154"><code>// }</code></span>
+<span class="codeline" id="line-155"><code></code></span>
+<span class="codeline" id="line-156"><code>// A Run is a continuous sequence of characters of a single direction.</code></span>
+<span class="codeline" id="line-157"><code>type Run struct {</code></span>
+<span class="codeline" id="line-158"><code>}</code></span>
+<span class="codeline" id="line-159"><code></code></span>
+<span class="codeline" id="line-160"><code>// String returns the text of the run in its original order.</code></span>
+<span class="codeline" id="line-161"><code>func (r *Run) String() string {</code></span>
+<span class="codeline" id="line-162"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-163"><code>}</code></span>
+<span class="codeline" id="line-164"><code></code></span>
+<span class="codeline" id="line-165"><code>// Bytes returns the text of the run in its original order.</code></span>
+<span class="codeline" id="line-166"><code>func (r *Run) Bytes() []byte {</code></span>
+<span class="codeline" id="line-167"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-168"><code>}</code></span>
+<span class="codeline" id="line-169"><code></code></span>
+<span class="codeline" id="line-170"><code>// TODO: methods for</code></span>
+<span class="codeline" id="line-171"><code>// - Display order</code></span>
+<span class="codeline" id="line-172"><code>// - headers and footers</code></span>
+<span class="codeline" id="line-173"><code>// - bracket replacement.</code></span>
+<span class="codeline" id="line-174"><code></code></span>
+<span class="codeline" id="line-175"><code>// Direction reports the direction of the run.</code></span>
+<span class="codeline" id="line-176"><code>func (r *Run) Direction() Direction {</code></span>
+<span class="codeline" id="line-177"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-178"><code>}</code></span>
+<span class="codeline" id="line-179"><code></code></span>
+<span class="codeline" id="line-180"><code>// Position of the Run within the text passed to SetBytes or SetString of the</code></span>
+<span class="codeline" id="line-181"><code>// originating Paragraph value.</code></span>
+<span class="codeline" id="line-182"><code>func (r *Run) Pos() (start, end int) {</code></span>
+<span class="codeline" id="line-183"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-184"><code>}</code></span>
+<span class="codeline" id="line-185"><code></code></span>
+<span class="codeline" id="line-186"><code>// AppendReverse reverses the order of characters of in, appends them to out,</code></span>
+<span class="codeline" id="line-187"><code>// and returns the result. Modifiers will still follow the runes they modify.</code></span>
+<span class="codeline" id="line-188"><code>// Brackets are replaced with their counterparts.</code></span>
+<span class="codeline" id="line-189"><code>func AppendReverse(out, in []byte) []byte {</code></span>
+<span class="codeline" id="line-190"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-191"><code>}</code></span>
+<span class="codeline" id="line-192"><code></code></span>
+<span class="codeline" id="line-193"><code>// ReverseString reverses the order of characters in s and returns a new string.</code></span>
+<span class="codeline" id="line-194"><code>// Modifiers will still follow the runes they modify. Brackets are replaced with</code></span>
+<span class="codeline" id="line-195"><code>// their counterparts.</code></span>
+<span class="codeline" id="line-196"><code>func ReverseString(s string) string {</code></span>
+<span class="codeline" id="line-197"><code>	panic("unimplemented")</code></span>
+<span class="codeline" id="line-198"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

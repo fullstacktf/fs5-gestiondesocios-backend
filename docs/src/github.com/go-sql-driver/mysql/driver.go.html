@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: driver.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	driver.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2012 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-4"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-5"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<div class="anchor" id="doc"><span class="codeline" id="line-7"><code>// Package mysql provides a MySQL driver for Go's database/sql package.</code></span>
+<span class="codeline" id="line-8"><code>//</code></span>
+<span class="codeline" id="line-9"><code>// The driver should be used via the database/sql package:</code></span>
+<span class="codeline" id="line-10"><code>//</code></span>
+<span class="codeline" id="line-11"><code>//  import "database/sql"</code></span>
+<span class="codeline" id="line-12"><code>//  import _ "github.com/go-sql-driver/mysql"</code></span>
+<span class="codeline" id="line-13"><code>//</code></span>
+<span class="codeline" id="line-14"><code>//  db, err := sql.Open("mysql", "user:password@/dbname")</code></span>
+<span class="codeline" id="line-15"><code>//</code></span>
+<span class="codeline" id="line-16"><code>// See https://github.com/go-sql-driver/mysql#usage for details</code></span></div><span class="codeline" id="line-17"><code>package mysql</code></span>
+<span class="codeline" id="line-18"><code></code></span>
+<span class="codeline" id="line-19"><code>import (</code></span>
+<span class="codeline" id="line-20"><code>	"context"</code></span>
+<span class="codeline" id="line-21"><code>	"database/sql"</code></span>
+<span class="codeline" id="line-22"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-23"><code>	"net"</code></span>
+<span class="codeline" id="line-24"><code>	"sync"</code></span>
+<span class="codeline" id="line-25"><code>)</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>// MySQLDriver is exported to make the driver directly accessible.</code></span>
+<span class="codeline" id="line-28"><code>// In general the driver is used via the database/sql package.</code></span>
+<span class="codeline" id="line-29"><code>type MySQLDriver struct{}</code></span>
+<span class="codeline" id="line-30"><code></code></span>
+<span class="codeline" id="line-31"><code>// DialFunc is a function which can be used to establish the network connection.</code></span>
+<span class="codeline" id="line-32"><code>// Custom dial functions must be registered with RegisterDial</code></span>
+<span class="codeline" id="line-33"><code>//</code></span>
+<span class="codeline" id="line-34"><code>// Deprecated: users should register a DialContextFunc instead</code></span>
+<span class="codeline" id="line-35"><code>type DialFunc func(addr string) (net.Conn, error)</code></span>
+<span class="codeline" id="line-36"><code></code></span>
+<span class="codeline" id="line-37"><code>// DialContextFunc is a function which can be used to establish the network connection.</code></span>
+<span class="codeline" id="line-38"><code>// Custom dial functions must be registered with RegisterDialContext</code></span>
+<span class="codeline" id="line-39"><code>type DialContextFunc func(ctx context.Context, addr string) (net.Conn, error)</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>var (</code></span>
+<span class="codeline" id="line-42"><code>	dialsLock sync.RWMutex</code></span>
+<span class="codeline" id="line-43"><code>	dials     map[string]DialContextFunc</code></span>
+<span class="codeline" id="line-44"><code>)</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>// RegisterDialContext registers a custom dial function. It can then be used by the</code></span>
+<span class="codeline" id="line-47"><code>// network address mynet(addr), where mynet is the registered new network.</code></span>
+<span class="codeline" id="line-48"><code>// The current context for the connection and its address is passed to the dial function.</code></span>
+<span class="codeline" id="line-49"><code>func RegisterDialContext(net string, dial DialContextFunc) {</code></span>
+<span class="codeline" id="line-50"><code>	dialsLock.Lock()</code></span>
+<span class="codeline" id="line-51"><code>	defer dialsLock.Unlock()</code></span>
+<span class="codeline" id="line-52"><code>	if dials == nil {</code></span>
+<span class="codeline" id="line-53"><code>		dials = make(map[string]DialContextFunc)</code></span>
+<span class="codeline" id="line-54"><code>	}</code></span>
+<span class="codeline" id="line-55"><code>	dials[net] = dial</code></span>
+<span class="codeline" id="line-56"><code>}</code></span>
+<span class="codeline" id="line-57"><code></code></span>
+<span class="codeline" id="line-58"><code>// RegisterDial registers a custom dial function. It can then be used by the</code></span>
+<span class="codeline" id="line-59"><code>// network address mynet(addr), where mynet is the registered new network.</code></span>
+<span class="codeline" id="line-60"><code>// addr is passed as a parameter to the dial function.</code></span>
+<span class="codeline" id="line-61"><code>//</code></span>
+<span class="codeline" id="line-62"><code>// Deprecated: users should call RegisterDialContext instead</code></span>
+<span class="codeline" id="line-63"><code>func RegisterDial(network string, dial DialFunc) {</code></span>
+<span class="codeline" id="line-64"><code>	RegisterDialContext(network, func(_ context.Context, addr string) (net.Conn, error) {</code></span>
+<span class="codeline" id="line-65"><code>		return dial(addr)</code></span>
+<span class="codeline" id="line-66"><code>	})</code></span>
+<span class="codeline" id="line-67"><code>}</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>// Open new Connection.</code></span>
+<span class="codeline" id="line-70"><code>// See https://github.com/go-sql-driver/mysql#dsn-data-source-name for how</code></span>
+<span class="codeline" id="line-71"><code>// the DSN string is formatted</code></span>
+<span class="codeline" id="line-72"><code>func (d MySQLDriver) Open(dsn string) (driver.Conn, error) {</code></span>
+<span class="codeline" id="line-73"><code>	cfg, err := ParseDSN(dsn)</code></span>
+<span class="codeline" id="line-74"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-75"><code>		return nil, err</code></span>
+<span class="codeline" id="line-76"><code>	}</code></span>
+<span class="codeline" id="line-77"><code>	c := &amp;connector{</code></span>
+<span class="codeline" id="line-78"><code>		cfg: cfg,</code></span>
+<span class="codeline" id="line-79"><code>	}</code></span>
+<span class="codeline" id="line-80"><code>	return c.Connect(context.Background())</code></span>
+<span class="codeline" id="line-81"><code>}</code></span>
+<span class="codeline" id="line-82"><code></code></span>
+<span class="codeline" id="line-83"><code>func init() {</code></span>
+<span class="codeline" id="line-84"><code>	sql.Register("mysql", &amp;MySQLDriver{})</code></span>
+<span class="codeline" id="line-85"><code>}</code></span>
+<span class="codeline" id="line-86"><code></code></span>
+<span class="codeline" id="line-87"><code>// NewConnector returns new driver.Connector.</code></span>
+<span class="codeline" id="line-88"><code>func NewConnector(cfg *Config) (driver.Connector, error) {</code></span>
+<span class="codeline" id="line-89"><code>	cfg = cfg.Clone()</code></span>
+<span class="codeline" id="line-90"><code>	// normalize the contents of cfg so calls to NewConnector have the same</code></span>
+<span class="codeline" id="line-91"><code>	// behavior as MySQLDriver.OpenConnector</code></span>
+<span class="codeline" id="line-92"><code>	if err := cfg.normalize(); err != nil {</code></span>
+<span class="codeline" id="line-93"><code>		return nil, err</code></span>
+<span class="codeline" id="line-94"><code>	}</code></span>
+<span class="codeline" id="line-95"><code>	return &amp;connector{cfg: cfg}, nil</code></span>
+<span class="codeline" id="line-96"><code>}</code></span>
+<span class="codeline" id="line-97"><code></code></span>
+<span class="codeline" id="line-98"><code>// OpenConnector implements driver.DriverContext.</code></span>
+<span class="codeline" id="line-99"><code>func (d MySQLDriver) OpenConnector(dsn string) (driver.Connector, error) {</code></span>
+<span class="codeline" id="line-100"><code>	cfg, err := ParseDSN(dsn)</code></span>
+<span class="codeline" id="line-101"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-102"><code>		return nil, err</code></span>
+<span class="codeline" id="line-103"><code>	}</code></span>
+<span class="codeline" id="line-104"><code>	return &amp;connector{</code></span>
+<span class="codeline" id="line-105"><code>		cfg: cfg,</code></span>
+<span class="codeline" id="line-106"><code>	}, nil</code></span>
+<span class="codeline" id="line-107"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/net/route</title>
+<link href="../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>route</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../index.html#pkg-vendor/golang.org/x/net/route">vendor/golang.org/x/net/route</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/net/route/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/net/route" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../dep/vendor/golang.org/x/net/route.html">5 packages</a>, and imported by <a href="../../../../../dep/vendor/golang.org/x/net/route.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html">address.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/binary.go.html">binary.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html">interface.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/interface_classic.go.html">interface_classic.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/interface_multicast.go.html">interface_multicast.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html">message.go</a>
+	<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#doc">d-&gt;</a> <a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html">route.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/route_classic.go.html">route_classic.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/sys.go.html">sys.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html">sys_darwin.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/syscall_go1_12_darwin.go.html">syscall_go1_12_darwin.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/zsys_darwin.go.html">zsys_darwin.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/route/empty.s.html">empty.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Addr" data-popularity="650">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-12">Addr</a> <b<i>(interface)</i></b>
+		An Addr represents an address associated with packet routing.
+
+		<input type='checkbox' class="stat" id="Addr-stat-methods"><label for="Addr-stat-methods">One Exported Method</label><span id='Addr-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-14">Family</a>() <a href="../../../../builtin.html#name-int">int</a></span>
+		<input type='checkbox' class="stat" id="Addr-stat-impledby"><label for="Addr-stat-impledby">Implemented By (4+)</label><span id='Addr-stat-impledby-content' class="stat-content">
+			*<a href="#name-DefaultAddr">DefaultAddr</a>
+			*<a href="#name-Inet4Addr">Inet4Addr</a>
+			*<a href="#name-Inet6Addr">Inet6Addr</a>
+			*<a href="#name-LinkAddr">LinkAddr</a></span></div>
+<div class="anchor" id="name-DefaultAddr" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-272">DefaultAddr</a> <i>(struct)</i>
+		A DefaultAddr represents an address of various operating
+		system-specific features.
+
+		<input type='checkbox' class="stat" id="DefaultAddr-stat-fields"><label for="DefaultAddr-stat-fields">One Exported Field</label><span id='DefaultAddr-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-274">Raw</a> <i>[]<a href="../../../../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="DefaultAddr-stat-methods"><label for="DefaultAddr-stat-methods">One Exported Method</label><span id='DefaultAddr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-278">Family</a>() <a href="../../../../builtin.html#name-int">int</a></span>
+		<input type='checkbox' class="stat" id="DefaultAddr-stat-impls"><label for="DefaultAddr-stat-impls">Implements (1+)</label><span id='DefaultAddr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a></span></div>
+<div class="anchor" id="name-Inet4Addr" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-119">Inet4Addr</a> <i>(struct)</i>
+		An Inet4Addr represents an internet address for IPv4.
+
+		<input type='checkbox' class="stat" id="Inet4Addr-stat-fields"><label for="Inet4Addr-stat-fields">One Exported Field</label><span id='Inet4Addr-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-120">IP</a> <i>[4]<a href="../../../../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="Inet4Addr-stat-methods"><label for="Inet4Addr-stat-methods">One Exported Method</label><span id='Inet4Addr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-124">Family</a>() <a href="../../../../builtin.html#name-int">int</a></span>
+		<input type='checkbox' class="stat" id="Inet4Addr-stat-impls"><label for="Inet4Addr-stat-impls">Implements (1+)</label><span id='Inet4Addr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a></span></div>
+<div class="anchor" id="name-Inet6Addr" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-142">Inet6Addr</a> <i>(struct)</i>
+		An Inet6Addr represents an internet address for IPv6.
+
+		<input type='checkbox' class="stat" id="Inet6Addr-stat-fields"><label for="Inet6Addr-stat-fields">Exported Fields (2)</label><span id='Inet6Addr-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-143">IP</a> <i>[16]<a href="../../../../builtin.html#name-byte">byte</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-144">ZoneID</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="Inet6Addr-stat-methods"><label for="Inet6Addr-stat-methods">One Exported Method</label><span id='Inet6Addr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-148">Family</a>() <a href="../../../../builtin.html#name-int">int</a></span>
+		<input type='checkbox' class="stat" id="Inet6Addr-stat-impls"><label for="Inet6Addr-stat-impls">Implements (1+)</label><span id='Inet6Addr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a></span></div>
+<div class="anchor" id="name-InterfaceAddrMessage" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-23">InterfaceAddrMessage</a> <i>(struct)</i>
+		An InterfaceAddrMessage represents an interface address message.
+
+		<input type='checkbox' class="stat" id="InterfaceAddrMessage-stat-fields"><label for="InterfaceAddrMessage-stat-fields">Exported Fields (5)</label><span id='InterfaceAddrMessage-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-28">Addrs</a> <i>[]<a href="#name-Addr">Addr</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-26">Flags</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-27">Index</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-25">Type</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-24">Version</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="InterfaceAddrMessage-stat-methods"><label for="InterfaceAddrMessage-stat-methods">One Exported Method</label><span id='InterfaceAddrMessage-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-34">Sys</a>() []<a href="#name-Sys">Sys</a></span>
+		<input type='checkbox' class="stat" id="InterfaceAddrMessage-stat-impls"><label for="InterfaceAddrMessage-stat-impls">Implements (1+)</label><span id='InterfaceAddrMessage-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Message">Message</a></span></div>
+<div class="anchor" id="name-InterfaceAnnounceMessage" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-53">InterfaceAnnounceMessage</a> <i>(struct)</i>
+		An InterfaceAnnounceMessage represents an interface announcement
+		message.
+
+		<input type='checkbox' class="stat" id="InterfaceAnnounceMessage-stat-fields"><label for="InterfaceAnnounceMessage-stat-fields">Exported Fields (5)</label><span id='InterfaceAnnounceMessage-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-56">Index</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-57">Name</a> <i><a href="../../../../builtin.html#name-string">string</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-55">Type</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-54">Version</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-58">What</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="InterfaceAnnounceMessage-stat-methods"><label for="InterfaceAnnounceMessage-stat-methods">One Exported Method</label><span id='InterfaceAnnounceMessage-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-64">Sys</a>() []<a href="#name-Sys">Sys</a></span>
+		<input type='checkbox' class="stat" id="InterfaceAnnounceMessage-stat-impls"><label for="InterfaceAnnounceMessage-stat-impls">Implements (1+)</label><span id='InterfaceAnnounceMessage-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Message">Message</a></span></div>
+<div class="anchor" id="name-InterfaceMessage" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-10">InterfaceMessage</a> <i>(struct)</i>
+		An InterfaceMessage represents an interface message.
+
+		<input type='checkbox' class="stat" id="InterfaceMessage-stat-fields"><label for="InterfaceMessage-stat-fields">Exported Fields (6)</label><span id='InterfaceMessage-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-16">Addrs</a> <i>[]<a href="#name-Addr">Addr</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-13">Flags</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-14">Index</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-15">Name</a> <i><a href="../../../../builtin.html#name-string">string</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-12">Type</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-11">Version</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="InterfaceMessage-stat-methods"><label for="InterfaceMessage-stat-methods">One Exported Method</label><span id='InterfaceMessage-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-43">Sys</a>() []<a href="#name-Sys">Sys</a></span>
+		<input type='checkbox' class="stat" id="InterfaceMessage-stat-impls"><label for="InterfaceMessage-stat-impls">Implements (1+)</label><span id='InterfaceMessage-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Message">Message</a></span></div>
+<div class="anchor" id="name-InterfaceMetrics" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-34">InterfaceMetrics</a> <i>(struct)</i>
+		InterfaceMetrics represents interface metrics.
+
+		<input type='checkbox' class="stat" id="InterfaceMetrics-stat-fields"><label for="InterfaceMetrics-stat-fields">Exported Fields (2)</label><span id='InterfaceMetrics-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-36">MTU</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-35">Type</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="InterfaceMetrics-stat-methods"><label for="InterfaceMetrics-stat-methods">One Exported Method</label><span id='InterfaceMetrics-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-40">SysType</a>() <a href="#name-SysType">SysType</a></span>
+		<input type='checkbox' class="stat" id="InterfaceMetrics-stat-impls"><label for="InterfaceMetrics-stat-impls">Implements (1+)</label><span id='InterfaceMetrics-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Sys">Sys</a></span></div>
+<div class="anchor" id="name-InterfaceMulticastAddrMessage" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-38">InterfaceMulticastAddrMessage</a> <i>(struct)</i>
+		An InterfaceMulticastAddrMessage represents an interface multicast
+		address message.
+
+		<input type='checkbox' class="stat" id="InterfaceMulticastAddrMessage-stat-fields"><label for="InterfaceMulticastAddrMessage-stat-fields">Exported Fields (5)</label><span id='InterfaceMulticastAddrMessage-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-28">Addrs</a> <i>[]<a href="#name-Addr">Addr</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-26">Flags</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-27">Index</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-25">Type</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-24">Version</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="InterfaceMulticastAddrMessage-stat-methods"><label for="InterfaceMulticastAddrMessage-stat-methods">One Exported Method</label><span id='InterfaceMulticastAddrMessage-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-49">Sys</a>() []<a href="#name-Sys">Sys</a></span>
+		<input type='checkbox' class="stat" id="InterfaceMulticastAddrMessage-stat-impls"><label for="InterfaceMulticastAddrMessage-stat-impls">Implements (1+)</label><span id='InterfaceMulticastAddrMessage-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Message">Message</a></span></div>
+<div class="anchor" id="name-LinkAddr" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-18">LinkAddr</a> <i>(struct)</i>
+		A LinkAddr represents a link-layer address.
+
+		<input type='checkbox' class="stat" id="LinkAddr-stat-fields"><label for="LinkAddr-stat-fields">Exported Fields (3)</label><span id='LinkAddr-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-21">Addr</a> <i>[]<a href="../../../../builtin.html#name-byte">byte</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-19">Index</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-20">Name</a> <i><a href="../../../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="LinkAddr-stat-methods"><label for="LinkAddr-stat-methods">One Exported Method</label><span id='LinkAddr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/address.go.html#line-25">Family</a>() <a href="../../../../builtin.html#name-int">int</a></span>
+		<input type='checkbox' class="stat" id="LinkAddr-stat-impls"><label for="LinkAddr-stat-impls">Implements (1+)</label><span id='LinkAddr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Addr">Addr</a></span></div>
+<div class="anchor" id="name-Message" data-popularity="875">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-10">Message</a> <b<i>(interface)</i></b>
+		A Message represents a routing message.
+
+		<input type='checkbox' class="stat" id="Message-stat-methods"><label for="Message-stat-methods">One Exported Method</label><span id='Message-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-12">Sys</a>() []<a href="#name-Sys">Sys</a></span>
+		<input type='checkbox' class="stat" id="Message-stat-impledby"><label for="Message-stat-impledby">Implemented By (5+)</label><span id='Message-stat-impledby-content' class="stat-content">
+			*<a href="#name-InterfaceAddrMessage">InterfaceAddrMessage</a>
+			*<a href="#name-InterfaceAnnounceMessage">InterfaceAnnounceMessage</a>
+			*<a href="#name-InterfaceMessage">InterfaceMessage</a>
+			*<a href="#name-InterfaceMulticastAddrMessage">InterfaceMulticastAddrMessage</a>
+			*<a href="#name-RouteMessage">RouteMessage</a></span>
+		<input type='checkbox' class="stat" id="Message-stat-results"><label for="Message-stat-results">As Outputs Of (1+)</label><span id='Message-stat-results-content' class="stat-content">
+			func <a href="#name-ParseRIB">ParseRIB</a>(typ <a href="#name-RIBType">RIBType</a>, b []<a href="../../../../builtin.html#name-byte">byte</a>) ([]<b>Message</b>, <a href="../../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-RIBType" data-popularity="80">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-92">RIBType</a> <a href="../../../../builtin.html#name-int">int</a>
+		A RIBType represents a type of routing information base.
+
+		<input type='checkbox' class="stat" id="RIBType-stat-params"><label for="RIBType-stat-params">As Inputs Of (2+)</label><span id='RIBType-stat-params-content' class="stat-content">
+			func <a href="#name-FetchRIB">FetchRIB</a>(af <a href="../../../../builtin.html#name-int">int</a>, typ <b>RIBType</b>, arg <a href="../../../../builtin.html#name-int">int</a>) ([]<a href="../../../../builtin.html#name-byte">byte</a>, <a href="../../../../builtin.html#name-error">error</a>)
+			func <a href="#name-ParseRIB">ParseRIB</a>(typ <b>RIBType</b>, b []<a href="../../../../builtin.html#name-byte">byte</a>) ([]<a href="#name-Message">Message</a>, <a href="../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="RIBType-stat-values"><label for="RIBType-stat-values">As Types Of (2+)</label><span id='RIBType-stat-values-content' class="stat-content">
+			const <a href="#name-RIBTypeInterface">RIBTypeInterface</a>
+			const <a href="#name-RIBTypeRoute">RIBTypeRoute</a></span></div>
+<div class="anchor" id="name-RouteMessage" data-popularity="150">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-72">RouteMessage</a> <i>(struct)</i>
+		A RouteMessage represents a message conveying an address prefix, a
+		nexthop address and an output interface.
+
+		Unlike other messages, this message can be used to query adjacency
+		information for the given address prefix, to add a new route, and
+		to delete or modify the existing route from the routing information
+		base inside the kernel by writing and reading route messages on a
+		routing socket.
+
+		For the manipulation of routing information, the route message must
+		contain appropriate fields that include:
+
+			Version       = &lt;must be specified&gt;
+			Type          = &lt;must be specified&gt;
+			Flags         = &lt;must be specified&gt;
+			Index         = &lt;must be specified if necessary&gt;
+			ID            = &lt;must be specified&gt;
+			Seq           = &lt;must be specified&gt;
+			Addrs         = &lt;must be specified&gt;
+
+		The Type field specifies a type of manipulation, the Flags field
+		specifies a class of target information and the Addrs field
+		specifies target information like the following:
+
+			route.RouteMessage{
+				Version: RTM_VERSION,
+				Type: RTM_GET,
+				Flags: RTF_UP | RTF_HOST,
+				ID: uintptr(os.Getpid()),
+				Seq: 1,
+				Addrs: []route.Addrs{
+					RTAX_DST: &amp;route.Inet4Addr{ ... },
+					RTAX_IFP: &amp;route.LinkAddr{ ... },
+					RTAX_BRD: &amp;route.Inet4Addr{ ... },
+				},
+			}
+
+		The values for the above fields depend on the implementation of
+		each operating system.
+
+		The Err field on a response message contains an error value on the
+		requested operation. If non-nil, the requested operation is failed.
+
+		<input type='checkbox' class="stat" id="RouteMessage-stat-fields"><label for="RouteMessage-stat-fields">Exported Fields (8)</label><span id='RouteMessage-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-80">Addrs</a> <i>[]<a href="#name-Addr">Addr</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-79">Err</a> <i><a href="../../../../builtin.html#name-error">error</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-75">Flags</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-77">ID</a> <i><a href="../../../../builtin.html#name-uintptr">uintptr</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-76">Index</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-78">Seq</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-74">Type</a> <i><a href="../../../../builtin.html#name-int">int</a></i>
+			<a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-73">Version</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="RouteMessage-stat-methods"><label for="RouteMessage-stat-methods">Exported Methods (2)</label><span id='RouteMessage-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-87">Marshal</a>() ([]<a href="../../../../builtin.html#name-byte">byte</a>, <a href="../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-25">Sys</a>() []<a href="#name-Sys">Sys</a></span>
+		<input type='checkbox' class="stat" id="RouteMessage-stat-impls"><label for="RouteMessage-stat-impls">Implements (1+)</label><span id='RouteMessage-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Message">Message</a></span></div>
+<div class="anchor" id="name-RouteMetrics" data-popularity="100">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-17">RouteMetrics</a> <i>(struct)</i>
+		RouteMetrics represents route metrics.
+
+		<input type='checkbox' class="stat" id="RouteMetrics-stat-fields"><label for="RouteMetrics-stat-fields">One Exported Field</label><span id='RouteMetrics-stat-fields-content' class="stat-content">
+			<a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-18">PathMTU</a> <i><a href="../../../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="RouteMetrics-stat-methods"><label for="RouteMetrics-stat-methods">One Exported Method</label><span id='RouteMetrics-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-22">SysType</a>() <a href="#name-SysType">SysType</a></span>
+		<input type='checkbox' class="stat" id="RouteMetrics-stat-impls"><label for="RouteMetrics-stat-impls">Implements (1+)</label><span id='RouteMetrics-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Sys">Sys</a></span></div>
+<div class="anchor" id="name-Sys" data-popularity="800">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-16">Sys</a> <b<i>(interface)</i></b>
+		A Sys reprensents operating system-specific information.
+
+		<input type='checkbox' class="stat" id="Sys-stat-methods"><label for="Sys-stat-methods">One Exported Method</label><span id='Sys-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-19">SysType</a>() <a href="#name-SysType">SysType</a></span>
+		<input type='checkbox' class="stat" id="Sys-stat-impledby"><label for="Sys-stat-impledby">Implemented By (2+)</label><span id='Sys-stat-impledby-content' class="stat-content">
+			*<a href="#name-InterfaceMetrics">InterfaceMetrics</a>
+			*<a href="#name-RouteMetrics">RouteMetrics</a></span>
+		<input type='checkbox' class="stat" id="Sys-stat-results"><label for="Sys-stat-results">As Outputs Of (6+)</label><span id='Sys-stat-results-content' class="stat-content">
+			func (*<a href="#name-InterfaceAddrMessage">InterfaceAddrMessage</a>).<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-34">Sys</a>() []<b>Sys</b>
+			func (*<a href="#name-InterfaceAnnounceMessage">InterfaceAnnounceMessage</a>).<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-64">Sys</a>() []<b>Sys</b>
+			func (*<a href="#name-InterfaceMessage">InterfaceMessage</a>).<a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-43">Sys</a>() []<b>Sys</b>
+			func (*<a href="#name-InterfaceMulticastAddrMessage">InterfaceMulticastAddrMessage</a>).<a href="../../../../../src/vendor/golang.org/x/net/route/interface.go.html#line-49">Sys</a>() []<b>Sys</b>
+			func <a href="#name-Message">Message</a>.<a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-12">Sys</a>() []<b>Sys</b>
+			func (*<a href="#name-RouteMessage">RouteMessage</a>).<a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-25">Sys</a>() []<b>Sys</b></span></div>
+<div class="anchor" id="name-SysType" data-popularity="235">	 type <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-24">SysType</a> <a href="../../../../builtin.html#name-int">int</a>
+		A SysType represents a type of operating system-specific
+		information.
+
+		<input type='checkbox' class="stat" id="SysType-stat-results"><label for="SysType-stat-results">As Outputs Of (3+)</label><span id='SysType-stat-results-content' class="stat-content">
+			func (*<a href="#name-InterfaceMetrics">InterfaceMetrics</a>).<a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-40">SysType</a>() <b>SysType</b>
+			func (*<a href="#name-RouteMetrics">RouteMetrics</a>).<a href="../../../../../src/vendor/golang.org/x/net/route/sys_darwin.go.html#line-22">SysType</a>() <b>SysType</b>
+			func <a href="#name-Sys">Sys</a>.<a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-19">SysType</a>() <b>SysType</b></span>
+		<input type='checkbox' class="stat" id="SysType-stat-values"><label for="SysType-stat-values">As Types Of (2+)</label><span id='SysType-stat-values-content' class="stat-content">
+			const <a href="#name-SysMetrics">SysMetrics</a>
+			const <a href="#name-SysStats">SysStats</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-FetchRIB">	 func <a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-109">FetchRIB</a>(af <a href="../../../../builtin.html#name-int">int</a>, typ <a href="#name-RIBType">RIBType</a>, arg <a href="../../../../builtin.html#name-int">int</a>) ([]<a href="../../../../builtin.html#name-byte">byte</a>, <a href="../../../../builtin.html#name-error">error</a>)
+		FetchRIB fetches a routing information base from the operating
+		system.
+
+		The provided af must be an address family.
+
+		The provided arg must be a RIBType-specific argument.
+		When RIBType is related to routes, arg might be a set of route
+		flags. When RIBType is related to network interfaces, arg might be
+		an interface index or a set of interface flags. In most cases, zero
+		means a wildcard.</div>
+<div class="anchor" id="name-ParseRIB">	 func <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-33">ParseRIB</a>(typ <a href="#name-RIBType">RIBType</a>, b []<a href="../../../../builtin.html#name-byte">byte</a>) ([]<a href="#name-Message">Message</a>, <a href="../../../../builtin.html#name-error">error</a>)
+		ParseRIB parses b as a routing information base and returns a list
+		of routing messages.</div>
+<div class="anchor" id="name-RIBTypeInterface">	const <a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-96">RIBTypeInterface</a> <a href="#name-RIBType">RIBType</a> = 3</div>
+<div class="anchor" id="name-RIBTypeRoute">	const <a href="../../../../../src/vendor/golang.org/x/net/route/route.go.html#line-95">RIBTypeRoute</a> <a href="#name-RIBType">RIBType</a> = 1</div>
+<div class="anchor" id="name-SysMetrics">	const <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-27">SysMetrics</a> <a href="#name-SysType">SysType</a> = 0</div>
+<div class="anchor" id="name-SysStats">	const <a href="../../../../../src/vendor/golang.org/x/net/route/message.go.html#line-28">SysStats</a> <a href="#name-SysType">SysType</a> = 1</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: bufio</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>bufio</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-bufio">bufio</a><i> (on <a href="https://golang.org/pkg/bufio/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/bufio" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/bufio.html">5 packages</a>, and imported by <a href="../dep/bufio.html#imported-by">9 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../src/bufio/bufio.go.html#doc">d-&gt;</a> <a href="../src/bufio/bufio.go.html">bufio.go</a>
+	    <a href="../src/bufio/scan.go.html">scan.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Reader" data-popularity="1390">	 type <a href="../src/bufio/bufio.go.html#line-32">Reader</a> <i>(struct)</i>
+		Reader implements buffering for an io.Reader object.
+
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">Exported Methods (15)</label><span id='Reader-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/bufio/bufio.go.html#line-319">Buffered</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-164">Discard</a>(n <a href="builtin.html#name-int">int</a>) (discarded <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-130">Peek</a>(n <a href="builtin.html#name-int">int</a>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-198">Read</a>(p []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-247">ReadByte</a>() (<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-462">ReadBytes</a>(delim <a href="builtin.html#name-byte">byte</a>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-388">ReadLine</a>() (line []<a href="builtin.html#name-byte">byte</a>, isPrefix <a href="builtin.html#name-bool">bool</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-286">ReadRune</a>() (r <a href="builtin.html#name-rune">rune</a>, size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-331">ReadSlice</a>(delim <a href="builtin.html#name-byte">byte</a>) (line []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-482">ReadString</a>(delim <a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-71">Reset</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-67">Size</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-266">UnreadByte</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-308">UnreadRune</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-499">WriteTo</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-impls"><label for="Reader-stat-impls">Implements (7+)</label><span id='Reader-stat-impls-content' class="stat-content">
+			*T : compress/flate.<a href="compress/flate.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-ByteReader">ByteReader</a>
+			*T : io.<a href="io.html#name-ByteScanner">ByteScanner</a>
+			*T : io.<a href="io.html#name-Reader">Reader</a>
+			*T : io.<a href="io.html#name-RuneReader">RuneReader</a>
+			*T : io.<a href="io.html#name-RuneScanner">RuneScanner</a>
+			*T : io.<a href="io.html#name-WriterTo">WriterTo</a></span>
+		<input type='checkbox' class="stat" id="Reader-stat-results"><label for="Reader-stat-results">As Outputs Of (2+)</label><span id='Reader-stat-results-content' class="stat-content">
+			func <a href="#name-NewReader">NewReader</a>(rd <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) *<b>Reader</b>
+			func <a href="#name-NewReaderSize">NewReaderSize</a>(rd <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, size <a href="builtin.html#name-int">int</a>) *<b>Reader</b></span>
+		<input type='checkbox' class="stat" id="Reader-stat-params"><label for="Reader-stat-params">As Inputs Of (4+)</label><span id='Reader-stat-params-content' class="stat-content">
+			func <a href="#name-NewReadWriter">NewReadWriter</a>(r *<b>Reader</b>, w *<a href="#name-Writer">Writer</a>) *<a href="#name-ReadWriter">ReadWriter</a>
+			func net/http.<a href="net/http.html#name-ReadRequest">ReadRequest</a>(b *<b>Reader</b>) (*<a href="net/http.html">http</a>.<a href="net/http.html#name-Request">Request</a>, <a href="builtin.html#name-error">error</a>)
+			func net/http.<a href="net/http.html#name-ReadResponse">ReadResponse</a>(r *<b>Reader</b>, req *<a href="net/http.html">http</a>.<a href="net/http.html#name-Request">Request</a>) (*<a href="net/http.html">http</a>.<a href="net/http.html#name-Response">Response</a>, <a href="builtin.html#name-error">error</a>)
+			func net/textproto.<a href="net/textproto.html#name-NewReader">NewReader</a>(r *<b>Reader</b>) *<a href="net/textproto.html">textproto</a>.<a href="net/textproto.html#name-Reader">Reader</a></span></div>
+<div class="anchor" id="name-ReadWriter" data-popularity="1750">	 type <a href="../src/bufio/bufio.go.html#line-774">ReadWriter</a> <i>(struct)</i>
+		ReadWriter stores pointers to a Reader and a Writer.
+		It implements io.ReadWriter.
+
+		<input type='checkbox' class="stat" id="ReadWriter-stat-fields"><label for="ReadWriter-stat-fields">Exported Fields (2)</label><span id='ReadWriter-stat-fields-content' class="stat-content">
+			<a href="../src/bufio/bufio.go.html#line-775">Reader</a> <i>*<a href="#name-Reader">Reader</a></i>
+			<a href="../src/bufio/bufio.go.html#line-776">Writer</a> <i>*<a href="#name-Writer">Writer</a></i></span>
+		<input type='checkbox' class="stat" id="ReadWriter-stat-methods"><label for="ReadWriter-stat-methods">Exported Methods (19)</label><span id='ReadWriter-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/bufio/bufio.go.html#line-624">Available</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/bufio/bufio.go.html#line-164">Discard</a>(n <a href="builtin.html#name-int">int</a>) (discarded <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-600">Flush</a>() <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/bufio/bufio.go.html#line-130">Peek</a>(n <a href="builtin.html#name-int">int</a>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-198">Read</a>(p []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-247">ReadByte</a>() (<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-462">ReadBytes</a>(delim <a href="builtin.html#name-byte">byte</a>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-724">ReadFrom</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-388">ReadLine</a>() (line []<a href="builtin.html#name-byte">byte</a>, isPrefix <a href="builtin.html#name-bool">bool</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-286">ReadRune</a>() (r <a href="builtin.html#name-rune">rune</a>, size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-331">ReadSlice</a>(delim <a href="builtin.html#name-byte">byte</a>) (line []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-482">ReadString</a>(delim <a href="builtin.html#name-byte">byte</a>) (<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-266">UnreadByte</a>() <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/bufio/bufio.go.html#line-308">UnreadRune</a>() <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/bufio/bufio.go.html#line-633">Write</a>(p []<a href="builtin.html#name-byte">byte</a>) (nn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-658">WriteByte</a>(c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/bufio/bufio.go.html#line-672">WriteRune</a>(r <a href="builtin.html#name-rune">rune</a>) (size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-703">WriteString</a>(s <a href="builtin.html#name-string">string</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/bufio/bufio.go.html#line-499">WriteTo</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="ReadWriter-stat-impls"><label for="ReadWriter-stat-impls">Implements (13+)</label><span id='ReadWriter-stat-impls-content' class="stat-content">
+			 T : compress/flate.<a href="compress/flate.html#name-Reader">Reader</a>
+			 T : gorm.io/gorm/clause.<a href="gorm.io/gorm/clause.html#name-Writer">Writer</a>
+			 T : io.<a href="io.html#name-ByteReader">ByteReader</a>
+			 T : io.<a href="io.html#name-ByteScanner">ByteScanner</a>
+			 T : io.<a href="io.html#name-ByteWriter">ByteWriter</a>
+			 T : io.<a href="io.html#name-Reader">Reader</a>
+			 T : io.<a href="io.html#name-ReaderFrom">ReaderFrom</a>
+			 T : io.<a href="io.html#name-ReadWriter">ReadWriter</a>
+			 T : io.<a href="io.html#name-RuneReader">RuneReader</a>
+			 T : io.<a href="io.html#name-RuneScanner">RuneScanner</a>
+			 T : io.<a href="io.html#name-StringWriter">StringWriter</a>
+			 T : io.<a href="io.html#name-Writer">Writer</a>
+			 T : io.<a href="io.html#name-WriterTo">WriterTo</a></span>
+		<input type='checkbox' class="stat" id="ReadWriter-stat-results"><label for="ReadWriter-stat-results">As Outputs Of (2+)</label><span id='ReadWriter-stat-results-content' class="stat-content">
+			func <a href="#name-NewReadWriter">NewReadWriter</a>(r *<a href="#name-Reader">Reader</a>, w *<a href="#name-Writer">Writer</a>) *<b>ReadWriter</b>
+			func net/http.<a href="net/http.html#name-Hijacker">Hijacker</a>.<a href="../src/net/http/server.go.html#line-200">Hijack</a>() (<a href="net.html">net</a>.<a href="net.html#name-Conn">Conn</a>, *<b>ReadWriter</b>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Scanner" data-popularity="375">	 type <a href="../src/bufio/scan.go.html#line-30">Scanner</a> <i>(struct)</i>
+		Scanner provides a convenient interface for reading data such as
+		a file of newline-delimited lines of text. Successive calls to
+		the Scan method will step through the 'tokens' of a file, skipping
+		the bytes between the tokens. The specification of a token is
+		defined by a split function of type SplitFunc; the default split
+		function breaks the input into lines with line termination stripped. Split
+		functions are defined in this package for scanning a file into
+		lines, bytes, UTF-8-encoded runes, and space-delimited words. The
+		client may instead provide a custom split function.
+
+		Scanning stops unrecoverably at EOF, the first I/O error, or a token too
+		large to fit in the buffer. When a scan stops, the reader may have
+		advanced arbitrarily far past the last token. Programs that need more
+		control over error handling or large tokens, or must run sequential scans
+		on a reader, should use bufio.Reader instead.
+
+		<input type='checkbox' class="stat" id="Scanner-stat-methods"><label for="Scanner-stat-methods">Exported Methods (6)</label><span id='Scanner-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/bufio/scan.go.html#line-267">Buffer</a>(buf []<a href="builtin.html#name-byte">byte</a>, max <a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/bufio/scan.go.html#line-106">Bytes</a>() []<a href="builtin.html#name-byte">byte</a>
+			(*T) <a href="../src/bufio/scan.go.html#line-96">Err</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bufio/scan.go.html#line-135">Scan</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/bufio/scan.go.html#line-279">Split</a>(split <a href="#name-SplitFunc">SplitFunc</a>)
+			(*T) <a href="../src/bufio/scan.go.html#line-112">Text</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Scanner-stat-results"><label for="Scanner-stat-results">As Outputs Of (1+)</label><span id='Scanner-stat-results-content' class="stat-content">
+			func <a href="#name-NewScanner">NewScanner</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) *<b>Scanner</b></span></div>
+<div class="anchor" id="name-SplitFunc" data-popularity="35">	 type <a href="../src/bufio/scan.go.html#line-65">SplitFunc</a> <i>(func)</i>
+		SplitFunc is the signature of the split function used to tokenize the
+		input. The arguments are an initial substring of the remaining unprocessed
+		data and a flag, atEOF, that reports whether the Reader has no more data
+		to give. The return values are the number of bytes to advance the input
+		and the next token to return to the user, if any, plus an error, if any.
+
+		Scanning stops if the function returns an error, in which case some of
+		the input may be discarded.
+
+		Otherwise, the Scanner advances the input. If the token is not nil,
+		the Scanner returns it to the user. If the token is nil, the
+		Scanner reads more data and continues scanning; if there is no more
+		data--if atEOF was true--the Scanner returns. If the data does not
+		yet hold a complete token, for instance if it has no newline while
+		scanning lines, a SplitFunc can return (0, nil, nil) to signal the
+		Scanner to read more data into the slice and try again with a
+		longer slice starting at the same point in the input.
+
+		The function is never called with an empty data slice unless atEOF
+		is true. If atEOF is true, however, data may be non-empty and,
+		as always, holds unprocessed text.
+
+		<input type='checkbox' class="stat" id="SplitFunc-stat-params"><label for="SplitFunc-stat-params">As Inputs Of (1+)</label><span id='SplitFunc-stat-params-content' class="stat-content">
+			func (*<a href="#name-Scanner">Scanner</a>).<a href="../src/bufio/scan.go.html#line-279">Split</a>(split <b>SplitFunc</b>)</span></div>
+<div class="anchor" id="name-Writer" data-popularity="970">	 type <a href="../src/bufio/bufio.go.html#line-558">Writer</a> <i>(struct)</i>
+		Writer implements buffering for an io.Writer object.
+		If an error occurs writing to a Writer, no more data will be
+		accepted and all subsequent writes, and Flush, will return the error.
+		After all data has been written, the client should call the
+		Flush method to guarantee all data has been forwarded to
+		the underlying io.Writer.
+
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">Exported Methods (10)</label><span id='Writer-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/bufio/bufio.go.html#line-624">Available</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-627">Buffered</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-600">Flush</a>() <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-724">ReadFrom</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) (n <a href="builtin.html#name-int64">int64</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-593">Reset</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-589">Size</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-633">Write</a>(p []<a href="builtin.html#name-byte">byte</a>) (nn <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-658">WriteByte</a>(c <a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/bufio/bufio.go.html#line-672">WriteRune</a>(r <a href="builtin.html#name-rune">rune</a>) (size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/bufio/bufio.go.html#line-703">WriteString</a>(s <a href="builtin.html#name-string">string</a>) (<a href="builtin.html#name-int">int</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impls"><label for="Writer-stat-impls">Implements (5+)</label><span id='Writer-stat-impls-content' class="stat-content">
+			*T : gorm.io/gorm/clause.<a href="gorm.io/gorm/clause.html#name-Writer">Writer</a>
+			*T : io.<a href="io.html#name-ByteWriter">ByteWriter</a>
+			*T : io.<a href="io.html#name-ReaderFrom">ReaderFrom</a>
+			*T : io.<a href="io.html#name-StringWriter">StringWriter</a>
+			*T : io.<a href="io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Writer-stat-results"><label for="Writer-stat-results">As Outputs Of (2+)</label><span id='Writer-stat-results-content' class="stat-content">
+			func <a href="#name-NewWriter">NewWriter</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) *<b>Writer</b>
+			func <a href="#name-NewWriterSize">NewWriterSize</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, size <a href="builtin.html#name-int">int</a>) *<b>Writer</b></span>
+		<input type='checkbox' class="stat" id="Writer-stat-params"><label for="Writer-stat-params">As Inputs Of (2+)</label><span id='Writer-stat-params-content' class="stat-content">
+			func <a href="#name-NewReadWriter">NewReadWriter</a>(r *<a href="#name-Reader">Reader</a>, w *<b>Writer</b>) *<a href="#name-ReadWriter">ReadWriter</a>
+			func net/textproto.<a href="net/textproto.html#name-NewWriter">NewWriter</a>(w *<b>Writer</b>) *<a href="net/textproto.html">textproto</a>.<a href="net/textproto.html#name-Writer">Writer</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ErrAdvanceTooFar">	  var <a href="../src/bufio/scan.go.html#line-71">ErrAdvanceTooFar</a> <a href="builtin.html#name-error">error</a>
+		Errors returned by Scanner.</div>
+<div class="anchor" id="name-ErrBadReadCount">	  var <a href="../src/bufio/scan.go.html#line-72">ErrBadReadCount</a> <a href="builtin.html#name-error">error</a>
+		Errors returned by Scanner.</div>
+<div class="anchor" id="name-ErrBufferFull">	  var <a href="../src/bufio/bufio.go.html#line-25">ErrBufferFull</a> <a href="builtin.html#name-error">error</a></div>
+<div class="anchor" id="name-ErrFinalToken">	  var <a href="../src/bufio/scan.go.html#line-124">ErrFinalToken</a> <a href="builtin.html#name-error">error</a>
+		ErrFinalToken is a special sentinel error value. It is intended to be
+		returned by a Split function to indicate that the token being delivered
+		with the error is the last token and scanning should stop after this one.
+		After ErrFinalToken is received by Scan, scanning stops with no error.
+		The value is useful to stop processing early or when it is necessary to
+		deliver a final empty token. One could achieve the same behavior
+		with a custom error value but providing one here is tidier.
+		See the emptyFinalToken example for a use of this value.</div>
+<div class="anchor" id="name-ErrInvalidUnreadByte">	  var <a href="../src/bufio/bufio.go.html#line-23">ErrInvalidUnreadByte</a> <a href="builtin.html#name-error">error</a></div>
+<div class="anchor" id="name-ErrInvalidUnreadRune">	  var <a href="../src/bufio/bufio.go.html#line-24">ErrInvalidUnreadRune</a> <a href="builtin.html#name-error">error</a></div>
+<div class="anchor" id="name-ErrNegativeAdvance">	  var <a href="../src/bufio/scan.go.html#line-70">ErrNegativeAdvance</a> <a href="builtin.html#name-error">error</a>
+		Errors returned by Scanner.</div>
+<div class="anchor" id="name-ErrNegativeCount">	  var <a href="../src/bufio/bufio.go.html#line-26">ErrNegativeCount</a> <a href="builtin.html#name-error">error</a></div>
+<div class="anchor" id="name-ErrTooLong">	  var <a href="../src/bufio/scan.go.html#line-69">ErrTooLong</a> <a href="builtin.html#name-error">error</a>
+		Errors returned by Scanner.</div>
+<div class="anchor" id="name-MaxScanTokenSize">	const <a href="../src/bufio/scan.go.html#line-80">MaxScanTokenSize</a> = 65536
+		MaxScanTokenSize is the maximum size used to buffer a token
+		unless the user provides an explicit buffer with Scanner.Buffer.
+		The actual maximum token size may be smaller as the buffer
+		may need to include, for instance, a newline.</div>
+<div class="anchor" id="name-NewReader">	 func <a href="../src/bufio/bufio.go.html#line-62">NewReader</a>(rd <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) *<a href="#name-Reader">Reader</a>
+		NewReader returns a new Reader whose buffer has the default size.</div>
+<div class="anchor" id="name-NewReaderSize">	 func <a href="../src/bufio/bufio.go.html#line-47">NewReaderSize</a>(rd <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, size <a href="builtin.html#name-int">int</a>) *<a href="#name-Reader">Reader</a>
+		NewReaderSize returns a new Reader whose buffer has at least the specified
+		size. If the argument io.Reader is already a Reader with large enough
+		size, it returns the underlying Reader.</div>
+<div class="anchor" id="name-NewReadWriter">	 func <a href="../src/bufio/bufio.go.html#line-780">NewReadWriter</a>(r *<a href="#name-Reader">Reader</a>, w *<a href="#name-Writer">Writer</a>) *<a href="#name-ReadWriter">ReadWriter</a>
+		NewReadWriter allocates a new ReadWriter that dispatches to r and w.</div>
+<div class="anchor" id="name-NewScanner">	 func <a href="../src/bufio/scan.go.html#line-87">NewScanner</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) *<a href="#name-Scanner">Scanner</a>
+		NewScanner returns a new Scanner to read from r.
+		The split function defaults to ScanLines.</div>
+<div class="anchor" id="name-NewWriter">	 func <a href="../src/bufio/bufio.go.html#line-584">NewWriter</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>) *<a href="#name-Writer">Writer</a>
+		NewWriter returns a new Writer whose buffer has the default size.</div>
+<div class="anchor" id="name-NewWriterSize">	 func <a href="../src/bufio/bufio.go.html#line-568">NewWriterSize</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, size <a href="builtin.html#name-int">int</a>) *<a href="#name-Writer">Writer</a>
+		NewWriterSize returns a new Writer whose buffer has at least the specified
+		size. If the argument io.Writer is already a Writer with large enough
+		size, it returns the underlying Writer.</div>
+<div class="anchor" id="name-ScanBytes">	 func <a href="../src/bufio/scan.go.html#line-289">ScanBytes</a>(data []<a href="builtin.html#name-byte">byte</a>, atEOF <a href="builtin.html#name-bool">bool</a>) (advance <a href="builtin.html#name-int">int</a>, token []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+		ScanBytes is a split function for a Scanner that returns each byte as a token.</div>
+<div class="anchor" id="name-ScanLines">	 func <a href="../src/bufio/scan.go.html#line-350">ScanLines</a>(data []<a href="builtin.html#name-byte">byte</a>, atEOF <a href="builtin.html#name-bool">bool</a>) (advance <a href="builtin.html#name-int">int</a>, token []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+		ScanLines is a split function for a Scanner that returns each line of
+		text, stripped of any trailing end-of-line marker. The returned line may
+		be empty. The end-of-line marker is one optional carriage return followed
+		by one mandatory newline. In regular expression notation, it is `\r?\n`.
+		The last non-empty line of input will be returned even if it has no
+		newline.</div>
+<div class="anchor" id="name-ScanRunes">	 func <a href="../src/bufio/scan.go.html#line-304">ScanRunes</a>(data []<a href="builtin.html#name-byte">byte</a>, atEOF <a href="builtin.html#name-bool">bool</a>) (advance <a href="builtin.html#name-int">int</a>, token []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+		ScanRunes is a split function for a Scanner that returns each
+		UTF-8-encoded rune as a token. The sequence of runes returned is
+		equivalent to that from a range loop over the input as a string, which
+		means that erroneous UTF-8 encodings translate to U+FFFD = "\xef\xbf\xbd".
+		Because of the Scan interface, this makes it impossible for the client to
+		distinguish correctly encoded replacement runes from encoding errors.</div>
+<div class="anchor" id="name-ScanWords">	 func <a href="../src/bufio/scan.go.html#line-395">ScanWords</a>(data []<a href="builtin.html#name-byte">byte</a>, atEOF <a href="builtin.html#name-bool">bool</a>) (advance <a href="builtin.html#name-int">int</a>, token []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+		ScanWords is a split function for a Scanner that returns each
+		space-separated word of text, with surrounding spaces deleted. It will
+		never return an empty string. The definition of space is set by
+		unicode.IsSpace.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

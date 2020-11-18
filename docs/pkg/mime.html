@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: mime</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>mime</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-mime">mime</a><i> (on <a href="https://golang.org/pkg/mime/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/mime" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/mime.html">12 packages</a>, and imported by <a href="../dep/mime.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/mime/encodedword.go.html">encodedword.go</a>
+	    <a href="../src/mime/grammar.go.html">grammar.go</a>
+	    <a href="../src/mime/mediatype.go.html">mediatype.go</a>
+	<a href="../src/mime/type.go.html#doc">d-&gt;</a> <a href="../src/mime/type.go.html">type.go</a>
+	    <a href="../src/mime/type_unix.go.html">type_unix.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-WordDecoder" data-popularity="100">	 type <a href="../src/mime/encodedword.go.html#line-187">WordDecoder</a> <i>(struct)</i>
+		A WordDecoder decodes MIME headers containing RFC 2047 encoded-words.
+
+		<input type='checkbox' class="stat" id="WordDecoder-stat-fields"><label for="WordDecoder-stat-fields">One Exported Field</label><span id='WordDecoder-stat-fields-content' class="stat-content">
+			<a href="../src/mime/encodedword.go.html#line-194">CharsetReader</a> <i>func(charset <a href="builtin.html#name-string">string</a>, input <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) (<a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, <a href="builtin.html#name-error">error</a>)</i></span>
+		<input type='checkbox' class="stat" id="WordDecoder-stat-methods"><label for="WordDecoder-stat-methods">Exported Methods (2)</label><span id='WordDecoder-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/mime/encodedword.go.html#line-198">Decode</a>(word <a href="builtin.html#name-string">string</a>) (<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)
+			(*T) <a href="../src/mime/encodedword.go.html#line-240">DecodeHeader</a>(header <a href="builtin.html#name-string">string</a>) (<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-WordEncoder" data-popularity="60">	 type <a href="../src/mime/encodedword.go.html#line-19">WordEncoder</a> <a href="builtin.html#name-byte">byte</a>
+		A WordEncoder is an RFC 2047 encoded-word encoder.
+
+		<input type='checkbox' class="stat" id="WordEncoder-stat-methods"><label for="WordEncoder-stat-methods">One Exported Method</label><span id='WordEncoder-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/mime/encodedword.go.html#line-35">Encode</a>(charset, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="WordEncoder-stat-values"><label for="WordEncoder-stat-values">As Types Of (2+)</label><span id='WordEncoder-stat-values-content' class="stat-content">
+			const <a href="#name-BEncoding">BEncoding</a>
+			const <a href="#name-QEncoding">QEncoding</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-AddExtensionType">	 func <a href="../src/mime/type.go.html#line-164">AddExtensionType</a>(ext, typ <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-error">error</a>
+		AddExtensionType sets the MIME type associated with
+		the extension ext to typ. The extension should begin with
+		a leading dot, as in ".html".</div>
+<div class="anchor" id="name-BEncoding">	const <a href="../src/mime/encodedword.go.html#line-23">BEncoding</a> <a href="#name-WordEncoder">WordEncoder</a> = 98
+		BEncoding represents Base64 encoding scheme as defined by RFC 2045.</div>
+<div class="anchor" id="name-ErrInvalidMediaParameter">	  var <a href="../src/mime/mediatype.go.html#line-128">ErrInvalidMediaParameter</a> <a href="builtin.html#name-error">error</a>
+		ErrInvalidMediaParameter is returned by ParseMediaType if
+		the media type value was found but there was an error parsing
+		the optional parameters</div>
+<div class="anchor" id="name-ExtensionsByType">	 func <a href="../src/mime/type.go.html#line-145">ExtensionsByType</a>(typ <a href="builtin.html#name-string">string</a>) ([]<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)
+		ExtensionsByType returns the extensions known to be associated with the MIME
+		type typ. The returned extensions will each begin with a leading dot, as in
+		".html". When typ has no associated extensions, ExtensionsByType returns an
+		nil slice.</div>
+<div class="anchor" id="name-FormatMediaType">	 func <a href="../src/mime/mediatype.go.html#line-20">FormatMediaType</a>(t <a href="builtin.html#name-string">string</a>, param map[<a href="builtin.html#name-string">string</a>]<a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		FormatMediaType serializes mediatype t and the parameters
+		param as a media type conforming to RFC 2045 and RFC 2616.
+		The type and parameter names are written in lower-case.
+		When any of the arguments result in a standard violation then
+		FormatMediaType returns the empty string.</div>
+<div class="anchor" id="name-ParseMediaType">	 func <a href="../src/mime/mediatype.go.html#line-140">ParseMediaType</a>(v <a href="builtin.html#name-string">string</a>) (mediatype <a href="builtin.html#name-string">string</a>, params map[<a href="builtin.html#name-string">string</a>]<a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+		ParseMediaType parses a media type value and any optional
+		parameters, per RFC 1521.  Media types are the values in
+		Content-Type and Content-Disposition headers (RFC 2183).
+		On success, ParseMediaType returns the media type converted
+		to lowercase and trimmed of white space and a non-nil map.
+		If there is an error parsing the optional parameter,
+		the media type will be returned along with the error
+		ErrInvalidMediaParameter.
+		The returned map, params, maps from the lowercase
+		attribute to the attribute value with its case preserved.</div>
+<div class="anchor" id="name-QEncoding">	const <a href="../src/mime/encodedword.go.html#line-25">QEncoding</a> <a href="#name-WordEncoder">WordEncoder</a> = 113
+		QEncoding represents the Q-encoding scheme as defined by RFC 2047.</div>
+<div class="anchor" id="name-TypeByExtension">	 func <a href="../src/mime/type.go.html#line-108">TypeByExtension</a>(ext <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+		TypeByExtension returns the MIME type associated with the file extension ext.
+		The extension ext should begin with a leading dot, as in ".html".
+		When ext has no associated type, TypeByExtension returns "".
+
+		Extensions are looked up first case-sensitively, then case-insensitively.
+
+		The built-in table is small but on unix it is augmented by the local
+		system's mime.types file(s) if available under one or more of these
+		names:
+
+		  /etc/mime.types
+		  /etc/apache2/mime.types
+		  /etc/apache/mime.types
+
+		On Windows, MIME types are extracted from the registry.
+
+		Text types have the charset parameter set to "utf-8" by default.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

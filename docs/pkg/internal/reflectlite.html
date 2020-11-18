@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: internal/reflectlite</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>reflectlite</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-internal/reflectlite">internal/reflectlite</a><i> (on <a href="https://golang.org/pkg/internal/reflectlite/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/internal/reflectlite" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/internal/reflectlite.html">3 packages</a>, and imported by <a href="../../dep/internal/reflectlite.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/internal/reflectlite/swapper.go.html">swapper.go</a>
+	<a href="../../src/internal/reflectlite/type.go.html#doc">d-&gt;</a> <a href="../../src/internal/reflectlite/type.go.html">type.go</a>
+	    <a href="../../src/internal/reflectlite/value.go.html">value.go</a>
+	    <a href="../../src/internal/reflectlite/asm.s.html">asm.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Kind" data-popularity="165">	 type <a href="../../src/internal/reflectlite/type.go.html#line-78">Kind</a> <a href="../builtin.html#name-uint">uint</a>
+		A Kind represents the specific kind of type that a Type represents.
+		The zero Kind is not a valid kind.
+
+		<input type='checkbox' class="stat" id="Kind-stat-results"><label for="Kind-stat-results">As Outputs Of (2+)</label><span id='Kind-stat-results-content' class="stat-content">
+			func <a href="#name-Type">Type</a>.<a href="../../src/internal/reflectlite/type.go.html#line-44">Kind</a>() <b>Kind</b>
+			func <a href="#name-Value">Value</a>.<a href="../../src/internal/reflectlite/value.go.html#line-317">Kind</a>() <b>Kind</b></span>
+		<input type='checkbox' class="stat" id="Kind-stat-values"><label for="Kind-stat-values">As Types Of (27+)</label><span id='Kind-stat-values-content' class="stat-content">
+			const <a href="#name-Array">Array</a>
+			const <a href="#name-Bool">Bool</a>
+			const <a href="#name-Chan">Chan</a>
+			const <a href="#name-Complex128">Complex128</a>
+			const <a href="#name-Complex64">Complex64</a>
+			const <a href="#name-Float32">Float32</a>
+			const <a href="#name-Float64">Float64</a>
+			const <a href="#name-Func">Func</a>
+			const <a href="#name-Int">Int</a>
+			const <a href="#name-Int16">Int16</a>
+			const <a href="#name-Int32">Int32</a>
+			const <a href="#name-Int64">Int64</a>
+			const <a href="#name-Int8">Int8</a>
+			const <a href="#name-Interface">Interface</a>
+			const <a href="#name-Invalid">Invalid</a>
+			const <a href="#name-Map">Map</a>
+			const <a href="#name-Ptr">Ptr</a>
+			const <a href="#name-Slice">Slice</a>
+			const <a href="#name-String">String</a>
+			const <a href="#name-Struct">Struct</a>
+			const <a href="#name-Uint">Uint</a>
+			const <a href="#name-Uint16">Uint16</a>
+			const <a href="#name-Uint32">Uint32</a>
+			const <a href="#name-Uint64">Uint64</a>
+			const <a href="#name-Uint8">Uint8</a>
+			const <a href="#name-Uintptr">Uintptr</a>
+			const <a href="#name-UnsafePointer">UnsafePointer</a></span></div>
+<div class="anchor" id="name-Type" data-popularity="795">	 type <a href="../../src/internal/reflectlite/type.go.html#line-25">Type</a> <b<i>(interface)</i></b>
+		Type is the representation of a Go type.
+
+		Not all methods apply to all kinds of types. Restrictions,
+		if any, are noted in the documentation for each method.
+		Use the Kind method to find out the kind of type before
+		calling kind-specific methods. Calling a method
+		inappropriate to the kind of type causes a run-time panic.
+
+		Type values are comparable, such as with the == operator,
+		so they can be used as map keys.
+		Two Type values are equal if they represent identical types.
+
+		<input type='checkbox' class="stat" id="Type-stat-methods"><label for="Type-stat-methods">Exported Methods (9)</label><span id='Type-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-50">AssignableTo</a>(u <b>Type</b>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-53">Comparable</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-64">Elem</a>() <b>Type</b>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-47">Implements</a>(u <b>Type</b>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-44">Kind</a>() <a href="#name-Kind">Kind</a>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-30">Name</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-37">PkgPath</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-41">Size</a>() <a href="../builtin.html#name-uintptr">uintptr</a>
+			 (T) <a href="../../src/internal/reflectlite/type.go.html#line-60">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Type-stat-impls"><label for="Type-stat-impls">Implements (1+)</label><span id='Type-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Type-stat-results"><label for="Type-stat-results">As Outputs Of (3+)</label><span id='Type-stat-results-content' class="stat-content">
+			func <a href="#name-TypeOf">TypeOf</a>(i interface{}) <b>Type</b>
+			func <a href="#name-Type">Type</a>.<a href="../../src/internal/reflectlite/type.go.html#line-64">Elem</a>() <b>Type</b>
+			func <a href="#name-Value">Value</a>.<a href="../../src/internal/reflectlite/value.go.html#line-374">Type</a>() <b>Type</b></span>
+		<input type='checkbox' class="stat" id="Type-stat-params"><label for="Type-stat-params">As Inputs Of (2+)</label><span id='Type-stat-params-content' class="stat-content">
+			func <a href="#name-Type">Type</a>.<a href="../../src/internal/reflectlite/type.go.html#line-50">AssignableTo</a>(u <b>Type</b>) <a href="../builtin.html#name-bool">bool</a>
+			func <a href="#name-Type">Type</a>.<a href="../../src/internal/reflectlite/type.go.html#line-47">Implements</a>(u <b>Type</b>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-Value" data-popularity="635">	 type <a href="../../src/internal/reflectlite/value.go.html#line-36">Value</a> <i>(struct)</i>
+		Value is the reflection interface to a Go value.
+
+		Not all methods apply to all kinds of values. Restrictions,
+		if any, are noted in the documentation for each method.
+		Use the Kind method to find out the kind of value before
+		calling kind-specific methods. Calling a method
+		inappropriate to the kind of type causes a run time panic.
+
+		The zero Value represents no value.
+		Its IsValid method returns false, its Kind method returns Invalid,
+		its String method returns "&lt;invalid Value&gt;", and all other methods panic.
+		Most functions and methods never return an invalid value.
+		If one does, its documentation states the conditions explicitly.
+
+		A Value can be used concurrently by multiple goroutines provided that
+		the underlying Go value can be used concurrently for the equivalent
+		direct operations.
+
+		To compare two Values, compare the results of the Interface method.
+		Using == on two Values does not compare the underlying values
+		they represent.
+
+		<input type='checkbox' class="stat" id="Value-stat-methods"><label for="Value-stat-methods">Exported Methods (8)</label><span id='Value-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-215">CanSet</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-223">Elem</a>() <b>Value</b>
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-286">IsNil</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-311">IsValid</a>() <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-317">Kind</a>() <a href="#name-Kind">Kind</a>
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-327">Len</a>() <a href="../builtin.html#name-int">int</a>
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-358">Set</a>(x <b>Value</b>)
+			 (T) <a href="../../src/internal/reflectlite/value.go.html#line-374">Type</a>() <a href="#name-Type">Type</a></span>
+		<input type='checkbox' class="stat" id="Value-stat-impls"><label for="Value-stat-impls">Implements (1+)</label><span id='Value-stat-impls-content' class="stat-content">
+			 T : database/sql/driver.<a href="../database/sql/driver.html#name-Validator">Validator</a></span>
+		<input type='checkbox' class="stat" id="Value-stat-results"><label for="Value-stat-results">As Outputs Of (2+)</label><span id='Value-stat-results-content' class="stat-content">
+			func <a href="#name-ValueOf">ValueOf</a>(i interface{}) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../../src/internal/reflectlite/value.go.html#line-223">Elem</a>() <b>Value</b></span>
+		<input type='checkbox' class="stat" id="Value-stat-params"><label for="Value-stat-params">As Inputs Of (1+)</label><span id='Value-stat-params-content' class="stat-content">
+			func <a href="#name-Value">Value</a>.<a href="../../src/internal/reflectlite/value.go.html#line-358">Set</a>(x <b>Value</b>)</span></div>
+<div class="anchor" id="name-ValueError" data-popularity="100">	 type <a href="../../src/internal/reflectlite/value.go.html#line-157">ValueError</a> <i>(struct)</i>
+		A ValueError occurs when a Value method is invoked on
+		a Value that does not support it. Such cases are documented
+		in the description of each method.
+
+		<input type='checkbox' class="stat" id="ValueError-stat-fields"><label for="ValueError-stat-fields">Exported Fields (2)</label><span id='ValueError-stat-fields-content' class="stat-content">
+			<a href="../../src/internal/reflectlite/value.go.html#line-159">Kind</a> <i><a href="#name-Kind">Kind</a></i>
+			<a href="../../src/internal/reflectlite/value.go.html#line-158">Method</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="ValueError-stat-methods"><label for="ValueError-stat-methods">One Exported Method</label><span id='ValueError-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/internal/reflectlite/value.go.html#line-162">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ValueError-stat-impls"><label for="ValueError-stat-impls">Implements (1+)</label><span id='ValueError-stat-impls-content' class="stat-content">
+			*T : <a href="../builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Array">	const <a href="../../src/internal/reflectlite/type.go.html#line-98">Array</a> <a href="#name-Kind">Kind</a> = 17</div>
+<div class="anchor" id="name-Bool">	const <a href="../../src/internal/reflectlite/type.go.html#line-82">Bool</a> <a href="#name-Kind">Kind</a> = 1</div>
+<div class="anchor" id="name-Chan">	const <a href="../../src/internal/reflectlite/type.go.html#line-99">Chan</a> <a href="#name-Kind">Kind</a> = 18</div>
+<div class="anchor" id="name-Complex128">	const <a href="../../src/internal/reflectlite/type.go.html#line-97">Complex128</a> <a href="#name-Kind">Kind</a> = 16</div>
+<div class="anchor" id="name-Complex64">	const <a href="../../src/internal/reflectlite/type.go.html#line-96">Complex64</a> <a href="#name-Kind">Kind</a> = 15</div>
+<div class="anchor" id="name-Float32">	const <a href="../../src/internal/reflectlite/type.go.html#line-94">Float32</a> <a href="#name-Kind">Kind</a> = 13</div>
+<div class="anchor" id="name-Float64">	const <a href="../../src/internal/reflectlite/type.go.html#line-95">Float64</a> <a href="#name-Kind">Kind</a> = 14</div>
+<div class="anchor" id="name-Func">	const <a href="../../src/internal/reflectlite/type.go.html#line-100">Func</a> <a href="#name-Kind">Kind</a> = 19</div>
+<div class="anchor" id="name-Int">	const <a href="../../src/internal/reflectlite/type.go.html#line-83">Int</a> <a href="#name-Kind">Kind</a> = 2</div>
+<div class="anchor" id="name-Int16">	const <a href="../../src/internal/reflectlite/type.go.html#line-85">Int16</a> <a href="#name-Kind">Kind</a> = 4</div>
+<div class="anchor" id="name-Int32">	const <a href="../../src/internal/reflectlite/type.go.html#line-86">Int32</a> <a href="#name-Kind">Kind</a> = 5</div>
+<div class="anchor" id="name-Int64">	const <a href="../../src/internal/reflectlite/type.go.html#line-87">Int64</a> <a href="#name-Kind">Kind</a> = 6</div>
+<div class="anchor" id="name-Int8">	const <a href="../../src/internal/reflectlite/type.go.html#line-84">Int8</a> <a href="#name-Kind">Kind</a> = 3</div>
+<div class="anchor" id="name-Interface">	const <a href="../../src/internal/reflectlite/type.go.html#line-101">Interface</a> <a href="#name-Kind">Kind</a> = 20</div>
+<div class="anchor" id="name-Invalid">	const <a href="../../src/internal/reflectlite/type.go.html#line-81">Invalid</a> <a href="#name-Kind">Kind</a> = 0</div>
+<div class="anchor" id="name-Map">	const <a href="../../src/internal/reflectlite/type.go.html#line-102">Map</a> <a href="#name-Kind">Kind</a> = 21</div>
+<div class="anchor" id="name-Ptr">	const <a href="../../src/internal/reflectlite/type.go.html#line-103">Ptr</a> <a href="#name-Kind">Kind</a> = 22</div>
+<div class="anchor" id="name-Slice">	const <a href="../../src/internal/reflectlite/type.go.html#line-104">Slice</a> <a href="#name-Kind">Kind</a> = 23</div>
+<div class="anchor" id="name-String">	const <a href="../../src/internal/reflectlite/type.go.html#line-105">String</a> <a href="#name-Kind">Kind</a> = 24</div>
+<div class="anchor" id="name-Struct">	const <a href="../../src/internal/reflectlite/type.go.html#line-106">Struct</a> <a href="#name-Kind">Kind</a> = 25</div>
+<div class="anchor" id="name-Swapper">	 func <a href="../../src/internal/reflectlite/swapper.go.html#line-16">Swapper</a>(slice interface{}) func(i, j <a href="../builtin.html#name-int">int</a>)
+		Swapper returns a function that swaps the elements in the provided
+		slice.
+
+		Swapper panics if the provided interface is not a slice.</div>
+<div class="anchor" id="name-TypeOf">	 func <a href="../../src/internal/reflectlite/type.go.html#line-664">TypeOf</a>(i interface{}) <a href="#name-Type">Type</a>
+		TypeOf returns the reflection Type that represents the dynamic type of i.
+		If i is a nil interface value, TypeOf returns nil.</div>
+<div class="anchor" id="name-Uint">	const <a href="../../src/internal/reflectlite/type.go.html#line-88">Uint</a> <a href="#name-Kind">Kind</a> = 7</div>
+<div class="anchor" id="name-Uint16">	const <a href="../../src/internal/reflectlite/type.go.html#line-90">Uint16</a> <a href="#name-Kind">Kind</a> = 9</div>
+<div class="anchor" id="name-Uint32">	const <a href="../../src/internal/reflectlite/type.go.html#line-91">Uint32</a> <a href="#name-Kind">Kind</a> = 10</div>
+<div class="anchor" id="name-Uint64">	const <a href="../../src/internal/reflectlite/type.go.html#line-92">Uint64</a> <a href="#name-Kind">Kind</a> = 11</div>
+<div class="anchor" id="name-Uint8">	const <a href="../../src/internal/reflectlite/type.go.html#line-89">Uint8</a> <a href="#name-Kind">Kind</a> = 8</div>
+<div class="anchor" id="name-Uintptr">	const <a href="../../src/internal/reflectlite/type.go.html#line-93">Uintptr</a> <a href="#name-Kind">Kind</a> = 12</div>
+<div class="anchor" id="name-UnsafePointer">	const <a href="../../src/internal/reflectlite/type.go.html#line-107">UnsafePointer</a> <a href="#name-Kind">Kind</a> = 26</div>
+<div class="anchor" id="name-ValueOf">	 func <a href="../../src/internal/reflectlite/value.go.html#line-392">ValueOf</a>(i interface{}) <a href="#name-Value">Value</a>
+		ValueOf returns a new Value initialized to the concrete value
+		stored in the interface i. ValueOf(nil) returns the zero Value.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

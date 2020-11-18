@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: route.go in package github.com/gorilla/mux</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	route.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/gorilla/mux.html">github.com/gorilla/mux</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2012 The Gorilla Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package mux</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"errors"</code></span>
+<span class="codeline" id="line-9"><code>	"fmt"</code></span>
+<span class="codeline" id="line-10"><code>	"net/http"</code></span>
+<span class="codeline" id="line-11"><code>	"net/url"</code></span>
+<span class="codeline" id="line-12"><code>	"regexp"</code></span>
+<span class="codeline" id="line-13"><code>	"strings"</code></span>
+<span class="codeline" id="line-14"><code>)</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>// Route stores information to match a request and build URLs.</code></span>
+<span class="codeline" id="line-17"><code>type Route struct {</code></span>
+<span class="codeline" id="line-18"><code>	// Request handler for the route.</code></span>
+<span class="codeline" id="line-19"><code>	handler http.Handler</code></span>
+<span class="codeline" id="line-20"><code>	// If true, this route never matches: it is only used to build URLs.</code></span>
+<span class="codeline" id="line-21"><code>	buildOnly bool</code></span>
+<span class="codeline" id="line-22"><code>	// The name used to build URLs.</code></span>
+<span class="codeline" id="line-23"><code>	name string</code></span>
+<span class="codeline" id="line-24"><code>	// Error resulted from building a route.</code></span>
+<span class="codeline" id="line-25"><code>	err error</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>	// "global" reference to all named routes</code></span>
+<span class="codeline" id="line-28"><code>	namedRoutes map[string]*Route</code></span>
+<span class="codeline" id="line-29"><code></code></span>
+<span class="codeline" id="line-30"><code>	// config possibly passed in from `Router`</code></span>
+<span class="codeline" id="line-31"><code>	routeConf</code></span>
+<span class="codeline" id="line-32"><code>}</code></span>
+<span class="codeline" id="line-33"><code></code></span>
+<span class="codeline" id="line-34"><code>// SkipClean reports whether path cleaning is enabled for this route via</code></span>
+<span class="codeline" id="line-35"><code>// Router.SkipClean.</code></span>
+<span class="codeline" id="line-36"><code>func (r *Route) SkipClean() bool {</code></span>
+<span class="codeline" id="line-37"><code>	return r.skipClean</code></span>
+<span class="codeline" id="line-38"><code>}</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>// Match matches the route against the request.</code></span>
+<span class="codeline" id="line-41"><code>func (r *Route) Match(req *http.Request, match *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-42"><code>	if r.buildOnly || r.err != nil {</code></span>
+<span class="codeline" id="line-43"><code>		return false</code></span>
+<span class="codeline" id="line-44"><code>	}</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>	var matchErr error</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>	// Match everything.</code></span>
+<span class="codeline" id="line-49"><code>	for _, m := range r.matchers {</code></span>
+<span class="codeline" id="line-50"><code>		if matched := m.Match(req, match); !matched {</code></span>
+<span class="codeline" id="line-51"><code>			if _, ok := m.(methodMatcher); ok {</code></span>
+<span class="codeline" id="line-52"><code>				matchErr = ErrMethodMismatch</code></span>
+<span class="codeline" id="line-53"><code>				continue</code></span>
+<span class="codeline" id="line-54"><code>			}</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>			// Ignore ErrNotFound errors. These errors arise from match call</code></span>
+<span class="codeline" id="line-57"><code>			// to Subrouters.</code></span>
+<span class="codeline" id="line-58"><code>			//</code></span>
+<span class="codeline" id="line-59"><code>			// This prevents subsequent matching subrouters from failing to</code></span>
+<span class="codeline" id="line-60"><code>			// run middleware. If not ignored, the middleware would see a</code></span>
+<span class="codeline" id="line-61"><code>			// non-nil MatchErr and be skipped, even when there was a</code></span>
+<span class="codeline" id="line-62"><code>			// matching route.</code></span>
+<span class="codeline" id="line-63"><code>			if match.MatchErr == ErrNotFound {</code></span>
+<span class="codeline" id="line-64"><code>				match.MatchErr = nil</code></span>
+<span class="codeline" id="line-65"><code>			}</code></span>
+<span class="codeline" id="line-66"><code></code></span>
+<span class="codeline" id="line-67"><code>			matchErr = nil</code></span>
+<span class="codeline" id="line-68"><code>			return false</code></span>
+<span class="codeline" id="line-69"><code>		}</code></span>
+<span class="codeline" id="line-70"><code>	}</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>	if matchErr != nil {</code></span>
+<span class="codeline" id="line-73"><code>		match.MatchErr = matchErr</code></span>
+<span class="codeline" id="line-74"><code>		return false</code></span>
+<span class="codeline" id="line-75"><code>	}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>	if match.MatchErr == ErrMethodMismatch &amp;&amp; r.handler != nil {</code></span>
+<span class="codeline" id="line-78"><code>		// We found a route which matches request method, clear MatchErr</code></span>
+<span class="codeline" id="line-79"><code>		match.MatchErr = nil</code></span>
+<span class="codeline" id="line-80"><code>		// Then override the mis-matched handler</code></span>
+<span class="codeline" id="line-81"><code>		match.Handler = r.handler</code></span>
+<span class="codeline" id="line-82"><code>	}</code></span>
+<span class="codeline" id="line-83"><code></code></span>
+<span class="codeline" id="line-84"><code>	// Yay, we have a match. Let's collect some info about it.</code></span>
+<span class="codeline" id="line-85"><code>	if match.Route == nil {</code></span>
+<span class="codeline" id="line-86"><code>		match.Route = r</code></span>
+<span class="codeline" id="line-87"><code>	}</code></span>
+<span class="codeline" id="line-88"><code>	if match.Handler == nil {</code></span>
+<span class="codeline" id="line-89"><code>		match.Handler = r.handler</code></span>
+<span class="codeline" id="line-90"><code>	}</code></span>
+<span class="codeline" id="line-91"><code>	if match.Vars == nil {</code></span>
+<span class="codeline" id="line-92"><code>		match.Vars = make(map[string]string)</code></span>
+<span class="codeline" id="line-93"><code>	}</code></span>
+<span class="codeline" id="line-94"><code></code></span>
+<span class="codeline" id="line-95"><code>	// Set variables.</code></span>
+<span class="codeline" id="line-96"><code>	r.regexp.setMatch(req, match, r)</code></span>
+<span class="codeline" id="line-97"><code>	return true</code></span>
+<span class="codeline" id="line-98"><code>}</code></span>
+<span class="codeline" id="line-99"><code></code></span>
+<span class="codeline" id="line-100"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-101"><code>// Route attributes</code></span>
+<span class="codeline" id="line-102"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-103"><code></code></span>
+<span class="codeline" id="line-104"><code>// GetError returns an error resulted from building the route, if any.</code></span>
+<span class="codeline" id="line-105"><code>func (r *Route) GetError() error {</code></span>
+<span class="codeline" id="line-106"><code>	return r.err</code></span>
+<span class="codeline" id="line-107"><code>}</code></span>
+<span class="codeline" id="line-108"><code></code></span>
+<span class="codeline" id="line-109"><code>// BuildOnly sets the route to never match: it is only used to build URLs.</code></span>
+<span class="codeline" id="line-110"><code>func (r *Route) BuildOnly() *Route {</code></span>
+<span class="codeline" id="line-111"><code>	r.buildOnly = true</code></span>
+<span class="codeline" id="line-112"><code>	return r</code></span>
+<span class="codeline" id="line-113"><code>}</code></span>
+<span class="codeline" id="line-114"><code></code></span>
+<span class="codeline" id="line-115"><code>// Handler --------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>// Handler sets a handler for the route.</code></span>
+<span class="codeline" id="line-118"><code>func (r *Route) Handler(handler http.Handler) *Route {</code></span>
+<span class="codeline" id="line-119"><code>	if r.err == nil {</code></span>
+<span class="codeline" id="line-120"><code>		r.handler = handler</code></span>
+<span class="codeline" id="line-121"><code>	}</code></span>
+<span class="codeline" id="line-122"><code>	return r</code></span>
+<span class="codeline" id="line-123"><code>}</code></span>
+<span class="codeline" id="line-124"><code></code></span>
+<span class="codeline" id="line-125"><code>// HandlerFunc sets a handler function for the route.</code></span>
+<span class="codeline" id="line-126"><code>func (r *Route) HandlerFunc(f func(http.ResponseWriter, *http.Request)) *Route {</code></span>
+<span class="codeline" id="line-127"><code>	return r.Handler(http.HandlerFunc(f))</code></span>
+<span class="codeline" id="line-128"><code>}</code></span>
+<span class="codeline" id="line-129"><code></code></span>
+<span class="codeline" id="line-130"><code>// GetHandler returns the handler for the route, if any.</code></span>
+<span class="codeline" id="line-131"><code>func (r *Route) GetHandler() http.Handler {</code></span>
+<span class="codeline" id="line-132"><code>	return r.handler</code></span>
+<span class="codeline" id="line-133"><code>}</code></span>
+<span class="codeline" id="line-134"><code></code></span>
+<span class="codeline" id="line-135"><code>// Name -----------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-136"><code></code></span>
+<span class="codeline" id="line-137"><code>// Name sets the name for the route, used to build URLs.</code></span>
+<span class="codeline" id="line-138"><code>// It is an error to call Name more than once on a route.</code></span>
+<span class="codeline" id="line-139"><code>func (r *Route) Name(name string) *Route {</code></span>
+<span class="codeline" id="line-140"><code>	if r.name != "" {</code></span>
+<span class="codeline" id="line-141"><code>		r.err = fmt.Errorf("mux: route already has name %q, can't set %q",</code></span>
+<span class="codeline" id="line-142"><code>			r.name, name)</code></span>
+<span class="codeline" id="line-143"><code>	}</code></span>
+<span class="codeline" id="line-144"><code>	if r.err == nil {</code></span>
+<span class="codeline" id="line-145"><code>		r.name = name</code></span>
+<span class="codeline" id="line-146"><code>		r.namedRoutes[name] = r</code></span>
+<span class="codeline" id="line-147"><code>	}</code></span>
+<span class="codeline" id="line-148"><code>	return r</code></span>
+<span class="codeline" id="line-149"><code>}</code></span>
+<span class="codeline" id="line-150"><code></code></span>
+<span class="codeline" id="line-151"><code>// GetName returns the name for the route, if any.</code></span>
+<span class="codeline" id="line-152"><code>func (r *Route) GetName() string {</code></span>
+<span class="codeline" id="line-153"><code>	return r.name</code></span>
+<span class="codeline" id="line-154"><code>}</code></span>
+<span class="codeline" id="line-155"><code></code></span>
+<span class="codeline" id="line-156"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-157"><code>// Matchers</code></span>
+<span class="codeline" id="line-158"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-159"><code></code></span>
+<span class="codeline" id="line-160"><code>// matcher types try to match a request.</code></span>
+<span class="codeline" id="line-161"><code>type matcher interface {</code></span>
+<span class="codeline" id="line-162"><code>	Match(*http.Request, *RouteMatch) bool</code></span>
+<span class="codeline" id="line-163"><code>}</code></span>
+<span class="codeline" id="line-164"><code></code></span>
+<span class="codeline" id="line-165"><code>// addMatcher adds a matcher to the route.</code></span>
+<span class="codeline" id="line-166"><code>func (r *Route) addMatcher(m matcher) *Route {</code></span>
+<span class="codeline" id="line-167"><code>	if r.err == nil {</code></span>
+<span class="codeline" id="line-168"><code>		r.matchers = append(r.matchers, m)</code></span>
+<span class="codeline" id="line-169"><code>	}</code></span>
+<span class="codeline" id="line-170"><code>	return r</code></span>
+<span class="codeline" id="line-171"><code>}</code></span>
+<span class="codeline" id="line-172"><code></code></span>
+<span class="codeline" id="line-173"><code>// addRegexpMatcher adds a host or path matcher and builder to a route.</code></span>
+<span class="codeline" id="line-174"><code>func (r *Route) addRegexpMatcher(tpl string, typ regexpType) error {</code></span>
+<span class="codeline" id="line-175"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-176"><code>		return r.err</code></span>
+<span class="codeline" id="line-177"><code>	}</code></span>
+<span class="codeline" id="line-178"><code>	if typ == regexpTypePath || typ == regexpTypePrefix {</code></span>
+<span class="codeline" id="line-179"><code>		if len(tpl) &gt; 0 &amp;&amp; tpl[0] != '/' {</code></span>
+<span class="codeline" id="line-180"><code>			return fmt.Errorf("mux: path must start with a slash, got %q", tpl)</code></span>
+<span class="codeline" id="line-181"><code>		}</code></span>
+<span class="codeline" id="line-182"><code>		if r.regexp.path != nil {</code></span>
+<span class="codeline" id="line-183"><code>			tpl = strings.TrimRight(r.regexp.path.template, "/") + tpl</code></span>
+<span class="codeline" id="line-184"><code>		}</code></span>
+<span class="codeline" id="line-185"><code>	}</code></span>
+<span class="codeline" id="line-186"><code>	rr, err := newRouteRegexp(tpl, typ, routeRegexpOptions{</code></span>
+<span class="codeline" id="line-187"><code>		strictSlash:    r.strictSlash,</code></span>
+<span class="codeline" id="line-188"><code>		useEncodedPath: r.useEncodedPath,</code></span>
+<span class="codeline" id="line-189"><code>	})</code></span>
+<span class="codeline" id="line-190"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-191"><code>		return err</code></span>
+<span class="codeline" id="line-192"><code>	}</code></span>
+<span class="codeline" id="line-193"><code>	for _, q := range r.regexp.queries {</code></span>
+<span class="codeline" id="line-194"><code>		if err = uniqueVars(rr.varsN, q.varsN); err != nil {</code></span>
+<span class="codeline" id="line-195"><code>			return err</code></span>
+<span class="codeline" id="line-196"><code>		}</code></span>
+<span class="codeline" id="line-197"><code>	}</code></span>
+<span class="codeline" id="line-198"><code>	if typ == regexpTypeHost {</code></span>
+<span class="codeline" id="line-199"><code>		if r.regexp.path != nil {</code></span>
+<span class="codeline" id="line-200"><code>			if err = uniqueVars(rr.varsN, r.regexp.path.varsN); err != nil {</code></span>
+<span class="codeline" id="line-201"><code>				return err</code></span>
+<span class="codeline" id="line-202"><code>			}</code></span>
+<span class="codeline" id="line-203"><code>		}</code></span>
+<span class="codeline" id="line-204"><code>		r.regexp.host = rr</code></span>
+<span class="codeline" id="line-205"><code>	} else {</code></span>
+<span class="codeline" id="line-206"><code>		if r.regexp.host != nil {</code></span>
+<span class="codeline" id="line-207"><code>			if err = uniqueVars(rr.varsN, r.regexp.host.varsN); err != nil {</code></span>
+<span class="codeline" id="line-208"><code>				return err</code></span>
+<span class="codeline" id="line-209"><code>			}</code></span>
+<span class="codeline" id="line-210"><code>		}</code></span>
+<span class="codeline" id="line-211"><code>		if typ == regexpTypeQuery {</code></span>
+<span class="codeline" id="line-212"><code>			r.regexp.queries = append(r.regexp.queries, rr)</code></span>
+<span class="codeline" id="line-213"><code>		} else {</code></span>
+<span class="codeline" id="line-214"><code>			r.regexp.path = rr</code></span>
+<span class="codeline" id="line-215"><code>		}</code></span>
+<span class="codeline" id="line-216"><code>	}</code></span>
+<span class="codeline" id="line-217"><code>	r.addMatcher(rr)</code></span>
+<span class="codeline" id="line-218"><code>	return nil</code></span>
+<span class="codeline" id="line-219"><code>}</code></span>
+<span class="codeline" id="line-220"><code></code></span>
+<span class="codeline" id="line-221"><code>// Headers --------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-222"><code></code></span>
+<span class="codeline" id="line-223"><code>// headerMatcher matches the request against header values.</code></span>
+<span class="codeline" id="line-224"><code>type headerMatcher map[string]string</code></span>
+<span class="codeline" id="line-225"><code></code></span>
+<span class="codeline" id="line-226"><code>func (m headerMatcher) Match(r *http.Request, match *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-227"><code>	return matchMapWithString(m, r.Header, true)</code></span>
+<span class="codeline" id="line-228"><code>}</code></span>
+<span class="codeline" id="line-229"><code></code></span>
+<span class="codeline" id="line-230"><code>// Headers adds a matcher for request header values.</code></span>
+<span class="codeline" id="line-231"><code>// It accepts a sequence of key/value pairs to be matched. For example:</code></span>
+<span class="codeline" id="line-232"><code>//</code></span>
+<span class="codeline" id="line-233"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-234"><code>//     r.Headers("Content-Type", "application/json",</code></span>
+<span class="codeline" id="line-235"><code>//               "X-Requested-With", "XMLHttpRequest")</code></span>
+<span class="codeline" id="line-236"><code>//</code></span>
+<span class="codeline" id="line-237"><code>// The above route will only match if both request header values match.</code></span>
+<span class="codeline" id="line-238"><code>// If the value is an empty string, it will match any value if the key is set.</code></span>
+<span class="codeline" id="line-239"><code>func (r *Route) Headers(pairs ...string) *Route {</code></span>
+<span class="codeline" id="line-240"><code>	if r.err == nil {</code></span>
+<span class="codeline" id="line-241"><code>		var headers map[string]string</code></span>
+<span class="codeline" id="line-242"><code>		headers, r.err = mapFromPairsToString(pairs...)</code></span>
+<span class="codeline" id="line-243"><code>		return r.addMatcher(headerMatcher(headers))</code></span>
+<span class="codeline" id="line-244"><code>	}</code></span>
+<span class="codeline" id="line-245"><code>	return r</code></span>
+<span class="codeline" id="line-246"><code>}</code></span>
+<span class="codeline" id="line-247"><code></code></span>
+<span class="codeline" id="line-248"><code>// headerRegexMatcher matches the request against the route given a regex for the header</code></span>
+<span class="codeline" id="line-249"><code>type headerRegexMatcher map[string]*regexp.Regexp</code></span>
+<span class="codeline" id="line-250"><code></code></span>
+<span class="codeline" id="line-251"><code>func (m headerRegexMatcher) Match(r *http.Request, match *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-252"><code>	return matchMapWithRegex(m, r.Header, true)</code></span>
+<span class="codeline" id="line-253"><code>}</code></span>
+<span class="codeline" id="line-254"><code></code></span>
+<span class="codeline" id="line-255"><code>// HeadersRegexp accepts a sequence of key/value pairs, where the value has regex</code></span>
+<span class="codeline" id="line-256"><code>// support. For example:</code></span>
+<span class="codeline" id="line-257"><code>//</code></span>
+<span class="codeline" id="line-258"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-259"><code>//     r.HeadersRegexp("Content-Type", "application/(text|json)",</code></span>
+<span class="codeline" id="line-260"><code>//               "X-Requested-With", "XMLHttpRequest")</code></span>
+<span class="codeline" id="line-261"><code>//</code></span>
+<span class="codeline" id="line-262"><code>// The above route will only match if both the request header matches both regular expressions.</code></span>
+<span class="codeline" id="line-263"><code>// If the value is an empty string, it will match any value if the key is set.</code></span>
+<span class="codeline" id="line-264"><code>// Use the start and end of string anchors (^ and $) to match an exact value.</code></span>
+<span class="codeline" id="line-265"><code>func (r *Route) HeadersRegexp(pairs ...string) *Route {</code></span>
+<span class="codeline" id="line-266"><code>	if r.err == nil {</code></span>
+<span class="codeline" id="line-267"><code>		var headers map[string]*regexp.Regexp</code></span>
+<span class="codeline" id="line-268"><code>		headers, r.err = mapFromPairsToRegex(pairs...)</code></span>
+<span class="codeline" id="line-269"><code>		return r.addMatcher(headerRegexMatcher(headers))</code></span>
+<span class="codeline" id="line-270"><code>	}</code></span>
+<span class="codeline" id="line-271"><code>	return r</code></span>
+<span class="codeline" id="line-272"><code>}</code></span>
+<span class="codeline" id="line-273"><code></code></span>
+<span class="codeline" id="line-274"><code>// Host -----------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-275"><code></code></span>
+<span class="codeline" id="line-276"><code>// Host adds a matcher for the URL host.</code></span>
+<span class="codeline" id="line-277"><code>// It accepts a template with zero or more URL variables enclosed by {}.</code></span>
+<span class="codeline" id="line-278"><code>// Variables can define an optional regexp pattern to be matched:</code></span>
+<span class="codeline" id="line-279"><code>//</code></span>
+<span class="codeline" id="line-280"><code>// - {name} matches anything until the next dot.</code></span>
+<span class="codeline" id="line-281"><code>//</code></span>
+<span class="codeline" id="line-282"><code>// - {name:pattern} matches the given regexp pattern.</code></span>
+<span class="codeline" id="line-283"><code>//</code></span>
+<span class="codeline" id="line-284"><code>// For example:</code></span>
+<span class="codeline" id="line-285"><code>//</code></span>
+<span class="codeline" id="line-286"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-287"><code>//     r.Host("www.example.com")</code></span>
+<span class="codeline" id="line-288"><code>//     r.Host("{subdomain}.domain.com")</code></span>
+<span class="codeline" id="line-289"><code>//     r.Host("{subdomain:[a-z]+}.domain.com")</code></span>
+<span class="codeline" id="line-290"><code>//</code></span>
+<span class="codeline" id="line-291"><code>// Variable names must be unique in a given route. They can be retrieved</code></span>
+<span class="codeline" id="line-292"><code>// calling mux.Vars(request).</code></span>
+<span class="codeline" id="line-293"><code>func (r *Route) Host(tpl string) *Route {</code></span>
+<span class="codeline" id="line-294"><code>	r.err = r.addRegexpMatcher(tpl, regexpTypeHost)</code></span>
+<span class="codeline" id="line-295"><code>	return r</code></span>
+<span class="codeline" id="line-296"><code>}</code></span>
+<span class="codeline" id="line-297"><code></code></span>
+<span class="codeline" id="line-298"><code>// MatcherFunc ----------------------------------------------------------------</code></span>
+<span class="codeline" id="line-299"><code></code></span>
+<span class="codeline" id="line-300"><code>// MatcherFunc is the function signature used by custom matchers.</code></span>
+<span class="codeline" id="line-301"><code>type MatcherFunc func(*http.Request, *RouteMatch) bool</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>// Match returns the match for a given request.</code></span>
+<span class="codeline" id="line-304"><code>func (m MatcherFunc) Match(r *http.Request, match *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-305"><code>	return m(r, match)</code></span>
+<span class="codeline" id="line-306"><code>}</code></span>
+<span class="codeline" id="line-307"><code></code></span>
+<span class="codeline" id="line-308"><code>// MatcherFunc adds a custom function to be used as request matcher.</code></span>
+<span class="codeline" id="line-309"><code>func (r *Route) MatcherFunc(f MatcherFunc) *Route {</code></span>
+<span class="codeline" id="line-310"><code>	return r.addMatcher(f)</code></span>
+<span class="codeline" id="line-311"><code>}</code></span>
+<span class="codeline" id="line-312"><code></code></span>
+<span class="codeline" id="line-313"><code>// Methods --------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>// methodMatcher matches the request against HTTP methods.</code></span>
+<span class="codeline" id="line-316"><code>type methodMatcher []string</code></span>
+<span class="codeline" id="line-317"><code></code></span>
+<span class="codeline" id="line-318"><code>func (m methodMatcher) Match(r *http.Request, match *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-319"><code>	return matchInArray(m, r.Method)</code></span>
+<span class="codeline" id="line-320"><code>}</code></span>
+<span class="codeline" id="line-321"><code></code></span>
+<span class="codeline" id="line-322"><code>// Methods adds a matcher for HTTP methods.</code></span>
+<span class="codeline" id="line-323"><code>// It accepts a sequence of one or more methods to be matched, e.g.:</code></span>
+<span class="codeline" id="line-324"><code>// "GET", "POST", "PUT".</code></span>
+<span class="codeline" id="line-325"><code>func (r *Route) Methods(methods ...string) *Route {</code></span>
+<span class="codeline" id="line-326"><code>	for k, v := range methods {</code></span>
+<span class="codeline" id="line-327"><code>		methods[k] = strings.ToUpper(v)</code></span>
+<span class="codeline" id="line-328"><code>	}</code></span>
+<span class="codeline" id="line-329"><code>	return r.addMatcher(methodMatcher(methods))</code></span>
+<span class="codeline" id="line-330"><code>}</code></span>
+<span class="codeline" id="line-331"><code></code></span>
+<span class="codeline" id="line-332"><code>// Path -----------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-333"><code></code></span>
+<span class="codeline" id="line-334"><code>// Path adds a matcher for the URL path.</code></span>
+<span class="codeline" id="line-335"><code>// It accepts a template with zero or more URL variables enclosed by {}. The</code></span>
+<span class="codeline" id="line-336"><code>// template must start with a "/".</code></span>
+<span class="codeline" id="line-337"><code>// Variables can define an optional regexp pattern to be matched:</code></span>
+<span class="codeline" id="line-338"><code>//</code></span>
+<span class="codeline" id="line-339"><code>// - {name} matches anything until the next slash.</code></span>
+<span class="codeline" id="line-340"><code>//</code></span>
+<span class="codeline" id="line-341"><code>// - {name:pattern} matches the given regexp pattern.</code></span>
+<span class="codeline" id="line-342"><code>//</code></span>
+<span class="codeline" id="line-343"><code>// For example:</code></span>
+<span class="codeline" id="line-344"><code>//</code></span>
+<span class="codeline" id="line-345"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-346"><code>//     r.Path("/products/").Handler(ProductsHandler)</code></span>
+<span class="codeline" id="line-347"><code>//     r.Path("/products/{key}").Handler(ProductsHandler)</code></span>
+<span class="codeline" id="line-348"><code>//     r.Path("/articles/{category}/{id:[0-9]+}").</code></span>
+<span class="codeline" id="line-349"><code>//       Handler(ArticleHandler)</code></span>
+<span class="codeline" id="line-350"><code>//</code></span>
+<span class="codeline" id="line-351"><code>// Variable names must be unique in a given route. They can be retrieved</code></span>
+<span class="codeline" id="line-352"><code>// calling mux.Vars(request).</code></span>
+<span class="codeline" id="line-353"><code>func (r *Route) Path(tpl string) *Route {</code></span>
+<span class="codeline" id="line-354"><code>	r.err = r.addRegexpMatcher(tpl, regexpTypePath)</code></span>
+<span class="codeline" id="line-355"><code>	return r</code></span>
+<span class="codeline" id="line-356"><code>}</code></span>
+<span class="codeline" id="line-357"><code></code></span>
+<span class="codeline" id="line-358"><code>// PathPrefix -----------------------------------------------------------------</code></span>
+<span class="codeline" id="line-359"><code></code></span>
+<span class="codeline" id="line-360"><code>// PathPrefix adds a matcher for the URL path prefix. This matches if the given</code></span>
+<span class="codeline" id="line-361"><code>// template is a prefix of the full URL path. See Route.Path() for details on</code></span>
+<span class="codeline" id="line-362"><code>// the tpl argument.</code></span>
+<span class="codeline" id="line-363"><code>//</code></span>
+<span class="codeline" id="line-364"><code>// Note that it does not treat slashes specially ("/foobar/" will be matched by</code></span>
+<span class="codeline" id="line-365"><code>// the prefix "/foo") so you may want to use a trailing slash here.</code></span>
+<span class="codeline" id="line-366"><code>//</code></span>
+<span class="codeline" id="line-367"><code>// Also note that the setting of Router.StrictSlash() has no effect on routes</code></span>
+<span class="codeline" id="line-368"><code>// with a PathPrefix matcher.</code></span>
+<span class="codeline" id="line-369"><code>func (r *Route) PathPrefix(tpl string) *Route {</code></span>
+<span class="codeline" id="line-370"><code>	r.err = r.addRegexpMatcher(tpl, regexpTypePrefix)</code></span>
+<span class="codeline" id="line-371"><code>	return r</code></span>
+<span class="codeline" id="line-372"><code>}</code></span>
+<span class="codeline" id="line-373"><code></code></span>
+<span class="codeline" id="line-374"><code>// Query ----------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-375"><code></code></span>
+<span class="codeline" id="line-376"><code>// Queries adds a matcher for URL query values.</code></span>
+<span class="codeline" id="line-377"><code>// It accepts a sequence of key/value pairs. Values may define variables.</code></span>
+<span class="codeline" id="line-378"><code>// For example:</code></span>
+<span class="codeline" id="line-379"><code>//</code></span>
+<span class="codeline" id="line-380"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-381"><code>//     r.Queries("foo", "bar", "id", "{id:[0-9]+}")</code></span>
+<span class="codeline" id="line-382"><code>//</code></span>
+<span class="codeline" id="line-383"><code>// The above route will only match if the URL contains the defined queries</code></span>
+<span class="codeline" id="line-384"><code>// values, e.g.: ?foo=bar&amp;id=42.</code></span>
+<span class="codeline" id="line-385"><code>//</code></span>
+<span class="codeline" id="line-386"><code>// If the value is an empty string, it will match any value if the key is set.</code></span>
+<span class="codeline" id="line-387"><code>//</code></span>
+<span class="codeline" id="line-388"><code>// Variables can define an optional regexp pattern to be matched:</code></span>
+<span class="codeline" id="line-389"><code>//</code></span>
+<span class="codeline" id="line-390"><code>// - {name} matches anything until the next slash.</code></span>
+<span class="codeline" id="line-391"><code>//</code></span>
+<span class="codeline" id="line-392"><code>// - {name:pattern} matches the given regexp pattern.</code></span>
+<span class="codeline" id="line-393"><code>func (r *Route) Queries(pairs ...string) *Route {</code></span>
+<span class="codeline" id="line-394"><code>	length := len(pairs)</code></span>
+<span class="codeline" id="line-395"><code>	if length%2 != 0 {</code></span>
+<span class="codeline" id="line-396"><code>		r.err = fmt.Errorf(</code></span>
+<span class="codeline" id="line-397"><code>			"mux: number of parameters must be multiple of 2, got %v", pairs)</code></span>
+<span class="codeline" id="line-398"><code>		return nil</code></span>
+<span class="codeline" id="line-399"><code>	}</code></span>
+<span class="codeline" id="line-400"><code>	for i := 0; i &lt; length; i += 2 {</code></span>
+<span class="codeline" id="line-401"><code>		if r.err = r.addRegexpMatcher(pairs[i]+"="+pairs[i+1], regexpTypeQuery); r.err != nil {</code></span>
+<span class="codeline" id="line-402"><code>			return r</code></span>
+<span class="codeline" id="line-403"><code>		}</code></span>
+<span class="codeline" id="line-404"><code>	}</code></span>
+<span class="codeline" id="line-405"><code></code></span>
+<span class="codeline" id="line-406"><code>	return r</code></span>
+<span class="codeline" id="line-407"><code>}</code></span>
+<span class="codeline" id="line-408"><code></code></span>
+<span class="codeline" id="line-409"><code>// Schemes --------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-410"><code></code></span>
+<span class="codeline" id="line-411"><code>// schemeMatcher matches the request against URL schemes.</code></span>
+<span class="codeline" id="line-412"><code>type schemeMatcher []string</code></span>
+<span class="codeline" id="line-413"><code></code></span>
+<span class="codeline" id="line-414"><code>func (m schemeMatcher) Match(r *http.Request, match *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-415"><code>	scheme := r.URL.Scheme</code></span>
+<span class="codeline" id="line-416"><code>	// https://golang.org/pkg/net/http/#Request</code></span>
+<span class="codeline" id="line-417"><code>	// "For [most] server requests, fields other than Path and RawQuery will be</code></span>
+<span class="codeline" id="line-418"><code>	// empty."</code></span>
+<span class="codeline" id="line-419"><code>	// Since we're an http muxer, the scheme is either going to be http or https</code></span>
+<span class="codeline" id="line-420"><code>	// though, so we can just set it based on the tls termination state.</code></span>
+<span class="codeline" id="line-421"><code>	if scheme == "" {</code></span>
+<span class="codeline" id="line-422"><code>		if r.TLS == nil {</code></span>
+<span class="codeline" id="line-423"><code>			scheme = "http"</code></span>
+<span class="codeline" id="line-424"><code>		} else {</code></span>
+<span class="codeline" id="line-425"><code>			scheme = "https"</code></span>
+<span class="codeline" id="line-426"><code>		}</code></span>
+<span class="codeline" id="line-427"><code>	}</code></span>
+<span class="codeline" id="line-428"><code>	return matchInArray(m, scheme)</code></span>
+<span class="codeline" id="line-429"><code>}</code></span>
+<span class="codeline" id="line-430"><code></code></span>
+<span class="codeline" id="line-431"><code>// Schemes adds a matcher for URL schemes.</code></span>
+<span class="codeline" id="line-432"><code>// It accepts a sequence of schemes to be matched, e.g.: "http", "https".</code></span>
+<span class="codeline" id="line-433"><code>// If the request's URL has a scheme set, it will be matched against.</code></span>
+<span class="codeline" id="line-434"><code>// Generally, the URL scheme will only be set if a previous handler set it,</code></span>
+<span class="codeline" id="line-435"><code>// such as the ProxyHeaders handler from gorilla/handlers.</code></span>
+<span class="codeline" id="line-436"><code>// If unset, the scheme will be determined based on the request's TLS</code></span>
+<span class="codeline" id="line-437"><code>// termination state.</code></span>
+<span class="codeline" id="line-438"><code>// The first argument to Schemes will be used when constructing a route URL.</code></span>
+<span class="codeline" id="line-439"><code>func (r *Route) Schemes(schemes ...string) *Route {</code></span>
+<span class="codeline" id="line-440"><code>	for k, v := range schemes {</code></span>
+<span class="codeline" id="line-441"><code>		schemes[k] = strings.ToLower(v)</code></span>
+<span class="codeline" id="line-442"><code>	}</code></span>
+<span class="codeline" id="line-443"><code>	if len(schemes) &gt; 0 {</code></span>
+<span class="codeline" id="line-444"><code>		r.buildScheme = schemes[0]</code></span>
+<span class="codeline" id="line-445"><code>	}</code></span>
+<span class="codeline" id="line-446"><code>	return r.addMatcher(schemeMatcher(schemes))</code></span>
+<span class="codeline" id="line-447"><code>}</code></span>
+<span class="codeline" id="line-448"><code></code></span>
+<span class="codeline" id="line-449"><code>// BuildVarsFunc --------------------------------------------------------------</code></span>
+<span class="codeline" id="line-450"><code></code></span>
+<span class="codeline" id="line-451"><code>// BuildVarsFunc is the function signature used by custom build variable</code></span>
+<span class="codeline" id="line-452"><code>// functions (which can modify route variables before a route's URL is built).</code></span>
+<span class="codeline" id="line-453"><code>type BuildVarsFunc func(map[string]string) map[string]string</code></span>
+<span class="codeline" id="line-454"><code></code></span>
+<span class="codeline" id="line-455"><code>// BuildVarsFunc adds a custom function to be used to modify build variables</code></span>
+<span class="codeline" id="line-456"><code>// before a route's URL is built.</code></span>
+<span class="codeline" id="line-457"><code>func (r *Route) BuildVarsFunc(f BuildVarsFunc) *Route {</code></span>
+<span class="codeline" id="line-458"><code>	if r.buildVarsFunc != nil {</code></span>
+<span class="codeline" id="line-459"><code>		// compose the old and new functions</code></span>
+<span class="codeline" id="line-460"><code>		old := r.buildVarsFunc</code></span>
+<span class="codeline" id="line-461"><code>		r.buildVarsFunc = func(m map[string]string) map[string]string {</code></span>
+<span class="codeline" id="line-462"><code>			return f(old(m))</code></span>
+<span class="codeline" id="line-463"><code>		}</code></span>
+<span class="codeline" id="line-464"><code>	} else {</code></span>
+<span class="codeline" id="line-465"><code>		r.buildVarsFunc = f</code></span>
+<span class="codeline" id="line-466"><code>	}</code></span>
+<span class="codeline" id="line-467"><code>	return r</code></span>
+<span class="codeline" id="line-468"><code>}</code></span>
+<span class="codeline" id="line-469"><code></code></span>
+<span class="codeline" id="line-470"><code>// Subrouter ------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-471"><code></code></span>
+<span class="codeline" id="line-472"><code>// Subrouter creates a subrouter for the route.</code></span>
+<span class="codeline" id="line-473"><code>//</code></span>
+<span class="codeline" id="line-474"><code>// It will test the inner routes only if the parent route matched. For example:</code></span>
+<span class="codeline" id="line-475"><code>//</code></span>
+<span class="codeline" id="line-476"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-477"><code>//     s := r.Host("www.example.com").Subrouter()</code></span>
+<span class="codeline" id="line-478"><code>//     s.HandleFunc("/products/", ProductsHandler)</code></span>
+<span class="codeline" id="line-479"><code>//     s.HandleFunc("/products/{key}", ProductHandler)</code></span>
+<span class="codeline" id="line-480"><code>//     s.HandleFunc("/articles/{category}/{id:[0-9]+}"), ArticleHandler)</code></span>
+<span class="codeline" id="line-481"><code>//</code></span>
+<span class="codeline" id="line-482"><code>// Here, the routes registered in the subrouter won't be tested if the host</code></span>
+<span class="codeline" id="line-483"><code>// doesn't match.</code></span>
+<span class="codeline" id="line-484"><code>func (r *Route) Subrouter() *Router {</code></span>
+<span class="codeline" id="line-485"><code>	// initialize a subrouter with a copy of the parent route's configuration</code></span>
+<span class="codeline" id="line-486"><code>	router := &amp;Router{routeConf: copyRouteConf(r.routeConf), namedRoutes: r.namedRoutes}</code></span>
+<span class="codeline" id="line-487"><code>	r.addMatcher(router)</code></span>
+<span class="codeline" id="line-488"><code>	return router</code></span>
+<span class="codeline" id="line-489"><code>}</code></span>
+<span class="codeline" id="line-490"><code></code></span>
+<span class="codeline" id="line-491"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-492"><code>// URL building</code></span>
+<span class="codeline" id="line-493"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-494"><code></code></span>
+<span class="codeline" id="line-495"><code>// URL builds a URL for the route.</code></span>
+<span class="codeline" id="line-496"><code>//</code></span>
+<span class="codeline" id="line-497"><code>// It accepts a sequence of key/value pairs for the route variables. For</code></span>
+<span class="codeline" id="line-498"><code>// example, given this route:</code></span>
+<span class="codeline" id="line-499"><code>//</code></span>
+<span class="codeline" id="line-500"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-501"><code>//     r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).</code></span>
+<span class="codeline" id="line-502"><code>//       Name("article")</code></span>
+<span class="codeline" id="line-503"><code>//</code></span>
+<span class="codeline" id="line-504"><code>// ...a URL for it can be built using:</code></span>
+<span class="codeline" id="line-505"><code>//</code></span>
+<span class="codeline" id="line-506"><code>//     url, err := r.Get("article").URL("category", "technology", "id", "42")</code></span>
+<span class="codeline" id="line-507"><code>//</code></span>
+<span class="codeline" id="line-508"><code>// ...which will return an url.URL with the following path:</code></span>
+<span class="codeline" id="line-509"><code>//</code></span>
+<span class="codeline" id="line-510"><code>//     "/articles/technology/42"</code></span>
+<span class="codeline" id="line-511"><code>//</code></span>
+<span class="codeline" id="line-512"><code>// This also works for host variables:</code></span>
+<span class="codeline" id="line-513"><code>//</code></span>
+<span class="codeline" id="line-514"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-515"><code>//     r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).</code></span>
+<span class="codeline" id="line-516"><code>//       Host("{subdomain}.domain.com").</code></span>
+<span class="codeline" id="line-517"><code>//       Name("article")</code></span>
+<span class="codeline" id="line-518"><code>//</code></span>
+<span class="codeline" id="line-519"><code>//     // url.String() will be "http://news.domain.com/articles/technology/42"</code></span>
+<span class="codeline" id="line-520"><code>//     url, err := r.Get("article").URL("subdomain", "news",</code></span>
+<span class="codeline" id="line-521"><code>//                                      "category", "technology",</code></span>
+<span class="codeline" id="line-522"><code>//                                      "id", "42")</code></span>
+<span class="codeline" id="line-523"><code>//</code></span>
+<span class="codeline" id="line-524"><code>// The scheme of the resulting url will be the first argument that was passed to Schemes:</code></span>
+<span class="codeline" id="line-525"><code>//</code></span>
+<span class="codeline" id="line-526"><code>//     // url.String() will be "https://example.com"</code></span>
+<span class="codeline" id="line-527"><code>//     r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-528"><code>//     url, err := r.Host("example.com")</code></span>
+<span class="codeline" id="line-529"><code>//                  .Schemes("https", "http").URL()</code></span>
+<span class="codeline" id="line-530"><code>//</code></span>
+<span class="codeline" id="line-531"><code>// All variables defined in the route are required, and their values must</code></span>
+<span class="codeline" id="line-532"><code>// conform to the corresponding patterns.</code></span>
+<span class="codeline" id="line-533"><code>func (r *Route) URL(pairs ...string) (*url.URL, error) {</code></span>
+<span class="codeline" id="line-534"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-535"><code>		return nil, r.err</code></span>
+<span class="codeline" id="line-536"><code>	}</code></span>
+<span class="codeline" id="line-537"><code>	values, err := r.prepareVars(pairs...)</code></span>
+<span class="codeline" id="line-538"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-539"><code>		return nil, err</code></span>
+<span class="codeline" id="line-540"><code>	}</code></span>
+<span class="codeline" id="line-541"><code>	var scheme, host, path string</code></span>
+<span class="codeline" id="line-542"><code>	queries := make([]string, 0, len(r.regexp.queries))</code></span>
+<span class="codeline" id="line-543"><code>	if r.regexp.host != nil {</code></span>
+<span class="codeline" id="line-544"><code>		if host, err = r.regexp.host.url(values); err != nil {</code></span>
+<span class="codeline" id="line-545"><code>			return nil, err</code></span>
+<span class="codeline" id="line-546"><code>		}</code></span>
+<span class="codeline" id="line-547"><code>		scheme = "http"</code></span>
+<span class="codeline" id="line-548"><code>		if r.buildScheme != "" {</code></span>
+<span class="codeline" id="line-549"><code>			scheme = r.buildScheme</code></span>
+<span class="codeline" id="line-550"><code>		}</code></span>
+<span class="codeline" id="line-551"><code>	}</code></span>
+<span class="codeline" id="line-552"><code>	if r.regexp.path != nil {</code></span>
+<span class="codeline" id="line-553"><code>		if path, err = r.regexp.path.url(values); err != nil {</code></span>
+<span class="codeline" id="line-554"><code>			return nil, err</code></span>
+<span class="codeline" id="line-555"><code>		}</code></span>
+<span class="codeline" id="line-556"><code>	}</code></span>
+<span class="codeline" id="line-557"><code>	for _, q := range r.regexp.queries {</code></span>
+<span class="codeline" id="line-558"><code>		var query string</code></span>
+<span class="codeline" id="line-559"><code>		if query, err = q.url(values); err != nil {</code></span>
+<span class="codeline" id="line-560"><code>			return nil, err</code></span>
+<span class="codeline" id="line-561"><code>		}</code></span>
+<span class="codeline" id="line-562"><code>		queries = append(queries, query)</code></span>
+<span class="codeline" id="line-563"><code>	}</code></span>
+<span class="codeline" id="line-564"><code>	return &amp;url.URL{</code></span>
+<span class="codeline" id="line-565"><code>		Scheme:   scheme,</code></span>
+<span class="codeline" id="line-566"><code>		Host:     host,</code></span>
+<span class="codeline" id="line-567"><code>		Path:     path,</code></span>
+<span class="codeline" id="line-568"><code>		RawQuery: strings.Join(queries, "&amp;"),</code></span>
+<span class="codeline" id="line-569"><code>	}, nil</code></span>
+<span class="codeline" id="line-570"><code>}</code></span>
+<span class="codeline" id="line-571"><code></code></span>
+<span class="codeline" id="line-572"><code>// URLHost builds the host part of the URL for a route. See Route.URL().</code></span>
+<span class="codeline" id="line-573"><code>//</code></span>
+<span class="codeline" id="line-574"><code>// The route must have a host defined.</code></span>
+<span class="codeline" id="line-575"><code>func (r *Route) URLHost(pairs ...string) (*url.URL, error) {</code></span>
+<span class="codeline" id="line-576"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-577"><code>		return nil, r.err</code></span>
+<span class="codeline" id="line-578"><code>	}</code></span>
+<span class="codeline" id="line-579"><code>	if r.regexp.host == nil {</code></span>
+<span class="codeline" id="line-580"><code>		return nil, errors.New("mux: route doesn't have a host")</code></span>
+<span class="codeline" id="line-581"><code>	}</code></span>
+<span class="codeline" id="line-582"><code>	values, err := r.prepareVars(pairs...)</code></span>
+<span class="codeline" id="line-583"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-584"><code>		return nil, err</code></span>
+<span class="codeline" id="line-585"><code>	}</code></span>
+<span class="codeline" id="line-586"><code>	host, err := r.regexp.host.url(values)</code></span>
+<span class="codeline" id="line-587"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-588"><code>		return nil, err</code></span>
+<span class="codeline" id="line-589"><code>	}</code></span>
+<span class="codeline" id="line-590"><code>	u := &amp;url.URL{</code></span>
+<span class="codeline" id="line-591"><code>		Scheme: "http",</code></span>
+<span class="codeline" id="line-592"><code>		Host:   host,</code></span>
+<span class="codeline" id="line-593"><code>	}</code></span>
+<span class="codeline" id="line-594"><code>	if r.buildScheme != "" {</code></span>
+<span class="codeline" id="line-595"><code>		u.Scheme = r.buildScheme</code></span>
+<span class="codeline" id="line-596"><code>	}</code></span>
+<span class="codeline" id="line-597"><code>	return u, nil</code></span>
+<span class="codeline" id="line-598"><code>}</code></span>
+<span class="codeline" id="line-599"><code></code></span>
+<span class="codeline" id="line-600"><code>// URLPath builds the path part of the URL for a route. See Route.URL().</code></span>
+<span class="codeline" id="line-601"><code>//</code></span>
+<span class="codeline" id="line-602"><code>// The route must have a path defined.</code></span>
+<span class="codeline" id="line-603"><code>func (r *Route) URLPath(pairs ...string) (*url.URL, error) {</code></span>
+<span class="codeline" id="line-604"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-605"><code>		return nil, r.err</code></span>
+<span class="codeline" id="line-606"><code>	}</code></span>
+<span class="codeline" id="line-607"><code>	if r.regexp.path == nil {</code></span>
+<span class="codeline" id="line-608"><code>		return nil, errors.New("mux: route doesn't have a path")</code></span>
+<span class="codeline" id="line-609"><code>	}</code></span>
+<span class="codeline" id="line-610"><code>	values, err := r.prepareVars(pairs...)</code></span>
+<span class="codeline" id="line-611"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-612"><code>		return nil, err</code></span>
+<span class="codeline" id="line-613"><code>	}</code></span>
+<span class="codeline" id="line-614"><code>	path, err := r.regexp.path.url(values)</code></span>
+<span class="codeline" id="line-615"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-616"><code>		return nil, err</code></span>
+<span class="codeline" id="line-617"><code>	}</code></span>
+<span class="codeline" id="line-618"><code>	return &amp;url.URL{</code></span>
+<span class="codeline" id="line-619"><code>		Path: path,</code></span>
+<span class="codeline" id="line-620"><code>	}, nil</code></span>
+<span class="codeline" id="line-621"><code>}</code></span>
+<span class="codeline" id="line-622"><code></code></span>
+<span class="codeline" id="line-623"><code>// GetPathTemplate returns the template used to build the</code></span>
+<span class="codeline" id="line-624"><code>// route match.</code></span>
+<span class="codeline" id="line-625"><code>// This is useful for building simple REST API documentation and for instrumentation</code></span>
+<span class="codeline" id="line-626"><code>// against third-party services.</code></span>
+<span class="codeline" id="line-627"><code>// An error will be returned if the route does not define a path.</code></span>
+<span class="codeline" id="line-628"><code>func (r *Route) GetPathTemplate() (string, error) {</code></span>
+<span class="codeline" id="line-629"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-630"><code>		return "", r.err</code></span>
+<span class="codeline" id="line-631"><code>	}</code></span>
+<span class="codeline" id="line-632"><code>	if r.regexp.path == nil {</code></span>
+<span class="codeline" id="line-633"><code>		return "", errors.New("mux: route doesn't have a path")</code></span>
+<span class="codeline" id="line-634"><code>	}</code></span>
+<span class="codeline" id="line-635"><code>	return r.regexp.path.template, nil</code></span>
+<span class="codeline" id="line-636"><code>}</code></span>
+<span class="codeline" id="line-637"><code></code></span>
+<span class="codeline" id="line-638"><code>// GetPathRegexp returns the expanded regular expression used to match route path.</code></span>
+<span class="codeline" id="line-639"><code>// This is useful for building simple REST API documentation and for instrumentation</code></span>
+<span class="codeline" id="line-640"><code>// against third-party services.</code></span>
+<span class="codeline" id="line-641"><code>// An error will be returned if the route does not define a path.</code></span>
+<span class="codeline" id="line-642"><code>func (r *Route) GetPathRegexp() (string, error) {</code></span>
+<span class="codeline" id="line-643"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-644"><code>		return "", r.err</code></span>
+<span class="codeline" id="line-645"><code>	}</code></span>
+<span class="codeline" id="line-646"><code>	if r.regexp.path == nil {</code></span>
+<span class="codeline" id="line-647"><code>		return "", errors.New("mux: route does not have a path")</code></span>
+<span class="codeline" id="line-648"><code>	}</code></span>
+<span class="codeline" id="line-649"><code>	return r.regexp.path.regexp.String(), nil</code></span>
+<span class="codeline" id="line-650"><code>}</code></span>
+<span class="codeline" id="line-651"><code></code></span>
+<span class="codeline" id="line-652"><code>// GetQueriesRegexp returns the expanded regular expressions used to match the</code></span>
+<span class="codeline" id="line-653"><code>// route queries.</code></span>
+<span class="codeline" id="line-654"><code>// This is useful for building simple REST API documentation and for instrumentation</code></span>
+<span class="codeline" id="line-655"><code>// against third-party services.</code></span>
+<span class="codeline" id="line-656"><code>// An error will be returned if the route does not have queries.</code></span>
+<span class="codeline" id="line-657"><code>func (r *Route) GetQueriesRegexp() ([]string, error) {</code></span>
+<span class="codeline" id="line-658"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-659"><code>		return nil, r.err</code></span>
+<span class="codeline" id="line-660"><code>	}</code></span>
+<span class="codeline" id="line-661"><code>	if r.regexp.queries == nil {</code></span>
+<span class="codeline" id="line-662"><code>		return nil, errors.New("mux: route doesn't have queries")</code></span>
+<span class="codeline" id="line-663"><code>	}</code></span>
+<span class="codeline" id="line-664"><code>	queries := make([]string, 0, len(r.regexp.queries))</code></span>
+<span class="codeline" id="line-665"><code>	for _, query := range r.regexp.queries {</code></span>
+<span class="codeline" id="line-666"><code>		queries = append(queries, query.regexp.String())</code></span>
+<span class="codeline" id="line-667"><code>	}</code></span>
+<span class="codeline" id="line-668"><code>	return queries, nil</code></span>
+<span class="codeline" id="line-669"><code>}</code></span>
+<span class="codeline" id="line-670"><code></code></span>
+<span class="codeline" id="line-671"><code>// GetQueriesTemplates returns the templates used to build the</code></span>
+<span class="codeline" id="line-672"><code>// query matching.</code></span>
+<span class="codeline" id="line-673"><code>// This is useful for building simple REST API documentation and for instrumentation</code></span>
+<span class="codeline" id="line-674"><code>// against third-party services.</code></span>
+<span class="codeline" id="line-675"><code>// An error will be returned if the route does not define queries.</code></span>
+<span class="codeline" id="line-676"><code>func (r *Route) GetQueriesTemplates() ([]string, error) {</code></span>
+<span class="codeline" id="line-677"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-678"><code>		return nil, r.err</code></span>
+<span class="codeline" id="line-679"><code>	}</code></span>
+<span class="codeline" id="line-680"><code>	if r.regexp.queries == nil {</code></span>
+<span class="codeline" id="line-681"><code>		return nil, errors.New("mux: route doesn't have queries")</code></span>
+<span class="codeline" id="line-682"><code>	}</code></span>
+<span class="codeline" id="line-683"><code>	queries := make([]string, 0, len(r.regexp.queries))</code></span>
+<span class="codeline" id="line-684"><code>	for _, query := range r.regexp.queries {</code></span>
+<span class="codeline" id="line-685"><code>		queries = append(queries, query.template)</code></span>
+<span class="codeline" id="line-686"><code>	}</code></span>
+<span class="codeline" id="line-687"><code>	return queries, nil</code></span>
+<span class="codeline" id="line-688"><code>}</code></span>
+<span class="codeline" id="line-689"><code></code></span>
+<span class="codeline" id="line-690"><code>// GetMethods returns the methods the route matches against</code></span>
+<span class="codeline" id="line-691"><code>// This is useful for building simple REST API documentation and for instrumentation</code></span>
+<span class="codeline" id="line-692"><code>// against third-party services.</code></span>
+<span class="codeline" id="line-693"><code>// An error will be returned if route does not have methods.</code></span>
+<span class="codeline" id="line-694"><code>func (r *Route) GetMethods() ([]string, error) {</code></span>
+<span class="codeline" id="line-695"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-696"><code>		return nil, r.err</code></span>
+<span class="codeline" id="line-697"><code>	}</code></span>
+<span class="codeline" id="line-698"><code>	for _, m := range r.matchers {</code></span>
+<span class="codeline" id="line-699"><code>		if methods, ok := m.(methodMatcher); ok {</code></span>
+<span class="codeline" id="line-700"><code>			return []string(methods), nil</code></span>
+<span class="codeline" id="line-701"><code>		}</code></span>
+<span class="codeline" id="line-702"><code>	}</code></span>
+<span class="codeline" id="line-703"><code>	return nil, errors.New("mux: route doesn't have methods")</code></span>
+<span class="codeline" id="line-704"><code>}</code></span>
+<span class="codeline" id="line-705"><code></code></span>
+<span class="codeline" id="line-706"><code>// GetHostTemplate returns the template used to build the</code></span>
+<span class="codeline" id="line-707"><code>// route match.</code></span>
+<span class="codeline" id="line-708"><code>// This is useful for building simple REST API documentation and for instrumentation</code></span>
+<span class="codeline" id="line-709"><code>// against third-party services.</code></span>
+<span class="codeline" id="line-710"><code>// An error will be returned if the route does not define a host.</code></span>
+<span class="codeline" id="line-711"><code>func (r *Route) GetHostTemplate() (string, error) {</code></span>
+<span class="codeline" id="line-712"><code>	if r.err != nil {</code></span>
+<span class="codeline" id="line-713"><code>		return "", r.err</code></span>
+<span class="codeline" id="line-714"><code>	}</code></span>
+<span class="codeline" id="line-715"><code>	if r.regexp.host == nil {</code></span>
+<span class="codeline" id="line-716"><code>		return "", errors.New("mux: route doesn't have a host")</code></span>
+<span class="codeline" id="line-717"><code>	}</code></span>
+<span class="codeline" id="line-718"><code>	return r.regexp.host.template, nil</code></span>
+<span class="codeline" id="line-719"><code>}</code></span>
+<span class="codeline" id="line-720"><code></code></span>
+<span class="codeline" id="line-721"><code>// prepareVars converts the route variable pairs into a map. If the route has a</code></span>
+<span class="codeline" id="line-722"><code>// BuildVarsFunc, it is invoked.</code></span>
+<span class="codeline" id="line-723"><code>func (r *Route) prepareVars(pairs ...string) (map[string]string, error) {</code></span>
+<span class="codeline" id="line-724"><code>	m, err := mapFromPairsToString(pairs...)</code></span>
+<span class="codeline" id="line-725"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-726"><code>		return nil, err</code></span>
+<span class="codeline" id="line-727"><code>	}</code></span>
+<span class="codeline" id="line-728"><code>	return r.buildVars(m), nil</code></span>
+<span class="codeline" id="line-729"><code>}</code></span>
+<span class="codeline" id="line-730"><code></code></span>
+<span class="codeline" id="line-731"><code>func (r *Route) buildVars(m map[string]string) map[string]string {</code></span>
+<span class="codeline" id="line-732"><code>	if r.buildVarsFunc != nil {</code></span>
+<span class="codeline" id="line-733"><code>		m = r.buildVarsFunc(m)</code></span>
+<span class="codeline" id="line-734"><code>	}</code></span>
+<span class="codeline" id="line-735"><code>	return m</code></span>
+<span class="codeline" id="line-736"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

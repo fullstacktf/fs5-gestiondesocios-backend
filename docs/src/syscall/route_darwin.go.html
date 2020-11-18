@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: route_darwin.go in package syscall</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	route_darwin.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/syscall.html">syscall</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package syscall</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import "unsafe"</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>func (any *anyMessage) toRoutingMessage(b []byte) RoutingMessage {</code></span>
+<span class="codeline" id="line-10"><code>	switch any.Type {</code></span>
+<span class="codeline" id="line-11"><code>	case RTM_ADD, RTM_DELETE, RTM_CHANGE, RTM_GET, RTM_LOSING, RTM_REDIRECT, RTM_MISS, RTM_LOCK, RTM_RESOLVE:</code></span>
+<span class="codeline" id="line-12"><code>		p := (*RouteMessage)(unsafe.Pointer(any))</code></span>
+<span class="codeline" id="line-13"><code>		return &amp;RouteMessage{Header: p.Header, Data: b[SizeofRtMsghdr:any.Msglen]}</code></span>
+<span class="codeline" id="line-14"><code>	case RTM_IFINFO:</code></span>
+<span class="codeline" id="line-15"><code>		p := (*InterfaceMessage)(unsafe.Pointer(any))</code></span>
+<span class="codeline" id="line-16"><code>		return &amp;InterfaceMessage{Header: p.Header, Data: b[SizeofIfMsghdr:any.Msglen]}</code></span>
+<span class="codeline" id="line-17"><code>	case RTM_NEWADDR, RTM_DELADDR:</code></span>
+<span class="codeline" id="line-18"><code>		p := (*InterfaceAddrMessage)(unsafe.Pointer(any))</code></span>
+<span class="codeline" id="line-19"><code>		return &amp;InterfaceAddrMessage{Header: p.Header, Data: b[SizeofIfaMsghdr:any.Msglen]}</code></span>
+<span class="codeline" id="line-20"><code>	case RTM_NEWMADDR2, RTM_DELMADDR:</code></span>
+<span class="codeline" id="line-21"><code>		p := (*InterfaceMulticastAddrMessage)(unsafe.Pointer(any))</code></span>
+<span class="codeline" id="line-22"><code>		return &amp;InterfaceMulticastAddrMessage{Header: p.Header, Data: b[SizeofIfmaMsghdr2:any.Msglen]}</code></span>
+<span class="codeline" id="line-23"><code>	}</code></span>
+<span class="codeline" id="line-24"><code>	return nil</code></span>
+<span class="codeline" id="line-25"><code>}</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>// InterfaceMulticastAddrMessage represents a routing message</code></span>
+<span class="codeline" id="line-28"><code>// containing network interface address entries.</code></span>
+<span class="codeline" id="line-29"><code>//</code></span>
+<span class="codeline" id="line-30"><code>// Deprecated: Use golang.org/x/net/route instead.</code></span>
+<span class="codeline" id="line-31"><code>type InterfaceMulticastAddrMessage struct {</code></span>
+<span class="codeline" id="line-32"><code>	Header IfmaMsghdr2</code></span>
+<span class="codeline" id="line-33"><code>	Data   []byte</code></span>
+<span class="codeline" id="line-34"><code>}</code></span>
+<span class="codeline" id="line-35"><code></code></span>
+<span class="codeline" id="line-36"><code>func (m *InterfaceMulticastAddrMessage) sockaddr() ([]Sockaddr, error) {</code></span>
+<span class="codeline" id="line-37"><code>	var sas [RTAX_MAX]Sockaddr</code></span>
+<span class="codeline" id="line-38"><code>	b := m.Data[:]</code></span>
+<span class="codeline" id="line-39"><code>	for i := uint(0); i &lt; RTAX_MAX &amp;&amp; len(b) &gt;= minRoutingSockaddrLen; i++ {</code></span>
+<span class="codeline" id="line-40"><code>		if m.Header.Addrs&amp;(1&lt;&lt;i) == 0 {</code></span>
+<span class="codeline" id="line-41"><code>			continue</code></span>
+<span class="codeline" id="line-42"><code>		}</code></span>
+<span class="codeline" id="line-43"><code>		rsa := (*RawSockaddr)(unsafe.Pointer(&amp;b[0]))</code></span>
+<span class="codeline" id="line-44"><code>		switch rsa.Family {</code></span>
+<span class="codeline" id="line-45"><code>		case AF_LINK:</code></span>
+<span class="codeline" id="line-46"><code>			sa, err := parseSockaddrLink(b)</code></span>
+<span class="codeline" id="line-47"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-48"><code>				return nil, err</code></span>
+<span class="codeline" id="line-49"><code>			}</code></span>
+<span class="codeline" id="line-50"><code>			sas[i] = sa</code></span>
+<span class="codeline" id="line-51"><code>			b = b[rsaAlignOf(int(rsa.Len)):]</code></span>
+<span class="codeline" id="line-52"><code>		case AF_INET, AF_INET6:</code></span>
+<span class="codeline" id="line-53"><code>			sa, err := parseSockaddrInet(b, rsa.Family)</code></span>
+<span class="codeline" id="line-54"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-55"><code>				return nil, err</code></span>
+<span class="codeline" id="line-56"><code>			}</code></span>
+<span class="codeline" id="line-57"><code>			sas[i] = sa</code></span>
+<span class="codeline" id="line-58"><code>			b = b[rsaAlignOf(int(rsa.Len)):]</code></span>
+<span class="codeline" id="line-59"><code>		default:</code></span>
+<span class="codeline" id="line-60"><code>			sa, l, err := parseLinkLayerAddr(b)</code></span>
+<span class="codeline" id="line-61"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-62"><code>				return nil, err</code></span>
+<span class="codeline" id="line-63"><code>			}</code></span>
+<span class="codeline" id="line-64"><code>			sas[i] = sa</code></span>
+<span class="codeline" id="line-65"><code>			b = b[l:]</code></span>
+<span class="codeline" id="line-66"><code>		}</code></span>
+<span class="codeline" id="line-67"><code>	}</code></span>
+<span class="codeline" id="line-68"><code>	return sas[:], nil</code></span>
+<span class="codeline" id="line-69"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

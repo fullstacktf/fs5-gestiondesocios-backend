@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: reader.go in package net/textproto</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	reader.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/net/textproto.html">net/textproto</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2010 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package textproto</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"bufio"</code></span>
+<span class="codeline" id="line-9"><code>	"bytes"</code></span>
+<span class="codeline" id="line-10"><code>	"fmt"</code></span>
+<span class="codeline" id="line-11"><code>	"io"</code></span>
+<span class="codeline" id="line-12"><code>	"io/ioutil"</code></span>
+<span class="codeline" id="line-13"><code>	"strconv"</code></span>
+<span class="codeline" id="line-14"><code>	"strings"</code></span>
+<span class="codeline" id="line-15"><code>	"sync"</code></span>
+<span class="codeline" id="line-16"><code>)</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>// A Reader implements convenience methods for reading requests</code></span>
+<span class="codeline" id="line-19"><code>// or responses from a text protocol network connection.</code></span>
+<span class="codeline" id="line-20"><code>type Reader struct {</code></span>
+<span class="codeline" id="line-21"><code>	R   *bufio.Reader</code></span>
+<span class="codeline" id="line-22"><code>	dot *dotReader</code></span>
+<span class="codeline" id="line-23"><code>	buf []byte // a re-usable buffer for readContinuedLineSlice</code></span>
+<span class="codeline" id="line-24"><code>}</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>// NewReader returns a new Reader reading from r.</code></span>
+<span class="codeline" id="line-27"><code>//</code></span>
+<span class="codeline" id="line-28"><code>// To avoid denial of service attacks, the provided bufio.Reader</code></span>
+<span class="codeline" id="line-29"><code>// should be reading from an io.LimitReader or similar Reader to bound</code></span>
+<span class="codeline" id="line-30"><code>// the size of responses.</code></span>
+<span class="codeline" id="line-31"><code>func NewReader(r *bufio.Reader) *Reader {</code></span>
+<span class="codeline" id="line-32"><code>	commonHeaderOnce.Do(initCommonHeader)</code></span>
+<span class="codeline" id="line-33"><code>	return &amp;Reader{R: r}</code></span>
+<span class="codeline" id="line-34"><code>}</code></span>
+<span class="codeline" id="line-35"><code></code></span>
+<span class="codeline" id="line-36"><code>// ReadLine reads a single line from r,</code></span>
+<span class="codeline" id="line-37"><code>// eliding the final \n or \r\n from the returned string.</code></span>
+<span class="codeline" id="line-38"><code>func (r *Reader) ReadLine() (string, error) {</code></span>
+<span class="codeline" id="line-39"><code>	line, err := r.readLineSlice()</code></span>
+<span class="codeline" id="line-40"><code>	return string(line), err</code></span>
+<span class="codeline" id="line-41"><code>}</code></span>
+<span class="codeline" id="line-42"><code></code></span>
+<span class="codeline" id="line-43"><code>// ReadLineBytes is like ReadLine but returns a []byte instead of a string.</code></span>
+<span class="codeline" id="line-44"><code>func (r *Reader) ReadLineBytes() ([]byte, error) {</code></span>
+<span class="codeline" id="line-45"><code>	line, err := r.readLineSlice()</code></span>
+<span class="codeline" id="line-46"><code>	if line != nil {</code></span>
+<span class="codeline" id="line-47"><code>		buf := make([]byte, len(line))</code></span>
+<span class="codeline" id="line-48"><code>		copy(buf, line)</code></span>
+<span class="codeline" id="line-49"><code>		line = buf</code></span>
+<span class="codeline" id="line-50"><code>	}</code></span>
+<span class="codeline" id="line-51"><code>	return line, err</code></span>
+<span class="codeline" id="line-52"><code>}</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>func (r *Reader) readLineSlice() ([]byte, error) {</code></span>
+<span class="codeline" id="line-55"><code>	r.closeDot()</code></span>
+<span class="codeline" id="line-56"><code>	var line []byte</code></span>
+<span class="codeline" id="line-57"><code>	for {</code></span>
+<span class="codeline" id="line-58"><code>		l, more, err := r.R.ReadLine()</code></span>
+<span class="codeline" id="line-59"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-60"><code>			return nil, err</code></span>
+<span class="codeline" id="line-61"><code>		}</code></span>
+<span class="codeline" id="line-62"><code>		// Avoid the copy if the first call produced a full line.</code></span>
+<span class="codeline" id="line-63"><code>		if line == nil &amp;&amp; !more {</code></span>
+<span class="codeline" id="line-64"><code>			return l, nil</code></span>
+<span class="codeline" id="line-65"><code>		}</code></span>
+<span class="codeline" id="line-66"><code>		line = append(line, l...)</code></span>
+<span class="codeline" id="line-67"><code>		if !more {</code></span>
+<span class="codeline" id="line-68"><code>			break</code></span>
+<span class="codeline" id="line-69"><code>		}</code></span>
+<span class="codeline" id="line-70"><code>	}</code></span>
+<span class="codeline" id="line-71"><code>	return line, nil</code></span>
+<span class="codeline" id="line-72"><code>}</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>// ReadContinuedLine reads a possibly continued line from r,</code></span>
+<span class="codeline" id="line-75"><code>// eliding the final trailing ASCII white space.</code></span>
+<span class="codeline" id="line-76"><code>// Lines after the first are considered continuations if they</code></span>
+<span class="codeline" id="line-77"><code>// begin with a space or tab character. In the returned data,</code></span>
+<span class="codeline" id="line-78"><code>// continuation lines are separated from the previous line</code></span>
+<span class="codeline" id="line-79"><code>// only by a single space: the newline and leading white space</code></span>
+<span class="codeline" id="line-80"><code>// are removed.</code></span>
+<span class="codeline" id="line-81"><code>//</code></span>
+<span class="codeline" id="line-82"><code>// For example, consider this input:</code></span>
+<span class="codeline" id="line-83"><code>//</code></span>
+<span class="codeline" id="line-84"><code>//	Line 1</code></span>
+<span class="codeline" id="line-85"><code>//	  continued...</code></span>
+<span class="codeline" id="line-86"><code>//	Line 2</code></span>
+<span class="codeline" id="line-87"><code>//</code></span>
+<span class="codeline" id="line-88"><code>// The first call to ReadContinuedLine will return "Line 1 continued..."</code></span>
+<span class="codeline" id="line-89"><code>// and the second will return "Line 2".</code></span>
+<span class="codeline" id="line-90"><code>//</code></span>
+<span class="codeline" id="line-91"><code>// Empty lines are never continued.</code></span>
+<span class="codeline" id="line-92"><code>//</code></span>
+<span class="codeline" id="line-93"><code>func (r *Reader) ReadContinuedLine() (string, error) {</code></span>
+<span class="codeline" id="line-94"><code>	line, err := r.readContinuedLineSlice(noValidation)</code></span>
+<span class="codeline" id="line-95"><code>	return string(line), err</code></span>
+<span class="codeline" id="line-96"><code>}</code></span>
+<span class="codeline" id="line-97"><code></code></span>
+<span class="codeline" id="line-98"><code>// trim returns s with leading and trailing spaces and tabs removed.</code></span>
+<span class="codeline" id="line-99"><code>// It does not assume Unicode or UTF-8.</code></span>
+<span class="codeline" id="line-100"><code>func trim(s []byte) []byte {</code></span>
+<span class="codeline" id="line-101"><code>	i := 0</code></span>
+<span class="codeline" id="line-102"><code>	for i &lt; len(s) &amp;&amp; (s[i] == ' ' || s[i] == '\t') {</code></span>
+<span class="codeline" id="line-103"><code>		i++</code></span>
+<span class="codeline" id="line-104"><code>	}</code></span>
+<span class="codeline" id="line-105"><code>	n := len(s)</code></span>
+<span class="codeline" id="line-106"><code>	for n &gt; i &amp;&amp; (s[n-1] == ' ' || s[n-1] == '\t') {</code></span>
+<span class="codeline" id="line-107"><code>		n--</code></span>
+<span class="codeline" id="line-108"><code>	}</code></span>
+<span class="codeline" id="line-109"><code>	return s[i:n]</code></span>
+<span class="codeline" id="line-110"><code>}</code></span>
+<span class="codeline" id="line-111"><code></code></span>
+<span class="codeline" id="line-112"><code>// ReadContinuedLineBytes is like ReadContinuedLine but</code></span>
+<span class="codeline" id="line-113"><code>// returns a []byte instead of a string.</code></span>
+<span class="codeline" id="line-114"><code>func (r *Reader) ReadContinuedLineBytes() ([]byte, error) {</code></span>
+<span class="codeline" id="line-115"><code>	line, err := r.readContinuedLineSlice(noValidation)</code></span>
+<span class="codeline" id="line-116"><code>	if line != nil {</code></span>
+<span class="codeline" id="line-117"><code>		buf := make([]byte, len(line))</code></span>
+<span class="codeline" id="line-118"><code>		copy(buf, line)</code></span>
+<span class="codeline" id="line-119"><code>		line = buf</code></span>
+<span class="codeline" id="line-120"><code>	}</code></span>
+<span class="codeline" id="line-121"><code>	return line, err</code></span>
+<span class="codeline" id="line-122"><code>}</code></span>
+<span class="codeline" id="line-123"><code></code></span>
+<span class="codeline" id="line-124"><code>// readContinuedLineSlice reads continued lines from the reader buffer,</code></span>
+<span class="codeline" id="line-125"><code>// returning a byte slice with all lines. The validateFirstLine function</code></span>
+<span class="codeline" id="line-126"><code>// is run on the first read line, and if it returns an error then this</code></span>
+<span class="codeline" id="line-127"><code>// error is returned from readContinuedLineSlice.</code></span>
+<span class="codeline" id="line-128"><code>func (r *Reader) readContinuedLineSlice(validateFirstLine func([]byte) error) ([]byte, error) {</code></span>
+<span class="codeline" id="line-129"><code>	if validateFirstLine == nil {</code></span>
+<span class="codeline" id="line-130"><code>		return nil, fmt.Errorf("missing validateFirstLine func")</code></span>
+<span class="codeline" id="line-131"><code>	}</code></span>
+<span class="codeline" id="line-132"><code></code></span>
+<span class="codeline" id="line-133"><code>	// Read the first line.</code></span>
+<span class="codeline" id="line-134"><code>	line, err := r.readLineSlice()</code></span>
+<span class="codeline" id="line-135"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-136"><code>		return nil, err</code></span>
+<span class="codeline" id="line-137"><code>	}</code></span>
+<span class="codeline" id="line-138"><code>	if len(line) == 0 { // blank line - no continuation</code></span>
+<span class="codeline" id="line-139"><code>		return line, nil</code></span>
+<span class="codeline" id="line-140"><code>	}</code></span>
+<span class="codeline" id="line-141"><code></code></span>
+<span class="codeline" id="line-142"><code>	if err := validateFirstLine(line); err != nil {</code></span>
+<span class="codeline" id="line-143"><code>		return nil, err</code></span>
+<span class="codeline" id="line-144"><code>	}</code></span>
+<span class="codeline" id="line-145"><code></code></span>
+<span class="codeline" id="line-146"><code>	// Optimistically assume that we have started to buffer the next line</code></span>
+<span class="codeline" id="line-147"><code>	// and it starts with an ASCII letter (the next header key), or a blank</code></span>
+<span class="codeline" id="line-148"><code>	// line, so we can avoid copying that buffered data around in memory</code></span>
+<span class="codeline" id="line-149"><code>	// and skipping over non-existent whitespace.</code></span>
+<span class="codeline" id="line-150"><code>	if r.R.Buffered() &gt; 1 {</code></span>
+<span class="codeline" id="line-151"><code>		peek, _ := r.R.Peek(2)</code></span>
+<span class="codeline" id="line-152"><code>		if len(peek) &gt; 0 &amp;&amp; (isASCIILetter(peek[0]) || peek[0] == '\n') ||</code></span>
+<span class="codeline" id="line-153"><code>			len(peek) == 2 &amp;&amp; peek[0] == '\r' &amp;&amp; peek[1] == '\n' {</code></span>
+<span class="codeline" id="line-154"><code>			return trim(line), nil</code></span>
+<span class="codeline" id="line-155"><code>		}</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code></code></span>
+<span class="codeline" id="line-158"><code>	// ReadByte or the next readLineSlice will flush the read buffer;</code></span>
+<span class="codeline" id="line-159"><code>	// copy the slice into buf.</code></span>
+<span class="codeline" id="line-160"><code>	r.buf = append(r.buf[:0], trim(line)...)</code></span>
+<span class="codeline" id="line-161"><code></code></span>
+<span class="codeline" id="line-162"><code>	// Read continuation lines.</code></span>
+<span class="codeline" id="line-163"><code>	for r.skipSpace() &gt; 0 {</code></span>
+<span class="codeline" id="line-164"><code>		line, err := r.readLineSlice()</code></span>
+<span class="codeline" id="line-165"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-166"><code>			break</code></span>
+<span class="codeline" id="line-167"><code>		}</code></span>
+<span class="codeline" id="line-168"><code>		r.buf = append(r.buf, ' ')</code></span>
+<span class="codeline" id="line-169"><code>		r.buf = append(r.buf, trim(line)...)</code></span>
+<span class="codeline" id="line-170"><code>	}</code></span>
+<span class="codeline" id="line-171"><code>	return r.buf, nil</code></span>
+<span class="codeline" id="line-172"><code>}</code></span>
+<span class="codeline" id="line-173"><code></code></span>
+<span class="codeline" id="line-174"><code>// skipSpace skips R over all spaces and returns the number of bytes skipped.</code></span>
+<span class="codeline" id="line-175"><code>func (r *Reader) skipSpace() int {</code></span>
+<span class="codeline" id="line-176"><code>	n := 0</code></span>
+<span class="codeline" id="line-177"><code>	for {</code></span>
+<span class="codeline" id="line-178"><code>		c, err := r.R.ReadByte()</code></span>
+<span class="codeline" id="line-179"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-180"><code>			// Bufio will keep err until next read.</code></span>
+<span class="codeline" id="line-181"><code>			break</code></span>
+<span class="codeline" id="line-182"><code>		}</code></span>
+<span class="codeline" id="line-183"><code>		if c != ' ' &amp;&amp; c != '\t' {</code></span>
+<span class="codeline" id="line-184"><code>			r.R.UnreadByte()</code></span>
+<span class="codeline" id="line-185"><code>			break</code></span>
+<span class="codeline" id="line-186"><code>		}</code></span>
+<span class="codeline" id="line-187"><code>		n++</code></span>
+<span class="codeline" id="line-188"><code>	}</code></span>
+<span class="codeline" id="line-189"><code>	return n</code></span>
+<span class="codeline" id="line-190"><code>}</code></span>
+<span class="codeline" id="line-191"><code></code></span>
+<span class="codeline" id="line-192"><code>func (r *Reader) readCodeLine(expectCode int) (code int, continued bool, message string, err error) {</code></span>
+<span class="codeline" id="line-193"><code>	line, err := r.ReadLine()</code></span>
+<span class="codeline" id="line-194"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-195"><code>		return</code></span>
+<span class="codeline" id="line-196"><code>	}</code></span>
+<span class="codeline" id="line-197"><code>	return parseCodeLine(line, expectCode)</code></span>
+<span class="codeline" id="line-198"><code>}</code></span>
+<span class="codeline" id="line-199"><code></code></span>
+<span class="codeline" id="line-200"><code>func parseCodeLine(line string, expectCode int) (code int, continued bool, message string, err error) {</code></span>
+<span class="codeline" id="line-201"><code>	if len(line) &lt; 4 || line[3] != ' ' &amp;&amp; line[3] != '-' {</code></span>
+<span class="codeline" id="line-202"><code>		err = ProtocolError("short response: " + line)</code></span>
+<span class="codeline" id="line-203"><code>		return</code></span>
+<span class="codeline" id="line-204"><code>	}</code></span>
+<span class="codeline" id="line-205"><code>	continued = line[3] == '-'</code></span>
+<span class="codeline" id="line-206"><code>	code, err = strconv.Atoi(line[0:3])</code></span>
+<span class="codeline" id="line-207"><code>	if err != nil || code &lt; 100 {</code></span>
+<span class="codeline" id="line-208"><code>		err = ProtocolError("invalid response code: " + line)</code></span>
+<span class="codeline" id="line-209"><code>		return</code></span>
+<span class="codeline" id="line-210"><code>	}</code></span>
+<span class="codeline" id="line-211"><code>	message = line[4:]</code></span>
+<span class="codeline" id="line-212"><code>	if 1 &lt;= expectCode &amp;&amp; expectCode &lt; 10 &amp;&amp; code/100 != expectCode ||</code></span>
+<span class="codeline" id="line-213"><code>		10 &lt;= expectCode &amp;&amp; expectCode &lt; 100 &amp;&amp; code/10 != expectCode ||</code></span>
+<span class="codeline" id="line-214"><code>		100 &lt;= expectCode &amp;&amp; expectCode &lt; 1000 &amp;&amp; code != expectCode {</code></span>
+<span class="codeline" id="line-215"><code>		err = &amp;Error{code, message}</code></span>
+<span class="codeline" id="line-216"><code>	}</code></span>
+<span class="codeline" id="line-217"><code>	return</code></span>
+<span class="codeline" id="line-218"><code>}</code></span>
+<span class="codeline" id="line-219"><code></code></span>
+<span class="codeline" id="line-220"><code>// ReadCodeLine reads a response code line of the form</code></span>
+<span class="codeline" id="line-221"><code>//	code message</code></span>
+<span class="codeline" id="line-222"><code>// where code is a three-digit status code and the message</code></span>
+<span class="codeline" id="line-223"><code>// extends to the rest of the line. An example of such a line is:</code></span>
+<span class="codeline" id="line-224"><code>//	220 plan9.bell-labs.com ESMTP</code></span>
+<span class="codeline" id="line-225"><code>//</code></span>
+<span class="codeline" id="line-226"><code>// If the prefix of the status does not match the digits in expectCode,</code></span>
+<span class="codeline" id="line-227"><code>// ReadCodeLine returns with err set to &amp;Error{code, message}.</code></span>
+<span class="codeline" id="line-228"><code>// For example, if expectCode is 31, an error will be returned if</code></span>
+<span class="codeline" id="line-229"><code>// the status is not in the range [310,319].</code></span>
+<span class="codeline" id="line-230"><code>//</code></span>
+<span class="codeline" id="line-231"><code>// If the response is multi-line, ReadCodeLine returns an error.</code></span>
+<span class="codeline" id="line-232"><code>//</code></span>
+<span class="codeline" id="line-233"><code>// An expectCode &lt;= 0 disables the check of the status code.</code></span>
+<span class="codeline" id="line-234"><code>//</code></span>
+<span class="codeline" id="line-235"><code>func (r *Reader) ReadCodeLine(expectCode int) (code int, message string, err error) {</code></span>
+<span class="codeline" id="line-236"><code>	code, continued, message, err := r.readCodeLine(expectCode)</code></span>
+<span class="codeline" id="line-237"><code>	if err == nil &amp;&amp; continued {</code></span>
+<span class="codeline" id="line-238"><code>		err = ProtocolError("unexpected multi-line response: " + message)</code></span>
+<span class="codeline" id="line-239"><code>	}</code></span>
+<span class="codeline" id="line-240"><code>	return</code></span>
+<span class="codeline" id="line-241"><code>}</code></span>
+<span class="codeline" id="line-242"><code></code></span>
+<span class="codeline" id="line-243"><code>// ReadResponse reads a multi-line response of the form:</code></span>
+<span class="codeline" id="line-244"><code>//</code></span>
+<span class="codeline" id="line-245"><code>//	code-message line 1</code></span>
+<span class="codeline" id="line-246"><code>//	code-message line 2</code></span>
+<span class="codeline" id="line-247"><code>//	...</code></span>
+<span class="codeline" id="line-248"><code>//	code message line n</code></span>
+<span class="codeline" id="line-249"><code>//</code></span>
+<span class="codeline" id="line-250"><code>// where code is a three-digit status code. The first line starts with the</code></span>
+<span class="codeline" id="line-251"><code>// code and a hyphen. The response is terminated by a line that starts</code></span>
+<span class="codeline" id="line-252"><code>// with the same code followed by a space. Each line in message is</code></span>
+<span class="codeline" id="line-253"><code>// separated by a newline (\n).</code></span>
+<span class="codeline" id="line-254"><code>//</code></span>
+<span class="codeline" id="line-255"><code>// See page 36 of RFC 959 (https://www.ietf.org/rfc/rfc959.txt) for</code></span>
+<span class="codeline" id="line-256"><code>// details of another form of response accepted:</code></span>
+<span class="codeline" id="line-257"><code>//</code></span>
+<span class="codeline" id="line-258"><code>//  code-message line 1</code></span>
+<span class="codeline" id="line-259"><code>//  message line 2</code></span>
+<span class="codeline" id="line-260"><code>//  ...</code></span>
+<span class="codeline" id="line-261"><code>//  code message line n</code></span>
+<span class="codeline" id="line-262"><code>//</code></span>
+<span class="codeline" id="line-263"><code>// If the prefix of the status does not match the digits in expectCode,</code></span>
+<span class="codeline" id="line-264"><code>// ReadResponse returns with err set to &amp;Error{code, message}.</code></span>
+<span class="codeline" id="line-265"><code>// For example, if expectCode is 31, an error will be returned if</code></span>
+<span class="codeline" id="line-266"><code>// the status is not in the range [310,319].</code></span>
+<span class="codeline" id="line-267"><code>//</code></span>
+<span class="codeline" id="line-268"><code>// An expectCode &lt;= 0 disables the check of the status code.</code></span>
+<span class="codeline" id="line-269"><code>//</code></span>
+<span class="codeline" id="line-270"><code>func (r *Reader) ReadResponse(expectCode int) (code int, message string, err error) {</code></span>
+<span class="codeline" id="line-271"><code>	code, continued, message, err := r.readCodeLine(expectCode)</code></span>
+<span class="codeline" id="line-272"><code>	multi := continued</code></span>
+<span class="codeline" id="line-273"><code>	for continued {</code></span>
+<span class="codeline" id="line-274"><code>		line, err := r.ReadLine()</code></span>
+<span class="codeline" id="line-275"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-276"><code>			return 0, "", err</code></span>
+<span class="codeline" id="line-277"><code>		}</code></span>
+<span class="codeline" id="line-278"><code></code></span>
+<span class="codeline" id="line-279"><code>		var code2 int</code></span>
+<span class="codeline" id="line-280"><code>		var moreMessage string</code></span>
+<span class="codeline" id="line-281"><code>		code2, continued, moreMessage, err = parseCodeLine(line, 0)</code></span>
+<span class="codeline" id="line-282"><code>		if err != nil || code2 != code {</code></span>
+<span class="codeline" id="line-283"><code>			message += "\n" + strings.TrimRight(line, "\r\n")</code></span>
+<span class="codeline" id="line-284"><code>			continued = true</code></span>
+<span class="codeline" id="line-285"><code>			continue</code></span>
+<span class="codeline" id="line-286"><code>		}</code></span>
+<span class="codeline" id="line-287"><code>		message += "\n" + moreMessage</code></span>
+<span class="codeline" id="line-288"><code>	}</code></span>
+<span class="codeline" id="line-289"><code>	if err != nil &amp;&amp; multi &amp;&amp; message != "" {</code></span>
+<span class="codeline" id="line-290"><code>		// replace one line error message with all lines (full message)</code></span>
+<span class="codeline" id="line-291"><code>		err = &amp;Error{code, message}</code></span>
+<span class="codeline" id="line-292"><code>	}</code></span>
+<span class="codeline" id="line-293"><code>	return</code></span>
+<span class="codeline" id="line-294"><code>}</code></span>
+<span class="codeline" id="line-295"><code></code></span>
+<span class="codeline" id="line-296"><code>// DotReader returns a new Reader that satisfies Reads using the</code></span>
+<span class="codeline" id="line-297"><code>// decoded text of a dot-encoded block read from r.</code></span>
+<span class="codeline" id="line-298"><code>// The returned Reader is only valid until the next call</code></span>
+<span class="codeline" id="line-299"><code>// to a method on r.</code></span>
+<span class="codeline" id="line-300"><code>//</code></span>
+<span class="codeline" id="line-301"><code>// Dot encoding is a common framing used for data blocks</code></span>
+<span class="codeline" id="line-302"><code>// in text protocols such as SMTP.  The data consists of a sequence</code></span>
+<span class="codeline" id="line-303"><code>// of lines, each of which ends in "\r\n".  The sequence itself</code></span>
+<span class="codeline" id="line-304"><code>// ends at a line containing just a dot: ".\r\n".  Lines beginning</code></span>
+<span class="codeline" id="line-305"><code>// with a dot are escaped with an additional dot to avoid</code></span>
+<span class="codeline" id="line-306"><code>// looking like the end of the sequence.</code></span>
+<span class="codeline" id="line-307"><code>//</code></span>
+<span class="codeline" id="line-308"><code>// The decoded form returned by the Reader's Read method</code></span>
+<span class="codeline" id="line-309"><code>// rewrites the "\r\n" line endings into the simpler "\n",</code></span>
+<span class="codeline" id="line-310"><code>// removes leading dot escapes if present, and stops with error io.EOF</code></span>
+<span class="codeline" id="line-311"><code>// after consuming (and discarding) the end-of-sequence line.</code></span>
+<span class="codeline" id="line-312"><code>func (r *Reader) DotReader() io.Reader {</code></span>
+<span class="codeline" id="line-313"><code>	r.closeDot()</code></span>
+<span class="codeline" id="line-314"><code>	r.dot = &amp;dotReader{r: r}</code></span>
+<span class="codeline" id="line-315"><code>	return r.dot</code></span>
+<span class="codeline" id="line-316"><code>}</code></span>
+<span class="codeline" id="line-317"><code></code></span>
+<span class="codeline" id="line-318"><code>type dotReader struct {</code></span>
+<span class="codeline" id="line-319"><code>	r     *Reader</code></span>
+<span class="codeline" id="line-320"><code>	state int</code></span>
+<span class="codeline" id="line-321"><code>}</code></span>
+<span class="codeline" id="line-322"><code></code></span>
+<span class="codeline" id="line-323"><code>// Read satisfies reads by decoding dot-encoded data read from d.r.</code></span>
+<span class="codeline" id="line-324"><code>func (d *dotReader) Read(b []byte) (n int, err error) {</code></span>
+<span class="codeline" id="line-325"><code>	// Run data through a simple state machine to</code></span>
+<span class="codeline" id="line-326"><code>	// elide leading dots, rewrite trailing \r\n into \n,</code></span>
+<span class="codeline" id="line-327"><code>	// and detect ending .\r\n line.</code></span>
+<span class="codeline" id="line-328"><code>	const (</code></span>
+<span class="codeline" id="line-329"><code>		stateBeginLine = iota // beginning of line; initial state; must be zero</code></span>
+<span class="codeline" id="line-330"><code>		stateDot              // read . at beginning of line</code></span>
+<span class="codeline" id="line-331"><code>		stateDotCR            // read .\r at beginning of line</code></span>
+<span class="codeline" id="line-332"><code>		stateCR               // read \r (possibly at end of line)</code></span>
+<span class="codeline" id="line-333"><code>		stateData             // reading data in middle of line</code></span>
+<span class="codeline" id="line-334"><code>		stateEOF              // reached .\r\n end marker line</code></span>
+<span class="codeline" id="line-335"><code>	)</code></span>
+<span class="codeline" id="line-336"><code>	br := d.r.R</code></span>
+<span class="codeline" id="line-337"><code>	for n &lt; len(b) &amp;&amp; d.state != stateEOF {</code></span>
+<span class="codeline" id="line-338"><code>		var c byte</code></span>
+<span class="codeline" id="line-339"><code>		c, err = br.ReadByte()</code></span>
+<span class="codeline" id="line-340"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-341"><code>			if err == io.EOF {</code></span>
+<span class="codeline" id="line-342"><code>				err = io.ErrUnexpectedEOF</code></span>
+<span class="codeline" id="line-343"><code>			}</code></span>
+<span class="codeline" id="line-344"><code>			break</code></span>
+<span class="codeline" id="line-345"><code>		}</code></span>
+<span class="codeline" id="line-346"><code>		switch d.state {</code></span>
+<span class="codeline" id="line-347"><code>		case stateBeginLine:</code></span>
+<span class="codeline" id="line-348"><code>			if c == '.' {</code></span>
+<span class="codeline" id="line-349"><code>				d.state = stateDot</code></span>
+<span class="codeline" id="line-350"><code>				continue</code></span>
+<span class="codeline" id="line-351"><code>			}</code></span>
+<span class="codeline" id="line-352"><code>			if c == '\r' {</code></span>
+<span class="codeline" id="line-353"><code>				d.state = stateCR</code></span>
+<span class="codeline" id="line-354"><code>				continue</code></span>
+<span class="codeline" id="line-355"><code>			}</code></span>
+<span class="codeline" id="line-356"><code>			d.state = stateData</code></span>
+<span class="codeline" id="line-357"><code></code></span>
+<span class="codeline" id="line-358"><code>		case stateDot:</code></span>
+<span class="codeline" id="line-359"><code>			if c == '\r' {</code></span>
+<span class="codeline" id="line-360"><code>				d.state = stateDotCR</code></span>
+<span class="codeline" id="line-361"><code>				continue</code></span>
+<span class="codeline" id="line-362"><code>			}</code></span>
+<span class="codeline" id="line-363"><code>			if c == '\n' {</code></span>
+<span class="codeline" id="line-364"><code>				d.state = stateEOF</code></span>
+<span class="codeline" id="line-365"><code>				continue</code></span>
+<span class="codeline" id="line-366"><code>			}</code></span>
+<span class="codeline" id="line-367"><code>			d.state = stateData</code></span>
+<span class="codeline" id="line-368"><code></code></span>
+<span class="codeline" id="line-369"><code>		case stateDotCR:</code></span>
+<span class="codeline" id="line-370"><code>			if c == '\n' {</code></span>
+<span class="codeline" id="line-371"><code>				d.state = stateEOF</code></span>
+<span class="codeline" id="line-372"><code>				continue</code></span>
+<span class="codeline" id="line-373"><code>			}</code></span>
+<span class="codeline" id="line-374"><code>			// Not part of .\r\n.</code></span>
+<span class="codeline" id="line-375"><code>			// Consume leading dot and emit saved \r.</code></span>
+<span class="codeline" id="line-376"><code>			br.UnreadByte()</code></span>
+<span class="codeline" id="line-377"><code>			c = '\r'</code></span>
+<span class="codeline" id="line-378"><code>			d.state = stateData</code></span>
+<span class="codeline" id="line-379"><code></code></span>
+<span class="codeline" id="line-380"><code>		case stateCR:</code></span>
+<span class="codeline" id="line-381"><code>			if c == '\n' {</code></span>
+<span class="codeline" id="line-382"><code>				d.state = stateBeginLine</code></span>
+<span class="codeline" id="line-383"><code>				break</code></span>
+<span class="codeline" id="line-384"><code>			}</code></span>
+<span class="codeline" id="line-385"><code>			// Not part of \r\n. Emit saved \r</code></span>
+<span class="codeline" id="line-386"><code>			br.UnreadByte()</code></span>
+<span class="codeline" id="line-387"><code>			c = '\r'</code></span>
+<span class="codeline" id="line-388"><code>			d.state = stateData</code></span>
+<span class="codeline" id="line-389"><code></code></span>
+<span class="codeline" id="line-390"><code>		case stateData:</code></span>
+<span class="codeline" id="line-391"><code>			if c == '\r' {</code></span>
+<span class="codeline" id="line-392"><code>				d.state = stateCR</code></span>
+<span class="codeline" id="line-393"><code>				continue</code></span>
+<span class="codeline" id="line-394"><code>			}</code></span>
+<span class="codeline" id="line-395"><code>			if c == '\n' {</code></span>
+<span class="codeline" id="line-396"><code>				d.state = stateBeginLine</code></span>
+<span class="codeline" id="line-397"><code>			}</code></span>
+<span class="codeline" id="line-398"><code>		}</code></span>
+<span class="codeline" id="line-399"><code>		b[n] = c</code></span>
+<span class="codeline" id="line-400"><code>		n++</code></span>
+<span class="codeline" id="line-401"><code>	}</code></span>
+<span class="codeline" id="line-402"><code>	if err == nil &amp;&amp; d.state == stateEOF {</code></span>
+<span class="codeline" id="line-403"><code>		err = io.EOF</code></span>
+<span class="codeline" id="line-404"><code>	}</code></span>
+<span class="codeline" id="line-405"><code>	if err != nil &amp;&amp; d.r.dot == d {</code></span>
+<span class="codeline" id="line-406"><code>		d.r.dot = nil</code></span>
+<span class="codeline" id="line-407"><code>	}</code></span>
+<span class="codeline" id="line-408"><code>	return</code></span>
+<span class="codeline" id="line-409"><code>}</code></span>
+<span class="codeline" id="line-410"><code></code></span>
+<span class="codeline" id="line-411"><code>// closeDot drains the current DotReader if any,</code></span>
+<span class="codeline" id="line-412"><code>// making sure that it reads until the ending dot line.</code></span>
+<span class="codeline" id="line-413"><code>func (r *Reader) closeDot() {</code></span>
+<span class="codeline" id="line-414"><code>	if r.dot == nil {</code></span>
+<span class="codeline" id="line-415"><code>		return</code></span>
+<span class="codeline" id="line-416"><code>	}</code></span>
+<span class="codeline" id="line-417"><code>	buf := make([]byte, 128)</code></span>
+<span class="codeline" id="line-418"><code>	for r.dot != nil {</code></span>
+<span class="codeline" id="line-419"><code>		// When Read reaches EOF or an error,</code></span>
+<span class="codeline" id="line-420"><code>		// it will set r.dot == nil.</code></span>
+<span class="codeline" id="line-421"><code>		r.dot.Read(buf)</code></span>
+<span class="codeline" id="line-422"><code>	}</code></span>
+<span class="codeline" id="line-423"><code>}</code></span>
+<span class="codeline" id="line-424"><code></code></span>
+<span class="codeline" id="line-425"><code>// ReadDotBytes reads a dot-encoding and returns the decoded data.</code></span>
+<span class="codeline" id="line-426"><code>//</code></span>
+<span class="codeline" id="line-427"><code>// See the documentation for the DotReader method for details about dot-encoding.</code></span>
+<span class="codeline" id="line-428"><code>func (r *Reader) ReadDotBytes() ([]byte, error) {</code></span>
+<span class="codeline" id="line-429"><code>	return ioutil.ReadAll(r.DotReader())</code></span>
+<span class="codeline" id="line-430"><code>}</code></span>
+<span class="codeline" id="line-431"><code></code></span>
+<span class="codeline" id="line-432"><code>// ReadDotLines reads a dot-encoding and returns a slice</code></span>
+<span class="codeline" id="line-433"><code>// containing the decoded lines, with the final \r\n or \n elided from each.</code></span>
+<span class="codeline" id="line-434"><code>//</code></span>
+<span class="codeline" id="line-435"><code>// See the documentation for the DotReader method for details about dot-encoding.</code></span>
+<span class="codeline" id="line-436"><code>func (r *Reader) ReadDotLines() ([]string, error) {</code></span>
+<span class="codeline" id="line-437"><code>	// We could use ReadDotBytes and then Split it,</code></span>
+<span class="codeline" id="line-438"><code>	// but reading a line at a time avoids needing a</code></span>
+<span class="codeline" id="line-439"><code>	// large contiguous block of memory and is simpler.</code></span>
+<span class="codeline" id="line-440"><code>	var v []string</code></span>
+<span class="codeline" id="line-441"><code>	var err error</code></span>
+<span class="codeline" id="line-442"><code>	for {</code></span>
+<span class="codeline" id="line-443"><code>		var line string</code></span>
+<span class="codeline" id="line-444"><code>		line, err = r.ReadLine()</code></span>
+<span class="codeline" id="line-445"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-446"><code>			if err == io.EOF {</code></span>
+<span class="codeline" id="line-447"><code>				err = io.ErrUnexpectedEOF</code></span>
+<span class="codeline" id="line-448"><code>			}</code></span>
+<span class="codeline" id="line-449"><code>			break</code></span>
+<span class="codeline" id="line-450"><code>		}</code></span>
+<span class="codeline" id="line-451"><code></code></span>
+<span class="codeline" id="line-452"><code>		// Dot by itself marks end; otherwise cut one dot.</code></span>
+<span class="codeline" id="line-453"><code>		if len(line) &gt; 0 &amp;&amp; line[0] == '.' {</code></span>
+<span class="codeline" id="line-454"><code>			if len(line) == 1 {</code></span>
+<span class="codeline" id="line-455"><code>				break</code></span>
+<span class="codeline" id="line-456"><code>			}</code></span>
+<span class="codeline" id="line-457"><code>			line = line[1:]</code></span>
+<span class="codeline" id="line-458"><code>		}</code></span>
+<span class="codeline" id="line-459"><code>		v = append(v, line)</code></span>
+<span class="codeline" id="line-460"><code>	}</code></span>
+<span class="codeline" id="line-461"><code>	return v, err</code></span>
+<span class="codeline" id="line-462"><code>}</code></span>
+<span class="codeline" id="line-463"><code></code></span>
+<span class="codeline" id="line-464"><code>// ReadMIMEHeader reads a MIME-style header from r.</code></span>
+<span class="codeline" id="line-465"><code>// The header is a sequence of possibly continued Key: Value lines</code></span>
+<span class="codeline" id="line-466"><code>// ending in a blank line.</code></span>
+<span class="codeline" id="line-467"><code>// The returned map m maps CanonicalMIMEHeaderKey(key) to a</code></span>
+<span class="codeline" id="line-468"><code>// sequence of values in the same order encountered in the input.</code></span>
+<span class="codeline" id="line-469"><code>//</code></span>
+<span class="codeline" id="line-470"><code>// For example, consider this input:</code></span>
+<span class="codeline" id="line-471"><code>//</code></span>
+<span class="codeline" id="line-472"><code>//	My-Key: Value 1</code></span>
+<span class="codeline" id="line-473"><code>//	Long-Key: Even</code></span>
+<span class="codeline" id="line-474"><code>//	       Longer Value</code></span>
+<span class="codeline" id="line-475"><code>//	My-Key: Value 2</code></span>
+<span class="codeline" id="line-476"><code>//</code></span>
+<span class="codeline" id="line-477"><code>// Given that input, ReadMIMEHeader returns the map:</code></span>
+<span class="codeline" id="line-478"><code>//</code></span>
+<span class="codeline" id="line-479"><code>//	map[string][]string{</code></span>
+<span class="codeline" id="line-480"><code>//		"My-Key": {"Value 1", "Value 2"},</code></span>
+<span class="codeline" id="line-481"><code>//		"Long-Key": {"Even Longer Value"},</code></span>
+<span class="codeline" id="line-482"><code>//	}</code></span>
+<span class="codeline" id="line-483"><code>//</code></span>
+<span class="codeline" id="line-484"><code>func (r *Reader) ReadMIMEHeader() (MIMEHeader, error) {</code></span>
+<span class="codeline" id="line-485"><code>	// Avoid lots of small slice allocations later by allocating one</code></span>
+<span class="codeline" id="line-486"><code>	// large one ahead of time which we'll cut up into smaller</code></span>
+<span class="codeline" id="line-487"><code>	// slices. If this isn't big enough later, we allocate small ones.</code></span>
+<span class="codeline" id="line-488"><code>	var strs []string</code></span>
+<span class="codeline" id="line-489"><code>	hint := r.upcomingHeaderNewlines()</code></span>
+<span class="codeline" id="line-490"><code>	if hint &gt; 0 {</code></span>
+<span class="codeline" id="line-491"><code>		strs = make([]string, hint)</code></span>
+<span class="codeline" id="line-492"><code>	}</code></span>
+<span class="codeline" id="line-493"><code></code></span>
+<span class="codeline" id="line-494"><code>	m := make(MIMEHeader, hint)</code></span>
+<span class="codeline" id="line-495"><code></code></span>
+<span class="codeline" id="line-496"><code>	// The first line cannot start with a leading space.</code></span>
+<span class="codeline" id="line-497"><code>	if buf, err := r.R.Peek(1); err == nil &amp;&amp; (buf[0] == ' ' || buf[0] == '\t') {</code></span>
+<span class="codeline" id="line-498"><code>		line, err := r.readLineSlice()</code></span>
+<span class="codeline" id="line-499"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-500"><code>			return m, err</code></span>
+<span class="codeline" id="line-501"><code>		}</code></span>
+<span class="codeline" id="line-502"><code>		return m, ProtocolError("malformed MIME header initial line: " + string(line))</code></span>
+<span class="codeline" id="line-503"><code>	}</code></span>
+<span class="codeline" id="line-504"><code></code></span>
+<span class="codeline" id="line-505"><code>	for {</code></span>
+<span class="codeline" id="line-506"><code>		kv, err := r.readContinuedLineSlice(mustHaveFieldNameColon)</code></span>
+<span class="codeline" id="line-507"><code>		if len(kv) == 0 {</code></span>
+<span class="codeline" id="line-508"><code>			return m, err</code></span>
+<span class="codeline" id="line-509"><code>		}</code></span>
+<span class="codeline" id="line-510"><code></code></span>
+<span class="codeline" id="line-511"><code>		// Key ends at first colon.</code></span>
+<span class="codeline" id="line-512"><code>		i := bytes.IndexByte(kv, ':')</code></span>
+<span class="codeline" id="line-513"><code>		if i &lt; 0 {</code></span>
+<span class="codeline" id="line-514"><code>			return m, ProtocolError("malformed MIME header line: " + string(kv))</code></span>
+<span class="codeline" id="line-515"><code>		}</code></span>
+<span class="codeline" id="line-516"><code>		key := canonicalMIMEHeaderKey(kv[:i])</code></span>
+<span class="codeline" id="line-517"><code></code></span>
+<span class="codeline" id="line-518"><code>		// As per RFC 7230 field-name is a token, tokens consist of one or more chars.</code></span>
+<span class="codeline" id="line-519"><code>		// We could return a ProtocolError here, but better to be liberal in what we</code></span>
+<span class="codeline" id="line-520"><code>		// accept, so if we get an empty key, skip it.</code></span>
+<span class="codeline" id="line-521"><code>		if key == "" {</code></span>
+<span class="codeline" id="line-522"><code>			continue</code></span>
+<span class="codeline" id="line-523"><code>		}</code></span>
+<span class="codeline" id="line-524"><code></code></span>
+<span class="codeline" id="line-525"><code>		// Skip initial spaces in value.</code></span>
+<span class="codeline" id="line-526"><code>		i++ // skip colon</code></span>
+<span class="codeline" id="line-527"><code>		for i &lt; len(kv) &amp;&amp; (kv[i] == ' ' || kv[i] == '\t') {</code></span>
+<span class="codeline" id="line-528"><code>			i++</code></span>
+<span class="codeline" id="line-529"><code>		}</code></span>
+<span class="codeline" id="line-530"><code>		value := string(kv[i:])</code></span>
+<span class="codeline" id="line-531"><code></code></span>
+<span class="codeline" id="line-532"><code>		vv := m[key]</code></span>
+<span class="codeline" id="line-533"><code>		if vv == nil &amp;&amp; len(strs) &gt; 0 {</code></span>
+<span class="codeline" id="line-534"><code>			// More than likely this will be a single-element key.</code></span>
+<span class="codeline" id="line-535"><code>			// Most headers aren't multi-valued.</code></span>
+<span class="codeline" id="line-536"><code>			// Set the capacity on strs[0] to 1, so any future append</code></span>
+<span class="codeline" id="line-537"><code>			// won't extend the slice into the other strings.</code></span>
+<span class="codeline" id="line-538"><code>			vv, strs = strs[:1:1], strs[1:]</code></span>
+<span class="codeline" id="line-539"><code>			vv[0] = value</code></span>
+<span class="codeline" id="line-540"><code>			m[key] = vv</code></span>
+<span class="codeline" id="line-541"><code>		} else {</code></span>
+<span class="codeline" id="line-542"><code>			m[key] = append(vv, value)</code></span>
+<span class="codeline" id="line-543"><code>		}</code></span>
+<span class="codeline" id="line-544"><code></code></span>
+<span class="codeline" id="line-545"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-546"><code>			return m, err</code></span>
+<span class="codeline" id="line-547"><code>		}</code></span>
+<span class="codeline" id="line-548"><code>	}</code></span>
+<span class="codeline" id="line-549"><code>}</code></span>
+<span class="codeline" id="line-550"><code></code></span>
+<span class="codeline" id="line-551"><code>// noValidation is a no-op validation func for readContinuedLineSlice</code></span>
+<span class="codeline" id="line-552"><code>// that permits any lines.</code></span>
+<span class="codeline" id="line-553"><code>func noValidation(_ []byte) error { return nil }</code></span>
+<span class="codeline" id="line-554"><code></code></span>
+<span class="codeline" id="line-555"><code>// mustHaveFieldNameColon ensures that, per RFC 7230, the</code></span>
+<span class="codeline" id="line-556"><code>// field-name is on a single line, so the first line must</code></span>
+<span class="codeline" id="line-557"><code>// contain a colon.</code></span>
+<span class="codeline" id="line-558"><code>func mustHaveFieldNameColon(line []byte) error {</code></span>
+<span class="codeline" id="line-559"><code>	if bytes.IndexByte(line, ':') &lt; 0 {</code></span>
+<span class="codeline" id="line-560"><code>		return ProtocolError(fmt.Sprintf("malformed MIME header: missing colon: %q", line))</code></span>
+<span class="codeline" id="line-561"><code>	}</code></span>
+<span class="codeline" id="line-562"><code>	return nil</code></span>
+<span class="codeline" id="line-563"><code>}</code></span>
+<span class="codeline" id="line-564"><code></code></span>
+<span class="codeline" id="line-565"><code>// upcomingHeaderNewlines returns an approximation of the number of newlines</code></span>
+<span class="codeline" id="line-566"><code>// that will be in this header. If it gets confused, it returns 0.</code></span>
+<span class="codeline" id="line-567"><code>func (r *Reader) upcomingHeaderNewlines() (n int) {</code></span>
+<span class="codeline" id="line-568"><code>	// Try to determine the 'hint' size.</code></span>
+<span class="codeline" id="line-569"><code>	r.R.Peek(1) // force a buffer load if empty</code></span>
+<span class="codeline" id="line-570"><code>	s := r.R.Buffered()</code></span>
+<span class="codeline" id="line-571"><code>	if s == 0 {</code></span>
+<span class="codeline" id="line-572"><code>		return</code></span>
+<span class="codeline" id="line-573"><code>	}</code></span>
+<span class="codeline" id="line-574"><code>	peek, _ := r.R.Peek(s)</code></span>
+<span class="codeline" id="line-575"><code>	for len(peek) &gt; 0 {</code></span>
+<span class="codeline" id="line-576"><code>		i := bytes.IndexByte(peek, '\n')</code></span>
+<span class="codeline" id="line-577"><code>		if i &lt; 3 {</code></span>
+<span class="codeline" id="line-578"><code>			// Not present (-1) or found within the next few bytes,</code></span>
+<span class="codeline" id="line-579"><code>			// implying we're at the end ("\r\n\r\n" or "\n\n")</code></span>
+<span class="codeline" id="line-580"><code>			return</code></span>
+<span class="codeline" id="line-581"><code>		}</code></span>
+<span class="codeline" id="line-582"><code>		n++</code></span>
+<span class="codeline" id="line-583"><code>		peek = peek[i+1:]</code></span>
+<span class="codeline" id="line-584"><code>	}</code></span>
+<span class="codeline" id="line-585"><code>	return</code></span>
+<span class="codeline" id="line-586"><code>}</code></span>
+<span class="codeline" id="line-587"><code></code></span>
+<span class="codeline" id="line-588"><code>// CanonicalMIMEHeaderKey returns the canonical format of the</code></span>
+<span class="codeline" id="line-589"><code>// MIME header key s. The canonicalization converts the first</code></span>
+<span class="codeline" id="line-590"><code>// letter and any letter following a hyphen to upper case;</code></span>
+<span class="codeline" id="line-591"><code>// the rest are converted to lowercase. For example, the</code></span>
+<span class="codeline" id="line-592"><code>// canonical key for "accept-encoding" is "Accept-Encoding".</code></span>
+<span class="codeline" id="line-593"><code>// MIME header keys are assumed to be ASCII only.</code></span>
+<span class="codeline" id="line-594"><code>// If s contains a space or invalid header field bytes, it is</code></span>
+<span class="codeline" id="line-595"><code>// returned without modifications.</code></span>
+<span class="codeline" id="line-596"><code>func CanonicalMIMEHeaderKey(s string) string {</code></span>
+<span class="codeline" id="line-597"><code>	commonHeaderOnce.Do(initCommonHeader)</code></span>
+<span class="codeline" id="line-598"><code></code></span>
+<span class="codeline" id="line-599"><code>	// Quick check for canonical encoding.</code></span>
+<span class="codeline" id="line-600"><code>	upper := true</code></span>
+<span class="codeline" id="line-601"><code>	for i := 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-602"><code>		c := s[i]</code></span>
+<span class="codeline" id="line-603"><code>		if !validHeaderFieldByte(c) {</code></span>
+<span class="codeline" id="line-604"><code>			return s</code></span>
+<span class="codeline" id="line-605"><code>		}</code></span>
+<span class="codeline" id="line-606"><code>		if upper &amp;&amp; 'a' &lt;= c &amp;&amp; c &lt;= 'z' {</code></span>
+<span class="codeline" id="line-607"><code>			return canonicalMIMEHeaderKey([]byte(s))</code></span>
+<span class="codeline" id="line-608"><code>		}</code></span>
+<span class="codeline" id="line-609"><code>		if !upper &amp;&amp; 'A' &lt;= c &amp;&amp; c &lt;= 'Z' {</code></span>
+<span class="codeline" id="line-610"><code>			return canonicalMIMEHeaderKey([]byte(s))</code></span>
+<span class="codeline" id="line-611"><code>		}</code></span>
+<span class="codeline" id="line-612"><code>		upper = c == '-'</code></span>
+<span class="codeline" id="line-613"><code>	}</code></span>
+<span class="codeline" id="line-614"><code>	return s</code></span>
+<span class="codeline" id="line-615"><code>}</code></span>
+<span class="codeline" id="line-616"><code></code></span>
+<span class="codeline" id="line-617"><code>const toLower = 'a' - 'A'</code></span>
+<span class="codeline" id="line-618"><code></code></span>
+<span class="codeline" id="line-619"><code>// validHeaderFieldByte reports whether b is a valid byte in a header</code></span>
+<span class="codeline" id="line-620"><code>// field name. RFC 7230 says:</code></span>
+<span class="codeline" id="line-621"><code>//   header-field   = field-name ":" OWS field-value OWS</code></span>
+<span class="codeline" id="line-622"><code>//   field-name     = token</code></span>
+<span class="codeline" id="line-623"><code>//   tchar = "!" / "#" / "$" / "%" / "&amp;" / "'" / "*" / "+" / "-" / "." /</code></span>
+<span class="codeline" id="line-624"><code>//           "^" / "_" / "`" / "|" / "~" / DIGIT / ALPHA</code></span>
+<span class="codeline" id="line-625"><code>//   token = 1*tchar</code></span>
+<span class="codeline" id="line-626"><code>func validHeaderFieldByte(b byte) bool {</code></span>
+<span class="codeline" id="line-627"><code>	return int(b) &lt; len(isTokenTable) &amp;&amp; isTokenTable[b]</code></span>
+<span class="codeline" id="line-628"><code>}</code></span>
+<span class="codeline" id="line-629"><code></code></span>
+<span class="codeline" id="line-630"><code>// canonicalMIMEHeaderKey is like CanonicalMIMEHeaderKey but is</code></span>
+<span class="codeline" id="line-631"><code>// allowed to mutate the provided byte slice before returning the</code></span>
+<span class="codeline" id="line-632"><code>// string.</code></span>
+<span class="codeline" id="line-633"><code>//</code></span>
+<span class="codeline" id="line-634"><code>// For invalid inputs (if a contains spaces or non-token bytes), a</code></span>
+<span class="codeline" id="line-635"><code>// is unchanged and a string copy is returned.</code></span>
+<span class="codeline" id="line-636"><code>func canonicalMIMEHeaderKey(a []byte) string {</code></span>
+<span class="codeline" id="line-637"><code>	// See if a looks like a header key. If not, return it unchanged.</code></span>
+<span class="codeline" id="line-638"><code>	for _, c := range a {</code></span>
+<span class="codeline" id="line-639"><code>		if validHeaderFieldByte(c) {</code></span>
+<span class="codeline" id="line-640"><code>			continue</code></span>
+<span class="codeline" id="line-641"><code>		}</code></span>
+<span class="codeline" id="line-642"><code>		// Don't canonicalize.</code></span>
+<span class="codeline" id="line-643"><code>		return string(a)</code></span>
+<span class="codeline" id="line-644"><code>	}</code></span>
+<span class="codeline" id="line-645"><code></code></span>
+<span class="codeline" id="line-646"><code>	upper := true</code></span>
+<span class="codeline" id="line-647"><code>	for i, c := range a {</code></span>
+<span class="codeline" id="line-648"><code>		// Canonicalize: first letter upper case</code></span>
+<span class="codeline" id="line-649"><code>		// and upper case after each dash.</code></span>
+<span class="codeline" id="line-650"><code>		// (Host, User-Agent, If-Modified-Since).</code></span>
+<span class="codeline" id="line-651"><code>		// MIME headers are ASCII only, so no Unicode issues.</code></span>
+<span class="codeline" id="line-652"><code>		if upper &amp;&amp; 'a' &lt;= c &amp;&amp; c &lt;= 'z' {</code></span>
+<span class="codeline" id="line-653"><code>			c -= toLower</code></span>
+<span class="codeline" id="line-654"><code>		} else if !upper &amp;&amp; 'A' &lt;= c &amp;&amp; c &lt;= 'Z' {</code></span>
+<span class="codeline" id="line-655"><code>			c += toLower</code></span>
+<span class="codeline" id="line-656"><code>		}</code></span>
+<span class="codeline" id="line-657"><code>		a[i] = c</code></span>
+<span class="codeline" id="line-658"><code>		upper = c == '-' // for next time</code></span>
+<span class="codeline" id="line-659"><code>	}</code></span>
+<span class="codeline" id="line-660"><code>	// The compiler recognizes m[string(byteSlice)] as a special</code></span>
+<span class="codeline" id="line-661"><code>	// case, so a copy of a's bytes into a new string does not</code></span>
+<span class="codeline" id="line-662"><code>	// happen in this map lookup:</code></span>
+<span class="codeline" id="line-663"><code>	if v := commonHeader[string(a)]; v != "" {</code></span>
+<span class="codeline" id="line-664"><code>		return v</code></span>
+<span class="codeline" id="line-665"><code>	}</code></span>
+<span class="codeline" id="line-666"><code>	return string(a)</code></span>
+<span class="codeline" id="line-667"><code>}</code></span>
+<span class="codeline" id="line-668"><code></code></span>
+<span class="codeline" id="line-669"><code>// commonHeader interns common header strings.</code></span>
+<span class="codeline" id="line-670"><code>var commonHeader map[string]string</code></span>
+<span class="codeline" id="line-671"><code></code></span>
+<span class="codeline" id="line-672"><code>var commonHeaderOnce sync.Once</code></span>
+<span class="codeline" id="line-673"><code></code></span>
+<span class="codeline" id="line-674"><code>func initCommonHeader() {</code></span>
+<span class="codeline" id="line-675"><code>	commonHeader = make(map[string]string)</code></span>
+<span class="codeline" id="line-676"><code>	for _, v := range []string{</code></span>
+<span class="codeline" id="line-677"><code>		"Accept",</code></span>
+<span class="codeline" id="line-678"><code>		"Accept-Charset",</code></span>
+<span class="codeline" id="line-679"><code>		"Accept-Encoding",</code></span>
+<span class="codeline" id="line-680"><code>		"Accept-Language",</code></span>
+<span class="codeline" id="line-681"><code>		"Accept-Ranges",</code></span>
+<span class="codeline" id="line-682"><code>		"Cache-Control",</code></span>
+<span class="codeline" id="line-683"><code>		"Cc",</code></span>
+<span class="codeline" id="line-684"><code>		"Connection",</code></span>
+<span class="codeline" id="line-685"><code>		"Content-Id",</code></span>
+<span class="codeline" id="line-686"><code>		"Content-Language",</code></span>
+<span class="codeline" id="line-687"><code>		"Content-Length",</code></span>
+<span class="codeline" id="line-688"><code>		"Content-Transfer-Encoding",</code></span>
+<span class="codeline" id="line-689"><code>		"Content-Type",</code></span>
+<span class="codeline" id="line-690"><code>		"Cookie",</code></span>
+<span class="codeline" id="line-691"><code>		"Date",</code></span>
+<span class="codeline" id="line-692"><code>		"Dkim-Signature",</code></span>
+<span class="codeline" id="line-693"><code>		"Etag",</code></span>
+<span class="codeline" id="line-694"><code>		"Expires",</code></span>
+<span class="codeline" id="line-695"><code>		"From",</code></span>
+<span class="codeline" id="line-696"><code>		"Host",</code></span>
+<span class="codeline" id="line-697"><code>		"If-Modified-Since",</code></span>
+<span class="codeline" id="line-698"><code>		"If-None-Match",</code></span>
+<span class="codeline" id="line-699"><code>		"In-Reply-To",</code></span>
+<span class="codeline" id="line-700"><code>		"Last-Modified",</code></span>
+<span class="codeline" id="line-701"><code>		"Location",</code></span>
+<span class="codeline" id="line-702"><code>		"Message-Id",</code></span>
+<span class="codeline" id="line-703"><code>		"Mime-Version",</code></span>
+<span class="codeline" id="line-704"><code>		"Pragma",</code></span>
+<span class="codeline" id="line-705"><code>		"Received",</code></span>
+<span class="codeline" id="line-706"><code>		"Return-Path",</code></span>
+<span class="codeline" id="line-707"><code>		"Server",</code></span>
+<span class="codeline" id="line-708"><code>		"Set-Cookie",</code></span>
+<span class="codeline" id="line-709"><code>		"Subject",</code></span>
+<span class="codeline" id="line-710"><code>		"To",</code></span>
+<span class="codeline" id="line-711"><code>		"User-Agent",</code></span>
+<span class="codeline" id="line-712"><code>		"Via",</code></span>
+<span class="codeline" id="line-713"><code>		"X-Forwarded-For",</code></span>
+<span class="codeline" id="line-714"><code>		"X-Imforwards",</code></span>
+<span class="codeline" id="line-715"><code>		"X-Powered-By",</code></span>
+<span class="codeline" id="line-716"><code>	} {</code></span>
+<span class="codeline" id="line-717"><code>		commonHeader[v] = v</code></span>
+<span class="codeline" id="line-718"><code>	}</code></span>
+<span class="codeline" id="line-719"><code>}</code></span>
+<span class="codeline" id="line-720"><code></code></span>
+<span class="codeline" id="line-721"><code>// isTokenTable is a copy of net/http/lex.go's isTokenTable.</code></span>
+<span class="codeline" id="line-722"><code>// See https://httpwg.github.io/specs/rfc7230.html#rule.token.separators</code></span>
+<span class="codeline" id="line-723"><code>var isTokenTable = [127]bool{</code></span>
+<span class="codeline" id="line-724"><code>	'!':  true,</code></span>
+<span class="codeline" id="line-725"><code>	'#':  true,</code></span>
+<span class="codeline" id="line-726"><code>	'$':  true,</code></span>
+<span class="codeline" id="line-727"><code>	'%':  true,</code></span>
+<span class="codeline" id="line-728"><code>	'&amp;':  true,</code></span>
+<span class="codeline" id="line-729"><code>	'\'': true,</code></span>
+<span class="codeline" id="line-730"><code>	'*':  true,</code></span>
+<span class="codeline" id="line-731"><code>	'+':  true,</code></span>
+<span class="codeline" id="line-732"><code>	'-':  true,</code></span>
+<span class="codeline" id="line-733"><code>	'.':  true,</code></span>
+<span class="codeline" id="line-734"><code>	'0':  true,</code></span>
+<span class="codeline" id="line-735"><code>	'1':  true,</code></span>
+<span class="codeline" id="line-736"><code>	'2':  true,</code></span>
+<span class="codeline" id="line-737"><code>	'3':  true,</code></span>
+<span class="codeline" id="line-738"><code>	'4':  true,</code></span>
+<span class="codeline" id="line-739"><code>	'5':  true,</code></span>
+<span class="codeline" id="line-740"><code>	'6':  true,</code></span>
+<span class="codeline" id="line-741"><code>	'7':  true,</code></span>
+<span class="codeline" id="line-742"><code>	'8':  true,</code></span>
+<span class="codeline" id="line-743"><code>	'9':  true,</code></span>
+<span class="codeline" id="line-744"><code>	'A':  true,</code></span>
+<span class="codeline" id="line-745"><code>	'B':  true,</code></span>
+<span class="codeline" id="line-746"><code>	'C':  true,</code></span>
+<span class="codeline" id="line-747"><code>	'D':  true,</code></span>
+<span class="codeline" id="line-748"><code>	'E':  true,</code></span>
+<span class="codeline" id="line-749"><code>	'F':  true,</code></span>
+<span class="codeline" id="line-750"><code>	'G':  true,</code></span>
+<span class="codeline" id="line-751"><code>	'H':  true,</code></span>
+<span class="codeline" id="line-752"><code>	'I':  true,</code></span>
+<span class="codeline" id="line-753"><code>	'J':  true,</code></span>
+<span class="codeline" id="line-754"><code>	'K':  true,</code></span>
+<span class="codeline" id="line-755"><code>	'L':  true,</code></span>
+<span class="codeline" id="line-756"><code>	'M':  true,</code></span>
+<span class="codeline" id="line-757"><code>	'N':  true,</code></span>
+<span class="codeline" id="line-758"><code>	'O':  true,</code></span>
+<span class="codeline" id="line-759"><code>	'P':  true,</code></span>
+<span class="codeline" id="line-760"><code>	'Q':  true,</code></span>
+<span class="codeline" id="line-761"><code>	'R':  true,</code></span>
+<span class="codeline" id="line-762"><code>	'S':  true,</code></span>
+<span class="codeline" id="line-763"><code>	'T':  true,</code></span>
+<span class="codeline" id="line-764"><code>	'U':  true,</code></span>
+<span class="codeline" id="line-765"><code>	'W':  true,</code></span>
+<span class="codeline" id="line-766"><code>	'V':  true,</code></span>
+<span class="codeline" id="line-767"><code>	'X':  true,</code></span>
+<span class="codeline" id="line-768"><code>	'Y':  true,</code></span>
+<span class="codeline" id="line-769"><code>	'Z':  true,</code></span>
+<span class="codeline" id="line-770"><code>	'^':  true,</code></span>
+<span class="codeline" id="line-771"><code>	'_':  true,</code></span>
+<span class="codeline" id="line-772"><code>	'`':  true,</code></span>
+<span class="codeline" id="line-773"><code>	'a':  true,</code></span>
+<span class="codeline" id="line-774"><code>	'b':  true,</code></span>
+<span class="codeline" id="line-775"><code>	'c':  true,</code></span>
+<span class="codeline" id="line-776"><code>	'd':  true,</code></span>
+<span class="codeline" id="line-777"><code>	'e':  true,</code></span>
+<span class="codeline" id="line-778"><code>	'f':  true,</code></span>
+<span class="codeline" id="line-779"><code>	'g':  true,</code></span>
+<span class="codeline" id="line-780"><code>	'h':  true,</code></span>
+<span class="codeline" id="line-781"><code>	'i':  true,</code></span>
+<span class="codeline" id="line-782"><code>	'j':  true,</code></span>
+<span class="codeline" id="line-783"><code>	'k':  true,</code></span>
+<span class="codeline" id="line-784"><code>	'l':  true,</code></span>
+<span class="codeline" id="line-785"><code>	'm':  true,</code></span>
+<span class="codeline" id="line-786"><code>	'n':  true,</code></span>
+<span class="codeline" id="line-787"><code>	'o':  true,</code></span>
+<span class="codeline" id="line-788"><code>	'p':  true,</code></span>
+<span class="codeline" id="line-789"><code>	'q':  true,</code></span>
+<span class="codeline" id="line-790"><code>	'r':  true,</code></span>
+<span class="codeline" id="line-791"><code>	's':  true,</code></span>
+<span class="codeline" id="line-792"><code>	't':  true,</code></span>
+<span class="codeline" id="line-793"><code>	'u':  true,</code></span>
+<span class="codeline" id="line-794"><code>	'v':  true,</code></span>
+<span class="codeline" id="line-795"><code>	'w':  true,</code></span>
+<span class="codeline" id="line-796"><code>	'x':  true,</code></span>
+<span class="codeline" id="line-797"><code>	'y':  true,</code></span>
+<span class="codeline" id="line-798"><code>	'z':  true,</code></span>
+<span class="codeline" id="line-799"><code>	'|':  true,</code></span>
+<span class="codeline" id="line-800"><code>	'~':  true,</code></span>
+<span class="codeline" id="line-801"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

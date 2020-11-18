@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: github.com/jinzhu/inflection</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>inflection</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-github.com/jinzhu/inflection">github.com/jinzhu/inflection</a><i> (on <a href="https://pkg.go.dev/github.com/jinzhu/inflection" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/github.com/jinzhu/inflection.html">2 packages</a>, and imported by <a href="../../../dep/github.com/jinzhu/inflection.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#doc">d-&gt;</a> <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html">inflections.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Irregular" data-popularity="0">	 type <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-44">Irregular</a> <i>(struct)</i>
+		Irregular is a hard replace inflection,
+		containing both singular and plural forms
+</div>
+<div class="anchor" id="name-IrregularSlice" data-popularity="110">	 type <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-53">IrregularSlice</a> <i>([])</i>
+		IrregularSlice is a slice of Irregular inflections
+
+		<input type='checkbox' class="stat" id="IrregularSlice-stat-results"><label for="IrregularSlice-stat-results">As Outputs Of (1+)</label><span id='IrregularSlice-stat-results-content' class="stat-content">
+			func <a href="#name-GetIrregular">GetIrregular</a>() <b>IrregularSlice</b></span>
+		<input type='checkbox' class="stat" id="IrregularSlice-stat-params"><label for="IrregularSlice-stat-params">As Inputs Of (1+)</label><span id='IrregularSlice-stat-params-content' class="stat-content">
+			func <a href="#name-SetIrregular">SetIrregular</a>(inflections <b>IrregularSlice</b>)</span></div>
+<div class="anchor" id="name-Regular" data-popularity="0">	 type <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-37">Regular</a> <i>(struct)</i>
+		Regular is a regexp find replace inflection
+</div>
+<div class="anchor" id="name-RegularSlice" data-popularity="220">	 type <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-50">RegularSlice</a> <i>([])</i>
+		RegularSlice is a slice of Regular inflections
+
+		<input type='checkbox' class="stat" id="RegularSlice-stat-results"><label for="RegularSlice-stat-results">As Outputs Of (2+)</label><span id='RegularSlice-stat-results-content' class="stat-content">
+			func <a href="#name-GetPlural">GetPlural</a>() <b>RegularSlice</b>
+			func <a href="#name-GetSingular">GetSingular</a>() <b>RegularSlice</b></span>
+		<input type='checkbox' class="stat" id="RegularSlice-stat-params"><label for="RegularSlice-stat-params">As Inputs Of (2+)</label><span id='RegularSlice-stat-params-content' class="stat-content">
+			func <a href="#name-SetPlural">SetPlural</a>(inflections <b>RegularSlice</b>)
+			func <a href="#name-SetSingular">SetSingular</a>(inflections <b>RegularSlice</b>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-AddIrregular">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-192">AddIrregular</a>(singular, plural <a href="../../builtin.html#name-string">string</a>)
+		AddIrregular adds an irregular inflection</div>
+<div class="anchor" id="name-AddPlural">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-180">AddPlural</a>(find, replace <a href="../../builtin.html#name-string">string</a>)
+		AddPlural adds a plural inflection</div>
+<div class="anchor" id="name-AddSingular">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-186">AddSingular</a>(find, replace <a href="../../builtin.html#name-string">string</a>)
+		AddSingular adds a singular inflection</div>
+<div class="anchor" id="name-AddUncountable">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-198">AddUncountable</a>(values ...<a href="../../builtin.html#name-string">string</a>)
+		AddUncountable adds an uncountable inflection</div>
+<div class="anchor" id="name-GetIrregular">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-218">GetIrregular</a>() <a href="#name-IrregularSlice">IrregularSlice</a>
+		GetIrregular retrieves the irregular inflection values</div>
+<div class="anchor" id="name-GetPlural">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-204">GetPlural</a>() <a href="#name-RegularSlice">RegularSlice</a>
+		GetPlural retrieves the plural inflection values</div>
+<div class="anchor" id="name-GetSingular">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-211">GetSingular</a>() <a href="#name-RegularSlice">RegularSlice</a>
+		GetSingular retrieves the singular inflection values</div>
+<div class="anchor" id="name-GetUncountable">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-225">GetUncountable</a>() []<a href="../../builtin.html#name-string">string</a>
+		GetUncountable retrieves the uncountable inflection values</div>
+<div class="anchor" id="name-Plural">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-256">Plural</a>(str <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+		Plural converts a word to its plural form</div>
+<div class="anchor" id="name-SetIrregular">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-244">SetIrregular</a>(inflections <a href="#name-IrregularSlice">IrregularSlice</a>)
+		SetIrregular sets the irregular inflections slice</div>
+<div class="anchor" id="name-SetPlural">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-232">SetPlural</a>(inflections <a href="#name-RegularSlice">RegularSlice</a>)
+		SetPlural sets the plural inflections slice</div>
+<div class="anchor" id="name-SetSingular">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-238">SetSingular</a>(inflections <a href="#name-RegularSlice">RegularSlice</a>)
+		SetSingular sets the singular inflections slice</div>
+<div class="anchor" id="name-SetUncountable">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-250">SetUncountable</a>(inflections []<a href="../../builtin.html#name-string">string</a>)
+		SetUncountable sets the uncountable inflections slice</div>
+<div class="anchor" id="name-Singular">	 func <a href="../../../src/github.com/jinzhu/inflection/inflections.go.html#line-266">Singular</a>(str <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+		Singular converts a word to its singular form</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

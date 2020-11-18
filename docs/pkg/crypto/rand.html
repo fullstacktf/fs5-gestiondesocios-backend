@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/rand</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>rand</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/rand">crypto/rand</a><i> (on <a href="https://golang.org/pkg/crypto/rand/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/rand" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/rand.html">13 packages</a>, and imported by <a href="../../dep/crypto/rand.html#imported-by">6 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/crypto/rand/eagain.go.html">eagain.go</a>
+	<a href="../../src/crypto/rand/rand.go.html#doc">d-&gt;</a> <a href="../../src/crypto/rand/rand.go.html">rand.go</a>
+	    <a href="../../src/crypto/rand/rand_unix.go.html">rand_unix.go</a>
+	    <a href="../../src/crypto/rand/util.go.html">util.go</a>
+
+<span class="title">Exported Type Names</span>
+
+	(none)
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Int">	 func <a href="../../src/crypto/rand/util.go.html#line-106">Int</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, max *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (n *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)
+		Int returns a uniform random value in [0, max). It panics if max &lt;= 0.</div>
+<div class="anchor" id="name-Prime">	 func <a href="../../src/crypto/rand/util.go.html#line-31">Prime</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, bits <a href="../builtin.html#name-int">int</a>) (p *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)
+		Prime returns a number, p, of the given size, such that p is prime
+		with high probability.
+		Prime will return error for any error returned by rand.Read or if bits &lt; 2.</div>
+<div class="anchor" id="name-Read">	 func <a href="../../src/crypto/rand/rand.go.html#line-23">Read</a>(b []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+		Read is a helper function that calls Reader.Read using io.ReadFull.
+		On return, n == len(b) if and only if err == nil.</div>
+<div class="anchor" id="name-Reader">	  var <a href="../../src/crypto/rand/rand.go.html#line-19">Reader</a> <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>
+		Reader is a global, shared instance of a cryptographically
+		secure random number generator.
+
+		On Linux and FreeBSD, Reader uses getrandom(2) if available, /dev/urandom otherwise.
+		On OpenBSD, Reader uses getentropy(2).
+		On other Unix-like systems, Reader reads from /dev/urandom.
+		On Windows systems, Reader uses the CryptGenRandom API.
+		On Wasm, Reader uses the Web Crypto API.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

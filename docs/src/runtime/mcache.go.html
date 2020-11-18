@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: mcache.go in package runtime</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	mcache.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/runtime.html">runtime</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package runtime</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"runtime/internal/atomic"</code></span>
+<span class="codeline" id="line-9"><code>	"unsafe"</code></span>
+<span class="codeline" id="line-10"><code>)</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>// Per-thread (in Go, per-P) cache for small objects.</code></span>
+<span class="codeline" id="line-13"><code>// No locking needed because it is per-thread (per-P).</code></span>
+<span class="codeline" id="line-14"><code>//</code></span>
+<span class="codeline" id="line-15"><code>// mcaches are allocated from non-GC'd memory, so any heap pointers</code></span>
+<span class="codeline" id="line-16"><code>// must be specially handled.</code></span>
+<span class="codeline" id="line-17"><code>//</code></span>
+<span class="codeline" id="line-18"><code>//go:notinheap</code></span>
+<span class="codeline" id="line-19"><code>type mcache struct {</code></span>
+<span class="codeline" id="line-20"><code>	// The following members are accessed on every malloc,</code></span>
+<span class="codeline" id="line-21"><code>	// so they are grouped here for better caching.</code></span>
+<span class="codeline" id="line-22"><code>	next_sample uintptr // trigger heap sample after allocating this many bytes</code></span>
+<span class="codeline" id="line-23"><code>	local_scan  uintptr // bytes of scannable heap allocated</code></span>
+<span class="codeline" id="line-24"><code></code></span>
+<span class="codeline" id="line-25"><code>	// Allocator cache for tiny objects w/o pointers.</code></span>
+<span class="codeline" id="line-26"><code>	// See "Tiny allocator" comment in malloc.go.</code></span>
+<span class="codeline" id="line-27"><code></code></span>
+<span class="codeline" id="line-28"><code>	// tiny points to the beginning of the current tiny block, or</code></span>
+<span class="codeline" id="line-29"><code>	// nil if there is no current tiny block.</code></span>
+<span class="codeline" id="line-30"><code>	//</code></span>
+<span class="codeline" id="line-31"><code>	// tiny is a heap pointer. Since mcache is in non-GC'd memory,</code></span>
+<span class="codeline" id="line-32"><code>	// we handle it by clearing it in releaseAll during mark</code></span>
+<span class="codeline" id="line-33"><code>	// termination.</code></span>
+<span class="codeline" id="line-34"><code>	tiny             uintptr</code></span>
+<span class="codeline" id="line-35"><code>	tinyoffset       uintptr</code></span>
+<span class="codeline" id="line-36"><code>	local_tinyallocs uintptr // number of tiny allocs not counted in other stats</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>	// The rest is not accessed on every malloc.</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>	alloc [numSpanClasses]*mspan // spans to allocate from, indexed by spanClass</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>	stackcache [_NumStackOrders]stackfreelist</code></span>
+<span class="codeline" id="line-43"><code></code></span>
+<span class="codeline" id="line-44"><code>	// Local allocator stats, flushed during GC.</code></span>
+<span class="codeline" id="line-45"><code>	local_largefree  uintptr                  // bytes freed for large objects (&gt;maxsmallsize)</code></span>
+<span class="codeline" id="line-46"><code>	local_nlargefree uintptr                  // number of frees for large objects (&gt;maxsmallsize)</code></span>
+<span class="codeline" id="line-47"><code>	local_nsmallfree [_NumSizeClasses]uintptr // number of frees for small objects (&lt;=maxsmallsize)</code></span>
+<span class="codeline" id="line-48"><code></code></span>
+<span class="codeline" id="line-49"><code>	// flushGen indicates the sweepgen during which this mcache</code></span>
+<span class="codeline" id="line-50"><code>	// was last flushed. If flushGen != mheap_.sweepgen, the spans</code></span>
+<span class="codeline" id="line-51"><code>	// in this mcache are stale and need to the flushed so they</code></span>
+<span class="codeline" id="line-52"><code>	// can be swept. This is done in acquirep.</code></span>
+<span class="codeline" id="line-53"><code>	flushGen uint32</code></span>
+<span class="codeline" id="line-54"><code>}</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>// A gclink is a node in a linked list of blocks, like mlink,</code></span>
+<span class="codeline" id="line-57"><code>// but it is opaque to the garbage collector.</code></span>
+<span class="codeline" id="line-58"><code>// The GC does not trace the pointers during collection,</code></span>
+<span class="codeline" id="line-59"><code>// and the compiler does not emit write barriers for assignments</code></span>
+<span class="codeline" id="line-60"><code>// of gclinkptr values. Code should store references to gclinks</code></span>
+<span class="codeline" id="line-61"><code>// as gclinkptr, not as *gclink.</code></span>
+<span class="codeline" id="line-62"><code>type gclink struct {</code></span>
+<span class="codeline" id="line-63"><code>	next gclinkptr</code></span>
+<span class="codeline" id="line-64"><code>}</code></span>
+<span class="codeline" id="line-65"><code></code></span>
+<span class="codeline" id="line-66"><code>// A gclinkptr is a pointer to a gclink, but it is opaque</code></span>
+<span class="codeline" id="line-67"><code>// to the garbage collector.</code></span>
+<span class="codeline" id="line-68"><code>type gclinkptr uintptr</code></span>
+<span class="codeline" id="line-69"><code></code></span>
+<span class="codeline" id="line-70"><code>// ptr returns the *gclink form of p.</code></span>
+<span class="codeline" id="line-71"><code>// The result should be used for accessing fields, not stored</code></span>
+<span class="codeline" id="line-72"><code>// in other data structures.</code></span>
+<span class="codeline" id="line-73"><code>func (p gclinkptr) ptr() *gclink {</code></span>
+<span class="codeline" id="line-74"><code>	return (*gclink)(unsafe.Pointer(p))</code></span>
+<span class="codeline" id="line-75"><code>}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>type stackfreelist struct {</code></span>
+<span class="codeline" id="line-78"><code>	list gclinkptr // linked list of free stacks</code></span>
+<span class="codeline" id="line-79"><code>	size uintptr   // total size of stacks in list</code></span>
+<span class="codeline" id="line-80"><code>}</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>// dummy mspan that contains no free objects.</code></span>
+<span class="codeline" id="line-83"><code>var emptymspan mspan</code></span>
+<span class="codeline" id="line-84"><code></code></span>
+<span class="codeline" id="line-85"><code>func allocmcache() *mcache {</code></span>
+<span class="codeline" id="line-86"><code>	var c *mcache</code></span>
+<span class="codeline" id="line-87"><code>	systemstack(func() {</code></span>
+<span class="codeline" id="line-88"><code>		lock(&amp;mheap_.lock)</code></span>
+<span class="codeline" id="line-89"><code>		c = (*mcache)(mheap_.cachealloc.alloc())</code></span>
+<span class="codeline" id="line-90"><code>		c.flushGen = mheap_.sweepgen</code></span>
+<span class="codeline" id="line-91"><code>		unlock(&amp;mheap_.lock)</code></span>
+<span class="codeline" id="line-92"><code>	})</code></span>
+<span class="codeline" id="line-93"><code>	for i := range c.alloc {</code></span>
+<span class="codeline" id="line-94"><code>		c.alloc[i] = &amp;emptymspan</code></span>
+<span class="codeline" id="line-95"><code>	}</code></span>
+<span class="codeline" id="line-96"><code>	c.next_sample = nextSample()</code></span>
+<span class="codeline" id="line-97"><code>	return c</code></span>
+<span class="codeline" id="line-98"><code>}</code></span>
+<span class="codeline" id="line-99"><code></code></span>
+<span class="codeline" id="line-100"><code>func freemcache(c *mcache) {</code></span>
+<span class="codeline" id="line-101"><code>	systemstack(func() {</code></span>
+<span class="codeline" id="line-102"><code>		c.releaseAll()</code></span>
+<span class="codeline" id="line-103"><code>		stackcache_clear(c)</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>		// NOTE(rsc,rlh): If gcworkbuffree comes back, we need to coordinate</code></span>
+<span class="codeline" id="line-106"><code>		// with the stealing of gcworkbufs during garbage collection to avoid</code></span>
+<span class="codeline" id="line-107"><code>		// a race where the workbuf is double-freed.</code></span>
+<span class="codeline" id="line-108"><code>		// gcworkbuffree(c.gcworkbuf)</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>		lock(&amp;mheap_.lock)</code></span>
+<span class="codeline" id="line-111"><code>		purgecachedstats(c)</code></span>
+<span class="codeline" id="line-112"><code>		mheap_.cachealloc.free(unsafe.Pointer(c))</code></span>
+<span class="codeline" id="line-113"><code>		unlock(&amp;mheap_.lock)</code></span>
+<span class="codeline" id="line-114"><code>	})</code></span>
+<span class="codeline" id="line-115"><code>}</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>// refill acquires a new span of span class spc for c. This span will</code></span>
+<span class="codeline" id="line-118"><code>// have at least one free object. The current span in c must be full.</code></span>
+<span class="codeline" id="line-119"><code>//</code></span>
+<span class="codeline" id="line-120"><code>// Must run in a non-preemptible context since otherwise the owner of</code></span>
+<span class="codeline" id="line-121"><code>// c could change.</code></span>
+<span class="codeline" id="line-122"><code>func (c *mcache) refill(spc spanClass) {</code></span>
+<span class="codeline" id="line-123"><code>	// Return the current cached span to the central lists.</code></span>
+<span class="codeline" id="line-124"><code>	s := c.alloc[spc]</code></span>
+<span class="codeline" id="line-125"><code></code></span>
+<span class="codeline" id="line-126"><code>	if uintptr(s.allocCount) != s.nelems {</code></span>
+<span class="codeline" id="line-127"><code>		throw("refill of span with free space remaining")</code></span>
+<span class="codeline" id="line-128"><code>	}</code></span>
+<span class="codeline" id="line-129"><code>	if s != &amp;emptymspan {</code></span>
+<span class="codeline" id="line-130"><code>		// Mark this span as no longer cached.</code></span>
+<span class="codeline" id="line-131"><code>		if s.sweepgen != mheap_.sweepgen+3 {</code></span>
+<span class="codeline" id="line-132"><code>			throw("bad sweepgen in refill")</code></span>
+<span class="codeline" id="line-133"><code>		}</code></span>
+<span class="codeline" id="line-134"><code>		if go115NewMCentralImpl {</code></span>
+<span class="codeline" id="line-135"><code>			mheap_.central[spc].mcentral.uncacheSpan(s)</code></span>
+<span class="codeline" id="line-136"><code>		} else {</code></span>
+<span class="codeline" id="line-137"><code>			atomic.Store(&amp;s.sweepgen, mheap_.sweepgen)</code></span>
+<span class="codeline" id="line-138"><code>		}</code></span>
+<span class="codeline" id="line-139"><code>	}</code></span>
+<span class="codeline" id="line-140"><code></code></span>
+<span class="codeline" id="line-141"><code>	// Get a new cached span from the central lists.</code></span>
+<span class="codeline" id="line-142"><code>	s = mheap_.central[spc].mcentral.cacheSpan()</code></span>
+<span class="codeline" id="line-143"><code>	if s == nil {</code></span>
+<span class="codeline" id="line-144"><code>		throw("out of memory")</code></span>
+<span class="codeline" id="line-145"><code>	}</code></span>
+<span class="codeline" id="line-146"><code></code></span>
+<span class="codeline" id="line-147"><code>	if uintptr(s.allocCount) == s.nelems {</code></span>
+<span class="codeline" id="line-148"><code>		throw("span has no free space")</code></span>
+<span class="codeline" id="line-149"><code>	}</code></span>
+<span class="codeline" id="line-150"><code></code></span>
+<span class="codeline" id="line-151"><code>	// Indicate that this span is cached and prevent asynchronous</code></span>
+<span class="codeline" id="line-152"><code>	// sweeping in the next sweep phase.</code></span>
+<span class="codeline" id="line-153"><code>	s.sweepgen = mheap_.sweepgen + 3</code></span>
+<span class="codeline" id="line-154"><code></code></span>
+<span class="codeline" id="line-155"><code>	c.alloc[spc] = s</code></span>
+<span class="codeline" id="line-156"><code>}</code></span>
+<span class="codeline" id="line-157"><code></code></span>
+<span class="codeline" id="line-158"><code>func (c *mcache) releaseAll() {</code></span>
+<span class="codeline" id="line-159"><code>	for i := range c.alloc {</code></span>
+<span class="codeline" id="line-160"><code>		s := c.alloc[i]</code></span>
+<span class="codeline" id="line-161"><code>		if s != &amp;emptymspan {</code></span>
+<span class="codeline" id="line-162"><code>			mheap_.central[i].mcentral.uncacheSpan(s)</code></span>
+<span class="codeline" id="line-163"><code>			c.alloc[i] = &amp;emptymspan</code></span>
+<span class="codeline" id="line-164"><code>		}</code></span>
+<span class="codeline" id="line-165"><code>	}</code></span>
+<span class="codeline" id="line-166"><code>	// Clear tinyalloc pool.</code></span>
+<span class="codeline" id="line-167"><code>	c.tiny = 0</code></span>
+<span class="codeline" id="line-168"><code>	c.tinyoffset = 0</code></span>
+<span class="codeline" id="line-169"><code>}</code></span>
+<span class="codeline" id="line-170"><code></code></span>
+<span class="codeline" id="line-171"><code>// prepareForSweep flushes c if the system has entered a new sweep phase</code></span>
+<span class="codeline" id="line-172"><code>// since c was populated. This must happen between the sweep phase</code></span>
+<span class="codeline" id="line-173"><code>// starting and the first allocation from c.</code></span>
+<span class="codeline" id="line-174"><code>func (c *mcache) prepareForSweep() {</code></span>
+<span class="codeline" id="line-175"><code>	// Alternatively, instead of making sure we do this on every P</code></span>
+<span class="codeline" id="line-176"><code>	// between starting the world and allocating on that P, we</code></span>
+<span class="codeline" id="line-177"><code>	// could leave allocate-black on, allow allocation to continue</code></span>
+<span class="codeline" id="line-178"><code>	// as usual, use a ragged barrier at the beginning of sweep to</code></span>
+<span class="codeline" id="line-179"><code>	// ensure all cached spans are swept, and then disable</code></span>
+<span class="codeline" id="line-180"><code>	// allocate-black. However, with this approach it's difficult</code></span>
+<span class="codeline" id="line-181"><code>	// to avoid spilling mark bits into the *next* GC cycle.</code></span>
+<span class="codeline" id="line-182"><code>	sg := mheap_.sweepgen</code></span>
+<span class="codeline" id="line-183"><code>	if c.flushGen == sg {</code></span>
+<span class="codeline" id="line-184"><code>		return</code></span>
+<span class="codeline" id="line-185"><code>	} else if c.flushGen != sg-2 {</code></span>
+<span class="codeline" id="line-186"><code>		println("bad flushGen", c.flushGen, "in prepareForSweep; sweepgen", sg)</code></span>
+<span class="codeline" id="line-187"><code>		throw("bad flushGen")</code></span>
+<span class="codeline" id="line-188"><code>	}</code></span>
+<span class="codeline" id="line-189"><code>	c.releaseAll()</code></span>
+<span class="codeline" id="line-190"><code>	stackcache_clear(c)</code></span>
+<span class="codeline" id="line-191"><code>	atomic.Store(&amp;c.flushGen, mheap_.sweepgen) // Synchronizes with gcStart</code></span>
+<span class="codeline" id="line-192"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

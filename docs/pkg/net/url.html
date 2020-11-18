@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: net/url</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>url</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-net/url">net/url</a><i> (on <a href="https://golang.org/pkg/net/url/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/net/url" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/net/url.html">5 packages</a>, and imported by <a href="../../dep/net/url.html#imported-by">5 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/net/url/url.go.html#doc">d-&gt;</a> <a href="../../src/net/url/url.go.html">url.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Error" data-popularity="300">	 type <a href="../../src/net/url/url.go.html#line-22">Error</a> <i>(struct)</i>
+		Error reports an error and the operation and URL that caused it.
+
+		<input type='checkbox' class="stat" id="Error-stat-fields"><label for="Error-stat-fields">Exported Fields (3)</label><span id='Error-stat-fields-content' class="stat-content">
+			<a href="../../src/net/url/url.go.html#line-25">Err</a> <i><a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/net/url/url.go.html#line-23">Op</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-24">URL</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Error-stat-methods"><label for="Error-stat-methods">Exported Methods (4)</label><span id='Error-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/url/url.go.html#line-29">Error</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-38">Temporary</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-31">Timeout</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-28">Unwrap</a>() <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Error-stat-impls"><label for="Error-stat-impls">Implements (2+)</label><span id='Error-stat-impls-content' class="stat-content">
+			*T : net.<a href="../net.html#name-Error">Error</a>
+			*T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-EscapeError" data-popularity="100">	 type <a href="../../src/net/url/url.go.html#line-83">EscapeError</a> <a href="../builtin.html#name-string">string</a>
+
+		<input type='checkbox' class="stat" id="EscapeError-stat-methods"><label for="EscapeError-stat-methods">One Exported Method</label><span id='EscapeError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/url/url.go.html#line-85">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="EscapeError-stat-impls"><label for="EscapeError-stat-impls">Implements (1+)</label><span id='EscapeError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-InvalidHostError" data-popularity="100">	 type <a href="../../src/net/url/url.go.html#line-89">InvalidHostError</a> <a href="../builtin.html#name-string">string</a>
+
+		<input type='checkbox' class="stat" id="InvalidHostError-stat-methods"><label for="InvalidHostError-stat-methods">One Exported Method</label><span id='InvalidHostError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/url/url.go.html#line-91">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="InvalidHostError-stat-impls"><label for="InvalidHostError-stat-impls">Implements (1+)</label><span id='InvalidHostError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-URL" data-popularity="1615">	 type <a href="../../src/net/url/url.go.html#line-358">URL</a> <i>(struct)</i>
+		A URL represents a parsed URL (technically, a URI reference).
+
+		The general form represented is:
+
+			[scheme:][//[userinfo@]host][/]path[?query][#fragment]
+
+		URLs that do not start with a slash after the scheme are interpreted as:
+
+			scheme:opaque[?query][#fragment]
+
+		Note that the Path field is stored in decoded form: /%47%6f%2f becomes /Go/.
+		A consequence is that it is impossible to tell which slashes in the Path were
+		slashes in the raw URL and which were %2f. This distinction is rarely important,
+		but when it is, the code should use RawPath, an optional field which only gets
+		set if the default encoding is different from Path.
+
+		URL's String method uses the EscapedPath method to obtain the path. See the
+		EscapedPath method for more details.
+
+		<input type='checkbox' class="stat" id="URL-stat-fields"><label for="URL-stat-fields">Exported Fields (10)</label><span id='URL-stat-fields-content' class="stat-content">
+			<a href="../../src/net/url/url.go.html#line-365">ForceQuery</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/net/url/url.go.html#line-367">Fragment</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-362">Host</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-360">Opaque</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-363">Path</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-368">RawFragment</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-364">RawPath</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-366">RawQuery</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-359">Scheme</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/net/url/url.go.html#line-361">User</a> <i>*<a href="#name-Userinfo">Userinfo</a></i></span>
+		<input type='checkbox' class="stat" id="URL-stat-methods"><label for="URL-stat-methods">Exported Methods (13)</label><span id='URL-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/url/url.go.html#line-763">EscapedFragment</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-700">EscapedPath</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-1111">Hostname</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-1026">IsAbs</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-1145">MarshalBinary</a>() (text []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/url/url.go.html#line-1033">Parse</a>(ref <a href="../builtin.html#name-string">string</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/url/url.go.html#line-1119">Port</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-1082">Query</a>() <a href="#name-Values">Values</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-862">Redacted</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-1089">RequestURI</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-1047">ResolveReference</a>(ref *<b>URL</b>) *<b>URL</b>
+			(*T) <a href="../../src/net/url/url.go.html#line-811">String</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-1149">UnmarshalBinary</a>(text []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="URL-stat-impls"><label for="URL-stat-impls">Implements (3+)</label><span id='URL-stat-impls-content' class="stat-content">
+			*T : encoding.<a href="../encoding.html#name-BinaryMarshaler">BinaryMarshaler</a>
+			*T : encoding.<a href="../encoding.html#name-BinaryUnmarshaler">BinaryUnmarshaler</a>
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="URL-stat-results"><label for="URL-stat-results">As Outputs Of (9+)</label><span id='URL-stat-results-content' class="stat-content">
+			func <a href="#name-Parse">Parse</a>(rawurl <a href="../builtin.html#name-string">string</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-ParseRequestURI">ParseRequestURI</a>(rawurl <a href="../builtin.html#name-string">string</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-URL">URL</a>).<a href="../../src/net/url/url.go.html#line-1033">Parse</a>(ref <a href="../builtin.html#name-string">string</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-URL">URL</a>).<a href="../../src/net/url/url.go.html#line-1047">ResolveReference</a>(ref *<b>URL</b>) *<b>URL</b>
+			func net/http.<a href="http.html#name-ProxyFromEnvironment">ProxyFromEnvironment</a>(req *<a href="http.html">http</a>.<a href="http.html#name-Request">Request</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func net/http.(*<a href="http.html#name-Response">Response</a>).<a href="../../src/net/http/response.go.html#line-137">Location</a>() (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Route">Route</a>).<a href="../../src/github.com/gorilla/mux/route.go.html#line-533">URL</a>(pairs ...<a href="../builtin.html#name-string">string</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Route">Route</a>).<a href="../../src/github.com/gorilla/mux/route.go.html#line-575">URLHost</a>(pairs ...<a href="../builtin.html#name-string">string</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func github.com/gorilla/mux.(*<a href="../github.com/gorilla/mux.html#name-Route">Route</a>).<a href="../../src/github.com/gorilla/mux/route.go.html#line-603">URLPath</a>(pairs ...<a href="../builtin.html#name-string">string</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="URL-stat-params"><label for="URL-stat-params">As Inputs Of (4+)</label><span id='URL-stat-params-content' class="stat-content">
+			func (*<a href="#name-URL">URL</a>).<a href="../../src/net/url/url.go.html#line-1047">ResolveReference</a>(ref *<b>URL</b>) *<b>URL</b>
+			func net/http.<a href="http.html#name-ProxyURL">ProxyURL</a>(fixedURL *<b>URL</b>) func(*<a href="http.html">http</a>.<a href="http.html#name-Request">Request</a>) (*<b>URL</b>, <a href="../builtin.html#name-error">error</a>)
+			func net/http.<a href="http.html#name-CookieJar">CookieJar</a>.<a href="../../src/net/http/jar.go.html#line-26">Cookies</a>(u *<b>URL</b>) []*<a href="http.html">http</a>.<a href="http.html#name-Cookie">Cookie</a>
+			func net/http.<a href="http.html#name-CookieJar">CookieJar</a>.<a href="../../src/net/http/jar.go.html#line-21">SetCookies</a>(u *<b>URL</b>, cookies []*<a href="http.html">http</a>.<a href="http.html#name-Cookie">Cookie</a>)</span></div>
+<div class="anchor" id="name-Userinfo" data-popularity="350">	 type <a href="../../src/net/url/url.go.html#line-393">Userinfo</a> <i>(struct)</i>
+		The Userinfo type is an immutable encapsulation of username and
+		password details for a URL. An existing Userinfo value is guaranteed
+		to have a username set (potentially empty, as allowed by RFC 2396),
+		and optionally a password.
+
+		<input type='checkbox' class="stat" id="Userinfo-stat-methods"><label for="Userinfo-stat-methods">Exported Methods (3)</label><span id='Userinfo-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/url/url.go.html#line-408">Password</a>() (<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/net/url/url.go.html#line-417">String</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/net/url/url.go.html#line-400">Username</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Userinfo-stat-impls"><label for="Userinfo-stat-impls">Implements (1+)</label><span id='Userinfo-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Userinfo-stat-results"><label for="Userinfo-stat-results">As Outputs Of (2+)</label><span id='Userinfo-stat-results-content' class="stat-content">
+			func <a href="#name-User">User</a>(username <a href="../builtin.html#name-string">string</a>) *<b>Userinfo</b>
+			func <a href="#name-UserPassword">UserPassword</a>(username, password <a href="../builtin.html#name-string">string</a>) *<b>Userinfo</b></span></div>
+<div class="anchor" id="name-Values" data-popularity="470">	 type <a href="../../src/net/url/url.go.html#line-878">Values</a> <i>(map)</i>
+		Values maps a string key to a list of values.
+		It is typically used for query parameters and form values.
+		Unlike in the http.Header map, the keys in a Values map
+		are case-sensitive.
+
+		<input type='checkbox' class="stat" id="Values-stat-methods"><label for="Values-stat-methods">Exported Methods (5)</label><span id='Values-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/url/url.go.html#line-903">Add</a>(key, value <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/url/url.go.html#line-908">Del</a>(key <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/url/url.go.html#line-963">Encode</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/net/url/url.go.html#line-884">Get</a>(key <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/net/url/url.go.html#line-897">Set</a>(key, value <a href="../builtin.html#name-string">string</a>)</span>
+		<input type='checkbox' class="stat" id="Values-stat-results"><label for="Values-stat-results">As Outputs Of (2+)</label><span id='Values-stat-results-content' class="stat-content">
+			func <a href="#name-ParseQuery">ParseQuery</a>(query <a href="../builtin.html#name-string">string</a>) (<b>Values</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-URL">URL</a>).<a href="../../src/net/url/url.go.html#line-1082">Query</a>() <b>Values</b></span>
+		<input type='checkbox' class="stat" id="Values-stat-params"><label for="Values-stat-params">As Inputs Of (2+)</label><span id='Values-stat-params-content' class="stat-content">
+			func net/http.<a href="http.html#name-PostForm">PostForm</a>(url <a href="../builtin.html#name-string">string</a>, data <b>Values</b>) (resp *<a href="http.html">http</a>.<a href="http.html#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)
+			func net/http.(*<a href="http.html#name-Client">Client</a>).<a href="../../src/net/http/client.go.html#line-877">PostForm</a>(url <a href="../builtin.html#name-string">string</a>, data <b>Values</b>) (resp *<a href="http.html">http</a>.<a href="http.html#name-Response">Response</a>, err <a href="../builtin.html#name-error">error</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Parse">	 func <a href="../../src/net/url/url.go.html#line-475">Parse</a>(rawurl <a href="../builtin.html#name-string">string</a>) (*<a href="#name-URL">URL</a>, <a href="../builtin.html#name-error">error</a>)
+		Parse parses rawurl into a URL structure.
+
+		The rawurl may be relative (a path, without a host) or absolute
+		(starting with a scheme). Trying to parse a hostname and path
+		without a scheme is invalid but may not necessarily return an
+		error, due to parsing ambiguities.</div>
+<div class="anchor" id="name-ParseQuery">	 func <a href="../../src/net/url/url.go.html#line-921">ParseQuery</a>(query <a href="../builtin.html#name-string">string</a>) (<a href="#name-Values">Values</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseQuery parses the URL-encoded query string and returns
+		a map listing the values specified for each key.
+		ParseQuery always returns a non-nil map containing all the
+		valid query parameters found; err describes the first decoding error
+		encountered, if any.
+
+		Query is expected to be a list of key=value settings separated by
+		ampersands or semicolons. A setting without an equals sign is
+		interpreted as a key set to an empty value.</div>
+<div class="anchor" id="name-ParseRequestURI">	 func <a href="../../src/net/url/url.go.html#line-496">ParseRequestURI</a>(rawurl <a href="../builtin.html#name-string">string</a>) (*<a href="#name-URL">URL</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseRequestURI parses rawurl into a URL structure. It assumes that
+		rawurl was received in an HTTP request, so the rawurl is interpreted
+		only as an absolute URI or an absolute path.
+		The string rawurl is assumed not to have a #fragment suffix.
+		(Web browsers strip #fragment before sending the URL to a web server.)</div>
+<div class="anchor" id="name-PathEscape">	 func <a href="../../src/net/url/url.go.html#line-280">PathEscape</a>(s <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+		PathEscape escapes the string so it can be safely placed inside a URL path segment,
+		replacing special characters (including /) with %XX sequences as needed.</div>
+<div class="anchor" id="name-PathUnescape">	 func <a href="../../src/net/url/url.go.html#line-193">PathUnescape</a>(s <a href="../builtin.html#name-string">string</a>) (<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+		PathUnescape does the inverse transformation of PathEscape,
+		converting each 3-byte encoded substring of the form "%AB" into the
+		hex-decoded byte 0xAB. It returns an error if any % is not followed
+		by two hexadecimal digits.
+
+		PathUnescape is identical to QueryUnescape except that it does not
+		unescape '+' to ' ' (space).</div>
+<div class="anchor" id="name-QueryEscape">	 func <a href="../../src/net/url/url.go.html#line-274">QueryEscape</a>(s <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+		QueryEscape escapes the string so it can be safely placed
+		inside a URL query.</div>
+<div class="anchor" id="name-QueryUnescape">	 func <a href="../../src/net/url/url.go.html#line-182">QueryUnescape</a>(s <a href="../builtin.html#name-string">string</a>) (<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+		QueryUnescape does the inverse transformation of QueryEscape,
+		converting each 3-byte encoded substring of the form "%AB" into the
+		hex-decoded byte 0xAB.
+		It returns an error if any % is not followed by two hexadecimal
+		digits.</div>
+<div class="anchor" id="name-User">	 func <a href="../../src/net/url/url.go.html#line-373">User</a>(username <a href="../builtin.html#name-string">string</a>) *<a href="#name-Userinfo">Userinfo</a>
+		User returns a Userinfo containing the provided username
+		and no password set.</div>
+<div class="anchor" id="name-UserPassword">	 func <a href="../../src/net/url/url.go.html#line-385">UserPassword</a>(username, password <a href="../builtin.html#name-string">string</a>) *<a href="#name-Userinfo">Userinfo</a>
+		UserPassword returns a Userinfo containing the provided username
+		and password.
+
+		This functionality should only be used with legacy web sites.
+		RFC 2396 warns that interpreting Userinfo this way
+		``is NOT RECOMMENDED, because the passing of authentication
+		information in clear text (such as URI) has proven to be a
+		security risk in almost every case where it has been used.''</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

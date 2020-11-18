@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/crypto/cryptobyte/asn1</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>asn1</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../../index.html#pkg-vendor/golang.org/x/crypto/cryptobyte/asn1">vendor/golang.org/x/crypto/cryptobyte/asn1</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/crypto/cryptobyte/asn1/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/crypto/cryptobyte/asn1" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports 0 packages, and imported by <a href="../../../../../../dep/vendor/golang.org/x/crypto/cryptobyte/asn1.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#doc">d-&gt;</a> <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html">asn1.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Tag" data-popularity="755">	 type <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-15">Tag</a> <a href="../../../../../builtin.html#name-uint8">uint8</a>
+		Tag represents an ASN.1 identifier octet, consisting of a tag number
+		(indicating a type) and class (such as context-specific or constructed).
+
+		Methods in the cryptobyte package only support the low-tag-number form, i.e.
+		a single identifier octet with bits 7-8 encoding the class and bits 1-6
+		encoding the tag number.
+
+		<input type='checkbox' class="stat" id="Tag-stat-methods"><label for="Tag-stat-methods">Exported Methods (2)</label><span id='Tag-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-23">Constructed</a>() <b>Tag</b>
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-26">ContextSpecific</a>() <b>Tag</b></span>
+		<input type='checkbox' class="stat" id="Tag-stat-results"><label for="Tag-stat-results">As Outputs Of (2+)</label><span id='Tag-stat-results-content' class="stat-content">
+			func <a href="#name-Tag">Tag</a>.<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-23">Constructed</a>() <b>Tag</b>
+			func <a href="#name-Tag">Tag</a>.<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-26">ContextSpecific</a>() <b>Tag</b></span>
+		<input type='checkbox' class="stat" id="Tag-stat-params"><label for="Tag-stat-params">As Inputs Of (14+)</label><span id='Tag-stat-params-content' class="stat-content">
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-217">AddASN1</a>(tag <b>Tag</b>, f <a href="../cryptobyte.html">cryptobyte</a>.<a href="../cryptobyte.html#name-BuilderContinuation">BuilderContinuation</a>)
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-28">AddASN1Int64WithTag</a>(v <a href="../../../../../builtin.html#name-int64">int64</a>, tag <b>Tag</b>)
+			func vendor/golang.org/x/crypto/cryptobyte.<a href="../cryptobyte.html#name-String">String</a>.<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-561">PeekASN1Tag</a>(tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-546">ReadAnyASN1</a>(out *<a href="../cryptobyte.html">cryptobyte</a>.<a href="../cryptobyte.html#name-String">String</a>, outTag *<b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-555">ReadAnyASN1Element</a>(out *<a href="../cryptobyte.html">cryptobyte</a>.<a href="../cryptobyte.html#name-String">String</a>, outTag *<b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-520">ReadASN1</a>(out *<a href="../cryptobyte.html">cryptobyte</a>.<a href="../cryptobyte.html#name-String">String</a>, tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-511">ReadASN1Bytes</a>(out *[]<a href="../../../../../builtin.html#name-byte">byte</a>, tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-533">ReadASN1Element</a>(out *<a href="../cryptobyte.html">cryptobyte</a>.<a href="../cryptobyte.html#name-String">String</a>, tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-374">ReadASN1Int64WithTag</a>(out *<a href="../../../../../builtin.html#name-int64">int64</a>, tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-579">ReadOptionalASN1</a>(out *<a href="../cryptobyte.html">cryptobyte</a>.<a href="../cryptobyte.html#name-String">String</a>, outPresent *<a href="../../../../../builtin.html#name-bool">bool</a>, tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-605">ReadOptionalASN1Integer</a>(out interface{}, tag <b>Tag</b>, defaultValue interface{}) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-643">ReadOptionalASN1OctetString</a>(out *[]<a href="../../../../../builtin.html#name-byte">byte</a>, outPresent *<a href="../../../../../builtin.html#name-bool">bool</a>, tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-570">SkipASN1</a>(tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../cryptobyte.html#name-String">String</a>).<a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-592">SkipOptionalASN1</a>(tag <b>Tag</b>) <a href="../../../../../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="Tag-stat-values"><label for="Tag-stat-values">As Types Of (16+)</label><span id='Tag-stat-values-content' class="stat-content">
+			const <a href="#name-BIT_STRING">BIT_STRING</a>
+			const <a href="#name-BOOLEAN">BOOLEAN</a>
+			const <a href="#name-ENUM">ENUM</a>
+			const <a href="#name-GeneralizedTime">GeneralizedTime</a>
+			const <a href="#name-GeneralString">GeneralString</a>
+			const <a href="#name-IA5String">IA5String</a>
+			const <a href="#name-INTEGER">INTEGER</a>
+			const <a href="#name-NULL">NULL</a>
+			const <a href="#name-OBJECT_IDENTIFIER">OBJECT_IDENTIFIER</a>
+			const <a href="#name-OCTET_STRING">OCTET_STRING</a>
+			const <a href="#name-PrintableString">PrintableString</a>
+			const <a href="#name-SEQUENCE">SEQUENCE</a>
+			const <a href="#name-SET">SET</a>
+			const <a href="#name-T61String">T61String</a>
+			const <a href="#name-UTCTime">UTCTime</a>
+			const <a href="#name-UTF8String">UTF8String</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BIT_STRING">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-32">BIT_STRING</a> <a href="#name-Tag">Tag</a> = 3
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-BOOLEAN">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-30">BOOLEAN</a> <a href="#name-Tag">Tag</a> = 1
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-ENUM">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-36">ENUM</a> <a href="#name-Tag">Tag</a> = 10
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-GeneralizedTime">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-44">GeneralizedTime</a> <a href="#name-Tag">Tag</a> = 24
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-GeneralString">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-45">GeneralString</a> <a href="#name-Tag">Tag</a> = 27
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-IA5String">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-42">IA5String</a> <a href="#name-Tag">Tag</a> = 22
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-INTEGER">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-31">INTEGER</a> <a href="#name-Tag">Tag</a> = 2
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-NULL">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-34">NULL</a> <a href="#name-Tag">Tag</a> = 5
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-OBJECT_IDENTIFIER">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-35">OBJECT_IDENTIFIER</a> <a href="#name-Tag">Tag</a> = 6
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-OCTET_STRING">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-33">OCTET_STRING</a> <a href="#name-Tag">Tag</a> = 4
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-PrintableString">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-40">PrintableString</a> <a href="#name-Tag">Tag</a> = 19
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-SEQUENCE">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-38">SEQUENCE</a> <a href="#name-Tag">Tag</a> = 48
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-SET">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-39">SET</a> <a href="#name-Tag">Tag</a> = 49
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-T61String">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-41">T61String</a> <a href="#name-Tag">Tag</a> = 20
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-UTCTime">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-43">UTCTime</a> <a href="#name-Tag">Tag</a> = 23
+		The following is a list of standard tag and class combinations.</div>
+<div class="anchor" id="name-UTF8String">	const <a href="../../../../../../src/vendor/golang.org/x/crypto/cryptobyte/asn1/asn1.go.html#line-37">UTF8String</a> <a href="#name-Tag">Tag</a> = 12
+		The following is a list of standard tag and class combinations.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

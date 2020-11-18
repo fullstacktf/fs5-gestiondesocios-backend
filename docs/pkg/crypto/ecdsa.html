@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/ecdsa</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>ecdsa</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/ecdsa">crypto/ecdsa</a><i> (on <a href="https://golang.org/pkg/crypto/ecdsa/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/ecdsa" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/ecdsa.html">11 packages</a>, and imported by <a href="../../dep/crypto/ecdsa.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/crypto/ecdsa/ecdsa.go.html#doc">d-&gt;</a> <a href="../../src/crypto/ecdsa/ecdsa.go.html">ecdsa.go</a>
+	    <a href="../../src/crypto/ecdsa/ecdsa_noasm.go.html">ecdsa_noasm.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-PrivateKey" data-popularity="805">	 type <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-87">PrivateKey</a> <i>(struct)</i>
+		PrivateKey represents an ECDSA private key.
+
+		<input type='checkbox' class="stat" id="PrivateKey-stat-fields"><label for="PrivateKey-stat-fields">Exported Fields (5)</label><span id='PrivateKey-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-89">D</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-88">PublicKey</a> <i><a href="#name-PublicKey">PublicKey</a></i>
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-88" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-61">Curve</a> <i><a href="elliptic.html">elliptic</a>.<a href="elliptic.html#name-Curve">Curve</a></i>
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-88" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-62">X</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-88" class="path-duplicate">PublicKey</a>.<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-62">Y</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-methods"><label for="PrivateKey-stat-methods">Exported Methods (9)</label><span id='PrivateKey-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-33">Add</a>(x1, y1, x2, y2 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-35">Double</a>(x1, y1 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			(*T) <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-100">Equal</a>(x <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PrivateKey">PrivateKey</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-31">IsOnCurve</a>(x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-29">Params</a>() *<a href="elliptic.html">elliptic</a>.<a href="elliptic.html#name-CurveParams">CurveParams</a>
+			(*T) <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-93">Public</a>() <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PublicKey">PublicKey</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-40">ScalarBaseMult</a>(k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-37">ScalarMult</a>(x1, y1 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			(*T) <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-115">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, digest []<a href="../builtin.html#name-byte">byte</a>, opts <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-SignerOpts">SignerOpts</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-impls"><label for="PrivateKey-stat-impls">Implements (2+)</label><span id='PrivateKey-stat-impls-content' class="stat-content">
+			*T : crypto.<a href="../crypto.html#name-Signer">Signer</a>
+			 T : crypto/elliptic.<a href="elliptic.html#name-Curve">Curve</a></span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-results"><label for="PrivateKey-stat-results">As Outputs Of (2+)</label><span id='PrivateKey-stat-results-content' class="stat-content">
+			func <a href="#name-GenerateKey">GenerateKey</a>(c <a href="elliptic.html">elliptic</a>.<a href="elliptic.html#name-Curve">Curve</a>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<b>PrivateKey</b>, <a href="../builtin.html#name-error">error</a>)
+			func crypto/x509.<a href="x509.html#name-ParseECPrivateKey">ParseECPrivateKey</a>(der []<a href="../builtin.html#name-byte">byte</a>) (*<b>PrivateKey</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PrivateKey-stat-params"><label for="PrivateKey-stat-params">As Inputs Of (3+)</label><span id='PrivateKey-stat-params-content' class="stat-content">
+			func <a href="#name-Sign">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, hash []<a href="../builtin.html#name-byte">byte</a>) (r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-SignASN1">SignASN1</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<b>PrivateKey</b>, hash []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func crypto/x509.<a href="x509.html#name-MarshalECPrivateKey">MarshalECPrivateKey</a>(key *<b>PrivateKey</b>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-PublicKey" data-popularity="470">	 type <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-60">PublicKey</a> <i>(struct)</i>
+		PublicKey represents an ECDSA public key.
+
+		<input type='checkbox' class="stat" id="PublicKey-stat-fields"><label for="PublicKey-stat-fields">Exported Fields (3)</label><span id='PublicKey-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-61">Curve</a> <i><a href="elliptic.html">elliptic</a>.<a href="elliptic.html#name-Curve">Curve</a></i>
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-62">X</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/ecdsa/ecdsa.go.html#line-62">Y</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-methods"><label for="PublicKey-stat-methods">Exported Methods (7)</label><span id='PublicKey-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-33">Add</a>(x1, y1, x2, y2 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-35">Double</a>(x1, y1 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			(*T) <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-73">Equal</a>(x <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PublicKey">PublicKey</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-31">IsOnCurve</a>(x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-29">Params</a>() *<a href="elliptic.html">elliptic</a>.<a href="elliptic.html#name-CurveParams">CurveParams</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-40">ScalarBaseMult</a>(k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-37">ScalarMult</a>(x1, y1 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)</span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-impls"><label for="PublicKey-stat-impls">Implements (1+)</label><span id='PublicKey-stat-impls-content' class="stat-content">
+			 T : crypto/elliptic.<a href="elliptic.html#name-Curve">Curve</a></span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-params"><label for="PublicKey-stat-params">As Inputs Of (2+)</label><span id='PublicKey-stat-params-content' class="stat-content">
+			func <a href="#name-Verify">Verify</a>(pub *<b>PublicKey</b>, hash []<a href="../builtin.html#name-byte">byte</a>, r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a>
+			func <a href="#name-VerifyASN1">VerifyASN1</a>(pub *<b>PublicKey</b>, hash, sig []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-GenerateKey">	 func <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-149">GenerateKey</a>(c <a href="elliptic.html">elliptic</a>.<a href="elliptic.html#name-Curve">Curve</a>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<a href="#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)
+		GenerateKey generates a public and private key pair.</div>
+<div class="anchor" id="name-Sign">	 func <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-200">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>) (r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)
+		Sign signs a hash (which should be the result of hashing a larger message)
+		using the private key, priv. If the hash is longer than the bit-length of the
+		private key's curve order, the hash will be truncated to that length. It
+		returns the signature as a pair of integers. The security of the private key
+		depends on the entropy of rand.</div>
+<div class="anchor" id="name-SignASN1">	 func <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-285">SignASN1</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="#name-PrivateKey">PrivateKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		SignASN1 signs a hash (which should be the result of hashing a larger message)
+		using the private key, priv. If the hash is longer than the bit-length of the
+		private key's curve order, the hash will be truncated to that length. It
+		returns the ASN.1 encoded signature. The security of the private key
+		depends on the entropy of rand.</div>
+<div class="anchor" id="name-Verify">	 func <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-291">Verify</a>(pub *<a href="#name-PublicKey">PublicKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>, r, s *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a>
+		Verify verifies the signature in r, s of hash using the public key, pub. Its
+		return value records whether the signature is valid.</div>
+<div class="anchor" id="name-VerifyASN1">	 func <a href="../../src/crypto/ecdsa/ecdsa.go.html#line-339">VerifyASN1</a>(pub *<a href="#name-PublicKey">PublicKey</a>, hash, sig []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a>
+		VerifyASN1 verifies the ASN.1 encoded signature, sig, of hash using the
+		public key, pub. Its return value records whether the signature is valid.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

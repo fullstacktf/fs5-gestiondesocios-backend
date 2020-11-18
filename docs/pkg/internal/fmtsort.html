@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: internal/fmtsort</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>fmtsort</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-internal/fmtsort">internal/fmtsort</a><i> (on <a href="https://golang.org/pkg/internal/fmtsort/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/internal/fmtsort" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/internal/fmtsort.html">2 packages</a>, and imported by <a href="../../dep/internal/fmtsort.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/internal/fmtsort/sort.go.html#doc">d-&gt;</a> <a href="../../src/internal/fmtsort/sort.go.html">sort.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-SortedMap" data-popularity="275">	 type <a href="../../src/internal/fmtsort/sort.go.html#line-21">SortedMap</a> <i>(struct)</i>
+		SortedMap represents a map's keys and values. The keys and values are
+		aligned in index order: Value[i] is the value in the map corresponding to Key[i].
+
+		<input type='checkbox' class="stat" id="SortedMap-stat-fields"><label for="SortedMap-stat-fields">Exported Fields (2)</label><span id='SortedMap-stat-fields-content' class="stat-content">
+			<a href="../../src/internal/fmtsort/sort.go.html#line-22">Key</a> <i>[]<a href="../reflect.html">reflect</a>.<a href="../reflect.html#name-Value">Value</a></i>
+			<a href="../../src/internal/fmtsort/sort.go.html#line-23">Value</a> <i>[]<a href="../reflect.html">reflect</a>.<a href="../reflect.html#name-Value">Value</a></i></span>
+		<input type='checkbox' class="stat" id="SortedMap-stat-methods"><label for="SortedMap-stat-methods">Exported Methods (3)</label><span id='SortedMap-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/internal/fmtsort/sort.go.html#line-26">Len</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/internal/fmtsort/sort.go.html#line-27">Less</a>(i, j <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/internal/fmtsort/sort.go.html#line-28">Swap</a>(i, j <a href="../builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="SortedMap-stat-impls"><label for="SortedMap-stat-impls">Implements (1+)</label><span id='SortedMap-stat-impls-content' class="stat-content">
+			*T : sort.<a href="../sort.html#name-Interface">Interface</a></span>
+		<input type='checkbox' class="stat" id="SortedMap-stat-results"><label for="SortedMap-stat-results">As Outputs Of (1+)</label><span id='SortedMap-stat-results-content' class="stat-content">
+			func <a href="#name-Sort">Sort</a>(mapValue <a href="../reflect.html">reflect</a>.<a href="../reflect.html#name-Value">Value</a>) *<b>SortedMap</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Sort">	 func <a href="../../src/internal/fmtsort/sort.go.html#line-52">Sort</a>(mapValue <a href="../reflect.html">reflect</a>.<a href="../reflect.html#name-Value">Value</a>) *<a href="#name-SortedMap">SortedMap</a>
+		Sort accepts a map and returns a SortedMap that has the same keys and
+		values but in a stable sorted order according to the keys, modulo issues
+		raised by unorderable key values such as NaNs.
+
+		The ordering rules are more general than with Go's &lt; operator:
+
+		 - when applicable, nil compares low
+		 - ints, floats, and strings order by &lt;
+		 - NaN compares less than non-NaN floats
+		 - bool compares false before true
+		 - complex compares real, then imag
+		 - pointers compare by machine address
+		 - channel values compare by machine address
+		 - structs compare each field in turn
+		 - arrays compare each element in turn.
+		   Otherwise identical arrays compare by length.
+		 - interface values compare first by reflect.Type describing the concrete type
+		   and then by concrete value as described in the previous rules.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

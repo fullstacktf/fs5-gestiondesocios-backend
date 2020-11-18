@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: packets.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	packets.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2012 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"bytes"</code></span>
+<span class="codeline" id="line-13"><code>	"crypto/tls"</code></span>
+<span class="codeline" id="line-14"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-15"><code>	"encoding/binary"</code></span>
+<span class="codeline" id="line-16"><code>	"errors"</code></span>
+<span class="codeline" id="line-17"><code>	"fmt"</code></span>
+<span class="codeline" id="line-18"><code>	"io"</code></span>
+<span class="codeline" id="line-19"><code>	"math"</code></span>
+<span class="codeline" id="line-20"><code>	"time"</code></span>
+<span class="codeline" id="line-21"><code>)</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>// Packets documentation:</code></span>
+<span class="codeline" id="line-24"><code>// http://dev.mysql.com/doc/internals/en/client-server-protocol.html</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>// Read packet to buffer 'data'</code></span>
+<span class="codeline" id="line-27"><code>func (mc *mysqlConn) readPacket() ([]byte, error) {</code></span>
+<span class="codeline" id="line-28"><code>	var prevData []byte</code></span>
+<span class="codeline" id="line-29"><code>	for {</code></span>
+<span class="codeline" id="line-30"><code>		// read packet header</code></span>
+<span class="codeline" id="line-31"><code>		data, err := mc.buf.readNext(4)</code></span>
+<span class="codeline" id="line-32"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-33"><code>			if cerr := mc.canceled.Value(); cerr != nil {</code></span>
+<span class="codeline" id="line-34"><code>				return nil, cerr</code></span>
+<span class="codeline" id="line-35"><code>			}</code></span>
+<span class="codeline" id="line-36"><code>			errLog.Print(err)</code></span>
+<span class="codeline" id="line-37"><code>			mc.Close()</code></span>
+<span class="codeline" id="line-38"><code>			return nil, ErrInvalidConn</code></span>
+<span class="codeline" id="line-39"><code>		}</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>		// packet length [24 bit]</code></span>
+<span class="codeline" id="line-42"><code>		pktLen := int(uint32(data[0]) | uint32(data[1])&lt;&lt;8 | uint32(data[2])&lt;&lt;16)</code></span>
+<span class="codeline" id="line-43"><code></code></span>
+<span class="codeline" id="line-44"><code>		// check packet sync [8 bit]</code></span>
+<span class="codeline" id="line-45"><code>		if data[3] != mc.sequence {</code></span>
+<span class="codeline" id="line-46"><code>			if data[3] &gt; mc.sequence {</code></span>
+<span class="codeline" id="line-47"><code>				return nil, ErrPktSyncMul</code></span>
+<span class="codeline" id="line-48"><code>			}</code></span>
+<span class="codeline" id="line-49"><code>			return nil, ErrPktSync</code></span>
+<span class="codeline" id="line-50"><code>		}</code></span>
+<span class="codeline" id="line-51"><code>		mc.sequence++</code></span>
+<span class="codeline" id="line-52"><code></code></span>
+<span class="codeline" id="line-53"><code>		// packets with length 0 terminate a previous packet which is a</code></span>
+<span class="codeline" id="line-54"><code>		// multiple of (2^24)-1 bytes long</code></span>
+<span class="codeline" id="line-55"><code>		if pktLen == 0 {</code></span>
+<span class="codeline" id="line-56"><code>			// there was no previous packet</code></span>
+<span class="codeline" id="line-57"><code>			if prevData == nil {</code></span>
+<span class="codeline" id="line-58"><code>				errLog.Print(ErrMalformPkt)</code></span>
+<span class="codeline" id="line-59"><code>				mc.Close()</code></span>
+<span class="codeline" id="line-60"><code>				return nil, ErrInvalidConn</code></span>
+<span class="codeline" id="line-61"><code>			}</code></span>
+<span class="codeline" id="line-62"><code></code></span>
+<span class="codeline" id="line-63"><code>			return prevData, nil</code></span>
+<span class="codeline" id="line-64"><code>		}</code></span>
+<span class="codeline" id="line-65"><code></code></span>
+<span class="codeline" id="line-66"><code>		// read packet body [pktLen bytes]</code></span>
+<span class="codeline" id="line-67"><code>		data, err = mc.buf.readNext(pktLen)</code></span>
+<span class="codeline" id="line-68"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-69"><code>			if cerr := mc.canceled.Value(); cerr != nil {</code></span>
+<span class="codeline" id="line-70"><code>				return nil, cerr</code></span>
+<span class="codeline" id="line-71"><code>			}</code></span>
+<span class="codeline" id="line-72"><code>			errLog.Print(err)</code></span>
+<span class="codeline" id="line-73"><code>			mc.Close()</code></span>
+<span class="codeline" id="line-74"><code>			return nil, ErrInvalidConn</code></span>
+<span class="codeline" id="line-75"><code>		}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>		// return data if this was the last packet</code></span>
+<span class="codeline" id="line-78"><code>		if pktLen &lt; maxPacketSize {</code></span>
+<span class="codeline" id="line-79"><code>			// zero allocations for non-split packets</code></span>
+<span class="codeline" id="line-80"><code>			if prevData == nil {</code></span>
+<span class="codeline" id="line-81"><code>				return data, nil</code></span>
+<span class="codeline" id="line-82"><code>			}</code></span>
+<span class="codeline" id="line-83"><code></code></span>
+<span class="codeline" id="line-84"><code>			return append(prevData, data...), nil</code></span>
+<span class="codeline" id="line-85"><code>		}</code></span>
+<span class="codeline" id="line-86"><code></code></span>
+<span class="codeline" id="line-87"><code>		prevData = append(prevData, data...)</code></span>
+<span class="codeline" id="line-88"><code>	}</code></span>
+<span class="codeline" id="line-89"><code>}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>// Write packet buffer 'data'</code></span>
+<span class="codeline" id="line-92"><code>func (mc *mysqlConn) writePacket(data []byte) error {</code></span>
+<span class="codeline" id="line-93"><code>	pktLen := len(data) - 4</code></span>
+<span class="codeline" id="line-94"><code></code></span>
+<span class="codeline" id="line-95"><code>	if pktLen &gt; mc.maxAllowedPacket {</code></span>
+<span class="codeline" id="line-96"><code>		return ErrPktTooLarge</code></span>
+<span class="codeline" id="line-97"><code>	}</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>	// Perform a stale connection check. We only perform this check for</code></span>
+<span class="codeline" id="line-100"><code>	// the first query on a connection that has been checked out of the</code></span>
+<span class="codeline" id="line-101"><code>	// connection pool: a fresh connection from the pool is more likely</code></span>
+<span class="codeline" id="line-102"><code>	// to be stale, and it has not performed any previous writes that</code></span>
+<span class="codeline" id="line-103"><code>	// could cause data corruption, so it's safe to return ErrBadConn</code></span>
+<span class="codeline" id="line-104"><code>	// if the check fails.</code></span>
+<span class="codeline" id="line-105"><code>	if mc.reset {</code></span>
+<span class="codeline" id="line-106"><code>		mc.reset = false</code></span>
+<span class="codeline" id="line-107"><code>		conn := mc.netConn</code></span>
+<span class="codeline" id="line-108"><code>		if mc.rawConn != nil {</code></span>
+<span class="codeline" id="line-109"><code>			conn = mc.rawConn</code></span>
+<span class="codeline" id="line-110"><code>		}</code></span>
+<span class="codeline" id="line-111"><code>		var err error</code></span>
+<span class="codeline" id="line-112"><code>		// If this connection has a ReadTimeout which we've been setting on</code></span>
+<span class="codeline" id="line-113"><code>		// reads, reset it to its default value before we attempt a non-blocking</code></span>
+<span class="codeline" id="line-114"><code>		// read, otherwise the scheduler will just time us out before we can read</code></span>
+<span class="codeline" id="line-115"><code>		if mc.cfg.ReadTimeout != 0 {</code></span>
+<span class="codeline" id="line-116"><code>			err = conn.SetReadDeadline(time.Time{})</code></span>
+<span class="codeline" id="line-117"><code>		}</code></span>
+<span class="codeline" id="line-118"><code>		if err == nil &amp;&amp; mc.cfg.CheckConnLiveness {</code></span>
+<span class="codeline" id="line-119"><code>			err = connCheck(conn)</code></span>
+<span class="codeline" id="line-120"><code>		}</code></span>
+<span class="codeline" id="line-121"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-122"><code>			errLog.Print("closing bad idle connection: ", err)</code></span>
+<span class="codeline" id="line-123"><code>			mc.Close()</code></span>
+<span class="codeline" id="line-124"><code>			return driver.ErrBadConn</code></span>
+<span class="codeline" id="line-125"><code>		}</code></span>
+<span class="codeline" id="line-126"><code>	}</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>	for {</code></span>
+<span class="codeline" id="line-129"><code>		var size int</code></span>
+<span class="codeline" id="line-130"><code>		if pktLen &gt;= maxPacketSize {</code></span>
+<span class="codeline" id="line-131"><code>			data[0] = 0xff</code></span>
+<span class="codeline" id="line-132"><code>			data[1] = 0xff</code></span>
+<span class="codeline" id="line-133"><code>			data[2] = 0xff</code></span>
+<span class="codeline" id="line-134"><code>			size = maxPacketSize</code></span>
+<span class="codeline" id="line-135"><code>		} else {</code></span>
+<span class="codeline" id="line-136"><code>			data[0] = byte(pktLen)</code></span>
+<span class="codeline" id="line-137"><code>			data[1] = byte(pktLen &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-138"><code>			data[2] = byte(pktLen &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-139"><code>			size = pktLen</code></span>
+<span class="codeline" id="line-140"><code>		}</code></span>
+<span class="codeline" id="line-141"><code>		data[3] = mc.sequence</code></span>
+<span class="codeline" id="line-142"><code></code></span>
+<span class="codeline" id="line-143"><code>		// Write packet</code></span>
+<span class="codeline" id="line-144"><code>		if mc.writeTimeout &gt; 0 {</code></span>
+<span class="codeline" id="line-145"><code>			if err := mc.netConn.SetWriteDeadline(time.Now().Add(mc.writeTimeout)); err != nil {</code></span>
+<span class="codeline" id="line-146"><code>				return err</code></span>
+<span class="codeline" id="line-147"><code>			}</code></span>
+<span class="codeline" id="line-148"><code>		}</code></span>
+<span class="codeline" id="line-149"><code></code></span>
+<span class="codeline" id="line-150"><code>		n, err := mc.netConn.Write(data[:4+size])</code></span>
+<span class="codeline" id="line-151"><code>		if err == nil &amp;&amp; n == 4+size {</code></span>
+<span class="codeline" id="line-152"><code>			mc.sequence++</code></span>
+<span class="codeline" id="line-153"><code>			if size != maxPacketSize {</code></span>
+<span class="codeline" id="line-154"><code>				return nil</code></span>
+<span class="codeline" id="line-155"><code>			}</code></span>
+<span class="codeline" id="line-156"><code>			pktLen -= size</code></span>
+<span class="codeline" id="line-157"><code>			data = data[size:]</code></span>
+<span class="codeline" id="line-158"><code>			continue</code></span>
+<span class="codeline" id="line-159"><code>		}</code></span>
+<span class="codeline" id="line-160"><code></code></span>
+<span class="codeline" id="line-161"><code>		// Handle error</code></span>
+<span class="codeline" id="line-162"><code>		if err == nil { // n != len(data)</code></span>
+<span class="codeline" id="line-163"><code>			mc.cleanup()</code></span>
+<span class="codeline" id="line-164"><code>			errLog.Print(ErrMalformPkt)</code></span>
+<span class="codeline" id="line-165"><code>		} else {</code></span>
+<span class="codeline" id="line-166"><code>			if cerr := mc.canceled.Value(); cerr != nil {</code></span>
+<span class="codeline" id="line-167"><code>				return cerr</code></span>
+<span class="codeline" id="line-168"><code>			}</code></span>
+<span class="codeline" id="line-169"><code>			if n == 0 &amp;&amp; pktLen == len(data)-4 {</code></span>
+<span class="codeline" id="line-170"><code>				// only for the first loop iteration when nothing was written yet</code></span>
+<span class="codeline" id="line-171"><code>				return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-172"><code>			}</code></span>
+<span class="codeline" id="line-173"><code>			mc.cleanup()</code></span>
+<span class="codeline" id="line-174"><code>			errLog.Print(err)</code></span>
+<span class="codeline" id="line-175"><code>		}</code></span>
+<span class="codeline" id="line-176"><code>		return ErrInvalidConn</code></span>
+<span class="codeline" id="line-177"><code>	}</code></span>
+<span class="codeline" id="line-178"><code>}</code></span>
+<span class="codeline" id="line-179"><code></code></span>
+<span class="codeline" id="line-180"><code>/******************************************************************************</code></span>
+<span class="codeline" id="line-181"><code>*                           Initialization Process                            *</code></span>
+<span class="codeline" id="line-182"><code>******************************************************************************/</code></span>
+<span class="codeline" id="line-183"><code></code></span>
+<span class="codeline" id="line-184"><code>// Handshake Initialization Packet</code></span>
+<span class="codeline" id="line-185"><code>// http://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::Handshake</code></span>
+<span class="codeline" id="line-186"><code>func (mc *mysqlConn) readHandshakePacket() (data []byte, plugin string, err error) {</code></span>
+<span class="codeline" id="line-187"><code>	data, err = mc.readPacket()</code></span>
+<span class="codeline" id="line-188"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-189"><code>		// for init we can rewrite this to ErrBadConn for sql.Driver to retry, since</code></span>
+<span class="codeline" id="line-190"><code>		// in connection initialization we don't risk retrying non-idempotent actions.</code></span>
+<span class="codeline" id="line-191"><code>		if err == ErrInvalidConn {</code></span>
+<span class="codeline" id="line-192"><code>			return nil, "", driver.ErrBadConn</code></span>
+<span class="codeline" id="line-193"><code>		}</code></span>
+<span class="codeline" id="line-194"><code>		return</code></span>
+<span class="codeline" id="line-195"><code>	}</code></span>
+<span class="codeline" id="line-196"><code></code></span>
+<span class="codeline" id="line-197"><code>	if data[0] == iERR {</code></span>
+<span class="codeline" id="line-198"><code>		return nil, "", mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-199"><code>	}</code></span>
+<span class="codeline" id="line-200"><code></code></span>
+<span class="codeline" id="line-201"><code>	// protocol version [1 byte]</code></span>
+<span class="codeline" id="line-202"><code>	if data[0] &lt; minProtocolVersion {</code></span>
+<span class="codeline" id="line-203"><code>		return nil, "", fmt.Errorf(</code></span>
+<span class="codeline" id="line-204"><code>			"unsupported protocol version %d. Version %d or higher is required",</code></span>
+<span class="codeline" id="line-205"><code>			data[0],</code></span>
+<span class="codeline" id="line-206"><code>			minProtocolVersion,</code></span>
+<span class="codeline" id="line-207"><code>		)</code></span>
+<span class="codeline" id="line-208"><code>	}</code></span>
+<span class="codeline" id="line-209"><code></code></span>
+<span class="codeline" id="line-210"><code>	// server version [null terminated string]</code></span>
+<span class="codeline" id="line-211"><code>	// connection id [4 bytes]</code></span>
+<span class="codeline" id="line-212"><code>	pos := 1 + bytes.IndexByte(data[1:], 0x00) + 1 + 4</code></span>
+<span class="codeline" id="line-213"><code></code></span>
+<span class="codeline" id="line-214"><code>	// first part of the password cipher [8 bytes]</code></span>
+<span class="codeline" id="line-215"><code>	authData := data[pos : pos+8]</code></span>
+<span class="codeline" id="line-216"><code></code></span>
+<span class="codeline" id="line-217"><code>	// (filler) always 0x00 [1 byte]</code></span>
+<span class="codeline" id="line-218"><code>	pos += 8 + 1</code></span>
+<span class="codeline" id="line-219"><code></code></span>
+<span class="codeline" id="line-220"><code>	// capability flags (lower 2 bytes) [2 bytes]</code></span>
+<span class="codeline" id="line-221"><code>	mc.flags = clientFlag(binary.LittleEndian.Uint16(data[pos : pos+2]))</code></span>
+<span class="codeline" id="line-222"><code>	if mc.flags&amp;clientProtocol41 == 0 {</code></span>
+<span class="codeline" id="line-223"><code>		return nil, "", ErrOldProtocol</code></span>
+<span class="codeline" id="line-224"><code>	}</code></span>
+<span class="codeline" id="line-225"><code>	if mc.flags&amp;clientSSL == 0 &amp;&amp; mc.cfg.tls != nil {</code></span>
+<span class="codeline" id="line-226"><code>		if mc.cfg.TLSConfig == "preferred" {</code></span>
+<span class="codeline" id="line-227"><code>			mc.cfg.tls = nil</code></span>
+<span class="codeline" id="line-228"><code>		} else {</code></span>
+<span class="codeline" id="line-229"><code>			return nil, "", ErrNoTLS</code></span>
+<span class="codeline" id="line-230"><code>		}</code></span>
+<span class="codeline" id="line-231"><code>	}</code></span>
+<span class="codeline" id="line-232"><code>	pos += 2</code></span>
+<span class="codeline" id="line-233"><code></code></span>
+<span class="codeline" id="line-234"><code>	if len(data) &gt; pos {</code></span>
+<span class="codeline" id="line-235"><code>		// character set [1 byte]</code></span>
+<span class="codeline" id="line-236"><code>		// status flags [2 bytes]</code></span>
+<span class="codeline" id="line-237"><code>		// capability flags (upper 2 bytes) [2 bytes]</code></span>
+<span class="codeline" id="line-238"><code>		// length of auth-plugin-data [1 byte]</code></span>
+<span class="codeline" id="line-239"><code>		// reserved (all [00]) [10 bytes]</code></span>
+<span class="codeline" id="line-240"><code>		pos += 1 + 2 + 2 + 1 + 10</code></span>
+<span class="codeline" id="line-241"><code></code></span>
+<span class="codeline" id="line-242"><code>		// second part of the password cipher [mininum 13 bytes],</code></span>
+<span class="codeline" id="line-243"><code>		// where len=MAX(13, length of auth-plugin-data - 8)</code></span>
+<span class="codeline" id="line-244"><code>		//</code></span>
+<span class="codeline" id="line-245"><code>		// The web documentation is ambiguous about the length. However,</code></span>
+<span class="codeline" id="line-246"><code>		// according to mysql-5.7/sql/auth/sql_authentication.cc line 538,</code></span>
+<span class="codeline" id="line-247"><code>		// the 13th byte is "\0 byte, terminating the second part of</code></span>
+<span class="codeline" id="line-248"><code>		// a scramble". So the second part of the password cipher is</code></span>
+<span class="codeline" id="line-249"><code>		// a NULL terminated string that's at least 13 bytes with the</code></span>
+<span class="codeline" id="line-250"><code>		// last byte being NULL.</code></span>
+<span class="codeline" id="line-251"><code>		//</code></span>
+<span class="codeline" id="line-252"><code>		// The official Python library uses the fixed length 12</code></span>
+<span class="codeline" id="line-253"><code>		// which seems to work but technically could have a hidden bug.</code></span>
+<span class="codeline" id="line-254"><code>		authData = append(authData, data[pos:pos+12]...)</code></span>
+<span class="codeline" id="line-255"><code>		pos += 13</code></span>
+<span class="codeline" id="line-256"><code></code></span>
+<span class="codeline" id="line-257"><code>		// EOF if version (&gt;= 5.5.7 and &lt; 5.5.10) or (&gt;= 5.6.0 and &lt; 5.6.2)</code></span>
+<span class="codeline" id="line-258"><code>		// \NUL otherwise</code></span>
+<span class="codeline" id="line-259"><code>		if end := bytes.IndexByte(data[pos:], 0x00); end != -1 {</code></span>
+<span class="codeline" id="line-260"><code>			plugin = string(data[pos : pos+end])</code></span>
+<span class="codeline" id="line-261"><code>		} else {</code></span>
+<span class="codeline" id="line-262"><code>			plugin = string(data[pos:])</code></span>
+<span class="codeline" id="line-263"><code>		}</code></span>
+<span class="codeline" id="line-264"><code></code></span>
+<span class="codeline" id="line-265"><code>		// make a memory safe copy of the cipher slice</code></span>
+<span class="codeline" id="line-266"><code>		var b [20]byte</code></span>
+<span class="codeline" id="line-267"><code>		copy(b[:], authData)</code></span>
+<span class="codeline" id="line-268"><code>		return b[:], plugin, nil</code></span>
+<span class="codeline" id="line-269"><code>	}</code></span>
+<span class="codeline" id="line-270"><code></code></span>
+<span class="codeline" id="line-271"><code>	// make a memory safe copy of the cipher slice</code></span>
+<span class="codeline" id="line-272"><code>	var b [8]byte</code></span>
+<span class="codeline" id="line-273"><code>	copy(b[:], authData)</code></span>
+<span class="codeline" id="line-274"><code>	return b[:], plugin, nil</code></span>
+<span class="codeline" id="line-275"><code>}</code></span>
+<span class="codeline" id="line-276"><code></code></span>
+<span class="codeline" id="line-277"><code>// Client Authentication Packet</code></span>
+<span class="codeline" id="line-278"><code>// http://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::HandshakeResponse</code></span>
+<span class="codeline" id="line-279"><code>func (mc *mysqlConn) writeHandshakeResponsePacket(authResp []byte, plugin string) error {</code></span>
+<span class="codeline" id="line-280"><code>	// Adjust client flags based on server support</code></span>
+<span class="codeline" id="line-281"><code>	clientFlags := clientProtocol41 |</code></span>
+<span class="codeline" id="line-282"><code>		clientSecureConn |</code></span>
+<span class="codeline" id="line-283"><code>		clientLongPassword |</code></span>
+<span class="codeline" id="line-284"><code>		clientTransactions |</code></span>
+<span class="codeline" id="line-285"><code>		clientLocalFiles |</code></span>
+<span class="codeline" id="line-286"><code>		clientPluginAuth |</code></span>
+<span class="codeline" id="line-287"><code>		clientMultiResults |</code></span>
+<span class="codeline" id="line-288"><code>		mc.flags&amp;clientLongFlag</code></span>
+<span class="codeline" id="line-289"><code></code></span>
+<span class="codeline" id="line-290"><code>	if mc.cfg.ClientFoundRows {</code></span>
+<span class="codeline" id="line-291"><code>		clientFlags |= clientFoundRows</code></span>
+<span class="codeline" id="line-292"><code>	}</code></span>
+<span class="codeline" id="line-293"><code></code></span>
+<span class="codeline" id="line-294"><code>	// To enable TLS / SSL</code></span>
+<span class="codeline" id="line-295"><code>	if mc.cfg.tls != nil {</code></span>
+<span class="codeline" id="line-296"><code>		clientFlags |= clientSSL</code></span>
+<span class="codeline" id="line-297"><code>	}</code></span>
+<span class="codeline" id="line-298"><code></code></span>
+<span class="codeline" id="line-299"><code>	if mc.cfg.MultiStatements {</code></span>
+<span class="codeline" id="line-300"><code>		clientFlags |= clientMultiStatements</code></span>
+<span class="codeline" id="line-301"><code>	}</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>	// encode length of the auth plugin data</code></span>
+<span class="codeline" id="line-304"><code>	var authRespLEIBuf [9]byte</code></span>
+<span class="codeline" id="line-305"><code>	authRespLen := len(authResp)</code></span>
+<span class="codeline" id="line-306"><code>	authRespLEI := appendLengthEncodedInteger(authRespLEIBuf[:0], uint64(authRespLen))</code></span>
+<span class="codeline" id="line-307"><code>	if len(authRespLEI) &gt; 1 {</code></span>
+<span class="codeline" id="line-308"><code>		// if the length can not be written in 1 byte, it must be written as a</code></span>
+<span class="codeline" id="line-309"><code>		// length encoded integer</code></span>
+<span class="codeline" id="line-310"><code>		clientFlags |= clientPluginAuthLenEncClientData</code></span>
+<span class="codeline" id="line-311"><code>	}</code></span>
+<span class="codeline" id="line-312"><code></code></span>
+<span class="codeline" id="line-313"><code>	pktLen := 4 + 4 + 1 + 23 + len(mc.cfg.User) + 1 + len(authRespLEI) + len(authResp) + 21 + 1</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>	// To specify a db name</code></span>
+<span class="codeline" id="line-316"><code>	if n := len(mc.cfg.DBName); n &gt; 0 {</code></span>
+<span class="codeline" id="line-317"><code>		clientFlags |= clientConnectWithDB</code></span>
+<span class="codeline" id="line-318"><code>		pktLen += n + 1</code></span>
+<span class="codeline" id="line-319"><code>	}</code></span>
+<span class="codeline" id="line-320"><code></code></span>
+<span class="codeline" id="line-321"><code>	// Calculate packet length and get buffer with that size</code></span>
+<span class="codeline" id="line-322"><code>	data, err := mc.buf.takeSmallBuffer(pktLen + 4)</code></span>
+<span class="codeline" id="line-323"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-324"><code>		// cannot take the buffer. Something must be wrong with the connection</code></span>
+<span class="codeline" id="line-325"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-326"><code>		return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-327"><code>	}</code></span>
+<span class="codeline" id="line-328"><code></code></span>
+<span class="codeline" id="line-329"><code>	// ClientFlags [32 bit]</code></span>
+<span class="codeline" id="line-330"><code>	data[4] = byte(clientFlags)</code></span>
+<span class="codeline" id="line-331"><code>	data[5] = byte(clientFlags &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-332"><code>	data[6] = byte(clientFlags &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-333"><code>	data[7] = byte(clientFlags &gt;&gt; 24)</code></span>
+<span class="codeline" id="line-334"><code></code></span>
+<span class="codeline" id="line-335"><code>	// MaxPacketSize [32 bit] (none)</code></span>
+<span class="codeline" id="line-336"><code>	data[8] = 0x00</code></span>
+<span class="codeline" id="line-337"><code>	data[9] = 0x00</code></span>
+<span class="codeline" id="line-338"><code>	data[10] = 0x00</code></span>
+<span class="codeline" id="line-339"><code>	data[11] = 0x00</code></span>
+<span class="codeline" id="line-340"><code></code></span>
+<span class="codeline" id="line-341"><code>	// Charset [1 byte]</code></span>
+<span class="codeline" id="line-342"><code>	var found bool</code></span>
+<span class="codeline" id="line-343"><code>	data[12], found = collations[mc.cfg.Collation]</code></span>
+<span class="codeline" id="line-344"><code>	if !found {</code></span>
+<span class="codeline" id="line-345"><code>		// Note possibility for false negatives:</code></span>
+<span class="codeline" id="line-346"><code>		// could be triggered  although the collation is valid if the</code></span>
+<span class="codeline" id="line-347"><code>		// collations map does not contain entries the server supports.</code></span>
+<span class="codeline" id="line-348"><code>		return errors.New("unknown collation")</code></span>
+<span class="codeline" id="line-349"><code>	}</code></span>
+<span class="codeline" id="line-350"><code></code></span>
+<span class="codeline" id="line-351"><code>	// SSL Connection Request Packet</code></span>
+<span class="codeline" id="line-352"><code>	// http://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::SSLRequest</code></span>
+<span class="codeline" id="line-353"><code>	if mc.cfg.tls != nil {</code></span>
+<span class="codeline" id="line-354"><code>		// Send TLS / SSL request packet</code></span>
+<span class="codeline" id="line-355"><code>		if err := mc.writePacket(data[:(4+4+1+23)+4]); err != nil {</code></span>
+<span class="codeline" id="line-356"><code>			return err</code></span>
+<span class="codeline" id="line-357"><code>		}</code></span>
+<span class="codeline" id="line-358"><code></code></span>
+<span class="codeline" id="line-359"><code>		// Switch to TLS</code></span>
+<span class="codeline" id="line-360"><code>		tlsConn := tls.Client(mc.netConn, mc.cfg.tls)</code></span>
+<span class="codeline" id="line-361"><code>		if err := tlsConn.Handshake(); err != nil {</code></span>
+<span class="codeline" id="line-362"><code>			return err</code></span>
+<span class="codeline" id="line-363"><code>		}</code></span>
+<span class="codeline" id="line-364"><code>		mc.rawConn = mc.netConn</code></span>
+<span class="codeline" id="line-365"><code>		mc.netConn = tlsConn</code></span>
+<span class="codeline" id="line-366"><code>		mc.buf.nc = tlsConn</code></span>
+<span class="codeline" id="line-367"><code>	}</code></span>
+<span class="codeline" id="line-368"><code></code></span>
+<span class="codeline" id="line-369"><code>	// Filler [23 bytes] (all 0x00)</code></span>
+<span class="codeline" id="line-370"><code>	pos := 13</code></span>
+<span class="codeline" id="line-371"><code>	for ; pos &lt; 13+23; pos++ {</code></span>
+<span class="codeline" id="line-372"><code>		data[pos] = 0</code></span>
+<span class="codeline" id="line-373"><code>	}</code></span>
+<span class="codeline" id="line-374"><code></code></span>
+<span class="codeline" id="line-375"><code>	// User [null terminated string]</code></span>
+<span class="codeline" id="line-376"><code>	if len(mc.cfg.User) &gt; 0 {</code></span>
+<span class="codeline" id="line-377"><code>		pos += copy(data[pos:], mc.cfg.User)</code></span>
+<span class="codeline" id="line-378"><code>	}</code></span>
+<span class="codeline" id="line-379"><code>	data[pos] = 0x00</code></span>
+<span class="codeline" id="line-380"><code>	pos++</code></span>
+<span class="codeline" id="line-381"><code></code></span>
+<span class="codeline" id="line-382"><code>	// Auth Data [length encoded integer]</code></span>
+<span class="codeline" id="line-383"><code>	pos += copy(data[pos:], authRespLEI)</code></span>
+<span class="codeline" id="line-384"><code>	pos += copy(data[pos:], authResp)</code></span>
+<span class="codeline" id="line-385"><code></code></span>
+<span class="codeline" id="line-386"><code>	// Databasename [null terminated string]</code></span>
+<span class="codeline" id="line-387"><code>	if len(mc.cfg.DBName) &gt; 0 {</code></span>
+<span class="codeline" id="line-388"><code>		pos += copy(data[pos:], mc.cfg.DBName)</code></span>
+<span class="codeline" id="line-389"><code>		data[pos] = 0x00</code></span>
+<span class="codeline" id="line-390"><code>		pos++</code></span>
+<span class="codeline" id="line-391"><code>	}</code></span>
+<span class="codeline" id="line-392"><code></code></span>
+<span class="codeline" id="line-393"><code>	pos += copy(data[pos:], plugin)</code></span>
+<span class="codeline" id="line-394"><code>	data[pos] = 0x00</code></span>
+<span class="codeline" id="line-395"><code>	pos++</code></span>
+<span class="codeline" id="line-396"><code></code></span>
+<span class="codeline" id="line-397"><code>	// Send Auth packet</code></span>
+<span class="codeline" id="line-398"><code>	return mc.writePacket(data[:pos])</code></span>
+<span class="codeline" id="line-399"><code>}</code></span>
+<span class="codeline" id="line-400"><code></code></span>
+<span class="codeline" id="line-401"><code>// http://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::AuthSwitchResponse</code></span>
+<span class="codeline" id="line-402"><code>func (mc *mysqlConn) writeAuthSwitchPacket(authData []byte) error {</code></span>
+<span class="codeline" id="line-403"><code>	pktLen := 4 + len(authData)</code></span>
+<span class="codeline" id="line-404"><code>	data, err := mc.buf.takeSmallBuffer(pktLen)</code></span>
+<span class="codeline" id="line-405"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-406"><code>		// cannot take the buffer. Something must be wrong with the connection</code></span>
+<span class="codeline" id="line-407"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-408"><code>		return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-409"><code>	}</code></span>
+<span class="codeline" id="line-410"><code></code></span>
+<span class="codeline" id="line-411"><code>	// Add the auth data [EOF]</code></span>
+<span class="codeline" id="line-412"><code>	copy(data[4:], authData)</code></span>
+<span class="codeline" id="line-413"><code>	return mc.writePacket(data)</code></span>
+<span class="codeline" id="line-414"><code>}</code></span>
+<span class="codeline" id="line-415"><code></code></span>
+<span class="codeline" id="line-416"><code>/******************************************************************************</code></span>
+<span class="codeline" id="line-417"><code>*                             Command Packets                                 *</code></span>
+<span class="codeline" id="line-418"><code>******************************************************************************/</code></span>
+<span class="codeline" id="line-419"><code></code></span>
+<span class="codeline" id="line-420"><code>func (mc *mysqlConn) writeCommandPacket(command byte) error {</code></span>
+<span class="codeline" id="line-421"><code>	// Reset Packet Sequence</code></span>
+<span class="codeline" id="line-422"><code>	mc.sequence = 0</code></span>
+<span class="codeline" id="line-423"><code></code></span>
+<span class="codeline" id="line-424"><code>	data, err := mc.buf.takeSmallBuffer(4 + 1)</code></span>
+<span class="codeline" id="line-425"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-426"><code>		// cannot take the buffer. Something must be wrong with the connection</code></span>
+<span class="codeline" id="line-427"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-428"><code>		return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-429"><code>	}</code></span>
+<span class="codeline" id="line-430"><code></code></span>
+<span class="codeline" id="line-431"><code>	// Add command byte</code></span>
+<span class="codeline" id="line-432"><code>	data[4] = command</code></span>
+<span class="codeline" id="line-433"><code></code></span>
+<span class="codeline" id="line-434"><code>	// Send CMD packet</code></span>
+<span class="codeline" id="line-435"><code>	return mc.writePacket(data)</code></span>
+<span class="codeline" id="line-436"><code>}</code></span>
+<span class="codeline" id="line-437"><code></code></span>
+<span class="codeline" id="line-438"><code>func (mc *mysqlConn) writeCommandPacketStr(command byte, arg string) error {</code></span>
+<span class="codeline" id="line-439"><code>	// Reset Packet Sequence</code></span>
+<span class="codeline" id="line-440"><code>	mc.sequence = 0</code></span>
+<span class="codeline" id="line-441"><code></code></span>
+<span class="codeline" id="line-442"><code>	pktLen := 1 + len(arg)</code></span>
+<span class="codeline" id="line-443"><code>	data, err := mc.buf.takeBuffer(pktLen + 4)</code></span>
+<span class="codeline" id="line-444"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-445"><code>		// cannot take the buffer. Something must be wrong with the connection</code></span>
+<span class="codeline" id="line-446"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-447"><code>		return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-448"><code>	}</code></span>
+<span class="codeline" id="line-449"><code></code></span>
+<span class="codeline" id="line-450"><code>	// Add command byte</code></span>
+<span class="codeline" id="line-451"><code>	data[4] = command</code></span>
+<span class="codeline" id="line-452"><code></code></span>
+<span class="codeline" id="line-453"><code>	// Add arg</code></span>
+<span class="codeline" id="line-454"><code>	copy(data[5:], arg)</code></span>
+<span class="codeline" id="line-455"><code></code></span>
+<span class="codeline" id="line-456"><code>	// Send CMD packet</code></span>
+<span class="codeline" id="line-457"><code>	return mc.writePacket(data)</code></span>
+<span class="codeline" id="line-458"><code>}</code></span>
+<span class="codeline" id="line-459"><code></code></span>
+<span class="codeline" id="line-460"><code>func (mc *mysqlConn) writeCommandPacketUint32(command byte, arg uint32) error {</code></span>
+<span class="codeline" id="line-461"><code>	// Reset Packet Sequence</code></span>
+<span class="codeline" id="line-462"><code>	mc.sequence = 0</code></span>
+<span class="codeline" id="line-463"><code></code></span>
+<span class="codeline" id="line-464"><code>	data, err := mc.buf.takeSmallBuffer(4 + 1 + 4)</code></span>
+<span class="codeline" id="line-465"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-466"><code>		// cannot take the buffer. Something must be wrong with the connection</code></span>
+<span class="codeline" id="line-467"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-468"><code>		return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-469"><code>	}</code></span>
+<span class="codeline" id="line-470"><code></code></span>
+<span class="codeline" id="line-471"><code>	// Add command byte</code></span>
+<span class="codeline" id="line-472"><code>	data[4] = command</code></span>
+<span class="codeline" id="line-473"><code></code></span>
+<span class="codeline" id="line-474"><code>	// Add arg [32 bit]</code></span>
+<span class="codeline" id="line-475"><code>	data[5] = byte(arg)</code></span>
+<span class="codeline" id="line-476"><code>	data[6] = byte(arg &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-477"><code>	data[7] = byte(arg &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-478"><code>	data[8] = byte(arg &gt;&gt; 24)</code></span>
+<span class="codeline" id="line-479"><code></code></span>
+<span class="codeline" id="line-480"><code>	// Send CMD packet</code></span>
+<span class="codeline" id="line-481"><code>	return mc.writePacket(data)</code></span>
+<span class="codeline" id="line-482"><code>}</code></span>
+<span class="codeline" id="line-483"><code></code></span>
+<span class="codeline" id="line-484"><code>/******************************************************************************</code></span>
+<span class="codeline" id="line-485"><code>*                              Result Packets                                 *</code></span>
+<span class="codeline" id="line-486"><code>******************************************************************************/</code></span>
+<span class="codeline" id="line-487"><code></code></span>
+<span class="codeline" id="line-488"><code>func (mc *mysqlConn) readAuthResult() ([]byte, string, error) {</code></span>
+<span class="codeline" id="line-489"><code>	data, err := mc.readPacket()</code></span>
+<span class="codeline" id="line-490"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-491"><code>		return nil, "", err</code></span>
+<span class="codeline" id="line-492"><code>	}</code></span>
+<span class="codeline" id="line-493"><code></code></span>
+<span class="codeline" id="line-494"><code>	// packet indicator</code></span>
+<span class="codeline" id="line-495"><code>	switch data[0] {</code></span>
+<span class="codeline" id="line-496"><code></code></span>
+<span class="codeline" id="line-497"><code>	case iOK:</code></span>
+<span class="codeline" id="line-498"><code>		return nil, "", mc.handleOkPacket(data)</code></span>
+<span class="codeline" id="line-499"><code></code></span>
+<span class="codeline" id="line-500"><code>	case iAuthMoreData:</code></span>
+<span class="codeline" id="line-501"><code>		return data[1:], "", err</code></span>
+<span class="codeline" id="line-502"><code></code></span>
+<span class="codeline" id="line-503"><code>	case iEOF:</code></span>
+<span class="codeline" id="line-504"><code>		if len(data) == 1 {</code></span>
+<span class="codeline" id="line-505"><code>			// https://dev.mysql.com/doc/internals/en/connection-phase-packets.html#packet-Protocol::OldAuthSwitchRequest</code></span>
+<span class="codeline" id="line-506"><code>			return nil, "mysql_old_password", nil</code></span>
+<span class="codeline" id="line-507"><code>		}</code></span>
+<span class="codeline" id="line-508"><code>		pluginEndIndex := bytes.IndexByte(data, 0x00)</code></span>
+<span class="codeline" id="line-509"><code>		if pluginEndIndex &lt; 0 {</code></span>
+<span class="codeline" id="line-510"><code>			return nil, "", ErrMalformPkt</code></span>
+<span class="codeline" id="line-511"><code>		}</code></span>
+<span class="codeline" id="line-512"><code>		plugin := string(data[1:pluginEndIndex])</code></span>
+<span class="codeline" id="line-513"><code>		authData := data[pluginEndIndex+1:]</code></span>
+<span class="codeline" id="line-514"><code>		return authData, plugin, nil</code></span>
+<span class="codeline" id="line-515"><code></code></span>
+<span class="codeline" id="line-516"><code>	default: // Error otherwise</code></span>
+<span class="codeline" id="line-517"><code>		return nil, "", mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-518"><code>	}</code></span>
+<span class="codeline" id="line-519"><code>}</code></span>
+<span class="codeline" id="line-520"><code></code></span>
+<span class="codeline" id="line-521"><code>// Returns error if Packet is not an 'Result OK'-Packet</code></span>
+<span class="codeline" id="line-522"><code>func (mc *mysqlConn) readResultOK() error {</code></span>
+<span class="codeline" id="line-523"><code>	data, err := mc.readPacket()</code></span>
+<span class="codeline" id="line-524"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-525"><code>		return err</code></span>
+<span class="codeline" id="line-526"><code>	}</code></span>
+<span class="codeline" id="line-527"><code></code></span>
+<span class="codeline" id="line-528"><code>	if data[0] == iOK {</code></span>
+<span class="codeline" id="line-529"><code>		return mc.handleOkPacket(data)</code></span>
+<span class="codeline" id="line-530"><code>	}</code></span>
+<span class="codeline" id="line-531"><code>	return mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-532"><code>}</code></span>
+<span class="codeline" id="line-533"><code></code></span>
+<span class="codeline" id="line-534"><code>// Result Set Header Packet</code></span>
+<span class="codeline" id="line-535"><code>// http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-ProtocolText::Resultset</code></span>
+<span class="codeline" id="line-536"><code>func (mc *mysqlConn) readResultSetHeaderPacket() (int, error) {</code></span>
+<span class="codeline" id="line-537"><code>	data, err := mc.readPacket()</code></span>
+<span class="codeline" id="line-538"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-539"><code>		switch data[0] {</code></span>
+<span class="codeline" id="line-540"><code></code></span>
+<span class="codeline" id="line-541"><code>		case iOK:</code></span>
+<span class="codeline" id="line-542"><code>			return 0, mc.handleOkPacket(data)</code></span>
+<span class="codeline" id="line-543"><code></code></span>
+<span class="codeline" id="line-544"><code>		case iERR:</code></span>
+<span class="codeline" id="line-545"><code>			return 0, mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-546"><code></code></span>
+<span class="codeline" id="line-547"><code>		case iLocalInFile:</code></span>
+<span class="codeline" id="line-548"><code>			return 0, mc.handleInFileRequest(string(data[1:]))</code></span>
+<span class="codeline" id="line-549"><code>		}</code></span>
+<span class="codeline" id="line-550"><code></code></span>
+<span class="codeline" id="line-551"><code>		// column count</code></span>
+<span class="codeline" id="line-552"><code>		num, _, n := readLengthEncodedInteger(data)</code></span>
+<span class="codeline" id="line-553"><code>		if n-len(data) == 0 {</code></span>
+<span class="codeline" id="line-554"><code>			return int(num), nil</code></span>
+<span class="codeline" id="line-555"><code>		}</code></span>
+<span class="codeline" id="line-556"><code></code></span>
+<span class="codeline" id="line-557"><code>		return 0, ErrMalformPkt</code></span>
+<span class="codeline" id="line-558"><code>	}</code></span>
+<span class="codeline" id="line-559"><code>	return 0, err</code></span>
+<span class="codeline" id="line-560"><code>}</code></span>
+<span class="codeline" id="line-561"><code></code></span>
+<span class="codeline" id="line-562"><code>// Error Packet</code></span>
+<span class="codeline" id="line-563"><code>// http://dev.mysql.com/doc/internals/en/generic-response-packets.html#packet-ERR_Packet</code></span>
+<span class="codeline" id="line-564"><code>func (mc *mysqlConn) handleErrorPacket(data []byte) error {</code></span>
+<span class="codeline" id="line-565"><code>	if data[0] != iERR {</code></span>
+<span class="codeline" id="line-566"><code>		return ErrMalformPkt</code></span>
+<span class="codeline" id="line-567"><code>	}</code></span>
+<span class="codeline" id="line-568"><code></code></span>
+<span class="codeline" id="line-569"><code>	// 0xff [1 byte]</code></span>
+<span class="codeline" id="line-570"><code></code></span>
+<span class="codeline" id="line-571"><code>	// Error Number [16 bit uint]</code></span>
+<span class="codeline" id="line-572"><code>	errno := binary.LittleEndian.Uint16(data[1:3])</code></span>
+<span class="codeline" id="line-573"><code></code></span>
+<span class="codeline" id="line-574"><code>	// 1792: ER_CANT_EXECUTE_IN_READ_ONLY_TRANSACTION</code></span>
+<span class="codeline" id="line-575"><code>	// 1290: ER_OPTION_PREVENTS_STATEMENT (returned by Aurora during failover)</code></span>
+<span class="codeline" id="line-576"><code>	if (errno == 1792 || errno == 1290) &amp;&amp; mc.cfg.RejectReadOnly {</code></span>
+<span class="codeline" id="line-577"><code>		// Oops; we are connected to a read-only connection, and won't be able</code></span>
+<span class="codeline" id="line-578"><code>		// to issue any write statements. Since RejectReadOnly is configured,</code></span>
+<span class="codeline" id="line-579"><code>		// we throw away this connection hoping this one would have write</code></span>
+<span class="codeline" id="line-580"><code>		// permission. This is specifically for a possible race condition</code></span>
+<span class="codeline" id="line-581"><code>		// during failover (e.g. on AWS Aurora). See README.md for more.</code></span>
+<span class="codeline" id="line-582"><code>		//</code></span>
+<span class="codeline" id="line-583"><code>		// We explicitly close the connection before returning</code></span>
+<span class="codeline" id="line-584"><code>		// driver.ErrBadConn to ensure that `database/sql` purges this</code></span>
+<span class="codeline" id="line-585"><code>		// connection and initiates a new one for next statement next time.</code></span>
+<span class="codeline" id="line-586"><code>		mc.Close()</code></span>
+<span class="codeline" id="line-587"><code>		return driver.ErrBadConn</code></span>
+<span class="codeline" id="line-588"><code>	}</code></span>
+<span class="codeline" id="line-589"><code></code></span>
+<span class="codeline" id="line-590"><code>	pos := 3</code></span>
+<span class="codeline" id="line-591"><code></code></span>
+<span class="codeline" id="line-592"><code>	// SQL State [optional: # + 5bytes string]</code></span>
+<span class="codeline" id="line-593"><code>	if data[3] == 0x23 {</code></span>
+<span class="codeline" id="line-594"><code>		//sqlstate := string(data[4 : 4+5])</code></span>
+<span class="codeline" id="line-595"><code>		pos = 9</code></span>
+<span class="codeline" id="line-596"><code>	}</code></span>
+<span class="codeline" id="line-597"><code></code></span>
+<span class="codeline" id="line-598"><code>	// Error Message [string]</code></span>
+<span class="codeline" id="line-599"><code>	return &amp;MySQLError{</code></span>
+<span class="codeline" id="line-600"><code>		Number:  errno,</code></span>
+<span class="codeline" id="line-601"><code>		Message: string(data[pos:]),</code></span>
+<span class="codeline" id="line-602"><code>	}</code></span>
+<span class="codeline" id="line-603"><code>}</code></span>
+<span class="codeline" id="line-604"><code></code></span>
+<span class="codeline" id="line-605"><code>func readStatus(b []byte) statusFlag {</code></span>
+<span class="codeline" id="line-606"><code>	return statusFlag(b[0]) | statusFlag(b[1])&lt;&lt;8</code></span>
+<span class="codeline" id="line-607"><code>}</code></span>
+<span class="codeline" id="line-608"><code></code></span>
+<span class="codeline" id="line-609"><code>// Ok Packet</code></span>
+<span class="codeline" id="line-610"><code>// http://dev.mysql.com/doc/internals/en/generic-response-packets.html#packet-OK_Packet</code></span>
+<span class="codeline" id="line-611"><code>func (mc *mysqlConn) handleOkPacket(data []byte) error {</code></span>
+<span class="codeline" id="line-612"><code>	var n, m int</code></span>
+<span class="codeline" id="line-613"><code></code></span>
+<span class="codeline" id="line-614"><code>	// 0x00 [1 byte]</code></span>
+<span class="codeline" id="line-615"><code></code></span>
+<span class="codeline" id="line-616"><code>	// Affected rows [Length Coded Binary]</code></span>
+<span class="codeline" id="line-617"><code>	mc.affectedRows, _, n = readLengthEncodedInteger(data[1:])</code></span>
+<span class="codeline" id="line-618"><code></code></span>
+<span class="codeline" id="line-619"><code>	// Insert id [Length Coded Binary]</code></span>
+<span class="codeline" id="line-620"><code>	mc.insertId, _, m = readLengthEncodedInteger(data[1+n:])</code></span>
+<span class="codeline" id="line-621"><code></code></span>
+<span class="codeline" id="line-622"><code>	// server_status [2 bytes]</code></span>
+<span class="codeline" id="line-623"><code>	mc.status = readStatus(data[1+n+m : 1+n+m+2])</code></span>
+<span class="codeline" id="line-624"><code>	if mc.status&amp;statusMoreResultsExists != 0 {</code></span>
+<span class="codeline" id="line-625"><code>		return nil</code></span>
+<span class="codeline" id="line-626"><code>	}</code></span>
+<span class="codeline" id="line-627"><code></code></span>
+<span class="codeline" id="line-628"><code>	// warning count [2 bytes]</code></span>
+<span class="codeline" id="line-629"><code></code></span>
+<span class="codeline" id="line-630"><code>	return nil</code></span>
+<span class="codeline" id="line-631"><code>}</code></span>
+<span class="codeline" id="line-632"><code></code></span>
+<span class="codeline" id="line-633"><code>// Read Packets as Field Packets until EOF-Packet or an Error appears</code></span>
+<span class="codeline" id="line-634"><code>// http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-Protocol::ColumnDefinition41</code></span>
+<span class="codeline" id="line-635"><code>func (mc *mysqlConn) readColumns(count int) ([]mysqlField, error) {</code></span>
+<span class="codeline" id="line-636"><code>	columns := make([]mysqlField, count)</code></span>
+<span class="codeline" id="line-637"><code></code></span>
+<span class="codeline" id="line-638"><code>	for i := 0; ; i++ {</code></span>
+<span class="codeline" id="line-639"><code>		data, err := mc.readPacket()</code></span>
+<span class="codeline" id="line-640"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-641"><code>			return nil, err</code></span>
+<span class="codeline" id="line-642"><code>		}</code></span>
+<span class="codeline" id="line-643"><code></code></span>
+<span class="codeline" id="line-644"><code>		// EOF Packet</code></span>
+<span class="codeline" id="line-645"><code>		if data[0] == iEOF &amp;&amp; (len(data) == 5 || len(data) == 1) {</code></span>
+<span class="codeline" id="line-646"><code>			if i == count {</code></span>
+<span class="codeline" id="line-647"><code>				return columns, nil</code></span>
+<span class="codeline" id="line-648"><code>			}</code></span>
+<span class="codeline" id="line-649"><code>			return nil, fmt.Errorf("column count mismatch n:%d len:%d", count, len(columns))</code></span>
+<span class="codeline" id="line-650"><code>		}</code></span>
+<span class="codeline" id="line-651"><code></code></span>
+<span class="codeline" id="line-652"><code>		// Catalog</code></span>
+<span class="codeline" id="line-653"><code>		pos, err := skipLengthEncodedString(data)</code></span>
+<span class="codeline" id="line-654"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-655"><code>			return nil, err</code></span>
+<span class="codeline" id="line-656"><code>		}</code></span>
+<span class="codeline" id="line-657"><code></code></span>
+<span class="codeline" id="line-658"><code>		// Database [len coded string]</code></span>
+<span class="codeline" id="line-659"><code>		n, err := skipLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-660"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-661"><code>			return nil, err</code></span>
+<span class="codeline" id="line-662"><code>		}</code></span>
+<span class="codeline" id="line-663"><code>		pos += n</code></span>
+<span class="codeline" id="line-664"><code></code></span>
+<span class="codeline" id="line-665"><code>		// Table [len coded string]</code></span>
+<span class="codeline" id="line-666"><code>		if mc.cfg.ColumnsWithAlias {</code></span>
+<span class="codeline" id="line-667"><code>			tableName, _, n, err := readLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-668"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-669"><code>				return nil, err</code></span>
+<span class="codeline" id="line-670"><code>			}</code></span>
+<span class="codeline" id="line-671"><code>			pos += n</code></span>
+<span class="codeline" id="line-672"><code>			columns[i].tableName = string(tableName)</code></span>
+<span class="codeline" id="line-673"><code>		} else {</code></span>
+<span class="codeline" id="line-674"><code>			n, err = skipLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-675"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-676"><code>				return nil, err</code></span>
+<span class="codeline" id="line-677"><code>			}</code></span>
+<span class="codeline" id="line-678"><code>			pos += n</code></span>
+<span class="codeline" id="line-679"><code>		}</code></span>
+<span class="codeline" id="line-680"><code></code></span>
+<span class="codeline" id="line-681"><code>		// Original table [len coded string]</code></span>
+<span class="codeline" id="line-682"><code>		n, err = skipLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-683"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-684"><code>			return nil, err</code></span>
+<span class="codeline" id="line-685"><code>		}</code></span>
+<span class="codeline" id="line-686"><code>		pos += n</code></span>
+<span class="codeline" id="line-687"><code></code></span>
+<span class="codeline" id="line-688"><code>		// Name [len coded string]</code></span>
+<span class="codeline" id="line-689"><code>		name, _, n, err := readLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-690"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-691"><code>			return nil, err</code></span>
+<span class="codeline" id="line-692"><code>		}</code></span>
+<span class="codeline" id="line-693"><code>		columns[i].name = string(name)</code></span>
+<span class="codeline" id="line-694"><code>		pos += n</code></span>
+<span class="codeline" id="line-695"><code></code></span>
+<span class="codeline" id="line-696"><code>		// Original name [len coded string]</code></span>
+<span class="codeline" id="line-697"><code>		n, err = skipLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-698"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-699"><code>			return nil, err</code></span>
+<span class="codeline" id="line-700"><code>		}</code></span>
+<span class="codeline" id="line-701"><code>		pos += n</code></span>
+<span class="codeline" id="line-702"><code></code></span>
+<span class="codeline" id="line-703"><code>		// Filler [uint8]</code></span>
+<span class="codeline" id="line-704"><code>		pos++</code></span>
+<span class="codeline" id="line-705"><code></code></span>
+<span class="codeline" id="line-706"><code>		// Charset [charset, collation uint8]</code></span>
+<span class="codeline" id="line-707"><code>		columns[i].charSet = data[pos]</code></span>
+<span class="codeline" id="line-708"><code>		pos += 2</code></span>
+<span class="codeline" id="line-709"><code></code></span>
+<span class="codeline" id="line-710"><code>		// Length [uint32]</code></span>
+<span class="codeline" id="line-711"><code>		columns[i].length = binary.LittleEndian.Uint32(data[pos : pos+4])</code></span>
+<span class="codeline" id="line-712"><code>		pos += 4</code></span>
+<span class="codeline" id="line-713"><code></code></span>
+<span class="codeline" id="line-714"><code>		// Field type [uint8]</code></span>
+<span class="codeline" id="line-715"><code>		columns[i].fieldType = fieldType(data[pos])</code></span>
+<span class="codeline" id="line-716"><code>		pos++</code></span>
+<span class="codeline" id="line-717"><code></code></span>
+<span class="codeline" id="line-718"><code>		// Flags [uint16]</code></span>
+<span class="codeline" id="line-719"><code>		columns[i].flags = fieldFlag(binary.LittleEndian.Uint16(data[pos : pos+2]))</code></span>
+<span class="codeline" id="line-720"><code>		pos += 2</code></span>
+<span class="codeline" id="line-721"><code></code></span>
+<span class="codeline" id="line-722"><code>		// Decimals [uint8]</code></span>
+<span class="codeline" id="line-723"><code>		columns[i].decimals = data[pos]</code></span>
+<span class="codeline" id="line-724"><code>		//pos++</code></span>
+<span class="codeline" id="line-725"><code></code></span>
+<span class="codeline" id="line-726"><code>		// Default value [len coded binary]</code></span>
+<span class="codeline" id="line-727"><code>		//if pos &lt; len(data) {</code></span>
+<span class="codeline" id="line-728"><code>		//	defaultVal, _, err = bytesToLengthCodedBinary(data[pos:])</code></span>
+<span class="codeline" id="line-729"><code>		//}</code></span>
+<span class="codeline" id="line-730"><code>	}</code></span>
+<span class="codeline" id="line-731"><code>}</code></span>
+<span class="codeline" id="line-732"><code></code></span>
+<span class="codeline" id="line-733"><code>// Read Packets as Field Packets until EOF-Packet or an Error appears</code></span>
+<span class="codeline" id="line-734"><code>// http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-ProtocolText::ResultsetRow</code></span>
+<span class="codeline" id="line-735"><code>func (rows *textRows) readRow(dest []driver.Value) error {</code></span>
+<span class="codeline" id="line-736"><code>	mc := rows.mc</code></span>
+<span class="codeline" id="line-737"><code></code></span>
+<span class="codeline" id="line-738"><code>	if rows.rs.done {</code></span>
+<span class="codeline" id="line-739"><code>		return io.EOF</code></span>
+<span class="codeline" id="line-740"><code>	}</code></span>
+<span class="codeline" id="line-741"><code></code></span>
+<span class="codeline" id="line-742"><code>	data, err := mc.readPacket()</code></span>
+<span class="codeline" id="line-743"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-744"><code>		return err</code></span>
+<span class="codeline" id="line-745"><code>	}</code></span>
+<span class="codeline" id="line-746"><code></code></span>
+<span class="codeline" id="line-747"><code>	// EOF Packet</code></span>
+<span class="codeline" id="line-748"><code>	if data[0] == iEOF &amp;&amp; len(data) == 5 {</code></span>
+<span class="codeline" id="line-749"><code>		// server_status [2 bytes]</code></span>
+<span class="codeline" id="line-750"><code>		rows.mc.status = readStatus(data[3:])</code></span>
+<span class="codeline" id="line-751"><code>		rows.rs.done = true</code></span>
+<span class="codeline" id="line-752"><code>		if !rows.HasNextResultSet() {</code></span>
+<span class="codeline" id="line-753"><code>			rows.mc = nil</code></span>
+<span class="codeline" id="line-754"><code>		}</code></span>
+<span class="codeline" id="line-755"><code>		return io.EOF</code></span>
+<span class="codeline" id="line-756"><code>	}</code></span>
+<span class="codeline" id="line-757"><code>	if data[0] == iERR {</code></span>
+<span class="codeline" id="line-758"><code>		rows.mc = nil</code></span>
+<span class="codeline" id="line-759"><code>		return mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-760"><code>	}</code></span>
+<span class="codeline" id="line-761"><code></code></span>
+<span class="codeline" id="line-762"><code>	// RowSet Packet</code></span>
+<span class="codeline" id="line-763"><code>	var n int</code></span>
+<span class="codeline" id="line-764"><code>	var isNull bool</code></span>
+<span class="codeline" id="line-765"><code>	pos := 0</code></span>
+<span class="codeline" id="line-766"><code></code></span>
+<span class="codeline" id="line-767"><code>	for i := range dest {</code></span>
+<span class="codeline" id="line-768"><code>		// Read bytes and convert to string</code></span>
+<span class="codeline" id="line-769"><code>		dest[i], isNull, n, err = readLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-770"><code>		pos += n</code></span>
+<span class="codeline" id="line-771"><code>		if err == nil {</code></span>
+<span class="codeline" id="line-772"><code>			if !isNull {</code></span>
+<span class="codeline" id="line-773"><code>				if !mc.parseTime {</code></span>
+<span class="codeline" id="line-774"><code>					continue</code></span>
+<span class="codeline" id="line-775"><code>				} else {</code></span>
+<span class="codeline" id="line-776"><code>					switch rows.rs.columns[i].fieldType {</code></span>
+<span class="codeline" id="line-777"><code>					case fieldTypeTimestamp, fieldTypeDateTime,</code></span>
+<span class="codeline" id="line-778"><code>						fieldTypeDate, fieldTypeNewDate:</code></span>
+<span class="codeline" id="line-779"><code>						dest[i], err = parseDateTime(</code></span>
+<span class="codeline" id="line-780"><code>							string(dest[i].([]byte)),</code></span>
+<span class="codeline" id="line-781"><code>							mc.cfg.Loc,</code></span>
+<span class="codeline" id="line-782"><code>						)</code></span>
+<span class="codeline" id="line-783"><code>						if err == nil {</code></span>
+<span class="codeline" id="line-784"><code>							continue</code></span>
+<span class="codeline" id="line-785"><code>						}</code></span>
+<span class="codeline" id="line-786"><code>					default:</code></span>
+<span class="codeline" id="line-787"><code>						continue</code></span>
+<span class="codeline" id="line-788"><code>					}</code></span>
+<span class="codeline" id="line-789"><code>				}</code></span>
+<span class="codeline" id="line-790"><code></code></span>
+<span class="codeline" id="line-791"><code>			} else {</code></span>
+<span class="codeline" id="line-792"><code>				dest[i] = nil</code></span>
+<span class="codeline" id="line-793"><code>				continue</code></span>
+<span class="codeline" id="line-794"><code>			}</code></span>
+<span class="codeline" id="line-795"><code>		}</code></span>
+<span class="codeline" id="line-796"><code>		return err // err != nil</code></span>
+<span class="codeline" id="line-797"><code>	}</code></span>
+<span class="codeline" id="line-798"><code></code></span>
+<span class="codeline" id="line-799"><code>	return nil</code></span>
+<span class="codeline" id="line-800"><code>}</code></span>
+<span class="codeline" id="line-801"><code></code></span>
+<span class="codeline" id="line-802"><code>// Reads Packets until EOF-Packet or an Error appears. Returns count of Packets read</code></span>
+<span class="codeline" id="line-803"><code>func (mc *mysqlConn) readUntilEOF() error {</code></span>
+<span class="codeline" id="line-804"><code>	for {</code></span>
+<span class="codeline" id="line-805"><code>		data, err := mc.readPacket()</code></span>
+<span class="codeline" id="line-806"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-807"><code>			return err</code></span>
+<span class="codeline" id="line-808"><code>		}</code></span>
+<span class="codeline" id="line-809"><code></code></span>
+<span class="codeline" id="line-810"><code>		switch data[0] {</code></span>
+<span class="codeline" id="line-811"><code>		case iERR:</code></span>
+<span class="codeline" id="line-812"><code>			return mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-813"><code>		case iEOF:</code></span>
+<span class="codeline" id="line-814"><code>			if len(data) == 5 {</code></span>
+<span class="codeline" id="line-815"><code>				mc.status = readStatus(data[3:])</code></span>
+<span class="codeline" id="line-816"><code>			}</code></span>
+<span class="codeline" id="line-817"><code>			return nil</code></span>
+<span class="codeline" id="line-818"><code>		}</code></span>
+<span class="codeline" id="line-819"><code>	}</code></span>
+<span class="codeline" id="line-820"><code>}</code></span>
+<span class="codeline" id="line-821"><code></code></span>
+<span class="codeline" id="line-822"><code>/******************************************************************************</code></span>
+<span class="codeline" id="line-823"><code>*                           Prepared Statements                               *</code></span>
+<span class="codeline" id="line-824"><code>******************************************************************************/</code></span>
+<span class="codeline" id="line-825"><code></code></span>
+<span class="codeline" id="line-826"><code>// Prepare Result Packets</code></span>
+<span class="codeline" id="line-827"><code>// http://dev.mysql.com/doc/internals/en/com-stmt-prepare-response.html</code></span>
+<span class="codeline" id="line-828"><code>func (stmt *mysqlStmt) readPrepareResultPacket() (uint16, error) {</code></span>
+<span class="codeline" id="line-829"><code>	data, err := stmt.mc.readPacket()</code></span>
+<span class="codeline" id="line-830"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-831"><code>		// packet indicator [1 byte]</code></span>
+<span class="codeline" id="line-832"><code>		if data[0] != iOK {</code></span>
+<span class="codeline" id="line-833"><code>			return 0, stmt.mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-834"><code>		}</code></span>
+<span class="codeline" id="line-835"><code></code></span>
+<span class="codeline" id="line-836"><code>		// statement id [4 bytes]</code></span>
+<span class="codeline" id="line-837"><code>		stmt.id = binary.LittleEndian.Uint32(data[1:5])</code></span>
+<span class="codeline" id="line-838"><code></code></span>
+<span class="codeline" id="line-839"><code>		// Column count [16 bit uint]</code></span>
+<span class="codeline" id="line-840"><code>		columnCount := binary.LittleEndian.Uint16(data[5:7])</code></span>
+<span class="codeline" id="line-841"><code></code></span>
+<span class="codeline" id="line-842"><code>		// Param count [16 bit uint]</code></span>
+<span class="codeline" id="line-843"><code>		stmt.paramCount = int(binary.LittleEndian.Uint16(data[7:9]))</code></span>
+<span class="codeline" id="line-844"><code></code></span>
+<span class="codeline" id="line-845"><code>		// Reserved [8 bit]</code></span>
+<span class="codeline" id="line-846"><code></code></span>
+<span class="codeline" id="line-847"><code>		// Warning count [16 bit uint]</code></span>
+<span class="codeline" id="line-848"><code></code></span>
+<span class="codeline" id="line-849"><code>		return columnCount, nil</code></span>
+<span class="codeline" id="line-850"><code>	}</code></span>
+<span class="codeline" id="line-851"><code>	return 0, err</code></span>
+<span class="codeline" id="line-852"><code>}</code></span>
+<span class="codeline" id="line-853"><code></code></span>
+<span class="codeline" id="line-854"><code>// http://dev.mysql.com/doc/internals/en/com-stmt-send-long-data.html</code></span>
+<span class="codeline" id="line-855"><code>func (stmt *mysqlStmt) writeCommandLongData(paramID int, arg []byte) error {</code></span>
+<span class="codeline" id="line-856"><code>	maxLen := stmt.mc.maxAllowedPacket - 1</code></span>
+<span class="codeline" id="line-857"><code>	pktLen := maxLen</code></span>
+<span class="codeline" id="line-858"><code></code></span>
+<span class="codeline" id="line-859"><code>	// After the header (bytes 0-3) follows before the data:</code></span>
+<span class="codeline" id="line-860"><code>	// 1 byte command</code></span>
+<span class="codeline" id="line-861"><code>	// 4 bytes stmtID</code></span>
+<span class="codeline" id="line-862"><code>	// 2 bytes paramID</code></span>
+<span class="codeline" id="line-863"><code>	const dataOffset = 1 + 4 + 2</code></span>
+<span class="codeline" id="line-864"><code></code></span>
+<span class="codeline" id="line-865"><code>	// Cannot use the write buffer since</code></span>
+<span class="codeline" id="line-866"><code>	// a) the buffer is too small</code></span>
+<span class="codeline" id="line-867"><code>	// b) it is in use</code></span>
+<span class="codeline" id="line-868"><code>	data := make([]byte, 4+1+4+2+len(arg))</code></span>
+<span class="codeline" id="line-869"><code></code></span>
+<span class="codeline" id="line-870"><code>	copy(data[4+dataOffset:], arg)</code></span>
+<span class="codeline" id="line-871"><code></code></span>
+<span class="codeline" id="line-872"><code>	for argLen := len(arg); argLen &gt; 0; argLen -= pktLen - dataOffset {</code></span>
+<span class="codeline" id="line-873"><code>		if dataOffset+argLen &lt; maxLen {</code></span>
+<span class="codeline" id="line-874"><code>			pktLen = dataOffset + argLen</code></span>
+<span class="codeline" id="line-875"><code>		}</code></span>
+<span class="codeline" id="line-876"><code></code></span>
+<span class="codeline" id="line-877"><code>		stmt.mc.sequence = 0</code></span>
+<span class="codeline" id="line-878"><code>		// Add command byte [1 byte]</code></span>
+<span class="codeline" id="line-879"><code>		data[4] = comStmtSendLongData</code></span>
+<span class="codeline" id="line-880"><code></code></span>
+<span class="codeline" id="line-881"><code>		// Add stmtID [32 bit]</code></span>
+<span class="codeline" id="line-882"><code>		data[5] = byte(stmt.id)</code></span>
+<span class="codeline" id="line-883"><code>		data[6] = byte(stmt.id &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-884"><code>		data[7] = byte(stmt.id &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-885"><code>		data[8] = byte(stmt.id &gt;&gt; 24)</code></span>
+<span class="codeline" id="line-886"><code></code></span>
+<span class="codeline" id="line-887"><code>		// Add paramID [16 bit]</code></span>
+<span class="codeline" id="line-888"><code>		data[9] = byte(paramID)</code></span>
+<span class="codeline" id="line-889"><code>		data[10] = byte(paramID &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-890"><code></code></span>
+<span class="codeline" id="line-891"><code>		// Send CMD packet</code></span>
+<span class="codeline" id="line-892"><code>		err := stmt.mc.writePacket(data[:4+pktLen])</code></span>
+<span class="codeline" id="line-893"><code>		if err == nil {</code></span>
+<span class="codeline" id="line-894"><code>			data = data[pktLen-dataOffset:]</code></span>
+<span class="codeline" id="line-895"><code>			continue</code></span>
+<span class="codeline" id="line-896"><code>		}</code></span>
+<span class="codeline" id="line-897"><code>		return err</code></span>
+<span class="codeline" id="line-898"><code></code></span>
+<span class="codeline" id="line-899"><code>	}</code></span>
+<span class="codeline" id="line-900"><code></code></span>
+<span class="codeline" id="line-901"><code>	// Reset Packet Sequence</code></span>
+<span class="codeline" id="line-902"><code>	stmt.mc.sequence = 0</code></span>
+<span class="codeline" id="line-903"><code>	return nil</code></span>
+<span class="codeline" id="line-904"><code>}</code></span>
+<span class="codeline" id="line-905"><code></code></span>
+<span class="codeline" id="line-906"><code>// Execute Prepared Statement</code></span>
+<span class="codeline" id="line-907"><code>// http://dev.mysql.com/doc/internals/en/com-stmt-execute.html</code></span>
+<span class="codeline" id="line-908"><code>func (stmt *mysqlStmt) writeExecutePacket(args []driver.Value) error {</code></span>
+<span class="codeline" id="line-909"><code>	if len(args) != stmt.paramCount {</code></span>
+<span class="codeline" id="line-910"><code>		return fmt.Errorf(</code></span>
+<span class="codeline" id="line-911"><code>			"argument count mismatch (got: %d; has: %d)",</code></span>
+<span class="codeline" id="line-912"><code>			len(args),</code></span>
+<span class="codeline" id="line-913"><code>			stmt.paramCount,</code></span>
+<span class="codeline" id="line-914"><code>		)</code></span>
+<span class="codeline" id="line-915"><code>	}</code></span>
+<span class="codeline" id="line-916"><code></code></span>
+<span class="codeline" id="line-917"><code>	const minPktLen = 4 + 1 + 4 + 1 + 4</code></span>
+<span class="codeline" id="line-918"><code>	mc := stmt.mc</code></span>
+<span class="codeline" id="line-919"><code></code></span>
+<span class="codeline" id="line-920"><code>	// Determine threshold dynamically to avoid packet size shortage.</code></span>
+<span class="codeline" id="line-921"><code>	longDataSize := mc.maxAllowedPacket / (stmt.paramCount + 1)</code></span>
+<span class="codeline" id="line-922"><code>	if longDataSize &lt; 64 {</code></span>
+<span class="codeline" id="line-923"><code>		longDataSize = 64</code></span>
+<span class="codeline" id="line-924"><code>	}</code></span>
+<span class="codeline" id="line-925"><code></code></span>
+<span class="codeline" id="line-926"><code>	// Reset packet-sequence</code></span>
+<span class="codeline" id="line-927"><code>	mc.sequence = 0</code></span>
+<span class="codeline" id="line-928"><code></code></span>
+<span class="codeline" id="line-929"><code>	var data []byte</code></span>
+<span class="codeline" id="line-930"><code>	var err error</code></span>
+<span class="codeline" id="line-931"><code></code></span>
+<span class="codeline" id="line-932"><code>	if len(args) == 0 {</code></span>
+<span class="codeline" id="line-933"><code>		data, err = mc.buf.takeBuffer(minPktLen)</code></span>
+<span class="codeline" id="line-934"><code>	} else {</code></span>
+<span class="codeline" id="line-935"><code>		data, err = mc.buf.takeCompleteBuffer()</code></span>
+<span class="codeline" id="line-936"><code>		// In this case the len(data) == cap(data) which is used to optimise the flow below.</code></span>
+<span class="codeline" id="line-937"><code>	}</code></span>
+<span class="codeline" id="line-938"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-939"><code>		// cannot take the buffer. Something must be wrong with the connection</code></span>
+<span class="codeline" id="line-940"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-941"><code>		return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-942"><code>	}</code></span>
+<span class="codeline" id="line-943"><code></code></span>
+<span class="codeline" id="line-944"><code>	// command [1 byte]</code></span>
+<span class="codeline" id="line-945"><code>	data[4] = comStmtExecute</code></span>
+<span class="codeline" id="line-946"><code></code></span>
+<span class="codeline" id="line-947"><code>	// statement_id [4 bytes]</code></span>
+<span class="codeline" id="line-948"><code>	data[5] = byte(stmt.id)</code></span>
+<span class="codeline" id="line-949"><code>	data[6] = byte(stmt.id &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-950"><code>	data[7] = byte(stmt.id &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-951"><code>	data[8] = byte(stmt.id &gt;&gt; 24)</code></span>
+<span class="codeline" id="line-952"><code></code></span>
+<span class="codeline" id="line-953"><code>	// flags (0: CURSOR_TYPE_NO_CURSOR) [1 byte]</code></span>
+<span class="codeline" id="line-954"><code>	data[9] = 0x00</code></span>
+<span class="codeline" id="line-955"><code></code></span>
+<span class="codeline" id="line-956"><code>	// iteration_count (uint32(1)) [4 bytes]</code></span>
+<span class="codeline" id="line-957"><code>	data[10] = 0x01</code></span>
+<span class="codeline" id="line-958"><code>	data[11] = 0x00</code></span>
+<span class="codeline" id="line-959"><code>	data[12] = 0x00</code></span>
+<span class="codeline" id="line-960"><code>	data[13] = 0x00</code></span>
+<span class="codeline" id="line-961"><code></code></span>
+<span class="codeline" id="line-962"><code>	if len(args) &gt; 0 {</code></span>
+<span class="codeline" id="line-963"><code>		pos := minPktLen</code></span>
+<span class="codeline" id="line-964"><code></code></span>
+<span class="codeline" id="line-965"><code>		var nullMask []byte</code></span>
+<span class="codeline" id="line-966"><code>		if maskLen, typesLen := (len(args)+7)/8, 1+2*len(args); pos+maskLen+typesLen &gt;= cap(data) {</code></span>
+<span class="codeline" id="line-967"><code>			// buffer has to be extended but we don't know by how much so</code></span>
+<span class="codeline" id="line-968"><code>			// we depend on append after all data with known sizes fit.</code></span>
+<span class="codeline" id="line-969"><code>			// We stop at that because we deal with a lot of columns here</code></span>
+<span class="codeline" id="line-970"><code>			// which makes the required allocation size hard to guess.</code></span>
+<span class="codeline" id="line-971"><code>			tmp := make([]byte, pos+maskLen+typesLen)</code></span>
+<span class="codeline" id="line-972"><code>			copy(tmp[:pos], data[:pos])</code></span>
+<span class="codeline" id="line-973"><code>			data = tmp</code></span>
+<span class="codeline" id="line-974"><code>			nullMask = data[pos : pos+maskLen]</code></span>
+<span class="codeline" id="line-975"><code>			// No need to clean nullMask as make ensures that.</code></span>
+<span class="codeline" id="line-976"><code>			pos += maskLen</code></span>
+<span class="codeline" id="line-977"><code>		} else {</code></span>
+<span class="codeline" id="line-978"><code>			nullMask = data[pos : pos+maskLen]</code></span>
+<span class="codeline" id="line-979"><code>			for i := range nullMask {</code></span>
+<span class="codeline" id="line-980"><code>				nullMask[i] = 0</code></span>
+<span class="codeline" id="line-981"><code>			}</code></span>
+<span class="codeline" id="line-982"><code>			pos += maskLen</code></span>
+<span class="codeline" id="line-983"><code>		}</code></span>
+<span class="codeline" id="line-984"><code></code></span>
+<span class="codeline" id="line-985"><code>		// newParameterBoundFlag 1 [1 byte]</code></span>
+<span class="codeline" id="line-986"><code>		data[pos] = 0x01</code></span>
+<span class="codeline" id="line-987"><code>		pos++</code></span>
+<span class="codeline" id="line-988"><code></code></span>
+<span class="codeline" id="line-989"><code>		// type of each parameter [len(args)*2 bytes]</code></span>
+<span class="codeline" id="line-990"><code>		paramTypes := data[pos:]</code></span>
+<span class="codeline" id="line-991"><code>		pos += len(args) * 2</code></span>
+<span class="codeline" id="line-992"><code></code></span>
+<span class="codeline" id="line-993"><code>		// value of each parameter [n bytes]</code></span>
+<span class="codeline" id="line-994"><code>		paramValues := data[pos:pos]</code></span>
+<span class="codeline" id="line-995"><code>		valuesCap := cap(paramValues)</code></span>
+<span class="codeline" id="line-996"><code></code></span>
+<span class="codeline" id="line-997"><code>		for i, arg := range args {</code></span>
+<span class="codeline" id="line-998"><code>			// build NULL-bitmap</code></span>
+<span class="codeline" id="line-999"><code>			if arg == nil {</code></span>
+<span class="codeline" id="line-1000"><code>				nullMask[i/8] |= 1 &lt;&lt; (uint(i) &amp; 7)</code></span>
+<span class="codeline" id="line-1001"><code>				paramTypes[i+i] = byte(fieldTypeNULL)</code></span>
+<span class="codeline" id="line-1002"><code>				paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1003"><code>				continue</code></span>
+<span class="codeline" id="line-1004"><code>			}</code></span>
+<span class="codeline" id="line-1005"><code></code></span>
+<span class="codeline" id="line-1006"><code>			// cache types and values</code></span>
+<span class="codeline" id="line-1007"><code>			switch v := arg.(type) {</code></span>
+<span class="codeline" id="line-1008"><code>			case int64:</code></span>
+<span class="codeline" id="line-1009"><code>				paramTypes[i+i] = byte(fieldTypeLongLong)</code></span>
+<span class="codeline" id="line-1010"><code>				paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1011"><code></code></span>
+<span class="codeline" id="line-1012"><code>				if cap(paramValues)-len(paramValues)-8 &gt;= 0 {</code></span>
+<span class="codeline" id="line-1013"><code>					paramValues = paramValues[:len(paramValues)+8]</code></span>
+<span class="codeline" id="line-1014"><code>					binary.LittleEndian.PutUint64(</code></span>
+<span class="codeline" id="line-1015"><code>						paramValues[len(paramValues)-8:],</code></span>
+<span class="codeline" id="line-1016"><code>						uint64(v),</code></span>
+<span class="codeline" id="line-1017"><code>					)</code></span>
+<span class="codeline" id="line-1018"><code>				} else {</code></span>
+<span class="codeline" id="line-1019"><code>					paramValues = append(paramValues,</code></span>
+<span class="codeline" id="line-1020"><code>						uint64ToBytes(uint64(v))...,</code></span>
+<span class="codeline" id="line-1021"><code>					)</code></span>
+<span class="codeline" id="line-1022"><code>				}</code></span>
+<span class="codeline" id="line-1023"><code></code></span>
+<span class="codeline" id="line-1024"><code>			case uint64:</code></span>
+<span class="codeline" id="line-1025"><code>				paramTypes[i+i] = byte(fieldTypeLongLong)</code></span>
+<span class="codeline" id="line-1026"><code>				paramTypes[i+i+1] = 0x80 // type is unsigned</code></span>
+<span class="codeline" id="line-1027"><code></code></span>
+<span class="codeline" id="line-1028"><code>				if cap(paramValues)-len(paramValues)-8 &gt;= 0 {</code></span>
+<span class="codeline" id="line-1029"><code>					paramValues = paramValues[:len(paramValues)+8]</code></span>
+<span class="codeline" id="line-1030"><code>					binary.LittleEndian.PutUint64(</code></span>
+<span class="codeline" id="line-1031"><code>						paramValues[len(paramValues)-8:],</code></span>
+<span class="codeline" id="line-1032"><code>						uint64(v),</code></span>
+<span class="codeline" id="line-1033"><code>					)</code></span>
+<span class="codeline" id="line-1034"><code>				} else {</code></span>
+<span class="codeline" id="line-1035"><code>					paramValues = append(paramValues,</code></span>
+<span class="codeline" id="line-1036"><code>						uint64ToBytes(uint64(v))...,</code></span>
+<span class="codeline" id="line-1037"><code>					)</code></span>
+<span class="codeline" id="line-1038"><code>				}</code></span>
+<span class="codeline" id="line-1039"><code></code></span>
+<span class="codeline" id="line-1040"><code>			case float64:</code></span>
+<span class="codeline" id="line-1041"><code>				paramTypes[i+i] = byte(fieldTypeDouble)</code></span>
+<span class="codeline" id="line-1042"><code>				paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1043"><code></code></span>
+<span class="codeline" id="line-1044"><code>				if cap(paramValues)-len(paramValues)-8 &gt;= 0 {</code></span>
+<span class="codeline" id="line-1045"><code>					paramValues = paramValues[:len(paramValues)+8]</code></span>
+<span class="codeline" id="line-1046"><code>					binary.LittleEndian.PutUint64(</code></span>
+<span class="codeline" id="line-1047"><code>						paramValues[len(paramValues)-8:],</code></span>
+<span class="codeline" id="line-1048"><code>						math.Float64bits(v),</code></span>
+<span class="codeline" id="line-1049"><code>					)</code></span>
+<span class="codeline" id="line-1050"><code>				} else {</code></span>
+<span class="codeline" id="line-1051"><code>					paramValues = append(paramValues,</code></span>
+<span class="codeline" id="line-1052"><code>						uint64ToBytes(math.Float64bits(v))...,</code></span>
+<span class="codeline" id="line-1053"><code>					)</code></span>
+<span class="codeline" id="line-1054"><code>				}</code></span>
+<span class="codeline" id="line-1055"><code></code></span>
+<span class="codeline" id="line-1056"><code>			case bool:</code></span>
+<span class="codeline" id="line-1057"><code>				paramTypes[i+i] = byte(fieldTypeTiny)</code></span>
+<span class="codeline" id="line-1058"><code>				paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1059"><code></code></span>
+<span class="codeline" id="line-1060"><code>				if v {</code></span>
+<span class="codeline" id="line-1061"><code>					paramValues = append(paramValues, 0x01)</code></span>
+<span class="codeline" id="line-1062"><code>				} else {</code></span>
+<span class="codeline" id="line-1063"><code>					paramValues = append(paramValues, 0x00)</code></span>
+<span class="codeline" id="line-1064"><code>				}</code></span>
+<span class="codeline" id="line-1065"><code></code></span>
+<span class="codeline" id="line-1066"><code>			case []byte:</code></span>
+<span class="codeline" id="line-1067"><code>				// Common case (non-nil value) first</code></span>
+<span class="codeline" id="line-1068"><code>				if v != nil {</code></span>
+<span class="codeline" id="line-1069"><code>					paramTypes[i+i] = byte(fieldTypeString)</code></span>
+<span class="codeline" id="line-1070"><code>					paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1071"><code></code></span>
+<span class="codeline" id="line-1072"><code>					if len(v) &lt; longDataSize {</code></span>
+<span class="codeline" id="line-1073"><code>						paramValues = appendLengthEncodedInteger(paramValues,</code></span>
+<span class="codeline" id="line-1074"><code>							uint64(len(v)),</code></span>
+<span class="codeline" id="line-1075"><code>						)</code></span>
+<span class="codeline" id="line-1076"><code>						paramValues = append(paramValues, v...)</code></span>
+<span class="codeline" id="line-1077"><code>					} else {</code></span>
+<span class="codeline" id="line-1078"><code>						if err := stmt.writeCommandLongData(i, v); err != nil {</code></span>
+<span class="codeline" id="line-1079"><code>							return err</code></span>
+<span class="codeline" id="line-1080"><code>						}</code></span>
+<span class="codeline" id="line-1081"><code>					}</code></span>
+<span class="codeline" id="line-1082"><code>					continue</code></span>
+<span class="codeline" id="line-1083"><code>				}</code></span>
+<span class="codeline" id="line-1084"><code></code></span>
+<span class="codeline" id="line-1085"><code>				// Handle []byte(nil) as a NULL value</code></span>
+<span class="codeline" id="line-1086"><code>				nullMask[i/8] |= 1 &lt;&lt; (uint(i) &amp; 7)</code></span>
+<span class="codeline" id="line-1087"><code>				paramTypes[i+i] = byte(fieldTypeNULL)</code></span>
+<span class="codeline" id="line-1088"><code>				paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1089"><code></code></span>
+<span class="codeline" id="line-1090"><code>			case string:</code></span>
+<span class="codeline" id="line-1091"><code>				paramTypes[i+i] = byte(fieldTypeString)</code></span>
+<span class="codeline" id="line-1092"><code>				paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1093"><code></code></span>
+<span class="codeline" id="line-1094"><code>				if len(v) &lt; longDataSize {</code></span>
+<span class="codeline" id="line-1095"><code>					paramValues = appendLengthEncodedInteger(paramValues,</code></span>
+<span class="codeline" id="line-1096"><code>						uint64(len(v)),</code></span>
+<span class="codeline" id="line-1097"><code>					)</code></span>
+<span class="codeline" id="line-1098"><code>					paramValues = append(paramValues, v...)</code></span>
+<span class="codeline" id="line-1099"><code>				} else {</code></span>
+<span class="codeline" id="line-1100"><code>					if err := stmt.writeCommandLongData(i, []byte(v)); err != nil {</code></span>
+<span class="codeline" id="line-1101"><code>						return err</code></span>
+<span class="codeline" id="line-1102"><code>					}</code></span>
+<span class="codeline" id="line-1103"><code>				}</code></span>
+<span class="codeline" id="line-1104"><code></code></span>
+<span class="codeline" id="line-1105"><code>			case time.Time:</code></span>
+<span class="codeline" id="line-1106"><code>				paramTypes[i+i] = byte(fieldTypeString)</code></span>
+<span class="codeline" id="line-1107"><code>				paramTypes[i+i+1] = 0x00</code></span>
+<span class="codeline" id="line-1108"><code></code></span>
+<span class="codeline" id="line-1109"><code>				var a [64]byte</code></span>
+<span class="codeline" id="line-1110"><code>				var b = a[:0]</code></span>
+<span class="codeline" id="line-1111"><code></code></span>
+<span class="codeline" id="line-1112"><code>				if v.IsZero() {</code></span>
+<span class="codeline" id="line-1113"><code>					b = append(b, "0000-00-00"...)</code></span>
+<span class="codeline" id="line-1114"><code>				} else {</code></span>
+<span class="codeline" id="line-1115"><code>					b = v.In(mc.cfg.Loc).AppendFormat(b, timeFormat)</code></span>
+<span class="codeline" id="line-1116"><code>				}</code></span>
+<span class="codeline" id="line-1117"><code></code></span>
+<span class="codeline" id="line-1118"><code>				paramValues = appendLengthEncodedInteger(paramValues,</code></span>
+<span class="codeline" id="line-1119"><code>					uint64(len(b)),</code></span>
+<span class="codeline" id="line-1120"><code>				)</code></span>
+<span class="codeline" id="line-1121"><code>				paramValues = append(paramValues, b...)</code></span>
+<span class="codeline" id="line-1122"><code></code></span>
+<span class="codeline" id="line-1123"><code>			default:</code></span>
+<span class="codeline" id="line-1124"><code>				return fmt.Errorf("cannot convert type: %T", arg)</code></span>
+<span class="codeline" id="line-1125"><code>			}</code></span>
+<span class="codeline" id="line-1126"><code>		}</code></span>
+<span class="codeline" id="line-1127"><code></code></span>
+<span class="codeline" id="line-1128"><code>		// Check if param values exceeded the available buffer</code></span>
+<span class="codeline" id="line-1129"><code>		// In that case we must build the data packet with the new values buffer</code></span>
+<span class="codeline" id="line-1130"><code>		if valuesCap != cap(paramValues) {</code></span>
+<span class="codeline" id="line-1131"><code>			data = append(data[:pos], paramValues...)</code></span>
+<span class="codeline" id="line-1132"><code>			if err = mc.buf.store(data); err != nil {</code></span>
+<span class="codeline" id="line-1133"><code>				errLog.Print(err)</code></span>
+<span class="codeline" id="line-1134"><code>				return errBadConnNoWrite</code></span>
+<span class="codeline" id="line-1135"><code>			}</code></span>
+<span class="codeline" id="line-1136"><code>		}</code></span>
+<span class="codeline" id="line-1137"><code></code></span>
+<span class="codeline" id="line-1138"><code>		pos += len(paramValues)</code></span>
+<span class="codeline" id="line-1139"><code>		data = data[:pos]</code></span>
+<span class="codeline" id="line-1140"><code>	}</code></span>
+<span class="codeline" id="line-1141"><code></code></span>
+<span class="codeline" id="line-1142"><code>	return mc.writePacket(data)</code></span>
+<span class="codeline" id="line-1143"><code>}</code></span>
+<span class="codeline" id="line-1144"><code></code></span>
+<span class="codeline" id="line-1145"><code>func (mc *mysqlConn) discardResults() error {</code></span>
+<span class="codeline" id="line-1146"><code>	for mc.status&amp;statusMoreResultsExists != 0 {</code></span>
+<span class="codeline" id="line-1147"><code>		resLen, err := mc.readResultSetHeaderPacket()</code></span>
+<span class="codeline" id="line-1148"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-1149"><code>			return err</code></span>
+<span class="codeline" id="line-1150"><code>		}</code></span>
+<span class="codeline" id="line-1151"><code>		if resLen &gt; 0 {</code></span>
+<span class="codeline" id="line-1152"><code>			// columns</code></span>
+<span class="codeline" id="line-1153"><code>			if err := mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-1154"><code>				return err</code></span>
+<span class="codeline" id="line-1155"><code>			}</code></span>
+<span class="codeline" id="line-1156"><code>			// rows</code></span>
+<span class="codeline" id="line-1157"><code>			if err := mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-1158"><code>				return err</code></span>
+<span class="codeline" id="line-1159"><code>			}</code></span>
+<span class="codeline" id="line-1160"><code>		}</code></span>
+<span class="codeline" id="line-1161"><code>	}</code></span>
+<span class="codeline" id="line-1162"><code>	return nil</code></span>
+<span class="codeline" id="line-1163"><code>}</code></span>
+<span class="codeline" id="line-1164"><code></code></span>
+<span class="codeline" id="line-1165"><code>// http://dev.mysql.com/doc/internals/en/binary-protocol-resultset-row.html</code></span>
+<span class="codeline" id="line-1166"><code>func (rows *binaryRows) readRow(dest []driver.Value) error {</code></span>
+<span class="codeline" id="line-1167"><code>	data, err := rows.mc.readPacket()</code></span>
+<span class="codeline" id="line-1168"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-1169"><code>		return err</code></span>
+<span class="codeline" id="line-1170"><code>	}</code></span>
+<span class="codeline" id="line-1171"><code></code></span>
+<span class="codeline" id="line-1172"><code>	// packet indicator [1 byte]</code></span>
+<span class="codeline" id="line-1173"><code>	if data[0] != iOK {</code></span>
+<span class="codeline" id="line-1174"><code>		// EOF Packet</code></span>
+<span class="codeline" id="line-1175"><code>		if data[0] == iEOF &amp;&amp; len(data) == 5 {</code></span>
+<span class="codeline" id="line-1176"><code>			rows.mc.status = readStatus(data[3:])</code></span>
+<span class="codeline" id="line-1177"><code>			rows.rs.done = true</code></span>
+<span class="codeline" id="line-1178"><code>			if !rows.HasNextResultSet() {</code></span>
+<span class="codeline" id="line-1179"><code>				rows.mc = nil</code></span>
+<span class="codeline" id="line-1180"><code>			}</code></span>
+<span class="codeline" id="line-1181"><code>			return io.EOF</code></span>
+<span class="codeline" id="line-1182"><code>		}</code></span>
+<span class="codeline" id="line-1183"><code>		mc := rows.mc</code></span>
+<span class="codeline" id="line-1184"><code>		rows.mc = nil</code></span>
+<span class="codeline" id="line-1185"><code></code></span>
+<span class="codeline" id="line-1186"><code>		// Error otherwise</code></span>
+<span class="codeline" id="line-1187"><code>		return mc.handleErrorPacket(data)</code></span>
+<span class="codeline" id="line-1188"><code>	}</code></span>
+<span class="codeline" id="line-1189"><code></code></span>
+<span class="codeline" id="line-1190"><code>	// NULL-bitmap,  [(column-count + 7 + 2) / 8 bytes]</code></span>
+<span class="codeline" id="line-1191"><code>	pos := 1 + (len(dest)+7+2)&gt;&gt;3</code></span>
+<span class="codeline" id="line-1192"><code>	nullMask := data[1:pos]</code></span>
+<span class="codeline" id="line-1193"><code></code></span>
+<span class="codeline" id="line-1194"><code>	for i := range dest {</code></span>
+<span class="codeline" id="line-1195"><code>		// Field is NULL</code></span>
+<span class="codeline" id="line-1196"><code>		// (byte &gt;&gt; bit-pos) % 2 == 1</code></span>
+<span class="codeline" id="line-1197"><code>		if ((nullMask[(i+2)&gt;&gt;3] &gt;&gt; uint((i+2)&amp;7)) &amp; 1) == 1 {</code></span>
+<span class="codeline" id="line-1198"><code>			dest[i] = nil</code></span>
+<span class="codeline" id="line-1199"><code>			continue</code></span>
+<span class="codeline" id="line-1200"><code>		}</code></span>
+<span class="codeline" id="line-1201"><code></code></span>
+<span class="codeline" id="line-1202"><code>		// Convert to byte-coded string</code></span>
+<span class="codeline" id="line-1203"><code>		switch rows.rs.columns[i].fieldType {</code></span>
+<span class="codeline" id="line-1204"><code>		case fieldTypeNULL:</code></span>
+<span class="codeline" id="line-1205"><code>			dest[i] = nil</code></span>
+<span class="codeline" id="line-1206"><code>			continue</code></span>
+<span class="codeline" id="line-1207"><code></code></span>
+<span class="codeline" id="line-1208"><code>		// Numeric Types</code></span>
+<span class="codeline" id="line-1209"><code>		case fieldTypeTiny:</code></span>
+<span class="codeline" id="line-1210"><code>			if rows.rs.columns[i].flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-1211"><code>				dest[i] = int64(data[pos])</code></span>
+<span class="codeline" id="line-1212"><code>			} else {</code></span>
+<span class="codeline" id="line-1213"><code>				dest[i] = int64(int8(data[pos]))</code></span>
+<span class="codeline" id="line-1214"><code>			}</code></span>
+<span class="codeline" id="line-1215"><code>			pos++</code></span>
+<span class="codeline" id="line-1216"><code>			continue</code></span>
+<span class="codeline" id="line-1217"><code></code></span>
+<span class="codeline" id="line-1218"><code>		case fieldTypeShort, fieldTypeYear:</code></span>
+<span class="codeline" id="line-1219"><code>			if rows.rs.columns[i].flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-1220"><code>				dest[i] = int64(binary.LittleEndian.Uint16(data[pos : pos+2]))</code></span>
+<span class="codeline" id="line-1221"><code>			} else {</code></span>
+<span class="codeline" id="line-1222"><code>				dest[i] = int64(int16(binary.LittleEndian.Uint16(data[pos : pos+2])))</code></span>
+<span class="codeline" id="line-1223"><code>			}</code></span>
+<span class="codeline" id="line-1224"><code>			pos += 2</code></span>
+<span class="codeline" id="line-1225"><code>			continue</code></span>
+<span class="codeline" id="line-1226"><code></code></span>
+<span class="codeline" id="line-1227"><code>		case fieldTypeInt24, fieldTypeLong:</code></span>
+<span class="codeline" id="line-1228"><code>			if rows.rs.columns[i].flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-1229"><code>				dest[i] = int64(binary.LittleEndian.Uint32(data[pos : pos+4]))</code></span>
+<span class="codeline" id="line-1230"><code>			} else {</code></span>
+<span class="codeline" id="line-1231"><code>				dest[i] = int64(int32(binary.LittleEndian.Uint32(data[pos : pos+4])))</code></span>
+<span class="codeline" id="line-1232"><code>			}</code></span>
+<span class="codeline" id="line-1233"><code>			pos += 4</code></span>
+<span class="codeline" id="line-1234"><code>			continue</code></span>
+<span class="codeline" id="line-1235"><code></code></span>
+<span class="codeline" id="line-1236"><code>		case fieldTypeLongLong:</code></span>
+<span class="codeline" id="line-1237"><code>			if rows.rs.columns[i].flags&amp;flagUnsigned != 0 {</code></span>
+<span class="codeline" id="line-1238"><code>				val := binary.LittleEndian.Uint64(data[pos : pos+8])</code></span>
+<span class="codeline" id="line-1239"><code>				if val &gt; math.MaxInt64 {</code></span>
+<span class="codeline" id="line-1240"><code>					dest[i] = uint64ToString(val)</code></span>
+<span class="codeline" id="line-1241"><code>				} else {</code></span>
+<span class="codeline" id="line-1242"><code>					dest[i] = int64(val)</code></span>
+<span class="codeline" id="line-1243"><code>				}</code></span>
+<span class="codeline" id="line-1244"><code>			} else {</code></span>
+<span class="codeline" id="line-1245"><code>				dest[i] = int64(binary.LittleEndian.Uint64(data[pos : pos+8]))</code></span>
+<span class="codeline" id="line-1246"><code>			}</code></span>
+<span class="codeline" id="line-1247"><code>			pos += 8</code></span>
+<span class="codeline" id="line-1248"><code>			continue</code></span>
+<span class="codeline" id="line-1249"><code></code></span>
+<span class="codeline" id="line-1250"><code>		case fieldTypeFloat:</code></span>
+<span class="codeline" id="line-1251"><code>			dest[i] = math.Float32frombits(binary.LittleEndian.Uint32(data[pos : pos+4]))</code></span>
+<span class="codeline" id="line-1252"><code>			pos += 4</code></span>
+<span class="codeline" id="line-1253"><code>			continue</code></span>
+<span class="codeline" id="line-1254"><code></code></span>
+<span class="codeline" id="line-1255"><code>		case fieldTypeDouble:</code></span>
+<span class="codeline" id="line-1256"><code>			dest[i] = math.Float64frombits(binary.LittleEndian.Uint64(data[pos : pos+8]))</code></span>
+<span class="codeline" id="line-1257"><code>			pos += 8</code></span>
+<span class="codeline" id="line-1258"><code>			continue</code></span>
+<span class="codeline" id="line-1259"><code></code></span>
+<span class="codeline" id="line-1260"><code>		// Length coded Binary Strings</code></span>
+<span class="codeline" id="line-1261"><code>		case fieldTypeDecimal, fieldTypeNewDecimal, fieldTypeVarChar,</code></span>
+<span class="codeline" id="line-1262"><code>			fieldTypeBit, fieldTypeEnum, fieldTypeSet, fieldTypeTinyBLOB,</code></span>
+<span class="codeline" id="line-1263"><code>			fieldTypeMediumBLOB, fieldTypeLongBLOB, fieldTypeBLOB,</code></span>
+<span class="codeline" id="line-1264"><code>			fieldTypeVarString, fieldTypeString, fieldTypeGeometry, fieldTypeJSON:</code></span>
+<span class="codeline" id="line-1265"><code>			var isNull bool</code></span>
+<span class="codeline" id="line-1266"><code>			var n int</code></span>
+<span class="codeline" id="line-1267"><code>			dest[i], isNull, n, err = readLengthEncodedString(data[pos:])</code></span>
+<span class="codeline" id="line-1268"><code>			pos += n</code></span>
+<span class="codeline" id="line-1269"><code>			if err == nil {</code></span>
+<span class="codeline" id="line-1270"><code>				if !isNull {</code></span>
+<span class="codeline" id="line-1271"><code>					continue</code></span>
+<span class="codeline" id="line-1272"><code>				} else {</code></span>
+<span class="codeline" id="line-1273"><code>					dest[i] = nil</code></span>
+<span class="codeline" id="line-1274"><code>					continue</code></span>
+<span class="codeline" id="line-1275"><code>				}</code></span>
+<span class="codeline" id="line-1276"><code>			}</code></span>
+<span class="codeline" id="line-1277"><code>			return err</code></span>
+<span class="codeline" id="line-1278"><code></code></span>
+<span class="codeline" id="line-1279"><code>		case</code></span>
+<span class="codeline" id="line-1280"><code>			fieldTypeDate, fieldTypeNewDate, // Date YYYY-MM-DD</code></span>
+<span class="codeline" id="line-1281"><code>			fieldTypeTime,                         // Time [-][H]HH:MM:SS[.fractal]</code></span>
+<span class="codeline" id="line-1282"><code>			fieldTypeTimestamp, fieldTypeDateTime: // Timestamp YYYY-MM-DD HH:MM:SS[.fractal]</code></span>
+<span class="codeline" id="line-1283"><code></code></span>
+<span class="codeline" id="line-1284"><code>			num, isNull, n := readLengthEncodedInteger(data[pos:])</code></span>
+<span class="codeline" id="line-1285"><code>			pos += n</code></span>
+<span class="codeline" id="line-1286"><code></code></span>
+<span class="codeline" id="line-1287"><code>			switch {</code></span>
+<span class="codeline" id="line-1288"><code>			case isNull:</code></span>
+<span class="codeline" id="line-1289"><code>				dest[i] = nil</code></span>
+<span class="codeline" id="line-1290"><code>				continue</code></span>
+<span class="codeline" id="line-1291"><code>			case rows.rs.columns[i].fieldType == fieldTypeTime:</code></span>
+<span class="codeline" id="line-1292"><code>				// database/sql does not support an equivalent to TIME, return a string</code></span>
+<span class="codeline" id="line-1293"><code>				var dstlen uint8</code></span>
+<span class="codeline" id="line-1294"><code>				switch decimals := rows.rs.columns[i].decimals; decimals {</code></span>
+<span class="codeline" id="line-1295"><code>				case 0x00, 0x1f:</code></span>
+<span class="codeline" id="line-1296"><code>					dstlen = 8</code></span>
+<span class="codeline" id="line-1297"><code>				case 1, 2, 3, 4, 5, 6:</code></span>
+<span class="codeline" id="line-1298"><code>					dstlen = 8 + 1 + decimals</code></span>
+<span class="codeline" id="line-1299"><code>				default:</code></span>
+<span class="codeline" id="line-1300"><code>					return fmt.Errorf(</code></span>
+<span class="codeline" id="line-1301"><code>						"protocol error, illegal decimals value %d",</code></span>
+<span class="codeline" id="line-1302"><code>						rows.rs.columns[i].decimals,</code></span>
+<span class="codeline" id="line-1303"><code>					)</code></span>
+<span class="codeline" id="line-1304"><code>				}</code></span>
+<span class="codeline" id="line-1305"><code>				dest[i], err = formatBinaryTime(data[pos:pos+int(num)], dstlen)</code></span>
+<span class="codeline" id="line-1306"><code>			case rows.mc.parseTime:</code></span>
+<span class="codeline" id="line-1307"><code>				dest[i], err = parseBinaryDateTime(num, data[pos:], rows.mc.cfg.Loc)</code></span>
+<span class="codeline" id="line-1308"><code>			default:</code></span>
+<span class="codeline" id="line-1309"><code>				var dstlen uint8</code></span>
+<span class="codeline" id="line-1310"><code>				if rows.rs.columns[i].fieldType == fieldTypeDate {</code></span>
+<span class="codeline" id="line-1311"><code>					dstlen = 10</code></span>
+<span class="codeline" id="line-1312"><code>				} else {</code></span>
+<span class="codeline" id="line-1313"><code>					switch decimals := rows.rs.columns[i].decimals; decimals {</code></span>
+<span class="codeline" id="line-1314"><code>					case 0x00, 0x1f:</code></span>
+<span class="codeline" id="line-1315"><code>						dstlen = 19</code></span>
+<span class="codeline" id="line-1316"><code>					case 1, 2, 3, 4, 5, 6:</code></span>
+<span class="codeline" id="line-1317"><code>						dstlen = 19 + 1 + decimals</code></span>
+<span class="codeline" id="line-1318"><code>					default:</code></span>
+<span class="codeline" id="line-1319"><code>						return fmt.Errorf(</code></span>
+<span class="codeline" id="line-1320"><code>							"protocol error, illegal decimals value %d",</code></span>
+<span class="codeline" id="line-1321"><code>							rows.rs.columns[i].decimals,</code></span>
+<span class="codeline" id="line-1322"><code>						)</code></span>
+<span class="codeline" id="line-1323"><code>					}</code></span>
+<span class="codeline" id="line-1324"><code>				}</code></span>
+<span class="codeline" id="line-1325"><code>				dest[i], err = formatBinaryDateTime(data[pos:pos+int(num)], dstlen)</code></span>
+<span class="codeline" id="line-1326"><code>			}</code></span>
+<span class="codeline" id="line-1327"><code></code></span>
+<span class="codeline" id="line-1328"><code>			if err == nil {</code></span>
+<span class="codeline" id="line-1329"><code>				pos += int(num)</code></span>
+<span class="codeline" id="line-1330"><code>				continue</code></span>
+<span class="codeline" id="line-1331"><code>			} else {</code></span>
+<span class="codeline" id="line-1332"><code>				return err</code></span>
+<span class="codeline" id="line-1333"><code>			}</code></span>
+<span class="codeline" id="line-1334"><code></code></span>
+<span class="codeline" id="line-1335"><code>		// Please report if this happens!</code></span>
+<span class="codeline" id="line-1336"><code>		default:</code></span>
+<span class="codeline" id="line-1337"><code>			return fmt.Errorf("unknown field type %d", rows.rs.columns[i].fieldType)</code></span>
+<span class="codeline" id="line-1338"><code>		}</code></span>
+<span class="codeline" id="line-1339"><code>	}</code></span>
+<span class="codeline" id="line-1340"><code></code></span>
+<span class="codeline" id="line-1341"><code>	return nil</code></span>
+<span class="codeline" id="line-1342"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

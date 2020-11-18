@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: gorm.io/gorm/logger</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>logger</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-gorm.io/gorm/logger">gorm.io/gorm/logger</a><i> (on <a href="https://pkg.go.dev/gorm.io/gorm/logger" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/gorm.io/gorm/logger.html">13 packages</a>, and imported by <a href="../../../dep/gorm.io/gorm/logger.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../src/gorm.io/gorm/logger/logger.go.html">logger.go</a>
+	    <a href="../../../src/gorm.io/gorm/logger/sql.go.html">sql.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Config" data-popularity="35">	 type <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-45">Config</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Config-stat-fields"><label for="Config-stat-fields">Exported Fields (3)</label><span id='Config-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-47">Colorful</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-48">LogLevel</a> <i><a href="#name-LogLevel">LogLevel</a></i>
+			<a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-46">SlowThreshold</a> <i><a href="../../time.html">time</a>.<a href="../../time.html#name-Duration">Duration</a></i></span>
+		<input type='checkbox' class="stat" id="Config-stat-params"><label for="Config-stat-params">As Inputs Of (1+)</label><span id='Config-stat-params-content' class="stat-content">
+			func <a href="#name-New">New</a>(writer <a href="#name-Writer">Writer</a>, config <b>Config</b>) <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Interface" data-popularity="410">	 type <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-52">Interface</a> <b<i>(interface)</i></b>
+		Interface logger interface
+
+		<input type='checkbox' class="stat" id="Interface-stat-methods"><label for="Interface-stat-methods">Exported Methods (5)</label><span id='Interface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-56">Error</a>(<a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, <a href="../../builtin.html#name-string">string</a>, ...interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-54">Info</a>(<a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, <a href="../../builtin.html#name-string">string</a>, ...interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-53">LogMode</a>(<a href="#name-LogLevel">LogLevel</a>) <b>Interface</b>
+			 (T) <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-57">Trace</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, begin <a href="../../time.html">time</a>.<a href="../../time.html#name-Time">Time</a>, fc func() (<a href="../../builtin.html#name-string">string</a>, <a href="../../builtin.html#name-int64">int64</a>), err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-55">Warn</a>(<a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, <a href="../../builtin.html#name-string">string</a>, ...interface{})</span>
+		<input type='checkbox' class="stat" id="Interface-stat-results"><label for="Interface-stat-results">As Outputs Of (2+)</label><span id='Interface-stat-results-content' class="stat-content">
+			func <a href="#name-New">New</a>(writer <a href="#name-Writer">Writer</a>, config <a href="#name-Config">Config</a>) <b>Interface</b>
+			func <a href="#name-Interface">Interface</a>.<a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-53">LogMode</a>(<a href="#name-LogLevel">LogLevel</a>) <b>Interface</b></span>
+		<input type='checkbox' class="stat" id="Interface-stat-values"><label for="Interface-stat-values">As Types Of (2+)</label><span id='Interface-stat-values-content' class="stat-content">
+			  var <a href="#name-Default">Default</a>
+			  var <a href="#name-Discard">Discard</a></span></div>
+<div class="anchor" id="name-LogLevel" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-31">LogLevel</a> <a href="../../builtin.html#name-int">int</a>
+		LogLevel
+
+		<input type='checkbox' class="stat" id="LogLevel-stat-params"><label for="LogLevel-stat-params">As Inputs Of (1+)</label><span id='LogLevel-stat-params-content' class="stat-content">
+			func <a href="#name-Interface">Interface</a>.<a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-53">LogMode</a>(<b>LogLevel</b>) <a href="#name-Interface">Interface</a></span>
+		<input type='checkbox' class="stat" id="LogLevel-stat-values"><label for="LogLevel-stat-values">As Types Of (4+)</label><span id='LogLevel-stat-values-content' class="stat-content">
+			const <a href="#name-Error">Error</a>
+			const <a href="#name-Info">Info</a>
+			const <a href="#name-Silent">Silent</a>
+			const <a href="#name-Warn">Warn</a></span></div>
+<div class="anchor" id="name-Writer" data-popularity="235">	 type <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-41">Writer</a> <b<i>(interface)</i></b>
+		Writer log writer interface
+
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">One Exported Method</label><span id='Writer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-42">Printf</a>(<a href="../../builtin.html#name-string">string</a>, ...interface{})</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impledby"><label for="Writer-stat-impledby">Implemented By (1+)</label><span id='Writer-stat-impledby-content' class="stat-content">
+			log.(*<a href="../../log.html#name-Logger">Logger</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-params"><label for="Writer-stat-params">As Inputs Of (1+)</label><span id='Writer-stat-params-content' class="stat-content">
+			func <a href="#name-New">New</a>(writer <b>Writer</b>, config <a href="#name-Config">Config</a>) <a href="#name-Interface">Interface</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Blue">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-20">Blue</a> = "\x1b[34m"
+		Colors</div>
+<div class="anchor" id="name-BlueBold">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-24">BlueBold</a> = "\x1b[34;1m"
+		Colors</div>
+<div class="anchor" id="name-Cyan">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-22">Cyan</a> = "\x1b[36m"
+		Colors</div>
+<div class="anchor" id="name-Default">	  var <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-62">Default</a> <a href="#name-Interface">Interface</a></div>
+<div class="anchor" id="name-Discard">	  var <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-61">Discard</a> <a href="#name-Interface">Interface</a></div>
+<div class="anchor" id="name-Error">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-35">Error</a> <a href="#name-LogLevel">LogLevel</a> = 2</div>
+<div class="anchor" id="name-ExplainSQL">	 func <a href="../../../src/gorm.io/gorm/logger/sql.go.html#line-27">ExplainSQL</a>(sql <a href="../../builtin.html#name-string">string</a>, numericPlaceholder *<a href="../../regexp.html">regexp</a>.<a href="../../regexp.html#name-Regexp">Regexp</a>, escaper <a href="../../builtin.html#name-string">string</a>, avars ...interface{}) <a href="../../builtin.html#name-string">string</a></div>
+<div class="anchor" id="name-Green">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-18">Green</a> = "\x1b[32m"
+		Colors</div>
+<div class="anchor" id="name-Info">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-37">Info</a> <a href="#name-LogLevel">LogLevel</a> = 4</div>
+<div class="anchor" id="name-Magenta">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-21">Magenta</a> = "\x1b[35m"
+		Colors</div>
+<div class="anchor" id="name-MagentaBold">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-25">MagentaBold</a> = "\x1b[35;1m"
+		Colors</div>
+<div class="anchor" id="name-New">	 func <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-70">New</a>(writer <a href="#name-Writer">Writer</a>, config <a href="#name-Config">Config</a>) <a href="#name-Interface">Interface</a></div>
+<div class="anchor" id="name-Recorder">	  var <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-67">Recorder</a> <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-167">traceRecorder</a></div>
+<div class="anchor" id="name-Red">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-17">Red</a> = "\x1b[31m"
+		Colors</div>
+<div class="anchor" id="name-RedBold">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-26">RedBold</a> = "\x1b[31;1m"
+		Colors</div>
+<div class="anchor" id="name-Reset">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-16">Reset</a> = "\x1b[0m"
+		Colors</div>
+<div class="anchor" id="name-Silent">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-34">Silent</a> <a href="#name-LogLevel">LogLevel</a> = 1</div>
+<div class="anchor" id="name-Warn">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-36">Warn</a> <a href="#name-LogLevel">LogLevel</a> = 3</div>
+<div class="anchor" id="name-White">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-23">White</a> = "\x1b[37m"
+		Colors</div>
+<div class="anchor" id="name-Yellow">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-19">Yellow</a> = "\x1b[33m"
+		Colors</div>
+<div class="anchor" id="name-YellowBold">	const <a href="../../../src/gorm.io/gorm/logger/logger.go.html#line-27">YellowBold</a> = "\x1b[33;1m"
+		Colors</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

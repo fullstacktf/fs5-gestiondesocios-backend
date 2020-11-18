@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/hmac</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>hmac</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/hmac">crypto/hmac</a><i> (on <a href="https://golang.org/pkg/crypto/hmac/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/hmac" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/hmac.html">2 packages</a>, and imported by <a href="../../dep/crypto/hmac.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/crypto/hmac/hmac.go.html#doc">d-&gt;</a> <a href="../../src/crypto/hmac/hmac.go.html">hmac.go</a>
+
+<span class="title">Exported Type Names</span>
+
+	(none)
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Equal">	 func <a href="../../src/crypto/hmac/hmac.go.html#line-152">Equal</a>(mac1, mac2 []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a>
+		Equal compares two MACs for equality without leaking timing information.</div>
+<div class="anchor" id="name-New">	 func <a href="../../src/crypto/hmac/hmac.go.html#line-126">New</a>(h func() <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>, key []<a href="../builtin.html#name-byte">byte</a>) <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>
+		New returns a new HMAC hash using the given hash.Hash type and key.
+		Note that unlike other hash implementations in the standard library,
+		the returned Hash does not implement encoding.BinaryMarshaler
+		or encoding.BinaryUnmarshaler.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

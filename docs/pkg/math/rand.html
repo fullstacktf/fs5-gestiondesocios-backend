@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: math/rand</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>rand</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-math/rand">math/rand</a><i> (on <a href="https://golang.org/pkg/math/rand/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/math/rand" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/math/rand.html">2 packages</a>, and imported by <a href="../../dep/math/rand.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/math/rand/exp.go.html">exp.go</a>
+	    <a href="../../src/math/rand/normal.go.html">normal.go</a>
+	<a href="../../src/math/rand/rand.go.html#doc">d-&gt;</a> <a href="../../src/math/rand/rand.go.html">rand.go</a>
+	    <a href="../../src/math/rand/rng.go.html">rng.go</a>
+	    <a href="../../src/math/rand/zipf.go.html">zipf.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Rand" data-popularity="1095">	 type <a href="../../src/math/rand/rand.go.html#line-51">Rand</a> <i>(struct)</i>
+		A Rand is a source of random numbers.
+
+		<input type='checkbox' class="stat" id="Rand-stat-methods"><label for="Rand-stat-methods">Exported Methods (16)</label><span id='Rand-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/math/rand/exp.go.html#line-31">ExpFloat64</a>() <a href="../builtin.html#name-float64">float64</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-204">Float32</a>() <a href="../builtin.html#name-float32">float32</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-178">Float64</a>() <a href="../builtin.html#name-float64">float64</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-102">Int</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-99">Int31</a>() <a href="../builtin.html#name-int32">int32</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-126">Int31n</a>(n <a href="../builtin.html#name-int32">int32</a>) <a href="../builtin.html#name-int32">int32</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-85">Int63</a>() <a href="../builtin.html#name-int64">int64</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-109">Int63n</a>(n <a href="../builtin.html#name-int64">int64</a>) <a href="../builtin.html#name-int64">int64</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-167">Intn</a>(n <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/rand/normal.go.html#line-38">NormFloat64</a>() <a href="../builtin.html#name-float64">float64</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-217">Perm</a>(n <a href="../builtin.html#name-int">int</a>) []<a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-260">Read</a>(p []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/rand/rand.go.html#line-74">Seed</a>(seed <a href="../builtin.html#name-int64">int64</a>)
+			(*T) <a href="../../src/math/rand/rand.go.html#line-235">Shuffle</a>(n <a href="../builtin.html#name-int">int</a>, swap func(i, j <a href="../builtin.html#name-int">int</a>))
+			(*T) <a href="../../src/math/rand/rand.go.html#line-88">Uint32</a>() <a href="../builtin.html#name-uint32">uint32</a>
+			(*T) <a href="../../src/math/rand/rand.go.html#line-91">Uint64</a>() <a href="../builtin.html#name-uint64">uint64</a></span>
+		<input type='checkbox' class="stat" id="Rand-stat-impls"><label for="Rand-stat-impls">Implements (3+)</label><span id='Rand-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Source">Source</a>
+			*T : <a href="#name-Source64">Source64</a>
+			*T : io.<a href="../io.html#name-Reader">Reader</a></span>
+		<input type='checkbox' class="stat" id="Rand-stat-results"><label for="Rand-stat-results">As Outputs Of (1+)</label><span id='Rand-stat-results-content' class="stat-content">
+			func <a href="#name-New">New</a>(src <a href="#name-Source">Source</a>) *<b>Rand</b></span>
+		<input type='checkbox' class="stat" id="Rand-stat-params"><label for="Rand-stat-params">As Inputs Of (2+)</label><span id='Rand-stat-params-content' class="stat-content">
+			func <a href="#name-NewZipf">NewZipf</a>(r *<b>Rand</b>, s <a href="../builtin.html#name-float64">float64</a>, v <a href="../builtin.html#name-float64">float64</a>, imax <a href="../builtin.html#name-uint64">uint64</a>) *<a href="#name-Zipf">Zipf</a>
+			func math/big.(*<a href="big.html#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-794">Rand</a>(rnd *<b>Rand</b>, n *<a href="big.html">big</a>.<a href="big.html#name-Int">Int</a>) *<a href="big.html">big</a>.<a href="big.html#name-Int">Int</a></span></div>
+<div class="anchor" id="name-Source" data-popularity="510">	 type <a href="../../src/math/rand/rand.go.html#line-25">Source</a> <b<i>(interface)</i></b>
+		A Source represents a source of uniformly-distributed
+		pseudo-random int64 values in the range [0, 1&lt;&lt;63).
+
+		<input type='checkbox' class="stat" id="Source-stat-methods"><label for="Source-stat-methods">Exported Methods (2)</label><span id='Source-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/math/rand/rand.go.html#line-26">Int63</a>() <a href="../builtin.html#name-int64">int64</a>
+			 (T) <a href="../../src/math/rand/rand.go.html#line-27">Seed</a>(seed <a href="../builtin.html#name-int64">int64</a>)</span>
+		<input type='checkbox' class="stat" id="Source-stat-impledby"><label for="Source-stat-impledby">Implemented By (2+)</label><span id='Source-stat-impledby-content' class="stat-content">
+			*<a href="#name-Rand">Rand</a>
+			<a href="#name-Source64">Source64</a> <i>(interface)</i></span>
+		<input type='checkbox' class="stat" id="Source-stat-results"><label for="Source-stat-results">As Outputs Of (1+)</label><span id='Source-stat-results-content' class="stat-content">
+			func <a href="#name-NewSource">NewSource</a>(seed <a href="../builtin.html#name-int64">int64</a>) <b>Source</b></span>
+		<input type='checkbox' class="stat" id="Source-stat-params"><label for="Source-stat-params">As Inputs Of (1+)</label><span id='Source-stat-params-content' class="stat-content">
+			func <a href="#name-New">New</a>(src <b>Source</b>) *<a href="#name-Rand">Rand</a></span></div>
+<div class="anchor" id="name-Source64" data-popularity="350">	 type <a href="../../src/math/rand/rand.go.html#line-36">Source64</a> <b<i>(interface)</i></b>
+		A Source64 is a Source that can also generate
+		uniformly-distributed pseudo-random uint64 values in
+		the range [0, 1&lt;&lt;64) directly.
+		If a Rand r's underlying Source s implements Source64,
+		then r.Uint64 returns the result of one call to s.Uint64
+		instead of making two calls to s.Int63.
+
+		<input type='checkbox' class="stat" id="Source64-stat-methods"><label for="Source64-stat-methods">Exported Methods (3)</label><span id='Source64-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/math/rand/rand.go.html#line-26">Int63</a>() <a href="../builtin.html#name-int64">int64</a>
+			 (T) <a href="../../src/math/rand/rand.go.html#line-27">Seed</a>(seed <a href="../builtin.html#name-int64">int64</a>)
+			 (T) <a href="../../src/math/rand/rand.go.html#line-38">Uint64</a>() <a href="../builtin.html#name-uint64">uint64</a></span>
+		<input type='checkbox' class="stat" id="Source64-stat-impledby"><label for="Source64-stat-impledby">Implemented By (1+)</label><span id='Source64-stat-impledby-content' class="stat-content">
+			*<a href="#name-Rand">Rand</a></span>
+		<input type='checkbox' class="stat" id="Source64-stat-impls"><label for="Source64-stat-impls">Implements (1+)</label><span id='Source64-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Source">Source</a></span></div>
+<div class="anchor" id="name-Zipf" data-popularity="125">	 type <a href="../../src/math/rand/zipf.go.html#line-15">Zipf</a> <i>(struct)</i>
+		A Zipf generates Zipf distributed variates.
+
+		<input type='checkbox' class="stat" id="Zipf-stat-methods"><label for="Zipf-stat-methods">One Exported Method</label><span id='Zipf-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/math/rand/zipf.go.html#line-58">Uint64</a>() <a href="../builtin.html#name-uint64">uint64</a></span>
+		<input type='checkbox' class="stat" id="Zipf-stat-results"><label for="Zipf-stat-results">As Outputs Of (1+)</label><span id='Zipf-stat-results-content' class="stat-content">
+			func <a href="#name-NewZipf">NewZipf</a>(r *<a href="#name-Rand">Rand</a>, s <a href="../builtin.html#name-float64">float64</a>, v <a href="../builtin.html#name-float64">float64</a>, imax <a href="../builtin.html#name-uint64">uint64</a>) *<b>Zipf</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ExpFloat64">	 func <a href="../../src/math/rand/rand.go.html#line-380">ExpFloat64</a>() <a href="../builtin.html#name-float64">float64</a>
+		ExpFloat64 returns an exponentially distributed float64 in the range
+		(0, +math.MaxFloat64] with an exponential distribution whose rate parameter
+		(lambda) is 1 and whose mean is 1/lambda (1) from the default Source.
+		To produce a distribution with a different rate parameter,
+		callers can adjust the output using:
+
+		 sample = ExpFloat64() / desiredRateParameter</div>
+<div class="anchor" id="name-Float32">	 func <a href="../../src/math/rand/rand.go.html#line-345">Float32</a>() <a href="../builtin.html#name-float32">float32</a>
+		Float32 returns, as a float32, a pseudo-random number in [0.0,1.0)
+		from the default Source.</div>
+<div class="anchor" id="name-Float64">	 func <a href="../../src/math/rand/rand.go.html#line-341">Float64</a>() <a href="../builtin.html#name-float64">float64</a>
+		Float64 returns, as a float64, a pseudo-random number in [0.0,1.0)
+		from the default Source.</div>
+<div class="anchor" id="name-Int">	 func <a href="../../src/math/rand/rand.go.html#line-322">Int</a>() <a href="../builtin.html#name-int">int</a>
+		Int returns a non-negative pseudo-random int from the default Source.</div>
+<div class="anchor" id="name-Int31">	 func <a href="../../src/math/rand/rand.go.html#line-319">Int31</a>() <a href="../builtin.html#name-int32">int32</a>
+		Int31 returns a non-negative pseudo-random 31-bit integer as an int32
+		from the default Source.</div>
+<div class="anchor" id="name-Int31n">	 func <a href="../../src/math/rand/rand.go.html#line-332">Int31n</a>(n <a href="../builtin.html#name-int32">int32</a>) <a href="../builtin.html#name-int32">int32</a>
+		Int31n returns, as an int32, a non-negative pseudo-random number in [0,n)
+		from the default Source.
+		It panics if n &lt;= 0.</div>
+<div class="anchor" id="name-Int63">	 func <a href="../../src/math/rand/rand.go.html#line-307">Int63</a>() <a href="../builtin.html#name-int64">int64</a>
+		Int63 returns a non-negative pseudo-random 63-bit integer as an int64
+		from the default Source.</div>
+<div class="anchor" id="name-Int63n">	 func <a href="../../src/math/rand/rand.go.html#line-327">Int63n</a>(n <a href="../builtin.html#name-int64">int64</a>) <a href="../builtin.html#name-int64">int64</a>
+		Int63n returns, as an int64, a non-negative pseudo-random number in [0,n)
+		from the default Source.
+		It panics if n &lt;= 0.</div>
+<div class="anchor" id="name-Intn">	 func <a href="../../src/math/rand/rand.go.html#line-337">Intn</a>(n <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-int">int</a>
+		Intn returns, as an int, a non-negative pseudo-random number in [0,n)
+		from the default Source.
+		It panics if n &lt;= 0.</div>
+<div class="anchor" id="name-New">	 func <a href="../../src/math/rand/rand.go.html#line-67">New</a>(src <a href="#name-Source">Source</a>) *<a href="#name-Rand">Rand</a>
+		New returns a new Rand that uses random values from src
+		to generate other random values.</div>
+<div class="anchor" id="name-NewSource">	 func <a href="../../src/math/rand/rand.go.html#line-44">NewSource</a>(seed <a href="../builtin.html#name-int64">int64</a>) <a href="#name-Source">Source</a>
+		NewSource returns a new pseudo-random Source seeded with the given value.
+		Unlike the default Source used by top-level functions, this source is not
+		safe for concurrent use by multiple goroutines.</div>
+<div class="anchor" id="name-NewZipf">	 func <a href="../../src/math/rand/zipf.go.html#line-39">NewZipf</a>(r *<a href="#name-Rand">Rand</a>, s <a href="../builtin.html#name-float64">float64</a>, v <a href="../builtin.html#name-float64">float64</a>, imax <a href="../builtin.html#name-uint64">uint64</a>) *<a href="#name-Zipf">Zipf</a>
+		NewZipf returns a Zipf variate generator.
+		The generator generates values k ∈ [0, imax]
+		such that P(k) is proportional to (v + k) ** (-s).
+		Requirements: s &gt; 1 and v &gt;= 1.</div>
+<div class="anchor" id="name-NormFloat64">	 func <a href="../../src/math/rand/rand.go.html#line-370">NormFloat64</a>() <a href="../builtin.html#name-float64">float64</a>
+		NormFloat64 returns a normally distributed float64 in the range
+		[-math.MaxFloat64, +math.MaxFloat64] with
+		standard normal distribution (mean = 0, stddev = 1)
+		from the default Source.
+		To produce a different normal distribution, callers can
+		adjust the output using:
+
+		 sample = NormFloat64() * desiredStdDev + desiredMean</div>
+<div class="anchor" id="name-Perm">	 func <a href="../../src/math/rand/rand.go.html#line-349">Perm</a>(n <a href="../builtin.html#name-int">int</a>) []<a href="../builtin.html#name-int">int</a>
+		Perm returns, as a slice of n ints, a pseudo-random permutation of the integers [0,n)
+		from the default Source.</div>
+<div class="anchor" id="name-Read">	 func <a href="../../src/math/rand/rand.go.html#line-359">Read</a>(p []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+		Read generates len(p) random bytes from the default Source and
+		writes them into p. It always returns len(p) and a nil error.
+		Read, unlike the Rand.Read method, is safe for concurrent use.</div>
+<div class="anchor" id="name-Seed">	 func <a href="../../src/math/rand/rand.go.html#line-303">Seed</a>(seed <a href="../builtin.html#name-int64">int64</a>)
+		Seed uses the provided seed value to initialize the default Source to a
+		deterministic state. If Seed is not called, the generator behaves as
+		if seeded by Seed(1). Seed values that have the same remainder when
+		divided by 2³¹-1 generate the same pseudo-random sequence.
+		Seed, unlike the Rand.Seed method, is safe for concurrent use.</div>
+<div class="anchor" id="name-Shuffle">	 func <a href="../../src/math/rand/rand.go.html#line-354">Shuffle</a>(n <a href="../builtin.html#name-int">int</a>, swap func(i, j <a href="../builtin.html#name-int">int</a>))
+		Shuffle pseudo-randomizes the order of elements using the default Source.
+		n is the number of elements. Shuffle panics if n &lt; 0.
+		swap swaps the elements with indexes i and j.</div>
+<div class="anchor" id="name-Uint32">	 func <a href="../../src/math/rand/rand.go.html#line-311">Uint32</a>() <a href="../builtin.html#name-uint32">uint32</a>
+		Uint32 returns a pseudo-random 32-bit value as a uint32
+		from the default Source.</div>
+<div class="anchor" id="name-Uint64">	 func <a href="../../src/math/rand/rand.go.html#line-315">Uint64</a>() <a href="../builtin.html#name-uint64">uint64</a>
+		Uint64 returns a pseudo-random 64-bit value as a uint64
+		from the default Source.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

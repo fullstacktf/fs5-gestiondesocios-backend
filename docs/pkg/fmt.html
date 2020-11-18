@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: fmt</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>fmt</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-fmt">fmt</a><i> (on <a href="https://golang.org/pkg/fmt/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/fmt" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/fmt.html">9 packages</a>, and imported by <a href="../dep/fmt.html#imported-by">40 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../src/fmt/doc.go.html#doc">d-&gt;</a> <a href="../src/fmt/doc.go.html">doc.go</a>
+	    <a href="../src/fmt/errors.go.html">errors.go</a>
+	    <a href="../src/fmt/format.go.html">format.go</a>
+	    <a href="../src/fmt/print.go.html">print.go</a>
+	    <a href="../src/fmt/scan.go.html">scan.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Formatter" data-popularity="350">	 type <a href="../src/fmt/print.go.html#line-53">Formatter</a> <b<i>(interface)</i></b>
+		Formatter is the interface implemented by values with a custom formatter.
+		The implementation of Format may call Sprint(f) or Fprint(f) etc.
+		to generate its output.
+
+		<input type='checkbox' class="stat" id="Formatter-stat-methods"><label for="Formatter-stat-methods">One Exported Method</label><span id='Formatter-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/fmt/print.go.html#line-54">Format</a>(f <a href="#name-State">State</a>, c <a href="builtin.html#name-rune">rune</a>)</span>
+		<input type='checkbox' class="stat" id="Formatter-stat-impledby"><label for="Formatter-stat-impledby">Implemented By (2+)</label><span id='Formatter-stat-impledby-content' class="stat-content">
+			math/big.(*<a href="math/big.html#name-Float">Float</a>)
+			math/big.(*<a href="math/big.html#name-Int">Int</a>)</span></div>
+<div class="anchor" id="name-GoStringer" data-popularity="3350">	 type <a href="../src/fmt/print.go.html#line-70">GoStringer</a> <b<i>(interface)</i></b>
+		GoStringer is implemented by any value that has a GoString method,
+		which defines the Go syntax for that value.
+		The GoString method is used to print values passed as an operand
+		to a %#v format.
+
+		<input type='checkbox' class="stat" id="GoStringer-stat-methods"><label for="GoStringer-stat-methods">One Exported Method</label><span id='GoStringer-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/fmt/print.go.html#line-71">GoString</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="GoStringer-stat-impledby"><label for="GoStringer-stat-impledby">Implemented By (22+)</label><span id='GoStringer-stat-impledby-content' class="stat-content">
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-AAAAResource">AAAAResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-AResource">AResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Class">Class</a>
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-CNAMEResource">CNAMEResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Header">Header</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Message">Message</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-MXResource">MXResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Name">Name</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-NSResource">NSResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-OpCode">OpCode</a>
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Option">Option</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-OPTResource">OPTResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-PTRResource">PTRResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Question">Question</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-RCode">RCode</a>
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Resource">Resource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-ResourceBody">ResourceBody</a> <i>(interface)</i>
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-ResourceHeader">ResourceHeader</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-SOAResource">SOAResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-SRVResource">SRVResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.(*<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-TXTResource">TXTResource</a>)
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Type">Type</a></span></div>
+<div class="anchor" id="name-Scanner" data-popularity="500">	 type <a href="../src/fmt/scan.go.html#line-55">Scanner</a> <b<i>(interface)</i></b>
+		Scanner is implemented by any value that has a Scan method, which scans
+		the input for the representation of a value and stores the result in the
+		receiver, which must be a pointer to be useful. The Scan method is called
+		for any argument to Scan, Scanf, or Scanln that implements it.
+
+		<input type='checkbox' class="stat" id="Scanner-stat-methods"><label for="Scanner-stat-methods">One Exported Method</label><span id='Scanner-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/fmt/scan.go.html#line-56">Scan</a>(state <a href="#name-ScanState">ScanState</a>, verb <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Scanner-stat-impledby"><label for="Scanner-stat-impledby">Implemented By (3+)</label><span id='Scanner-stat-impledby-content' class="stat-content">
+			math/big.(*<a href="math/big.html#name-Float">Float</a>)
+			math/big.(*<a href="math/big.html#name-Int">Int</a>)
+			math/big.(*<a href="math/big.html#name-Rat">Rat</a>)</span></div>
+<div class="anchor" id="name-ScanState" data-popularity="590">	 type <a href="../src/fmt/scan.go.html#line-21">ScanState</a> <b<i>(interface)</i></b>
+		ScanState represents the scanner state passed to custom scanners.
+		Scanners may do rune-at-a-time scanning or ask the ScanState
+		to discover the next space-delimited token.
+
+		<input type='checkbox' class="stat" id="ScanState-stat-methods"><label for="ScanState-stat-methods">Exported Methods (6)</label><span id='ScanState-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/fmt/scan.go.html#line-48">Read</a>(buf []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/fmt/scan.go.html#line-26">ReadRune</a>() (r <a href="builtin.html#name-rune">rune</a>, size <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/fmt/scan.go.html#line-32">SkipSpace</a>()
+			 (T) <a href="../src/fmt/scan.go.html#line-41">Token</a>(skipSpace <a href="builtin.html#name-bool">bool</a>, f func(<a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>) (token []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/fmt/scan.go.html#line-28">UnreadRune</a>() <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/fmt/scan.go.html#line-44">Width</a>() (wid <a href="builtin.html#name-int">int</a>, ok <a href="builtin.html#name-bool">bool</a>)</span>
+		<input type='checkbox' class="stat" id="ScanState-stat-impls"><label for="ScanState-stat-impls">Implements (3+)</label><span id='ScanState-stat-impls-content' class="stat-content">
+			 T : io.<a href="io.html#name-Reader">Reader</a>
+			 T : io.<a href="io.html#name-RuneReader">RuneReader</a>
+			 T : io.<a href="io.html#name-RuneScanner">RuneScanner</a></span>
+		<input type='checkbox' class="stat" id="ScanState-stat-params"><label for="ScanState-stat-params">As Inputs Of (4+)</label><span id='ScanState-stat-params-content' class="stat-content">
+			func <a href="#name-Scanner">Scanner</a>.<a href="../src/fmt/scan.go.html#line-56">Scan</a>(state <b>ScanState</b>, verb <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-error">error</a>
+			func math/big.(*<a href="math/big.html#name-Float">Float</a>).<a href="../src/math/big/floatconv.go.html#line-300">Scan</a>(s <b>ScanState</b>, ch <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-error">error</a>
+			func math/big.(*<a href="math/big.html#name-Int">Int</a>).<a href="../src/math/big/intconv.go.html#line-238">Scan</a>(s <b>ScanState</b>, ch <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-error">error</a>
+			func math/big.(*<a href="math/big.html#name-Rat">Rat</a>).<a href="../src/math/big/ratconv.go.html#line-26">Scan</a>(s <b>ScanState</b>, ch <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-State" data-popularity="355">	 type <a href="../src/fmt/print.go.html#line-38">State</a> <b<i>(interface)</i></b>
+		State represents the printer state passed to custom formatters.
+		It provides access to the io.Writer interface plus information about
+		the flags and options for the operand's format specifier.
+
+		<input type='checkbox' class="stat" id="State-stat-methods"><label for="State-stat-methods">Exported Methods (4)</label><span id='State-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/fmt/print.go.html#line-47">Flag</a>(c <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/fmt/print.go.html#line-44">Precision</a>() (prec <a href="builtin.html#name-int">int</a>, ok <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/fmt/print.go.html#line-42">Width</a>() (wid <a href="builtin.html#name-int">int</a>, ok <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/fmt/print.go.html#line-40">Write</a>(b []<a href="builtin.html#name-byte">byte</a>) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="State-stat-impls"><label for="State-stat-impls">Implements (1+)</label><span id='State-stat-impls-content' class="stat-content">
+			 T : io.<a href="io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="State-stat-params"><label for="State-stat-params">As Inputs Of (3+)</label><span id='State-stat-params-content' class="stat-content">
+			func <a href="#name-Formatter">Formatter</a>.<a href="../src/fmt/print.go.html#line-54">Format</a>(f <b>State</b>, c <a href="builtin.html#name-rune">rune</a>)
+			func math/big.(*<a href="math/big.html#name-Float">Float</a>).<a href="../src/math/big/ftoa.go.html#line-465">Format</a>(s <b>State</b>, format <a href="builtin.html#name-rune">rune</a>)
+			func math/big.(*<a href="math/big.html#name-Int">Int</a>).<a href="../src/math/big/intconv.go.html#line-67">Format</a>(s <b>State</b>, ch <a href="builtin.html#name-rune">rune</a>)</span></div>
+<div class="anchor" id="name-Stringer" data-popularity="10550">	 type <a href="../src/fmt/print.go.html#line-62">Stringer</a> <b<i>(interface)</i></b>
+		Stringer is implemented by any value that has a String method,
+		which defines the ``native'' format for that value.
+		The String method is used to print values passed as an operand
+		to any format that accepts a string or to an unformatted printer
+		such as Print.
+
+		<input type='checkbox' class="stat" id="Stringer-stat-methods"><label for="Stringer-stat-methods">One Exported Method</label><span id='Stringer-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/runtime/error.go.html#line-185">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Stringer-stat-impledby"><label for="Stringer-stat-impledby">Implemented By (70+)</label><span id='Stringer-stat-impledby-content' class="stat-content">
+			bytes.(*<a href="bytes.html#name-Buffer">Buffer</a>)
+			crypto.<a href="crypto.html#name-Hash">Hash</a>
+			crypto/tls.<a href="crypto/tls.html#name-ClientAuthType">ClientAuthType</a>
+			crypto/tls.<a href="crypto/tls.html#name-CurveID">CurveID</a>
+			crypto/tls.<a href="crypto/tls.html#name-SignatureScheme">SignatureScheme</a>
+			crypto/x509.<a href="crypto/x509.html#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a>
+			crypto/x509.<a href="crypto/x509.html#name-SignatureAlgorithm">SignatureAlgorithm</a>
+			crypto/x509/pkix.<a href="crypto/x509/pkix.html#name-Name">Name</a>
+			crypto/x509/pkix.<a href="crypto/x509/pkix.html#name-RDNSequence">RDNSequence</a>
+			database/sql.<a href="database/sql.html#name-IsolationLevel">IsolationLevel</a>
+			encoding/asn1.<a href="encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a>
+			encoding/binary.<a href="encoding/binary.html#name-ByteOrder">ByteOrder</a> <i>(interface)</i>
+			encoding/json.<a href="encoding/json.html#name-Delim">Delim</a>
+			encoding/json.<a href="encoding/json.html#name-Number">Number</a>
+			github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-Now">Now</a>
+			go/ast.<a href="go/ast.html#name-CommentMap">CommentMap</a>
+			go/ast.(*<a href="go/ast.html#name-Ident">Ident</a>)
+			go/ast.<a href="go/ast.html#name-ObjKind">ObjKind</a>
+			go/ast.(*<a href="go/ast.html#name-Scope">Scope</a>)
+			go/token.<a href="go/token.html#name-Position">Position</a>
+			go/token.<a href="go/token.html#name-Token">Token</a>
+			gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-Schema">Schema</a>
+			internal/reflectlite.<a href="internal/reflectlite.html#name-Type">Type</a> <i>(interface)</i>
+			math/big.<a href="math/big.html#name-Accuracy">Accuracy</a>
+			math/big.(*<a href="math/big.html#name-Float">Float</a>)
+			math/big.(*<a href="math/big.html#name-Int">Int</a>)
+			math/big.(*<a href="math/big.html#name-Rat">Rat</a>)
+			math/big.<a href="math/big.html#name-RoundingMode">RoundingMode</a>
+			net.<a href="net.html#name-Addr">Addr</a> <i>(interface)</i>
+			net.<a href="net.html#name-Flags">Flags</a>
+			net.<a href="net.html#name-HardwareAddr">HardwareAddr</a>
+			net.<a href="net.html#name-IP">IP</a>
+			net.(*<a href="net.html#name-IPAddr">IPAddr</a>)
+			net.<a href="net.html#name-IPMask">IPMask</a>
+			net.(*<a href="net.html#name-IPNet">IPNet</a>)
+			net.(*<a href="net.html#name-TCPAddr">TCPAddr</a>)
+			net.(*<a href="net.html#name-UDPAddr">UDPAddr</a>)
+			net.(*<a href="net.html#name-UnixAddr">UnixAddr</a>)
+			net/http.<a href="net/http.html#name-ConnState">ConnState</a>
+			net/http.(*<a href="net/http.html#name-Cookie">Cookie</a>)
+			net/url.(*<a href="net/url.html#name-URL">URL</a>)
+			net/url.(*<a href="net/url.html#name-Userinfo">Userinfo</a>)
+			os.<a href="os.html#name-FileMode">FileMode</a>
+			os.(*<a href="os.html#name-ProcessState">ProcessState</a>)
+			os.<a href="os.html#name-Signal">Signal</a> <i>(interface)</i>
+			reflect.<a href="reflect.html#name-ChanDir">ChanDir</a>
+			reflect.<a href="reflect.html#name-Kind">Kind</a>
+			reflect.<a href="reflect.html#name-Type">Type</a> <i>(interface)</i>
+			reflect.<a href="reflect.html#name-Value">Value</a>
+			regexp.(*<a href="regexp.html#name-Regexp">Regexp</a>)
+			regexp/syntax.<a href="regexp/syntax.html#name-ErrorCode">ErrorCode</a>
+			regexp/syntax.(*<a href="regexp/syntax.html#name-Inst">Inst</a>)
+			regexp/syntax.<a href="regexp/syntax.html#name-InstOp">InstOp</a>
+			regexp/syntax.<a href="regexp/syntax.html#name-Op">Op</a>
+			regexp/syntax.(*<a href="regexp/syntax.html#name-Prog">Prog</a>)
+			regexp/syntax.(*<a href="regexp/syntax.html#name-Regexp">Regexp</a>)
+			strings.(*<a href="strings.html#name-Builder">Builder</a>)
+			syscall.<a href="syscall.html#name-Signal">Signal</a>
+			time.<a href="time.html#name-Duration">Duration</a>
+			time.(*<a href="time.html#name-Location">Location</a>)
+			time.<a href="time.html#name-Month">Month</a>
+			time.<a href="time.html#name-Time">Time</a>
+			time.<a href="time.html#name-Weekday">Weekday</a>
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Class">Class</a>
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Name">Name</a>
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-RCode">RCode</a>
+			vendor/golang.org/x/net/dns/dnsmessage.<a href="vendor/golang.org/x/net/dns/dnsmessage.html#name-Type">Type</a>
+			vendor/golang.org/x/net/http2/hpack.<a href="vendor/golang.org/x/net/http2/hpack.html#name-HeaderField">HeaderField</a>
+			vendor/golang.org/x/net/idna.(*<a href="vendor/golang.org/x/net/idna.html#name-Profile">Profile</a>)
+			vendor/golang.org/x/text/unicode/bidi.(*<a href="vendor/golang.org/x/text/unicode/bidi.html#name-Run">Run</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Errorf">	 func <a href="../src/fmt/errors.go.html#line-17">Errorf</a>(format <a href="builtin.html#name-string">string</a>, a ...interface{}) <a href="builtin.html#name-error">error</a>
+		Errorf formats according to a format specifier and returns the string as a
+		value that satisfies error.
+
+		If the format specifier includes a %w verb with an error operand,
+		the returned error will implement an Unwrap method returning the operand. It is
+		invalid to include more than one %w verb or to supply it with an operand
+		that does not implement the error interface. The %w verb is otherwise
+		a synonym for %v.</div>
+<div class="anchor" id="name-Fprint">	 func <a href="../src/fmt/print.go.html#line-230">Fprint</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Fprint formats using the default formats for its operands and writes to w.
+		Spaces are added between operands when neither is a string.
+		It returns the number of bytes written and any write error encountered.</div>
+<div class="anchor" id="name-Fprintf">	 func <a href="../src/fmt/print.go.html#line-202">Fprintf</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, format <a href="builtin.html#name-string">string</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Fprintf formats according to a format specifier and writes to w.
+		It returns the number of bytes written and any write error encountered.</div>
+<div class="anchor" id="name-Fprintln">	 func <a href="../src/fmt/print.go.html#line-262">Fprintln</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Fprintln formats using the default formats for its operands and writes to w.
+		Spaces are always added between operands and a newline is appended.
+		It returns the number of bytes written and any write error encountered.</div>
+<div class="anchor" id="name-Fscan">	 func <a href="../src/fmt/scan.go.html#line-121">Fscan</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Fscan scans text read from r, storing successive space-separated
+		values into successive arguments. Newlines count as space. It
+		returns the number of items successfully scanned. If that is less
+		than the number of arguments, err will report why.</div>
+<div class="anchor" id="name-Fscanf">	 func <a href="../src/fmt/scan.go.html#line-141">Fscanf</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, format <a href="builtin.html#name-string">string</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Fscanf scans text read from r, storing successive space-separated
+		values into successive arguments as determined by the format. It
+		returns the number of items successfully parsed.
+		Newlines in the input must match newlines in the format.</div>
+<div class="anchor" id="name-Fscanln">	 func <a href="../src/fmt/scan.go.html#line-130">Fscanln</a>(r <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Fscanln is similar to Fscan, but stops scanning at a newline and
+		after the final item there must be a newline or EOF.</div>
+<div class="anchor" id="name-Print">	 func <a href="../src/fmt/print.go.html#line-241">Print</a>(a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Print formats using the default formats for its operands and writes to standard output.
+		Spaces are added between operands when neither is a string.
+		It returns the number of bytes written and any write error encountered.</div>
+<div class="anchor" id="name-Printf">	 func <a href="../src/fmt/print.go.html#line-212">Printf</a>(format <a href="builtin.html#name-string">string</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Printf formats according to a format specifier and writes to standard output.
+		It returns the number of bytes written and any write error encountered.</div>
+<div class="anchor" id="name-Println">	 func <a href="../src/fmt/print.go.html#line-273">Println</a>(a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Println formats using the default formats for its operands and writes to standard output.
+		Spaces are always added between operands and a newline is appended.
+		It returns the number of bytes written and any write error encountered.</div>
+<div class="anchor" id="name-Scan">	 func <a href="../src/fmt/scan.go.html#line-63">Scan</a>(a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Scan scans text read from standard input, storing successive
+		space-separated values into successive arguments. Newlines count
+		as space. It returns the number of items successfully scanned.
+		If that is less than the number of arguments, err will report why.</div>
+<div class="anchor" id="name-Scanf">	 func <a href="../src/fmt/scan.go.html#line-80">Scanf</a>(format <a href="builtin.html#name-string">string</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Scanf scans text read from standard input, storing successive
+		space-separated values into successive arguments as determined by
+		the format. It returns the number of items successfully scanned.
+		If that is less than the number of arguments, err will report why.
+		Newlines in the input must match newlines in the format.
+		The one exception: the verb %c always scans the next rune in the
+		input, even if it is a space (or tab etc.) or newline.</div>
+<div class="anchor" id="name-Scanln">	 func <a href="../src/fmt/scan.go.html#line-69">Scanln</a>(a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Scanln is similar to Scan, but stops scanning at a newline and
+		after the final item there must be a newline or EOF.</div>
+<div class="anchor" id="name-Sprint">	 func <a href="../src/fmt/print.go.html#line-247">Sprint</a>(a ...interface{}) <a href="builtin.html#name-string">string</a>
+		Sprint formats using the default formats for its operands and returns the resulting string.
+		Spaces are added between operands when neither is a string.</div>
+<div class="anchor" id="name-Sprintf">	 func <a href="../src/fmt/print.go.html#line-217">Sprintf</a>(format <a href="builtin.html#name-string">string</a>, a ...interface{}) <a href="builtin.html#name-string">string</a>
+		Sprintf formats according to a format specifier and returns the resulting string.</div>
+<div class="anchor" id="name-Sprintln">	 func <a href="../src/fmt/print.go.html#line-279">Sprintln</a>(a ...interface{}) <a href="builtin.html#name-string">string</a>
+		Sprintln formats using the default formats for its operands and returns the resulting string.
+		Spaces are always added between operands and a newline is appended.</div>
+<div class="anchor" id="name-Sscan">	 func <a href="../src/fmt/scan.go.html#line-99">Sscan</a>(str <a href="builtin.html#name-string">string</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Sscan scans the argument string, storing successive space-separated
+		values into successive arguments. Newlines count as space. It
+		returns the number of items successfully scanned. If that is less
+		than the number of arguments, err will report why.</div>
+<div class="anchor" id="name-Sscanf">	 func <a href="../src/fmt/scan.go.html#line-113">Sscanf</a>(str <a href="builtin.html#name-string">string</a>, format <a href="builtin.html#name-string">string</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Sscanf scans the argument string, storing successive space-separated
+		values into successive arguments as determined by the format. It
+		returns the number of items successfully parsed.
+		Newlines in the input must match newlines in the format.</div>
+<div class="anchor" id="name-Sscanln">	 func <a href="../src/fmt/scan.go.html#line-105">Sscanln</a>(str <a href="builtin.html#name-string">string</a>, a ...interface{}) (n <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+		Sscanln is similar to Sscan, but stops scanning at a newline and
+		after the final item there must be a newline or EOF.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

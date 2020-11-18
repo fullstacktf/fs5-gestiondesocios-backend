@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/crypto/curve25519</title>
+<link href="../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>curve25519</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../index.html#pkg-vendor/golang.org/x/crypto/curve25519">vendor/golang.org/x/crypto/curve25519</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/crypto/curve25519/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/crypto/curve25519" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../dep/vendor/golang.org/x/crypto/curve25519.html">3 packages</a>, and imported by <a href="../../../../../dep/vendor/golang.org/x/crypto/curve25519.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html#doc">d-&gt;</a> <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html">curve25519.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519_amd64.go.html">curve25519_amd64.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519_generic.go.html">curve25519_generic.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519_amd64.s.html">curve25519_amd64.s</a>
+
+<span class="title">Exported Type Names</span>
+
+	(none)
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Basepoint">	  var <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html#line-41">Basepoint</a> []<a href="../../../../builtin.html#name-byte">byte</a>
+		Basepoint is the canonical Curve25519 generator.</div>
+<div class="anchor" id="name-PointSize">	const <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html#line-37">PointSize</a> = 32
+		PointSize is the size of the point input to X25519.</div>
+<div class="anchor" id="name-ScalarBaseMult">	 func <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html#line-29">ScalarBaseMult</a>(dst, scalar *[32]<a href="../../../../builtin.html#name-byte">byte</a>)
+		ScalarBaseMult sets dst to the product scalar * base where base is the
+		standard generator.
+
+		It is recommended to use the X25519 function with Basepoint instead, as
+		copying into fixed size arrays can lead to unexpected bugs.</div>
+<div class="anchor" id="name-ScalarMult">	 func <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html#line-20">ScalarMult</a>(dst, scalar, point *[32]<a href="../../../../builtin.html#name-byte">byte</a>)
+		ScalarMult sets dst to the product scalar * point.
+
+		Deprecated: when provided a low-order point, ScalarMult will set dst to all
+		zeroes, irrespective of the scalar. Instead, use the X25519 function, which
+		will return an error.</div>
+<div class="anchor" id="name-ScalarSize">	const <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html#line-35">ScalarSize</a> = 32
+		ScalarSize is the size of the scalar input to X25519.</div>
+<div class="anchor" id="name-X25519">	 func <a href="../../../../../src/vendor/golang.org/x/crypto/curve25519/curve25519.go.html#line-67">X25519</a>(scalar, point []<a href="../../../../builtin.html#name-byte">byte</a>) ([]<a href="../../../../builtin.html#name-byte">byte</a>, <a href="../../../../builtin.html#name-error">error</a>)
+		X25519 returns the result of the scalar multiplication (scalar * point),
+		according to RFC 7748, Section 5. scalar, point and the return value are
+		slices of 32 bytes.
+
+		scalar can be generated at random, for example with crypto/rand. point should
+		be either Basepoint or the output of another X25519 call.
+
+		If point is Basepoint (but not if it's a different slice with the same
+		contents) a precomputed implementation might be used for performance.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

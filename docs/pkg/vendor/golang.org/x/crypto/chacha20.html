@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/crypto/chacha20</title>
+<link href="../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>chacha20</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../index.html#pkg-vendor/golang.org/x/crypto/chacha20">vendor/golang.org/x/crypto/chacha20</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/crypto/chacha20/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/crypto/chacha20" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../dep/vendor/golang.org/x/crypto/chacha20.html">6 packages</a>, and imported by <a href="../../../../../dep/vendor/golang.org/x/crypto/chacha20.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#doc">d-&gt;</a> <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html">chacha_generic.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_noasm.go.html">chacha_noasm.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/xor.go.html">xor.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Cipher" data-popularity="225">	 type <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-36">Cipher</a> <i>(struct)</i>
+		Cipher is a stateful instance of ChaCha20 or XChaCha20 using a particular key
+		and nonce. A *Cipher implements the cipher.Stream interface.
+
+		<input type='checkbox' class="stat" id="Cipher-stat-methods"><label for="Cipher-stat-methods">Exported Methods (2)</label><span id='Cipher-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-152">SetCounter</a>(counter <a href="../../../../builtin.html#name-uint32">uint32</a>)
+			(*T) <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-184">XORKeyStream</a>(dst, src []<a href="../../../../builtin.html#name-byte">byte</a>)</span>
+		<input type='checkbox' class="stat" id="Cipher-stat-impls"><label for="Cipher-stat-impls">Implements (1+)</label><span id='Cipher-stat-impls-content' class="stat-content">
+			*T : crypto/cipher.<a href="../../../../crypto/cipher.html#name-Stream">Stream</a></span>
+		<input type='checkbox' class="stat" id="Cipher-stat-results"><label for="Cipher-stat-results">As Outputs Of (1+)</label><span id='Cipher-stat-results-content' class="stat-content">
+			func <a href="#name-NewUnauthenticatedCipher">NewUnauthenticatedCipher</a>(key, nonce []<a href="../../../../builtin.html#name-byte">byte</a>) (*<b>Cipher</b>, <a href="../../../../builtin.html#name-error">error</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-HChaCha20">	 func <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-344">HChaCha20</a>(key, nonce []<a href="../../../../builtin.html#name-byte">byte</a>) ([]<a href="../../../../builtin.html#name-byte">byte</a>, <a href="../../../../builtin.html#name-error">error</a>)
+		HChaCha20 uses the ChaCha20 core to generate a derived key from a 32 bytes
+		key and a 16 bytes nonce. It returns an error if key or nonce have any other
+		length. It is used as part of the XChaCha20 construction.</div>
+<div class="anchor" id="name-KeySize">	const <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-20">KeySize</a> = 32
+		KeySize is the size of the key used by this cipher, in bytes.</div>
+<div class="anchor" id="name-NewUnauthenticatedCipher">	 func <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-72">NewUnauthenticatedCipher</a>(key, nonce []<a href="../../../../builtin.html#name-byte">byte</a>) (*<a href="#name-Cipher">Cipher</a>, <a href="../../../../builtin.html#name-error">error</a>)
+		NewUnauthenticatedCipher creates a new ChaCha20 stream cipher with the given
+		32 bytes key and a 12 or 24 bytes nonce. If a nonce of 24 bytes is provided,
+		the XChaCha20 construction will be used. It returns an error if key or nonce
+		have any other length.
+
+		Note that ChaCha20, like all stream ciphers, is not authenticated and allows
+		attackers to silently tamper with the plaintext. For this reason, it is more
+		appropriate as a building block than as a standalone encryption mechanism.
+		Instead, consider using package golang.org/x/crypto/chacha20poly1305.</div>
+<div class="anchor" id="name-NonceSize">	const <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-27">NonceSize</a> = 12
+		NonceSize is the size of the nonce used with the standard variant of this
+		cipher, in bytes.
+
+		Note that this is too short to be safely generated at random if the same
+		key is reused more than 2³² times.</div>
+<div class="anchor" id="name-NonceSizeX">	const <a href="../../../../../src/vendor/golang.org/x/crypto/chacha20/chacha_generic.go.html#line-31">NonceSizeX</a> = 24
+		NonceSizeX is the size of the nonce used with the XChaCha20 variant of
+		this cipher, in bytes.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

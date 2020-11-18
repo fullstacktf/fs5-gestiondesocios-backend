@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: utils.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	utils.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2012 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"crypto/tls"</code></span>
+<span class="codeline" id="line-13"><code>	"database/sql"</code></span>
+<span class="codeline" id="line-14"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-15"><code>	"encoding/binary"</code></span>
+<span class="codeline" id="line-16"><code>	"errors"</code></span>
+<span class="codeline" id="line-17"><code>	"fmt"</code></span>
+<span class="codeline" id="line-18"><code>	"io"</code></span>
+<span class="codeline" id="line-19"><code>	"strconv"</code></span>
+<span class="codeline" id="line-20"><code>	"strings"</code></span>
+<span class="codeline" id="line-21"><code>	"sync"</code></span>
+<span class="codeline" id="line-22"><code>	"sync/atomic"</code></span>
+<span class="codeline" id="line-23"><code>	"time"</code></span>
+<span class="codeline" id="line-24"><code>)</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>// Registry for custom tls.Configs</code></span>
+<span class="codeline" id="line-27"><code>var (</code></span>
+<span class="codeline" id="line-28"><code>	tlsConfigLock     sync.RWMutex</code></span>
+<span class="codeline" id="line-29"><code>	tlsConfigRegistry map[string]*tls.Config</code></span>
+<span class="codeline" id="line-30"><code>)</code></span>
+<span class="codeline" id="line-31"><code></code></span>
+<span class="codeline" id="line-32"><code>// RegisterTLSConfig registers a custom tls.Config to be used with sql.Open.</code></span>
+<span class="codeline" id="line-33"><code>// Use the key as a value in the DSN where tls=value.</code></span>
+<span class="codeline" id="line-34"><code>//</code></span>
+<span class="codeline" id="line-35"><code>// Note: The provided tls.Config is exclusively owned by the driver after</code></span>
+<span class="codeline" id="line-36"><code>// registering it.</code></span>
+<span class="codeline" id="line-37"><code>//</code></span>
+<span class="codeline" id="line-38"><code>//  rootCertPool := x509.NewCertPool()</code></span>
+<span class="codeline" id="line-39"><code>//  pem, err := ioutil.ReadFile("/path/ca-cert.pem")</code></span>
+<span class="codeline" id="line-40"><code>//  if err != nil {</code></span>
+<span class="codeline" id="line-41"><code>//      log.Fatal(err)</code></span>
+<span class="codeline" id="line-42"><code>//  }</code></span>
+<span class="codeline" id="line-43"><code>//  if ok := rootCertPool.AppendCertsFromPEM(pem); !ok {</code></span>
+<span class="codeline" id="line-44"><code>//      log.Fatal("Failed to append PEM.")</code></span>
+<span class="codeline" id="line-45"><code>//  }</code></span>
+<span class="codeline" id="line-46"><code>//  clientCert := make([]tls.Certificate, 0, 1)</code></span>
+<span class="codeline" id="line-47"><code>//  certs, err := tls.LoadX509KeyPair("/path/client-cert.pem", "/path/client-key.pem")</code></span>
+<span class="codeline" id="line-48"><code>//  if err != nil {</code></span>
+<span class="codeline" id="line-49"><code>//      log.Fatal(err)</code></span>
+<span class="codeline" id="line-50"><code>//  }</code></span>
+<span class="codeline" id="line-51"><code>//  clientCert = append(clientCert, certs)</code></span>
+<span class="codeline" id="line-52"><code>//  mysql.RegisterTLSConfig("custom", &amp;tls.Config{</code></span>
+<span class="codeline" id="line-53"><code>//      RootCAs: rootCertPool,</code></span>
+<span class="codeline" id="line-54"><code>//      Certificates: clientCert,</code></span>
+<span class="codeline" id="line-55"><code>//  })</code></span>
+<span class="codeline" id="line-56"><code>//  db, err := sql.Open("mysql", "user@tcp(localhost:3306)/test?tls=custom")</code></span>
+<span class="codeline" id="line-57"><code>//</code></span>
+<span class="codeline" id="line-58"><code>func RegisterTLSConfig(key string, config *tls.Config) error {</code></span>
+<span class="codeline" id="line-59"><code>	if _, isBool := readBool(key); isBool || strings.ToLower(key) == "skip-verify" || strings.ToLower(key) == "preferred" {</code></span>
+<span class="codeline" id="line-60"><code>		return fmt.Errorf("key '%s' is reserved", key)</code></span>
+<span class="codeline" id="line-61"><code>	}</code></span>
+<span class="codeline" id="line-62"><code></code></span>
+<span class="codeline" id="line-63"><code>	tlsConfigLock.Lock()</code></span>
+<span class="codeline" id="line-64"><code>	if tlsConfigRegistry == nil {</code></span>
+<span class="codeline" id="line-65"><code>		tlsConfigRegistry = make(map[string]*tls.Config)</code></span>
+<span class="codeline" id="line-66"><code>	}</code></span>
+<span class="codeline" id="line-67"><code></code></span>
+<span class="codeline" id="line-68"><code>	tlsConfigRegistry[key] = config</code></span>
+<span class="codeline" id="line-69"><code>	tlsConfigLock.Unlock()</code></span>
+<span class="codeline" id="line-70"><code>	return nil</code></span>
+<span class="codeline" id="line-71"><code>}</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>// DeregisterTLSConfig removes the tls.Config associated with key.</code></span>
+<span class="codeline" id="line-74"><code>func DeregisterTLSConfig(key string) {</code></span>
+<span class="codeline" id="line-75"><code>	tlsConfigLock.Lock()</code></span>
+<span class="codeline" id="line-76"><code>	if tlsConfigRegistry != nil {</code></span>
+<span class="codeline" id="line-77"><code>		delete(tlsConfigRegistry, key)</code></span>
+<span class="codeline" id="line-78"><code>	}</code></span>
+<span class="codeline" id="line-79"><code>	tlsConfigLock.Unlock()</code></span>
+<span class="codeline" id="line-80"><code>}</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>func getTLSConfigClone(key string) (config *tls.Config) {</code></span>
+<span class="codeline" id="line-83"><code>	tlsConfigLock.RLock()</code></span>
+<span class="codeline" id="line-84"><code>	if v, ok := tlsConfigRegistry[key]; ok {</code></span>
+<span class="codeline" id="line-85"><code>		config = v.Clone()</code></span>
+<span class="codeline" id="line-86"><code>	}</code></span>
+<span class="codeline" id="line-87"><code>	tlsConfigLock.RUnlock()</code></span>
+<span class="codeline" id="line-88"><code>	return</code></span>
+<span class="codeline" id="line-89"><code>}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>// Returns the bool value of the input.</code></span>
+<span class="codeline" id="line-92"><code>// The 2nd return value indicates if the input was a valid bool value</code></span>
+<span class="codeline" id="line-93"><code>func readBool(input string) (value bool, valid bool) {</code></span>
+<span class="codeline" id="line-94"><code>	switch input {</code></span>
+<span class="codeline" id="line-95"><code>	case "1", "true", "TRUE", "True":</code></span>
+<span class="codeline" id="line-96"><code>		return true, true</code></span>
+<span class="codeline" id="line-97"><code>	case "0", "false", "FALSE", "False":</code></span>
+<span class="codeline" id="line-98"><code>		return false, true</code></span>
+<span class="codeline" id="line-99"><code>	}</code></span>
+<span class="codeline" id="line-100"><code></code></span>
+<span class="codeline" id="line-101"><code>	// Not a valid bool value</code></span>
+<span class="codeline" id="line-102"><code>	return</code></span>
+<span class="codeline" id="line-103"><code>}</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>/******************************************************************************</code></span>
+<span class="codeline" id="line-106"><code>*                           Time related utils                                *</code></span>
+<span class="codeline" id="line-107"><code>******************************************************************************/</code></span>
+<span class="codeline" id="line-108"><code></code></span>
+<span class="codeline" id="line-109"><code>func parseDateTime(str string, loc *time.Location) (t time.Time, err error) {</code></span>
+<span class="codeline" id="line-110"><code>	base := "0000-00-00 00:00:00.0000000"</code></span>
+<span class="codeline" id="line-111"><code>	switch len(str) {</code></span>
+<span class="codeline" id="line-112"><code>	case 10, 19, 21, 22, 23, 24, 25, 26: // up to "YYYY-MM-DD HH:MM:SS.MMMMMM"</code></span>
+<span class="codeline" id="line-113"><code>		if str == base[:len(str)] {</code></span>
+<span class="codeline" id="line-114"><code>			return</code></span>
+<span class="codeline" id="line-115"><code>		}</code></span>
+<span class="codeline" id="line-116"><code>		t, err = time.Parse(timeFormat[:len(str)], str)</code></span>
+<span class="codeline" id="line-117"><code>	default:</code></span>
+<span class="codeline" id="line-118"><code>		err = fmt.Errorf("invalid time string: %s", str)</code></span>
+<span class="codeline" id="line-119"><code>		return</code></span>
+<span class="codeline" id="line-120"><code>	}</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>	// Adjust location</code></span>
+<span class="codeline" id="line-123"><code>	if err == nil &amp;&amp; loc != time.UTC {</code></span>
+<span class="codeline" id="line-124"><code>		y, mo, d := t.Date()</code></span>
+<span class="codeline" id="line-125"><code>		h, mi, s := t.Clock()</code></span>
+<span class="codeline" id="line-126"><code>		t, err = time.Date(y, mo, d, h, mi, s, t.Nanosecond(), loc), nil</code></span>
+<span class="codeline" id="line-127"><code>	}</code></span>
+<span class="codeline" id="line-128"><code></code></span>
+<span class="codeline" id="line-129"><code>	return</code></span>
+<span class="codeline" id="line-130"><code>}</code></span>
+<span class="codeline" id="line-131"><code></code></span>
+<span class="codeline" id="line-132"><code>func parseBinaryDateTime(num uint64, data []byte, loc *time.Location) (driver.Value, error) {</code></span>
+<span class="codeline" id="line-133"><code>	switch num {</code></span>
+<span class="codeline" id="line-134"><code>	case 0:</code></span>
+<span class="codeline" id="line-135"><code>		return time.Time{}, nil</code></span>
+<span class="codeline" id="line-136"><code>	case 4:</code></span>
+<span class="codeline" id="line-137"><code>		return time.Date(</code></span>
+<span class="codeline" id="line-138"><code>			int(binary.LittleEndian.Uint16(data[:2])), // year</code></span>
+<span class="codeline" id="line-139"><code>			time.Month(data[2]),                       // month</code></span>
+<span class="codeline" id="line-140"><code>			int(data[3]),                              // day</code></span>
+<span class="codeline" id="line-141"><code>			0, 0, 0, 0,</code></span>
+<span class="codeline" id="line-142"><code>			loc,</code></span>
+<span class="codeline" id="line-143"><code>		), nil</code></span>
+<span class="codeline" id="line-144"><code>	case 7:</code></span>
+<span class="codeline" id="line-145"><code>		return time.Date(</code></span>
+<span class="codeline" id="line-146"><code>			int(binary.LittleEndian.Uint16(data[:2])), // year</code></span>
+<span class="codeline" id="line-147"><code>			time.Month(data[2]),                       // month</code></span>
+<span class="codeline" id="line-148"><code>			int(data[3]),                              // day</code></span>
+<span class="codeline" id="line-149"><code>			int(data[4]),                              // hour</code></span>
+<span class="codeline" id="line-150"><code>			int(data[5]),                              // minutes</code></span>
+<span class="codeline" id="line-151"><code>			int(data[6]),                              // seconds</code></span>
+<span class="codeline" id="line-152"><code>			0,</code></span>
+<span class="codeline" id="line-153"><code>			loc,</code></span>
+<span class="codeline" id="line-154"><code>		), nil</code></span>
+<span class="codeline" id="line-155"><code>	case 11:</code></span>
+<span class="codeline" id="line-156"><code>		return time.Date(</code></span>
+<span class="codeline" id="line-157"><code>			int(binary.LittleEndian.Uint16(data[:2])), // year</code></span>
+<span class="codeline" id="line-158"><code>			time.Month(data[2]),                       // month</code></span>
+<span class="codeline" id="line-159"><code>			int(data[3]),                              // day</code></span>
+<span class="codeline" id="line-160"><code>			int(data[4]),                              // hour</code></span>
+<span class="codeline" id="line-161"><code>			int(data[5]),                              // minutes</code></span>
+<span class="codeline" id="line-162"><code>			int(data[6]),                              // seconds</code></span>
+<span class="codeline" id="line-163"><code>			int(binary.LittleEndian.Uint32(data[7:11]))*1000, // nanoseconds</code></span>
+<span class="codeline" id="line-164"><code>			loc,</code></span>
+<span class="codeline" id="line-165"><code>		), nil</code></span>
+<span class="codeline" id="line-166"><code>	}</code></span>
+<span class="codeline" id="line-167"><code>	return nil, fmt.Errorf("invalid DATETIME packet length %d", num)</code></span>
+<span class="codeline" id="line-168"><code>}</code></span>
+<span class="codeline" id="line-169"><code></code></span>
+<span class="codeline" id="line-170"><code>// zeroDateTime is used in formatBinaryDateTime to avoid an allocation</code></span>
+<span class="codeline" id="line-171"><code>// if the DATE or DATETIME has the zero value.</code></span>
+<span class="codeline" id="line-172"><code>// It must never be changed.</code></span>
+<span class="codeline" id="line-173"><code>// The current behavior depends on database/sql copying the result.</code></span>
+<span class="codeline" id="line-174"><code>var zeroDateTime = []byte("0000-00-00 00:00:00.000000")</code></span>
+<span class="codeline" id="line-175"><code></code></span>
+<span class="codeline" id="line-176"><code>const digits01 = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789"</code></span>
+<span class="codeline" id="line-177"><code>const digits10 = "0000000000111111111122222222223333333333444444444455555555556666666666777777777788888888889999999999"</code></span>
+<span class="codeline" id="line-178"><code></code></span>
+<span class="codeline" id="line-179"><code>func appendMicrosecs(dst, src []byte, decimals int) []byte {</code></span>
+<span class="codeline" id="line-180"><code>	if decimals &lt;= 0 {</code></span>
+<span class="codeline" id="line-181"><code>		return dst</code></span>
+<span class="codeline" id="line-182"><code>	}</code></span>
+<span class="codeline" id="line-183"><code>	if len(src) == 0 {</code></span>
+<span class="codeline" id="line-184"><code>		return append(dst, ".000000"[:decimals+1]...)</code></span>
+<span class="codeline" id="line-185"><code>	}</code></span>
+<span class="codeline" id="line-186"><code></code></span>
+<span class="codeline" id="line-187"><code>	microsecs := binary.LittleEndian.Uint32(src[:4])</code></span>
+<span class="codeline" id="line-188"><code>	p1 := byte(microsecs / 10000)</code></span>
+<span class="codeline" id="line-189"><code>	microsecs -= 10000 * uint32(p1)</code></span>
+<span class="codeline" id="line-190"><code>	p2 := byte(microsecs / 100)</code></span>
+<span class="codeline" id="line-191"><code>	microsecs -= 100 * uint32(p2)</code></span>
+<span class="codeline" id="line-192"><code>	p3 := byte(microsecs)</code></span>
+<span class="codeline" id="line-193"><code></code></span>
+<span class="codeline" id="line-194"><code>	switch decimals {</code></span>
+<span class="codeline" id="line-195"><code>	default:</code></span>
+<span class="codeline" id="line-196"><code>		return append(dst, '.',</code></span>
+<span class="codeline" id="line-197"><code>			digits10[p1], digits01[p1],</code></span>
+<span class="codeline" id="line-198"><code>			digits10[p2], digits01[p2],</code></span>
+<span class="codeline" id="line-199"><code>			digits10[p3], digits01[p3],</code></span>
+<span class="codeline" id="line-200"><code>		)</code></span>
+<span class="codeline" id="line-201"><code>	case 1:</code></span>
+<span class="codeline" id="line-202"><code>		return append(dst, '.',</code></span>
+<span class="codeline" id="line-203"><code>			digits10[p1],</code></span>
+<span class="codeline" id="line-204"><code>		)</code></span>
+<span class="codeline" id="line-205"><code>	case 2:</code></span>
+<span class="codeline" id="line-206"><code>		return append(dst, '.',</code></span>
+<span class="codeline" id="line-207"><code>			digits10[p1], digits01[p1],</code></span>
+<span class="codeline" id="line-208"><code>		)</code></span>
+<span class="codeline" id="line-209"><code>	case 3:</code></span>
+<span class="codeline" id="line-210"><code>		return append(dst, '.',</code></span>
+<span class="codeline" id="line-211"><code>			digits10[p1], digits01[p1],</code></span>
+<span class="codeline" id="line-212"><code>			digits10[p2],</code></span>
+<span class="codeline" id="line-213"><code>		)</code></span>
+<span class="codeline" id="line-214"><code>	case 4:</code></span>
+<span class="codeline" id="line-215"><code>		return append(dst, '.',</code></span>
+<span class="codeline" id="line-216"><code>			digits10[p1], digits01[p1],</code></span>
+<span class="codeline" id="line-217"><code>			digits10[p2], digits01[p2],</code></span>
+<span class="codeline" id="line-218"><code>		)</code></span>
+<span class="codeline" id="line-219"><code>	case 5:</code></span>
+<span class="codeline" id="line-220"><code>		return append(dst, '.',</code></span>
+<span class="codeline" id="line-221"><code>			digits10[p1], digits01[p1],</code></span>
+<span class="codeline" id="line-222"><code>			digits10[p2], digits01[p2],</code></span>
+<span class="codeline" id="line-223"><code>			digits10[p3],</code></span>
+<span class="codeline" id="line-224"><code>		)</code></span>
+<span class="codeline" id="line-225"><code>	}</code></span>
+<span class="codeline" id="line-226"><code>}</code></span>
+<span class="codeline" id="line-227"><code></code></span>
+<span class="codeline" id="line-228"><code>func formatBinaryDateTime(src []byte, length uint8) (driver.Value, error) {</code></span>
+<span class="codeline" id="line-229"><code>	// length expects the deterministic length of the zero value,</code></span>
+<span class="codeline" id="line-230"><code>	// negative time and 100+ hours are automatically added if needed</code></span>
+<span class="codeline" id="line-231"><code>	if len(src) == 0 {</code></span>
+<span class="codeline" id="line-232"><code>		return zeroDateTime[:length], nil</code></span>
+<span class="codeline" id="line-233"><code>	}</code></span>
+<span class="codeline" id="line-234"><code>	var dst []byte      // return value</code></span>
+<span class="codeline" id="line-235"><code>	var p1, p2, p3 byte // current digit pair</code></span>
+<span class="codeline" id="line-236"><code></code></span>
+<span class="codeline" id="line-237"><code>	switch length {</code></span>
+<span class="codeline" id="line-238"><code>	case 10, 19, 21, 22, 23, 24, 25, 26:</code></span>
+<span class="codeline" id="line-239"><code>	default:</code></span>
+<span class="codeline" id="line-240"><code>		t := "DATE"</code></span>
+<span class="codeline" id="line-241"><code>		if length &gt; 10 {</code></span>
+<span class="codeline" id="line-242"><code>			t += "TIME"</code></span>
+<span class="codeline" id="line-243"><code>		}</code></span>
+<span class="codeline" id="line-244"><code>		return nil, fmt.Errorf("illegal %s length %d", t, length)</code></span>
+<span class="codeline" id="line-245"><code>	}</code></span>
+<span class="codeline" id="line-246"><code>	switch len(src) {</code></span>
+<span class="codeline" id="line-247"><code>	case 4, 7, 11:</code></span>
+<span class="codeline" id="line-248"><code>	default:</code></span>
+<span class="codeline" id="line-249"><code>		t := "DATE"</code></span>
+<span class="codeline" id="line-250"><code>		if length &gt; 10 {</code></span>
+<span class="codeline" id="line-251"><code>			t += "TIME"</code></span>
+<span class="codeline" id="line-252"><code>		}</code></span>
+<span class="codeline" id="line-253"><code>		return nil, fmt.Errorf("illegal %s packet length %d", t, len(src))</code></span>
+<span class="codeline" id="line-254"><code>	}</code></span>
+<span class="codeline" id="line-255"><code>	dst = make([]byte, 0, length)</code></span>
+<span class="codeline" id="line-256"><code>	// start with the date</code></span>
+<span class="codeline" id="line-257"><code>	year := binary.LittleEndian.Uint16(src[:2])</code></span>
+<span class="codeline" id="line-258"><code>	pt := year / 100</code></span>
+<span class="codeline" id="line-259"><code>	p1 = byte(year - 100*uint16(pt))</code></span>
+<span class="codeline" id="line-260"><code>	p2, p3 = src[2], src[3]</code></span>
+<span class="codeline" id="line-261"><code>	dst = append(dst,</code></span>
+<span class="codeline" id="line-262"><code>		digits10[pt], digits01[pt],</code></span>
+<span class="codeline" id="line-263"><code>		digits10[p1], digits01[p1], '-',</code></span>
+<span class="codeline" id="line-264"><code>		digits10[p2], digits01[p2], '-',</code></span>
+<span class="codeline" id="line-265"><code>		digits10[p3], digits01[p3],</code></span>
+<span class="codeline" id="line-266"><code>	)</code></span>
+<span class="codeline" id="line-267"><code>	if length == 10 {</code></span>
+<span class="codeline" id="line-268"><code>		return dst, nil</code></span>
+<span class="codeline" id="line-269"><code>	}</code></span>
+<span class="codeline" id="line-270"><code>	if len(src) == 4 {</code></span>
+<span class="codeline" id="line-271"><code>		return append(dst, zeroDateTime[10:length]...), nil</code></span>
+<span class="codeline" id="line-272"><code>	}</code></span>
+<span class="codeline" id="line-273"><code>	dst = append(dst, ' ')</code></span>
+<span class="codeline" id="line-274"><code>	p1 = src[4] // hour</code></span>
+<span class="codeline" id="line-275"><code>	src = src[5:]</code></span>
+<span class="codeline" id="line-276"><code></code></span>
+<span class="codeline" id="line-277"><code>	// p1 is 2-digit hour, src is after hour</code></span>
+<span class="codeline" id="line-278"><code>	p2, p3 = src[0], src[1]</code></span>
+<span class="codeline" id="line-279"><code>	dst = append(dst,</code></span>
+<span class="codeline" id="line-280"><code>		digits10[p1], digits01[p1], ':',</code></span>
+<span class="codeline" id="line-281"><code>		digits10[p2], digits01[p2], ':',</code></span>
+<span class="codeline" id="line-282"><code>		digits10[p3], digits01[p3],</code></span>
+<span class="codeline" id="line-283"><code>	)</code></span>
+<span class="codeline" id="line-284"><code>	return appendMicrosecs(dst, src[2:], int(length)-20), nil</code></span>
+<span class="codeline" id="line-285"><code>}</code></span>
+<span class="codeline" id="line-286"><code></code></span>
+<span class="codeline" id="line-287"><code>func formatBinaryTime(src []byte, length uint8) (driver.Value, error) {</code></span>
+<span class="codeline" id="line-288"><code>	// length expects the deterministic length of the zero value,</code></span>
+<span class="codeline" id="line-289"><code>	// negative time and 100+ hours are automatically added if needed</code></span>
+<span class="codeline" id="line-290"><code>	if len(src) == 0 {</code></span>
+<span class="codeline" id="line-291"><code>		return zeroDateTime[11 : 11+length], nil</code></span>
+<span class="codeline" id="line-292"><code>	}</code></span>
+<span class="codeline" id="line-293"><code>	var dst []byte // return value</code></span>
+<span class="codeline" id="line-294"><code></code></span>
+<span class="codeline" id="line-295"><code>	switch length {</code></span>
+<span class="codeline" id="line-296"><code>	case</code></span>
+<span class="codeline" id="line-297"><code>		8,                      // time (can be up to 10 when negative and 100+ hours)</code></span>
+<span class="codeline" id="line-298"><code>		10, 11, 12, 13, 14, 15: // time with fractional seconds</code></span>
+<span class="codeline" id="line-299"><code>	default:</code></span>
+<span class="codeline" id="line-300"><code>		return nil, fmt.Errorf("illegal TIME length %d", length)</code></span>
+<span class="codeline" id="line-301"><code>	}</code></span>
+<span class="codeline" id="line-302"><code>	switch len(src) {</code></span>
+<span class="codeline" id="line-303"><code>	case 8, 12:</code></span>
+<span class="codeline" id="line-304"><code>	default:</code></span>
+<span class="codeline" id="line-305"><code>		return nil, fmt.Errorf("invalid TIME packet length %d", len(src))</code></span>
+<span class="codeline" id="line-306"><code>	}</code></span>
+<span class="codeline" id="line-307"><code>	// +2 to enable negative time and 100+ hours</code></span>
+<span class="codeline" id="line-308"><code>	dst = make([]byte, 0, length+2)</code></span>
+<span class="codeline" id="line-309"><code>	if src[0] == 1 {</code></span>
+<span class="codeline" id="line-310"><code>		dst = append(dst, '-')</code></span>
+<span class="codeline" id="line-311"><code>	}</code></span>
+<span class="codeline" id="line-312"><code>	days := binary.LittleEndian.Uint32(src[1:5])</code></span>
+<span class="codeline" id="line-313"><code>	hours := int64(days)*24 + int64(src[5])</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>	if hours &gt;= 100 {</code></span>
+<span class="codeline" id="line-316"><code>		dst = strconv.AppendInt(dst, hours, 10)</code></span>
+<span class="codeline" id="line-317"><code>	} else {</code></span>
+<span class="codeline" id="line-318"><code>		dst = append(dst, digits10[hours], digits01[hours])</code></span>
+<span class="codeline" id="line-319"><code>	}</code></span>
+<span class="codeline" id="line-320"><code></code></span>
+<span class="codeline" id="line-321"><code>	min, sec := src[6], src[7]</code></span>
+<span class="codeline" id="line-322"><code>	dst = append(dst, ':',</code></span>
+<span class="codeline" id="line-323"><code>		digits10[min], digits01[min], ':',</code></span>
+<span class="codeline" id="line-324"><code>		digits10[sec], digits01[sec],</code></span>
+<span class="codeline" id="line-325"><code>	)</code></span>
+<span class="codeline" id="line-326"><code>	return appendMicrosecs(dst, src[8:], int(length)-9), nil</code></span>
+<span class="codeline" id="line-327"><code>}</code></span>
+<span class="codeline" id="line-328"><code></code></span>
+<span class="codeline" id="line-329"><code>/******************************************************************************</code></span>
+<span class="codeline" id="line-330"><code>*                       Convert from and to bytes                             *</code></span>
+<span class="codeline" id="line-331"><code>******************************************************************************/</code></span>
+<span class="codeline" id="line-332"><code></code></span>
+<span class="codeline" id="line-333"><code>func uint64ToBytes(n uint64) []byte {</code></span>
+<span class="codeline" id="line-334"><code>	return []byte{</code></span>
+<span class="codeline" id="line-335"><code>		byte(n),</code></span>
+<span class="codeline" id="line-336"><code>		byte(n &gt;&gt; 8),</code></span>
+<span class="codeline" id="line-337"><code>		byte(n &gt;&gt; 16),</code></span>
+<span class="codeline" id="line-338"><code>		byte(n &gt;&gt; 24),</code></span>
+<span class="codeline" id="line-339"><code>		byte(n &gt;&gt; 32),</code></span>
+<span class="codeline" id="line-340"><code>		byte(n &gt;&gt; 40),</code></span>
+<span class="codeline" id="line-341"><code>		byte(n &gt;&gt; 48),</code></span>
+<span class="codeline" id="line-342"><code>		byte(n &gt;&gt; 56),</code></span>
+<span class="codeline" id="line-343"><code>	}</code></span>
+<span class="codeline" id="line-344"><code>}</code></span>
+<span class="codeline" id="line-345"><code></code></span>
+<span class="codeline" id="line-346"><code>func uint64ToString(n uint64) []byte {</code></span>
+<span class="codeline" id="line-347"><code>	var a [20]byte</code></span>
+<span class="codeline" id="line-348"><code>	i := 20</code></span>
+<span class="codeline" id="line-349"><code></code></span>
+<span class="codeline" id="line-350"><code>	// U+0030 = 0</code></span>
+<span class="codeline" id="line-351"><code>	// ...</code></span>
+<span class="codeline" id="line-352"><code>	// U+0039 = 9</code></span>
+<span class="codeline" id="line-353"><code></code></span>
+<span class="codeline" id="line-354"><code>	var q uint64</code></span>
+<span class="codeline" id="line-355"><code>	for n &gt;= 10 {</code></span>
+<span class="codeline" id="line-356"><code>		i--</code></span>
+<span class="codeline" id="line-357"><code>		q = n / 10</code></span>
+<span class="codeline" id="line-358"><code>		a[i] = uint8(n-q*10) + 0x30</code></span>
+<span class="codeline" id="line-359"><code>		n = q</code></span>
+<span class="codeline" id="line-360"><code>	}</code></span>
+<span class="codeline" id="line-361"><code></code></span>
+<span class="codeline" id="line-362"><code>	i--</code></span>
+<span class="codeline" id="line-363"><code>	a[i] = uint8(n) + 0x30</code></span>
+<span class="codeline" id="line-364"><code></code></span>
+<span class="codeline" id="line-365"><code>	return a[i:]</code></span>
+<span class="codeline" id="line-366"><code>}</code></span>
+<span class="codeline" id="line-367"><code></code></span>
+<span class="codeline" id="line-368"><code>// treats string value as unsigned integer representation</code></span>
+<span class="codeline" id="line-369"><code>func stringToInt(b []byte) int {</code></span>
+<span class="codeline" id="line-370"><code>	val := 0</code></span>
+<span class="codeline" id="line-371"><code>	for i := range b {</code></span>
+<span class="codeline" id="line-372"><code>		val *= 10</code></span>
+<span class="codeline" id="line-373"><code>		val += int(b[i] - 0x30)</code></span>
+<span class="codeline" id="line-374"><code>	}</code></span>
+<span class="codeline" id="line-375"><code>	return val</code></span>
+<span class="codeline" id="line-376"><code>}</code></span>
+<span class="codeline" id="line-377"><code></code></span>
+<span class="codeline" id="line-378"><code>// returns the string read as a bytes slice, wheter the value is NULL,</code></span>
+<span class="codeline" id="line-379"><code>// the number of bytes read and an error, in case the string is longer than</code></span>
+<span class="codeline" id="line-380"><code>// the input slice</code></span>
+<span class="codeline" id="line-381"><code>func readLengthEncodedString(b []byte) ([]byte, bool, int, error) {</code></span>
+<span class="codeline" id="line-382"><code>	// Get length</code></span>
+<span class="codeline" id="line-383"><code>	num, isNull, n := readLengthEncodedInteger(b)</code></span>
+<span class="codeline" id="line-384"><code>	if num &lt; 1 {</code></span>
+<span class="codeline" id="line-385"><code>		return b[n:n], isNull, n, nil</code></span>
+<span class="codeline" id="line-386"><code>	}</code></span>
+<span class="codeline" id="line-387"><code></code></span>
+<span class="codeline" id="line-388"><code>	n += int(num)</code></span>
+<span class="codeline" id="line-389"><code></code></span>
+<span class="codeline" id="line-390"><code>	// Check data length</code></span>
+<span class="codeline" id="line-391"><code>	if len(b) &gt;= n {</code></span>
+<span class="codeline" id="line-392"><code>		return b[n-int(num) : n : n], false, n, nil</code></span>
+<span class="codeline" id="line-393"><code>	}</code></span>
+<span class="codeline" id="line-394"><code>	return nil, false, n, io.EOF</code></span>
+<span class="codeline" id="line-395"><code>}</code></span>
+<span class="codeline" id="line-396"><code></code></span>
+<span class="codeline" id="line-397"><code>// returns the number of bytes skipped and an error, in case the string is</code></span>
+<span class="codeline" id="line-398"><code>// longer than the input slice</code></span>
+<span class="codeline" id="line-399"><code>func skipLengthEncodedString(b []byte) (int, error) {</code></span>
+<span class="codeline" id="line-400"><code>	// Get length</code></span>
+<span class="codeline" id="line-401"><code>	num, _, n := readLengthEncodedInteger(b)</code></span>
+<span class="codeline" id="line-402"><code>	if num &lt; 1 {</code></span>
+<span class="codeline" id="line-403"><code>		return n, nil</code></span>
+<span class="codeline" id="line-404"><code>	}</code></span>
+<span class="codeline" id="line-405"><code></code></span>
+<span class="codeline" id="line-406"><code>	n += int(num)</code></span>
+<span class="codeline" id="line-407"><code></code></span>
+<span class="codeline" id="line-408"><code>	// Check data length</code></span>
+<span class="codeline" id="line-409"><code>	if len(b) &gt;= n {</code></span>
+<span class="codeline" id="line-410"><code>		return n, nil</code></span>
+<span class="codeline" id="line-411"><code>	}</code></span>
+<span class="codeline" id="line-412"><code>	return n, io.EOF</code></span>
+<span class="codeline" id="line-413"><code>}</code></span>
+<span class="codeline" id="line-414"><code></code></span>
+<span class="codeline" id="line-415"><code>// returns the number read, whether the value is NULL and the number of bytes read</code></span>
+<span class="codeline" id="line-416"><code>func readLengthEncodedInteger(b []byte) (uint64, bool, int) {</code></span>
+<span class="codeline" id="line-417"><code>	// See issue #349</code></span>
+<span class="codeline" id="line-418"><code>	if len(b) == 0 {</code></span>
+<span class="codeline" id="line-419"><code>		return 0, true, 1</code></span>
+<span class="codeline" id="line-420"><code>	}</code></span>
+<span class="codeline" id="line-421"><code></code></span>
+<span class="codeline" id="line-422"><code>	switch b[0] {</code></span>
+<span class="codeline" id="line-423"><code>	// 251: NULL</code></span>
+<span class="codeline" id="line-424"><code>	case 0xfb:</code></span>
+<span class="codeline" id="line-425"><code>		return 0, true, 1</code></span>
+<span class="codeline" id="line-426"><code></code></span>
+<span class="codeline" id="line-427"><code>	// 252: value of following 2</code></span>
+<span class="codeline" id="line-428"><code>	case 0xfc:</code></span>
+<span class="codeline" id="line-429"><code>		return uint64(b[1]) | uint64(b[2])&lt;&lt;8, false, 3</code></span>
+<span class="codeline" id="line-430"><code></code></span>
+<span class="codeline" id="line-431"><code>	// 253: value of following 3</code></span>
+<span class="codeline" id="line-432"><code>	case 0xfd:</code></span>
+<span class="codeline" id="line-433"><code>		return uint64(b[1]) | uint64(b[2])&lt;&lt;8 | uint64(b[3])&lt;&lt;16, false, 4</code></span>
+<span class="codeline" id="line-434"><code></code></span>
+<span class="codeline" id="line-435"><code>	// 254: value of following 8</code></span>
+<span class="codeline" id="line-436"><code>	case 0xfe:</code></span>
+<span class="codeline" id="line-437"><code>		return uint64(b[1]) | uint64(b[2])&lt;&lt;8 | uint64(b[3])&lt;&lt;16 |</code></span>
+<span class="codeline" id="line-438"><code>				uint64(b[4])&lt;&lt;24 | uint64(b[5])&lt;&lt;32 | uint64(b[6])&lt;&lt;40 |</code></span>
+<span class="codeline" id="line-439"><code>				uint64(b[7])&lt;&lt;48 | uint64(b[8])&lt;&lt;56,</code></span>
+<span class="codeline" id="line-440"><code>			false, 9</code></span>
+<span class="codeline" id="line-441"><code>	}</code></span>
+<span class="codeline" id="line-442"><code></code></span>
+<span class="codeline" id="line-443"><code>	// 0-250: value of first byte</code></span>
+<span class="codeline" id="line-444"><code>	return uint64(b[0]), false, 1</code></span>
+<span class="codeline" id="line-445"><code>}</code></span>
+<span class="codeline" id="line-446"><code></code></span>
+<span class="codeline" id="line-447"><code>// encodes a uint64 value and appends it to the given bytes slice</code></span>
+<span class="codeline" id="line-448"><code>func appendLengthEncodedInteger(b []byte, n uint64) []byte {</code></span>
+<span class="codeline" id="line-449"><code>	switch {</code></span>
+<span class="codeline" id="line-450"><code>	case n &lt;= 250:</code></span>
+<span class="codeline" id="line-451"><code>		return append(b, byte(n))</code></span>
+<span class="codeline" id="line-452"><code></code></span>
+<span class="codeline" id="line-453"><code>	case n &lt;= 0xffff:</code></span>
+<span class="codeline" id="line-454"><code>		return append(b, 0xfc, byte(n), byte(n&gt;&gt;8))</code></span>
+<span class="codeline" id="line-455"><code></code></span>
+<span class="codeline" id="line-456"><code>	case n &lt;= 0xffffff:</code></span>
+<span class="codeline" id="line-457"><code>		return append(b, 0xfd, byte(n), byte(n&gt;&gt;8), byte(n&gt;&gt;16))</code></span>
+<span class="codeline" id="line-458"><code>	}</code></span>
+<span class="codeline" id="line-459"><code>	return append(b, 0xfe, byte(n), byte(n&gt;&gt;8), byte(n&gt;&gt;16), byte(n&gt;&gt;24),</code></span>
+<span class="codeline" id="line-460"><code>		byte(n&gt;&gt;32), byte(n&gt;&gt;40), byte(n&gt;&gt;48), byte(n&gt;&gt;56))</code></span>
+<span class="codeline" id="line-461"><code>}</code></span>
+<span class="codeline" id="line-462"><code></code></span>
+<span class="codeline" id="line-463"><code>// reserveBuffer checks cap(buf) and expand buffer to len(buf) + appendSize.</code></span>
+<span class="codeline" id="line-464"><code>// If cap(buf) is not enough, reallocate new buffer.</code></span>
+<span class="codeline" id="line-465"><code>func reserveBuffer(buf []byte, appendSize int) []byte {</code></span>
+<span class="codeline" id="line-466"><code>	newSize := len(buf) + appendSize</code></span>
+<span class="codeline" id="line-467"><code>	if cap(buf) &lt; newSize {</code></span>
+<span class="codeline" id="line-468"><code>		// Grow buffer exponentially</code></span>
+<span class="codeline" id="line-469"><code>		newBuf := make([]byte, len(buf)*2+appendSize)</code></span>
+<span class="codeline" id="line-470"><code>		copy(newBuf, buf)</code></span>
+<span class="codeline" id="line-471"><code>		buf = newBuf</code></span>
+<span class="codeline" id="line-472"><code>	}</code></span>
+<span class="codeline" id="line-473"><code>	return buf[:newSize]</code></span>
+<span class="codeline" id="line-474"><code>}</code></span>
+<span class="codeline" id="line-475"><code></code></span>
+<span class="codeline" id="line-476"><code>// escapeBytesBackslash escapes []byte with backslashes (\)</code></span>
+<span class="codeline" id="line-477"><code>// This escapes the contents of a string (provided as []byte) by adding backslashes before special</code></span>
+<span class="codeline" id="line-478"><code>// characters, and turning others into specific escape sequences, such as</code></span>
+<span class="codeline" id="line-479"><code>// turning newlines into \n and null bytes into \0.</code></span>
+<span class="codeline" id="line-480"><code>// https://github.com/mysql/mysql-server/blob/mysql-5.7.5/mysys/charset.c#L823-L932</code></span>
+<span class="codeline" id="line-481"><code>func escapeBytesBackslash(buf, v []byte) []byte {</code></span>
+<span class="codeline" id="line-482"><code>	pos := len(buf)</code></span>
+<span class="codeline" id="line-483"><code>	buf = reserveBuffer(buf, len(v)*2)</code></span>
+<span class="codeline" id="line-484"><code></code></span>
+<span class="codeline" id="line-485"><code>	for _, c := range v {</code></span>
+<span class="codeline" id="line-486"><code>		switch c {</code></span>
+<span class="codeline" id="line-487"><code>		case '\x00':</code></span>
+<span class="codeline" id="line-488"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-489"><code>			buf[pos+1] = '0'</code></span>
+<span class="codeline" id="line-490"><code>			pos += 2</code></span>
+<span class="codeline" id="line-491"><code>		case '\n':</code></span>
+<span class="codeline" id="line-492"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-493"><code>			buf[pos+1] = 'n'</code></span>
+<span class="codeline" id="line-494"><code>			pos += 2</code></span>
+<span class="codeline" id="line-495"><code>		case '\r':</code></span>
+<span class="codeline" id="line-496"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-497"><code>			buf[pos+1] = 'r'</code></span>
+<span class="codeline" id="line-498"><code>			pos += 2</code></span>
+<span class="codeline" id="line-499"><code>		case '\x1a':</code></span>
+<span class="codeline" id="line-500"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-501"><code>			buf[pos+1] = 'Z'</code></span>
+<span class="codeline" id="line-502"><code>			pos += 2</code></span>
+<span class="codeline" id="line-503"><code>		case '\'':</code></span>
+<span class="codeline" id="line-504"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-505"><code>			buf[pos+1] = '\''</code></span>
+<span class="codeline" id="line-506"><code>			pos += 2</code></span>
+<span class="codeline" id="line-507"><code>		case '"':</code></span>
+<span class="codeline" id="line-508"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-509"><code>			buf[pos+1] = '"'</code></span>
+<span class="codeline" id="line-510"><code>			pos += 2</code></span>
+<span class="codeline" id="line-511"><code>		case '\\':</code></span>
+<span class="codeline" id="line-512"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-513"><code>			buf[pos+1] = '\\'</code></span>
+<span class="codeline" id="line-514"><code>			pos += 2</code></span>
+<span class="codeline" id="line-515"><code>		default:</code></span>
+<span class="codeline" id="line-516"><code>			buf[pos] = c</code></span>
+<span class="codeline" id="line-517"><code>			pos++</code></span>
+<span class="codeline" id="line-518"><code>		}</code></span>
+<span class="codeline" id="line-519"><code>	}</code></span>
+<span class="codeline" id="line-520"><code></code></span>
+<span class="codeline" id="line-521"><code>	return buf[:pos]</code></span>
+<span class="codeline" id="line-522"><code>}</code></span>
+<span class="codeline" id="line-523"><code></code></span>
+<span class="codeline" id="line-524"><code>// escapeStringBackslash is similar to escapeBytesBackslash but for string.</code></span>
+<span class="codeline" id="line-525"><code>func escapeStringBackslash(buf []byte, v string) []byte {</code></span>
+<span class="codeline" id="line-526"><code>	pos := len(buf)</code></span>
+<span class="codeline" id="line-527"><code>	buf = reserveBuffer(buf, len(v)*2)</code></span>
+<span class="codeline" id="line-528"><code></code></span>
+<span class="codeline" id="line-529"><code>	for i := 0; i &lt; len(v); i++ {</code></span>
+<span class="codeline" id="line-530"><code>		c := v[i]</code></span>
+<span class="codeline" id="line-531"><code>		switch c {</code></span>
+<span class="codeline" id="line-532"><code>		case '\x00':</code></span>
+<span class="codeline" id="line-533"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-534"><code>			buf[pos+1] = '0'</code></span>
+<span class="codeline" id="line-535"><code>			pos += 2</code></span>
+<span class="codeline" id="line-536"><code>		case '\n':</code></span>
+<span class="codeline" id="line-537"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-538"><code>			buf[pos+1] = 'n'</code></span>
+<span class="codeline" id="line-539"><code>			pos += 2</code></span>
+<span class="codeline" id="line-540"><code>		case '\r':</code></span>
+<span class="codeline" id="line-541"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-542"><code>			buf[pos+1] = 'r'</code></span>
+<span class="codeline" id="line-543"><code>			pos += 2</code></span>
+<span class="codeline" id="line-544"><code>		case '\x1a':</code></span>
+<span class="codeline" id="line-545"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-546"><code>			buf[pos+1] = 'Z'</code></span>
+<span class="codeline" id="line-547"><code>			pos += 2</code></span>
+<span class="codeline" id="line-548"><code>		case '\'':</code></span>
+<span class="codeline" id="line-549"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-550"><code>			buf[pos+1] = '\''</code></span>
+<span class="codeline" id="line-551"><code>			pos += 2</code></span>
+<span class="codeline" id="line-552"><code>		case '"':</code></span>
+<span class="codeline" id="line-553"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-554"><code>			buf[pos+1] = '"'</code></span>
+<span class="codeline" id="line-555"><code>			pos += 2</code></span>
+<span class="codeline" id="line-556"><code>		case '\\':</code></span>
+<span class="codeline" id="line-557"><code>			buf[pos] = '\\'</code></span>
+<span class="codeline" id="line-558"><code>			buf[pos+1] = '\\'</code></span>
+<span class="codeline" id="line-559"><code>			pos += 2</code></span>
+<span class="codeline" id="line-560"><code>		default:</code></span>
+<span class="codeline" id="line-561"><code>			buf[pos] = c</code></span>
+<span class="codeline" id="line-562"><code>			pos++</code></span>
+<span class="codeline" id="line-563"><code>		}</code></span>
+<span class="codeline" id="line-564"><code>	}</code></span>
+<span class="codeline" id="line-565"><code></code></span>
+<span class="codeline" id="line-566"><code>	return buf[:pos]</code></span>
+<span class="codeline" id="line-567"><code>}</code></span>
+<span class="codeline" id="line-568"><code></code></span>
+<span class="codeline" id="line-569"><code>// escapeBytesQuotes escapes apostrophes in []byte by doubling them up.</code></span>
+<span class="codeline" id="line-570"><code>// This escapes the contents of a string by doubling up any apostrophes that</code></span>
+<span class="codeline" id="line-571"><code>// it contains. This is used when the NO_BACKSLASH_ESCAPES SQL_MODE is in</code></span>
+<span class="codeline" id="line-572"><code>// effect on the server.</code></span>
+<span class="codeline" id="line-573"><code>// https://github.com/mysql/mysql-server/blob/mysql-5.7.5/mysys/charset.c#L963-L1038</code></span>
+<span class="codeline" id="line-574"><code>func escapeBytesQuotes(buf, v []byte) []byte {</code></span>
+<span class="codeline" id="line-575"><code>	pos := len(buf)</code></span>
+<span class="codeline" id="line-576"><code>	buf = reserveBuffer(buf, len(v)*2)</code></span>
+<span class="codeline" id="line-577"><code></code></span>
+<span class="codeline" id="line-578"><code>	for _, c := range v {</code></span>
+<span class="codeline" id="line-579"><code>		if c == '\'' {</code></span>
+<span class="codeline" id="line-580"><code>			buf[pos] = '\''</code></span>
+<span class="codeline" id="line-581"><code>			buf[pos+1] = '\''</code></span>
+<span class="codeline" id="line-582"><code>			pos += 2</code></span>
+<span class="codeline" id="line-583"><code>		} else {</code></span>
+<span class="codeline" id="line-584"><code>			buf[pos] = c</code></span>
+<span class="codeline" id="line-585"><code>			pos++</code></span>
+<span class="codeline" id="line-586"><code>		}</code></span>
+<span class="codeline" id="line-587"><code>	}</code></span>
+<span class="codeline" id="line-588"><code></code></span>
+<span class="codeline" id="line-589"><code>	return buf[:pos]</code></span>
+<span class="codeline" id="line-590"><code>}</code></span>
+<span class="codeline" id="line-591"><code></code></span>
+<span class="codeline" id="line-592"><code>// escapeStringQuotes is similar to escapeBytesQuotes but for string.</code></span>
+<span class="codeline" id="line-593"><code>func escapeStringQuotes(buf []byte, v string) []byte {</code></span>
+<span class="codeline" id="line-594"><code>	pos := len(buf)</code></span>
+<span class="codeline" id="line-595"><code>	buf = reserveBuffer(buf, len(v)*2)</code></span>
+<span class="codeline" id="line-596"><code></code></span>
+<span class="codeline" id="line-597"><code>	for i := 0; i &lt; len(v); i++ {</code></span>
+<span class="codeline" id="line-598"><code>		c := v[i]</code></span>
+<span class="codeline" id="line-599"><code>		if c == '\'' {</code></span>
+<span class="codeline" id="line-600"><code>			buf[pos] = '\''</code></span>
+<span class="codeline" id="line-601"><code>			buf[pos+1] = '\''</code></span>
+<span class="codeline" id="line-602"><code>			pos += 2</code></span>
+<span class="codeline" id="line-603"><code>		} else {</code></span>
+<span class="codeline" id="line-604"><code>			buf[pos] = c</code></span>
+<span class="codeline" id="line-605"><code>			pos++</code></span>
+<span class="codeline" id="line-606"><code>		}</code></span>
+<span class="codeline" id="line-607"><code>	}</code></span>
+<span class="codeline" id="line-608"><code></code></span>
+<span class="codeline" id="line-609"><code>	return buf[:pos]</code></span>
+<span class="codeline" id="line-610"><code>}</code></span>
+<span class="codeline" id="line-611"><code></code></span>
+<span class="codeline" id="line-612"><code>/******************************************************************************</code></span>
+<span class="codeline" id="line-613"><code>*                               Sync utils                                    *</code></span>
+<span class="codeline" id="line-614"><code>******************************************************************************/</code></span>
+<span class="codeline" id="line-615"><code></code></span>
+<span class="codeline" id="line-616"><code>// noCopy may be embedded into structs which must not be copied</code></span>
+<span class="codeline" id="line-617"><code>// after the first use.</code></span>
+<span class="codeline" id="line-618"><code>//</code></span>
+<span class="codeline" id="line-619"><code>// See https://github.com/golang/go/issues/8005#issuecomment-190753527</code></span>
+<span class="codeline" id="line-620"><code>// for details.</code></span>
+<span class="codeline" id="line-621"><code>type noCopy struct{}</code></span>
+<span class="codeline" id="line-622"><code></code></span>
+<span class="codeline" id="line-623"><code>// Lock is a no-op used by -copylocks checker from `go vet`.</code></span>
+<span class="codeline" id="line-624"><code>func (*noCopy) Lock() {}</code></span>
+<span class="codeline" id="line-625"><code></code></span>
+<span class="codeline" id="line-626"><code>// atomicBool is a wrapper around uint32 for usage as a boolean value with</code></span>
+<span class="codeline" id="line-627"><code>// atomic access.</code></span>
+<span class="codeline" id="line-628"><code>type atomicBool struct {</code></span>
+<span class="codeline" id="line-629"><code>	_noCopy noCopy</code></span>
+<span class="codeline" id="line-630"><code>	value   uint32</code></span>
+<span class="codeline" id="line-631"><code>}</code></span>
+<span class="codeline" id="line-632"><code></code></span>
+<span class="codeline" id="line-633"><code>// IsSet returns whether the current boolean value is true</code></span>
+<span class="codeline" id="line-634"><code>func (ab *atomicBool) IsSet() bool {</code></span>
+<span class="codeline" id="line-635"><code>	return atomic.LoadUint32(&amp;ab.value) &gt; 0</code></span>
+<span class="codeline" id="line-636"><code>}</code></span>
+<span class="codeline" id="line-637"><code></code></span>
+<span class="codeline" id="line-638"><code>// Set sets the value of the bool regardless of the previous value</code></span>
+<span class="codeline" id="line-639"><code>func (ab *atomicBool) Set(value bool) {</code></span>
+<span class="codeline" id="line-640"><code>	if value {</code></span>
+<span class="codeline" id="line-641"><code>		atomic.StoreUint32(&amp;ab.value, 1)</code></span>
+<span class="codeline" id="line-642"><code>	} else {</code></span>
+<span class="codeline" id="line-643"><code>		atomic.StoreUint32(&amp;ab.value, 0)</code></span>
+<span class="codeline" id="line-644"><code>	}</code></span>
+<span class="codeline" id="line-645"><code>}</code></span>
+<span class="codeline" id="line-646"><code></code></span>
+<span class="codeline" id="line-647"><code>// TrySet sets the value of the bool and returns whether the value changed</code></span>
+<span class="codeline" id="line-648"><code>func (ab *atomicBool) TrySet(value bool) bool {</code></span>
+<span class="codeline" id="line-649"><code>	if value {</code></span>
+<span class="codeline" id="line-650"><code>		return atomic.SwapUint32(&amp;ab.value, 1) == 0</code></span>
+<span class="codeline" id="line-651"><code>	}</code></span>
+<span class="codeline" id="line-652"><code>	return atomic.SwapUint32(&amp;ab.value, 0) &gt; 0</code></span>
+<span class="codeline" id="line-653"><code>}</code></span>
+<span class="codeline" id="line-654"><code></code></span>
+<span class="codeline" id="line-655"><code>// atomicError is a wrapper for atomically accessed error values</code></span>
+<span class="codeline" id="line-656"><code>type atomicError struct {</code></span>
+<span class="codeline" id="line-657"><code>	_noCopy noCopy</code></span>
+<span class="codeline" id="line-658"><code>	value   atomic.Value</code></span>
+<span class="codeline" id="line-659"><code>}</code></span>
+<span class="codeline" id="line-660"><code></code></span>
+<span class="codeline" id="line-661"><code>// Set sets the error value regardless of the previous value.</code></span>
+<span class="codeline" id="line-662"><code>// The value must not be nil</code></span>
+<span class="codeline" id="line-663"><code>func (ae *atomicError) Set(value error) {</code></span>
+<span class="codeline" id="line-664"><code>	ae.value.Store(value)</code></span>
+<span class="codeline" id="line-665"><code>}</code></span>
+<span class="codeline" id="line-666"><code></code></span>
+<span class="codeline" id="line-667"><code>// Value returns the current error value</code></span>
+<span class="codeline" id="line-668"><code>func (ae *atomicError) Value() error {</code></span>
+<span class="codeline" id="line-669"><code>	if v := ae.value.Load(); v != nil {</code></span>
+<span class="codeline" id="line-670"><code>		// this will panic if the value doesn't implement the error interface</code></span>
+<span class="codeline" id="line-671"><code>		return v.(error)</code></span>
+<span class="codeline" id="line-672"><code>	}</code></span>
+<span class="codeline" id="line-673"><code>	return nil</code></span>
+<span class="codeline" id="line-674"><code>}</code></span>
+<span class="codeline" id="line-675"><code></code></span>
+<span class="codeline" id="line-676"><code>func namedValueToValue(named []driver.NamedValue) ([]driver.Value, error) {</code></span>
+<span class="codeline" id="line-677"><code>	dargs := make([]driver.Value, len(named))</code></span>
+<span class="codeline" id="line-678"><code>	for n, param := range named {</code></span>
+<span class="codeline" id="line-679"><code>		if len(param.Name) &gt; 0 {</code></span>
+<span class="codeline" id="line-680"><code>			// TODO: support the use of Named Parameters #561</code></span>
+<span class="codeline" id="line-681"><code>			return nil, errors.New("mysql: driver does not support the use of Named Parameters")</code></span>
+<span class="codeline" id="line-682"><code>		}</code></span>
+<span class="codeline" id="line-683"><code>		dargs[n] = param.Value</code></span>
+<span class="codeline" id="line-684"><code>	}</code></span>
+<span class="codeline" id="line-685"><code>	return dargs, nil</code></span>
+<span class="codeline" id="line-686"><code>}</code></span>
+<span class="codeline" id="line-687"><code></code></span>
+<span class="codeline" id="line-688"><code>func mapIsolationLevel(level driver.IsolationLevel) (string, error) {</code></span>
+<span class="codeline" id="line-689"><code>	switch sql.IsolationLevel(level) {</code></span>
+<span class="codeline" id="line-690"><code>	case sql.LevelRepeatableRead:</code></span>
+<span class="codeline" id="line-691"><code>		return "REPEATABLE READ", nil</code></span>
+<span class="codeline" id="line-692"><code>	case sql.LevelReadCommitted:</code></span>
+<span class="codeline" id="line-693"><code>		return "READ COMMITTED", nil</code></span>
+<span class="codeline" id="line-694"><code>	case sql.LevelReadUncommitted:</code></span>
+<span class="codeline" id="line-695"><code>		return "READ UNCOMMITTED", nil</code></span>
+<span class="codeline" id="line-696"><code>	case sql.LevelSerializable:</code></span>
+<span class="codeline" id="line-697"><code>		return "SERIALIZABLE", nil</code></span>
+<span class="codeline" id="line-698"><code>	default:</code></span>
+<span class="codeline" id="line-699"><code>		return "", fmt.Errorf("mysql: unsupported isolation level: %v", level)</code></span>
+<span class="codeline" id="line-700"><code>	}</code></span>
+<span class="codeline" id="line-701"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

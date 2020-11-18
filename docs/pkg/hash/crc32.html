@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: hash/crc32</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>crc32</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-hash/crc32">hash/crc32</a><i> (on <a href="https://golang.org/pkg/hash/crc32/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/hash/crc32" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/hash/crc32.html">5 packages</a>, and imported by <a href="../../dep/hash/crc32.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/hash/crc32/crc32.go.html#doc">d-&gt;</a> <a href="../../src/hash/crc32/crc32.go.html">crc32.go</a>
+	    <a href="../../src/hash/crc32/crc32_amd64.go.html">crc32_amd64.go</a>
+	    <a href="../../src/hash/crc32/crc32_generic.go.html">crc32_generic.go</a>
+	    <a href="../../src/hash/crc32/crc32_amd64.s.html">crc32_amd64.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Table" data-popularity="185">	 type <a href="../../src/hash/crc32/crc32.go.html#line-42">Table</a> <i>([...])</i>
+		Table is a 256-word table representing the polynomial for efficient processing.
+
+		<input type='checkbox' class="stat" id="Table-stat-results"><label for="Table-stat-results">As Outputs Of (1+)</label><span id='Table-stat-results-content' class="stat-content">
+			func <a href="#name-MakeTable">MakeTable</a>(poly <a href="../builtin.html#name-uint32">uint32</a>) *<b>Table</b></span>
+		<input type='checkbox' class="stat" id="Table-stat-params"><label for="Table-stat-params">As Inputs Of (3+)</label><span id='Table-stat-params-content' class="stat-content">
+			func <a href="#name-Checksum">Checksum</a>(data []<a href="../builtin.html#name-byte">byte</a>, tab *<b>Table</b>) <a href="../builtin.html#name-uint32">uint32</a>
+			func <a href="#name-New">New</a>(tab *<b>Table</b>) <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash32">Hash32</a>
+			func <a href="#name-Update">Update</a>(crc <a href="../builtin.html#name-uint32">uint32</a>, tab *<b>Table</b>, p []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-uint32">uint32</a></span>
+		<input type='checkbox' class="stat" id="Table-stat-values"><label for="Table-stat-values">As Types Of (1+)</label><span id='Table-stat-values-content' class="stat-content">
+			  var <a href="#name-IEEETable">IEEETable</a> *Table</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Castagnoli">	const <a href="../../src/hash/crc32/crc32.go.html#line-33">Castagnoli</a> = 2197175160
+		Castagnoli's polynomial, used in iSCSI.
+		Has better error detection characteristics than IEEE.
+		https://dx.doi.org/10.1109/26.231911</div>
+<div class="anchor" id="name-Checksum">	 func <a href="../../src/hash/crc32/crc32.go.html#line-247">Checksum</a>(data []<a href="../builtin.html#name-byte">byte</a>, tab *<a href="#name-Table">Table</a>) <a href="../builtin.html#name-uint32">uint32</a>
+		Checksum returns the CRC-32 checksum of data
+		using the polynomial represented by the Table.</div>
+<div class="anchor" id="name-ChecksumIEEE">	 func <a href="../../src/hash/crc32/crc32.go.html#line-251">ChecksumIEEE</a>(data []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-uint32">uint32</a>
+		ChecksumIEEE returns the CRC-32 checksum of data
+		using the IEEE polynomial.</div>
+<div class="anchor" id="name-IEEE">	const <a href="../../src/hash/crc32/crc32.go.html#line-28">IEEE</a> = 3988292384
+		IEEE is by far and away the most common CRC-32 polynomial.
+		Used by ethernet (IEEE 802.3), v.42, fddi, gzip, zip, png, ...</div>
+<div class="anchor" id="name-IEEETable">	  var <a href="../../src/hash/crc32/crc32.go.html#line-99">IEEETable</a> *<a href="#name-Table">Table</a>
+		IEEETable is the table for the IEEE polynomial.</div>
+<div class="anchor" id="name-Koopman">	const <a href="../../src/hash/crc32/crc32.go.html#line-38">Koopman</a> = 3945912366
+		Koopman's polynomial.
+		Also has better error detection characteristics than IEEE.
+		https://dx.doi.org/10.1109/DSN.2002.1028931</div>
+<div class="anchor" id="name-MakeTable">	 func <a href="../../src/hash/crc32/crc32.go.html#line-124">MakeTable</a>(poly <a href="../builtin.html#name-uint32">uint32</a>) *<a href="#name-Table">Table</a>
+		MakeTable returns a Table constructed from the specified polynomial.
+		The contents of this Table must not be modified.</div>
+<div class="anchor" id="name-New">	 func <a href="../../src/hash/crc32/crc32.go.html#line-147">New</a>(tab *<a href="#name-Table">Table</a>) <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash32">Hash32</a>
+		New creates a new hash.Hash32 computing the CRC-32 checksum using the
+		polynomial represented by the Table. Its Sum method will lay the
+		value out in big-endian byte order. The returned Hash32 also
+		implements encoding.BinaryMarshaler and encoding.BinaryUnmarshaler to
+		marshal and unmarshal the internal state of the hash.</div>
+<div class="anchor" id="name-NewIEEE">	 func <a href="../../src/hash/crc32/crc32.go.html#line-159">NewIEEE</a>() <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash32">Hash32</a>
+		NewIEEE creates a new hash.Hash32 computing the CRC-32 checksum using
+		the IEEE polynomial. Its Sum method will lay the value out in
+		big-endian byte order. The returned Hash32 also implements
+		encoding.BinaryMarshaler and encoding.BinaryUnmarshaler to marshal
+		and unmarshal the internal state of the hash.</div>
+<div class="anchor" id="name-Size">	const <a href="../../src/hash/crc32/crc32.go.html#line-22">Size</a> = 4
+		The size of a CRC-32 checksum in bytes.</div>
+<div class="anchor" id="name-Update">	 func <a href="../../src/hash/crc32/crc32.go.html#line-210">Update</a>(crc <a href="../builtin.html#name-uint32">uint32</a>, tab *<a href="#name-Table">Table</a>, p []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-uint32">uint32</a>
+		Update returns the result of adding the bytes in p to the crc.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

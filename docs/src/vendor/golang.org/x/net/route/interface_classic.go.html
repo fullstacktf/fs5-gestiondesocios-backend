@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: interface_classic.go in package vendor/golang.org/x/net/route</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	interface_classic.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../pkg/vendor/golang.org/x/net/route.html">vendor/golang.org/x/net/route</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2016 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build darwin dragonfly netbsd</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>package route</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>import "runtime"</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>func (w *wireFormat) parseInterfaceMessage(_ RIBType, b []byte) (Message, error) {</code></span>
+<span class="codeline" id="line-12"><code>	if len(b) &lt; w.bodyOff {</code></span>
+<span class="codeline" id="line-13"><code>		return nil, errMessageTooShort</code></span>
+<span class="codeline" id="line-14"><code>	}</code></span>
+<span class="codeline" id="line-15"><code>	l := int(nativeEndian.Uint16(b[:2]))</code></span>
+<span class="codeline" id="line-16"><code>	if len(b) &lt; l {</code></span>
+<span class="codeline" id="line-17"><code>		return nil, errInvalidMessage</code></span>
+<span class="codeline" id="line-18"><code>	}</code></span>
+<span class="codeline" id="line-19"><code>	attrs := uint(nativeEndian.Uint32(b[4:8]))</code></span>
+<span class="codeline" id="line-20"><code>	if attrs&amp;sysRTA_IFP == 0 {</code></span>
+<span class="codeline" id="line-21"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-22"><code>	}</code></span>
+<span class="codeline" id="line-23"><code>	m := &amp;InterfaceMessage{</code></span>
+<span class="codeline" id="line-24"><code>		Version: int(b[2]),</code></span>
+<span class="codeline" id="line-25"><code>		Type:    int(b[3]),</code></span>
+<span class="codeline" id="line-26"><code>		Addrs:   make([]Addr, sysRTAX_MAX),</code></span>
+<span class="codeline" id="line-27"><code>		Flags:   int(nativeEndian.Uint32(b[8:12])),</code></span>
+<span class="codeline" id="line-28"><code>		Index:   int(nativeEndian.Uint16(b[12:14])),</code></span>
+<span class="codeline" id="line-29"><code>		extOff:  w.extOff,</code></span>
+<span class="codeline" id="line-30"><code>		raw:     b[:l],</code></span>
+<span class="codeline" id="line-31"><code>	}</code></span>
+<span class="codeline" id="line-32"><code>	a, err := parseLinkAddr(b[w.bodyOff:])</code></span>
+<span class="codeline" id="line-33"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-34"><code>		return nil, err</code></span>
+<span class="codeline" id="line-35"><code>	}</code></span>
+<span class="codeline" id="line-36"><code>	m.Addrs[sysRTAX_IFP] = a</code></span>
+<span class="codeline" id="line-37"><code>	m.Name = a.(*LinkAddr).Name</code></span>
+<span class="codeline" id="line-38"><code>	return m, nil</code></span>
+<span class="codeline" id="line-39"><code>}</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>func (w *wireFormat) parseInterfaceAddrMessage(_ RIBType, b []byte) (Message, error) {</code></span>
+<span class="codeline" id="line-42"><code>	if len(b) &lt; w.bodyOff {</code></span>
+<span class="codeline" id="line-43"><code>		return nil, errMessageTooShort</code></span>
+<span class="codeline" id="line-44"><code>	}</code></span>
+<span class="codeline" id="line-45"><code>	l := int(nativeEndian.Uint16(b[:2]))</code></span>
+<span class="codeline" id="line-46"><code>	if len(b) &lt; l {</code></span>
+<span class="codeline" id="line-47"><code>		return nil, errInvalidMessage</code></span>
+<span class="codeline" id="line-48"><code>	}</code></span>
+<span class="codeline" id="line-49"><code>	m := &amp;InterfaceAddrMessage{</code></span>
+<span class="codeline" id="line-50"><code>		Version: int(b[2]),</code></span>
+<span class="codeline" id="line-51"><code>		Type:    int(b[3]),</code></span>
+<span class="codeline" id="line-52"><code>		Flags:   int(nativeEndian.Uint32(b[8:12])),</code></span>
+<span class="codeline" id="line-53"><code>		raw:     b[:l],</code></span>
+<span class="codeline" id="line-54"><code>	}</code></span>
+<span class="codeline" id="line-55"><code>	if runtime.GOOS == "netbsd" {</code></span>
+<span class="codeline" id="line-56"><code>		m.Index = int(nativeEndian.Uint16(b[16:18]))</code></span>
+<span class="codeline" id="line-57"><code>	} else {</code></span>
+<span class="codeline" id="line-58"><code>		m.Index = int(nativeEndian.Uint16(b[12:14]))</code></span>
+<span class="codeline" id="line-59"><code>	}</code></span>
+<span class="codeline" id="line-60"><code>	var err error</code></span>
+<span class="codeline" id="line-61"><code>	m.Addrs, err = parseAddrs(uint(nativeEndian.Uint32(b[4:8])), parseKernelInetAddr, b[w.bodyOff:])</code></span>
+<span class="codeline" id="line-62"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-63"><code>		return nil, err</code></span>
+<span class="codeline" id="line-64"><code>	}</code></span>
+<span class="codeline" id="line-65"><code>	return m, nil</code></span>
+<span class="codeline" id="line-66"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

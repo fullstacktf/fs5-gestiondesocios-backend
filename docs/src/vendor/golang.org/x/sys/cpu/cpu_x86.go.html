@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: cpu_x86.go in package vendor/golang.org/x/sys/cpu</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	cpu_x86.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../pkg/vendor/golang.org/x/sys/cpu.html">vendor/golang.org/x/sys/cpu</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2018 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build 386 amd64 amd64p32</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>package cpu</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>const cacheLineSize = 64</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>func init() {</code></span>
+<span class="codeline" id="line-12"><code>	Initialized = true</code></span>
+<span class="codeline" id="line-13"><code></code></span>
+<span class="codeline" id="line-14"><code>	maxID, _, _, _ := cpuid(0, 0)</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>	if maxID &lt; 1 {</code></span>
+<span class="codeline" id="line-17"><code>		return</code></span>
+<span class="codeline" id="line-18"><code>	}</code></span>
+<span class="codeline" id="line-19"><code></code></span>
+<span class="codeline" id="line-20"><code>	_, _, ecx1, edx1 := cpuid(1, 0)</code></span>
+<span class="codeline" id="line-21"><code>	X86.HasSSE2 = isSet(26, edx1)</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>	X86.HasSSE3 = isSet(0, ecx1)</code></span>
+<span class="codeline" id="line-24"><code>	X86.HasPCLMULQDQ = isSet(1, ecx1)</code></span>
+<span class="codeline" id="line-25"><code>	X86.HasSSSE3 = isSet(9, ecx1)</code></span>
+<span class="codeline" id="line-26"><code>	X86.HasFMA = isSet(12, ecx1)</code></span>
+<span class="codeline" id="line-27"><code>	X86.HasSSE41 = isSet(19, ecx1)</code></span>
+<span class="codeline" id="line-28"><code>	X86.HasSSE42 = isSet(20, ecx1)</code></span>
+<span class="codeline" id="line-29"><code>	X86.HasPOPCNT = isSet(23, ecx1)</code></span>
+<span class="codeline" id="line-30"><code>	X86.HasAES = isSet(25, ecx1)</code></span>
+<span class="codeline" id="line-31"><code>	X86.HasOSXSAVE = isSet(27, ecx1)</code></span>
+<span class="codeline" id="line-32"><code>	X86.HasRDRAND = isSet(30, ecx1)</code></span>
+<span class="codeline" id="line-33"><code></code></span>
+<span class="codeline" id="line-34"><code>	osSupportsAVX := false</code></span>
+<span class="codeline" id="line-35"><code>	// For XGETBV, OSXSAVE bit is required and sufficient.</code></span>
+<span class="codeline" id="line-36"><code>	if X86.HasOSXSAVE {</code></span>
+<span class="codeline" id="line-37"><code>		eax, _ := xgetbv()</code></span>
+<span class="codeline" id="line-38"><code>		// Check if XMM and YMM registers have OS support.</code></span>
+<span class="codeline" id="line-39"><code>		osSupportsAVX = isSet(1, eax) &amp;&amp; isSet(2, eax)</code></span>
+<span class="codeline" id="line-40"><code>	}</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>	X86.HasAVX = isSet(28, ecx1) &amp;&amp; osSupportsAVX</code></span>
+<span class="codeline" id="line-43"><code></code></span>
+<span class="codeline" id="line-44"><code>	if maxID &lt; 7 {</code></span>
+<span class="codeline" id="line-45"><code>		return</code></span>
+<span class="codeline" id="line-46"><code>	}</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>	_, ebx7, _, _ := cpuid(7, 0)</code></span>
+<span class="codeline" id="line-49"><code>	X86.HasBMI1 = isSet(3, ebx7)</code></span>
+<span class="codeline" id="line-50"><code>	X86.HasAVX2 = isSet(5, ebx7) &amp;&amp; osSupportsAVX</code></span>
+<span class="codeline" id="line-51"><code>	X86.HasBMI2 = isSet(8, ebx7)</code></span>
+<span class="codeline" id="line-52"><code>	X86.HasERMS = isSet(9, ebx7)</code></span>
+<span class="codeline" id="line-53"><code>	X86.HasRDSEED = isSet(18, ebx7)</code></span>
+<span class="codeline" id="line-54"><code>	X86.HasADX = isSet(19, ebx7)</code></span>
+<span class="codeline" id="line-55"><code>}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>func isSet(bitpos uint, value uint32) bool {</code></span>
+<span class="codeline" id="line-58"><code>	return value&amp;(1&lt;&lt;bitpos) != 0</code></span>
+<span class="codeline" id="line-59"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: executable_darwin.go in package os</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	executable_darwin.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/os.html">os</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2016 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package os</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import "errors"</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>var executablePath string // set by ../runtime/os_darwin.go</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>var initCwd, initCwdErr = Getwd()</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>func executable() (string, error) {</code></span>
+<span class="codeline" id="line-14"><code>	ep := executablePath</code></span>
+<span class="codeline" id="line-15"><code>	if len(ep) == 0 {</code></span>
+<span class="codeline" id="line-16"><code>		return ep, errors.New("cannot find executable path")</code></span>
+<span class="codeline" id="line-17"><code>	}</code></span>
+<span class="codeline" id="line-18"><code>	if ep[0] != '/' {</code></span>
+<span class="codeline" id="line-19"><code>		if initCwdErr != nil {</code></span>
+<span class="codeline" id="line-20"><code>			return ep, initCwdErr</code></span>
+<span class="codeline" id="line-21"><code>		}</code></span>
+<span class="codeline" id="line-22"><code>		if len(ep) &gt; 2 &amp;&amp; ep[0:2] == "./" {</code></span>
+<span class="codeline" id="line-23"><code>			// skip "./"</code></span>
+<span class="codeline" id="line-24"><code>			ep = ep[2:]</code></span>
+<span class="codeline" id="line-25"><code>		}</code></span>
+<span class="codeline" id="line-26"><code>		ep = initCwd + "/" + ep</code></span>
+<span class="codeline" id="line-27"><code>	}</code></span>
+<span class="codeline" id="line-28"><code>	return ep, nil</code></span>
+<span class="codeline" id="line-29"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: time</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>time</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-time">time</a><i> (on <a href="https://golang.org/pkg/time/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/time" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/time.html">5 packages</a>, and imported by <a href="../dep/time.html#imported-by">22 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/time/format.go.html">format.go</a>
+	    <a href="../src/time/sleep.go.html">sleep.go</a>
+	    <a href="../src/time/sys_unix.go.html">sys_unix.go</a>
+	    <a href="../src/time/tick.go.html">tick.go</a>
+	<a href="../src/time/time.go.html#doc">d-&gt;</a> <a href="../src/time/time.go.html">time.go</a>
+	    <a href="../src/time/zoneinfo.go.html">zoneinfo.go</a>
+	    <a href="../src/time/zoneinfo_read.go.html">zoneinfo_read.go</a>
+	    <a href="../src/time/zoneinfo_unix.go.html">zoneinfo_unix.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Duration" data-popularity="1780">	 type <a href="../src/time/time.go.html#line-583">Duration</a> <a href="builtin.html#name-int64">int64</a>
+		A Duration represents the elapsed time between two instants
+		as an int64 nanosecond count. The representation limits the
+		largest representable duration to approximately 290 years.
+
+		<input type='checkbox' class="stat" id="Duration-stat-methods"><label for="Duration-stat-methods">Exported Methods (9)</label><span id='Duration-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/time/time.go.html#line-761">Hours</a>() <a href="builtin.html#name-float64">float64</a>
+			 (T) <a href="../src/time/time.go.html#line-732">Microseconds</a>() <a href="builtin.html#name-int64">int64</a>
+			 (T) <a href="../src/time/time.go.html#line-735">Milliseconds</a>() <a href="builtin.html#name-int64">int64</a>
+			 (T) <a href="../src/time/time.go.html#line-754">Minutes</a>() <a href="builtin.html#name-float64">float64</a>
+			 (T) <a href="../src/time/time.go.html#line-729">Nanoseconds</a>() <a href="builtin.html#name-int64">int64</a>
+			 (T) <a href="../src/time/time.go.html#line-788">Round</a>(m <b>Duration</b>) <b>Duration</b>
+			 (T) <a href="../src/time/time.go.html#line-747">Seconds</a>() <a href="builtin.html#name-float64">float64</a>
+			 (T) <a href="../src/time/time.go.html#line-614">String</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/time/time.go.html#line-769">Truncate</a>(m <b>Duration</b>) <b>Duration</b></span>
+		<input type='checkbox' class="stat" id="Duration-stat-impls"><label for="Duration-stat-impls">Implements (1+)</label><span id='Duration-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Duration-stat-results"><label for="Duration-stat-results">As Outputs Of (8+)</label><span id='Duration-stat-results-content' class="stat-content">
+			func <a href="#name-ParseDuration">ParseDuration</a>(s <a href="builtin.html#name-string">string</a>) (<b>Duration</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Since">Since</a>(t <a href="#name-Time">Time</a>) <b>Duration</b>
+			func <a href="#name-Until">Until</a>(t <a href="#name-Time">Time</a>) <b>Duration</b>
+			func <a href="#name-Duration">Duration</a>.<a href="../src/time/time.go.html#line-788">Round</a>(m <b>Duration</b>) <b>Duration</b>
+			func <a href="#name-Duration">Duration</a>.<a href="../src/time/time.go.html#line-769">Truncate</a>(m <b>Duration</b>) <b>Duration</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-841">Sub</a>(u <a href="#name-Time">Time</a>) <b>Duration</b>
+			func os.(*<a href="os.html#name-ProcessState">ProcessState</a>).<a href="../src/os/exec.go.html#line-140">SystemTime</a>() <b>Duration</b>
+			func os.(*<a href="os.html#name-ProcessState">ProcessState</a>).<a href="../src/os/exec.go.html#line-135">UserTime</a>() <b>Duration</b></span>
+		<input type='checkbox' class="stat" id="Duration-stat-params"><label for="Duration-stat-params">As Inputs Of (19+)</label><span id='Duration-stat-params-content' class="stat-content">
+			func <a href="#name-After">After</a>(d <b>Duration</b>) &lt;-chan <a href="#name-Time">Time</a>
+			func <a href="#name-AfterFunc">AfterFunc</a>(d <b>Duration</b>, f func()) *<a href="#name-Timer">Timer</a>
+			func <a href="#name-NewTicker">NewTicker</a>(d <b>Duration</b>) *<a href="#name-Ticker">Ticker</a>
+			func <a href="#name-NewTimer">NewTimer</a>(d <b>Duration</b>) *<a href="#name-Timer">Timer</a>
+			func <a href="#name-Sleep">Sleep</a>(d <b>Duration</b>)
+			func <a href="#name-Tick">Tick</a>(d <b>Duration</b>) &lt;-chan <a href="#name-Time">Time</a>
+			func <a href="#name-Duration">Duration</a>.<a href="../src/time/time.go.html#line-788">Round</a>(m <b>Duration</b>) <b>Duration</b>
+			func <a href="#name-Duration">Duration</a>.<a href="../src/time/time.go.html#line-769">Truncate</a>(m <b>Duration</b>) <b>Duration</b>
+			func (*<a href="#name-Ticker">Ticker</a>).<a href="../src/time/tick.go.html#line-51">Reset</a>(d <b>Duration</b>)
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-813">Add</a>(d <b>Duration</b>) <a href="#name-Time">Time</a>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1420">Round</a>(d <b>Duration</b>) <a href="#name-Time">Time</a>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1403">Truncate</a>(d <b>Duration</b>) <a href="#name-Time">Time</a>
+			func (*<a href="#name-Timer">Timer</a>).<a href="../src/time/sleep.go.html#line-121">Reset</a>(d <b>Duration</b>) <a href="builtin.html#name-bool">bool</a>
+			func context.<a href="context.html#name-WithTimeout">WithTimeout</a>(parent <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, timeout <b>Duration</b>) (<a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, <a href="context.html">context</a>.<a href="context.html#name-CancelFunc">CancelFunc</a>)
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-963">SetConnMaxIdleTime</a>(d <b>Duration</b>)
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-941">SetConnMaxLifetime</a>(d <b>Duration</b>)
+			func net.<a href="net.html#name-DialTimeout">DialTimeout</a>(network, address <a href="builtin.html#name-string">string</a>, timeout <b>Duration</b>) (<a href="net.html">net</a>.<a href="net.html#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-TCPConn">TCPConn</a>).<a href="../src/net/tcpsock.go.html#line-169">SetKeepAlivePeriod</a>(d <b>Duration</b>) <a href="builtin.html#name-error">error</a>
+			func net/http.<a href="net/http.html#name-TimeoutHandler">TimeoutHandler</a>(h <a href="net/http.html">http</a>.<a href="net/http.html#name-Handler">Handler</a>, dt <b>Duration</b>, msg <a href="builtin.html#name-string">string</a>) <a href="net/http.html">http</a>.<a href="net/http.html#name-Handler">Handler</a></span>
+		<input type='checkbox' class="stat" id="Duration-stat-values"><label for="Duration-stat-values">As Types Of (6+)</label><span id='Duration-stat-values-content' class="stat-content">
+			const <a href="#name-Hour">Hour</a>
+			const <a href="#name-Microsecond">Microsecond</a>
+			const <a href="#name-Millisecond">Millisecond</a>
+			const <a href="#name-Minute">Minute</a>
+			const <a href="#name-Nanosecond">Nanosecond</a>
+			const <a href="#name-Second">Second</a></span></div>
+<div class="anchor" id="name-Location" data-popularity="585">	 type <a href="../src/time/zoneinfo.go.html#line-19">Location</a> <i>(struct)</i>
+		A Location maps time instants to the zone in use at that time.
+		Typically, the Location represents the collection of time offsets
+		in use in a geographical area. For many Locations the time offset varies
+		depending on whether daylight savings time is in use at the time instant.
+
+		<input type='checkbox' class="stat" id="Location-stat-methods"><label for="Location-stat-methods">One Exported Method</label><span id='Location-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/time/zoneinfo.go.html#line-99">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Location-stat-impls"><label for="Location-stat-impls">Implements (1+)</label><span id='Location-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Location-stat-results"><label for="Location-stat-results">As Outputs Of (4+)</label><span id='Location-stat-results-content' class="stat-content">
+			func <a href="#name-FixedZone">FixedZone</a>(name <a href="builtin.html#name-string">string</a>, offset <a href="builtin.html#name-int">int</a>) *<b>Location</b>
+			func <a href="#name-LoadLocation">LoadLocation</a>(name <a href="builtin.html#name-string">string</a>) (*<b>Location</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-LoadLocationFromTZData">LoadLocationFromTZData</a>(name <a href="builtin.html#name-string">string</a>, data []<a href="builtin.html#name-byte">byte</a>) (*<b>Location</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1106">Location</a>() *<b>Location</b></span>
+		<input type='checkbox' class="stat" id="Location-stat-params"><label for="Location-stat-params">As Inputs Of (5+)</label><span id='Location-stat-params-content' class="stat-content">
+			func <a href="#name-Date">Date</a>(year <a href="builtin.html#name-int">int</a>, month <a href="#name-Month">Month</a>, day, hour, min, sec, nsec <a href="builtin.html#name-int">int</a>, loc *<b>Location</b>) <a href="#name-Time">Time</a>
+			func <a href="#name-ParseInLocation">ParseInLocation</a>(layout, value <a href="builtin.html#name-string">string</a>, loc *<b>Location</b>) (<a href="#name-Time">Time</a>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1097">In</a>(loc *<b>Location</b>) <a href="#name-Time">Time</a>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-MustParseInLocation">MustParseInLocation</a>(loc *<b>Location</b>, strs ...<a href="builtin.html#name-string">string</a>) <a href="#name-Time">Time</a>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-ParseInLocation">ParseInLocation</a>(loc *<b>Location</b>, strs ...<a href="builtin.html#name-string">string</a>) (<a href="#name-Time">Time</a>, <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Location-stat-values"><label for="Location-stat-values">As Types Of (2+)</label><span id='Location-stat-values-content' class="stat-content">
+			  var <a href="#name-Local">Local</a> *<b>Location</b>
+			  var <a href="#name-UTC">UTC</a> *<b>Location</b></span></div>
+<div class="anchor" id="name-Month" data-popularity="300">	 type <a href="../src/time/time.go.html#line-273">Month</a> <a href="builtin.html#name-int">int</a>
+		A Month specifies a month of the year (January = 1, ...).
+
+		<input type='checkbox' class="stat" id="Month-stat-methods"><label for="Month-stat-methods">One Exported Method</label><span id='Month-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/time/time.go.html#line-291">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Month-stat-impls"><label for="Month-stat-impls">Implements (1+)</label><span id='Month-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Month-stat-results"><label for="Month-stat-results">As Outputs Of (2+)</label><span id='Month-stat-results-content' class="stat-content">
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-475">Date</a>() (year <a href="builtin.html#name-int">int</a>, month <b>Month</b>, day <a href="builtin.html#name-int">int</a>)
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-487">Month</a>() <b>Month</b></span>
+		<input type='checkbox' class="stat" id="Month-stat-params"><label for="Month-stat-params">As Inputs Of (1+)</label><span id='Month-stat-params-content' class="stat-content">
+			func <a href="#name-Date">Date</a>(year <a href="builtin.html#name-int">int</a>, month <b>Month</b>, day, hour, min, sec, nsec <a href="builtin.html#name-int">int</a>, loc *<a href="#name-Location">Location</a>) <a href="#name-Time">Time</a></span>
+		<input type='checkbox' class="stat" id="Month-stat-values"><label for="Month-stat-values">As Types Of (12+)</label><span id='Month-stat-values-content' class="stat-content">
+			const <a href="#name-April">April</a>
+			const <a href="#name-August">August</a>
+			const <a href="#name-December">December</a>
+			const <a href="#name-February">February</a>
+			const <a href="#name-January">January</a>
+			const <a href="#name-July">July</a>
+			const <a href="#name-June">June</a>
+			const <a href="#name-March">March</a>
+			const <a href="#name-May">May</a>
+			const <a href="#name-November">November</a>
+			const <a href="#name-October">October</a>
+			const <a href="#name-September">September</a></span></div>
+<div class="anchor" id="name-ParseError" data-popularity="100">	 type <a href="../src/time/format.go.html#line-681">ParseError</a> <i>(struct)</i>
+		ParseError describes a problem parsing a time string.
+
+		<input type='checkbox' class="stat" id="ParseError-stat-fields"><label for="ParseError-stat-fields">Exported Fields (5)</label><span id='ParseError-stat-fields-content' class="stat-content">
+			<a href="../src/time/format.go.html#line-682">Layout</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/time/format.go.html#line-684">LayoutElem</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/time/format.go.html#line-686">Message</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/time/format.go.html#line-683">Value</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/time/format.go.html#line-685">ValueElem</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="ParseError-stat-methods"><label for="ParseError-stat-methods">One Exported Method</label><span id='ParseError-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/time/format.go.html#line-694">Error</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ParseError-stat-impls"><label for="ParseError-stat-impls">Implements (1+)</label><span id='ParseError-stat-impls-content' class="stat-content">
+			*T : <a href="builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Ticker" data-popularity="175">	 type <a href="../src/time/tick.go.html#line-11">Ticker</a> <i>(struct)</i>
+		A Ticker holds a channel that delivers `ticks' of a clock
+		at intervals.
+
+		<input type='checkbox' class="stat" id="Ticker-stat-fields"><label for="Ticker-stat-fields">One Exported Field</label><span id='Ticker-stat-fields-content' class="stat-content">
+			<a href="../src/time/sleep.go.html#line-49">C</a> <i>&lt;-chan <a href="#name-Time">Time</a></i></span>
+		<input type='checkbox' class="stat" id="Ticker-stat-methods"><label for="Ticker-stat-methods">Exported Methods (2)</label><span id='Ticker-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/time/tick.go.html#line-51">Reset</a>(d <a href="#name-Duration">Duration</a>)
+			(*T) <a href="../src/time/tick.go.html#line-45">Stop</a>()</span>
+		<input type='checkbox' class="stat" id="Ticker-stat-results"><label for="Ticker-stat-results">As Outputs Of (1+)</label><span id='Ticker-stat-results-content' class="stat-content">
+			func <a href="#name-NewTicker">NewTicker</a>(d <a href="#name-Duration">Duration</a>) *<b>Ticker</b></span></div>
+<div class="anchor" id="name-Time" data-popularity="8100">	 type <a href="../src/time/time.go.html#line-127">Time</a> <i>(struct)</i>
+		A Time represents an instant in time with nanosecond precision.
+
+		Programs using times should typically store and pass them as values,
+		not pointers. That is, time variables and struct fields should be of
+		type time.Time, not *time.Time.
+
+		A Time value can be used by multiple goroutines simultaneously except
+		that the methods GobDecode, UnmarshalBinary, UnmarshalJSON and
+		UnmarshalText are not concurrency-safe.
+
+		Time instants can be compared using the Before, After, and Equal methods.
+		The Sub method subtracts two instants, producing a Duration.
+		The Add method adds a Time and a Duration, producing a Time.
+
+		The zero value of type Time is January 1, year 1, 00:00:00.000000000 UTC.
+		As this time is unlikely to come up in practice, the IsZero method gives
+		a simple way of detecting a time that has not been initialized explicitly.
+
+		Each Time has associated with it a Location, consulted when computing the
+		presentation form of the time, such as in the Format, Hour, and Year methods.
+		The methods Local, UTC, and In return a Time with a specific location.
+		Changing the location in this way changes only the presentation; it does not
+		change the instant in time being denoted and therefore does not affect the
+		computations described in earlier paragraphs.
+
+		Representations of a Time value saved by the GobEncode, MarshalBinary,
+		MarshalJSON, and MarshalText methods store the Time.Location's offset, but not
+		the location name. They therefore lose information about Daylight Saving Time.
+
+		In addition to the required “wall clock” reading, a Time may contain an optional
+		reading of the current process's monotonic clock, to provide additional precision
+		for comparison or subtraction.
+		See the “Monotonic Clocks” section in the package documentation for details.
+
+		Note that the Go == operator compares not just the time instant but also the
+		Location and the monotonic clock reading. Therefore, Time values should not
+		be used as map or database keys without first guaranteeing that the
+		identical Location has been set for all values, which can be achieved
+		through use of the UTC or Local method, and that the monotonic clock reading
+		has been stripped by setting t = t.Round(0). In general, prefer t.Equal(u)
+		to t == u, since t.Equal uses the most accurate comparison available and
+		correctly handles the case when only one of its arguments has a monotonic
+		clock reading.
+
+		<input type='checkbox' class="stat" id="Time-stat-methods"><label for="Time-stat-methods">Exported Methods (39)</label><span id='Time-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/time/time.go.html#line-813">Add</a>(d <a href="#name-Duration">Duration</a>) <b>Time</b>
+			 (T) <a href="../src/time/time.go.html#line-900">AddDate</a>(years <a href="builtin.html#name-int">int</a>, months <a href="builtin.html#name-int">int</a>, days <a href="builtin.html#name-int">int</a>) <b>Time</b>
+			 (T) <a href="../src/time/time.go.html#line-241">After</a>(u <b>Time</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/time/format.go.html#line-511">AppendFormat</a>(b []<a href="builtin.html#name-byte">byte</a>, layout <a href="builtin.html#name-string">string</a>) []<a href="builtin.html#name-byte">byte</a>
+			 (T) <a href="../src/time/time.go.html#line-251">Before</a>(u <b>Time</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/time/time.go.html#line-538">Clock</a>() (hour, min, sec <a href="builtin.html#name-int">int</a>)
+			 (T) <a href="../src/time/time.go.html#line-475">Date</a>() (year <a href="builtin.html#name-int">int</a>, month <a href="#name-Month">Month</a>, day <a href="builtin.html#name-int">int</a>)
+			 (T) <a href="../src/time/time.go.html#line-493">Day</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/time/time.go.html#line-265">Equal</a>(u <b>Time</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/time/format.go.html#line-495">Format</a>(layout <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/time/time.go.html#line-1234">GobDecode</a>(data []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/time/time.go.html#line-1229">GobEncode</a>() ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/time/time.go.html#line-553">Hour</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/time/time.go.html#line-514">ISOWeek</a>() (year, week <a href="builtin.html#name-int">int</a>)
+			 (T) <a href="../src/time/time.go.html#line-1097">In</a>(loc *<a href="#name-Location">Location</a>) <b>Time</b>
+			 (T) <a href="../src/time/time.go.html#line-426">IsZero</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/time/time.go.html#line-1087">Local</a>() <b>Time</b>
+			 (T) <a href="../src/time/time.go.html#line-1106">Location</a>() *<a href="#name-Location">Location</a>
+			 (T) <a href="../src/time/time.go.html#line-1144">MarshalBinary</a>() ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/time/time.go.html#line-1240">MarshalJSON</a>() ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/time/time.go.html#line-1269">MarshalText</a>() ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/time/time.go.html#line-558">Minute</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/time/time.go.html#line-487">Month</a>() <a href="#name-Month">Month</a>
+			 (T) <a href="../src/time/time.go.html#line-569">Nanosecond</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/time/time.go.html#line-1420">Round</a>(d <a href="#name-Duration">Duration</a>) <b>Time</b>
+			 (T) <a href="../src/time/time.go.html#line-563">Second</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/time/format.go.html#line-450">String</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/time/time.go.html#line-841">Sub</a>(u <b>Time</b>) <a href="#name-Duration">Duration</a>
+			 (T) <a href="../src/time/time.go.html#line-1403">Truncate</a>(d <a href="#name-Duration">Duration</a>) <b>Time</b>
+			 (T) <a href="../src/time/time.go.html#line-1081">UTC</a>() <b>Time</b>
+			 (T) <a href="../src/time/time.go.html#line-1127">Unix</a>() <a href="builtin.html#name-int64">int64</a>
+			 (T) <a href="../src/time/time.go.html#line-1137">UnixNano</a>() <a href="builtin.html#name-int64">int64</a>
+			(*T) <a href="../src/time/time.go.html#line-1185">UnmarshalBinary</a>(data []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/time/time.go.html#line-1256">UnmarshalJSON</a>(data []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/time/time.go.html#line-1280">UnmarshalText</a>(data []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/time/time.go.html#line-499">Weekday</a>() <a href="#name-Weekday">Weekday</a>
+			 (T) <a href="../src/time/time.go.html#line-481">Year</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/time/time.go.html#line-575">YearDay</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/time/time.go.html#line-1116">Zone</a>() (name <a href="builtin.html#name-string">string</a>, offset <a href="builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="Time-stat-impls"><label for="Time-stat-impls">Implements (7+)</label><span id='Time-stat-impls-content' class="stat-content">
+			 T : encoding.<a href="encoding.html#name-BinaryMarshaler">BinaryMarshaler</a>
+			*T : encoding.<a href="encoding.html#name-BinaryUnmarshaler">BinaryUnmarshaler</a>
+			 T : encoding.<a href="encoding.html#name-TextMarshaler">TextMarshaler</a>
+			*T : encoding.<a href="encoding.html#name-TextUnmarshaler">TextUnmarshaler</a>
+			 T : encoding/json.<a href="encoding/json.html#name-Marshaler">Marshaler</a>
+			*T : encoding/json.<a href="encoding/json.html#name-Unmarshaler">Unmarshaler</a>
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Time-stat-results"><label for="Time-stat-results">As Outputs Of (61+)</label><span id='Time-stat-results-content' class="stat-content">
+			func <a href="#name-After">After</a>(d <a href="#name-Duration">Duration</a>) &lt;-chan <b>Time</b>
+			func <a href="#name-Date">Date</a>(year <a href="builtin.html#name-int">int</a>, month <a href="#name-Month">Month</a>, day, hour, min, sec, nsec <a href="builtin.html#name-int">int</a>, loc *<a href="#name-Location">Location</a>) <b>Time</b>
+			func <a href="#name-Now">Now</a>() <b>Time</b>
+			func <a href="#name-Parse">Parse</a>(layout, value <a href="builtin.html#name-string">string</a>) (<b>Time</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-ParseInLocation">ParseInLocation</a>(layout, value <a href="builtin.html#name-string">string</a>, loc *<a href="#name-Location">Location</a>) (<b>Time</b>, <a href="builtin.html#name-error">error</a>)
+			func <a href="#name-Tick">Tick</a>(d <a href="#name-Duration">Duration</a>) &lt;-chan <b>Time</b>
+			func <a href="#name-Unix">Unix</a>(sec <a href="builtin.html#name-int64">int64</a>, nsec <a href="builtin.html#name-int64">int64</a>) <b>Time</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-813">Add</a>(d <a href="#name-Duration">Duration</a>) <b>Time</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-900">AddDate</a>(years <a href="builtin.html#name-int">int</a>, months <a href="builtin.html#name-int">int</a>, days <a href="builtin.html#name-int">int</a>) <b>Time</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1097">In</a>(loc *<a href="#name-Location">Location</a>) <b>Time</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1087">Local</a>() <b>Time</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1420">Round</a>(d <a href="#name-Duration">Duration</a>) <b>Time</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1403">Truncate</a>(d <a href="#name-Duration">Duration</a>) <b>Time</b>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-1081">UTC</a>() <b>Time</b>
+			func context.<a href="context.html#name-Context">Context</a>.<a href="../src/context/context.go.html#line-66">Deadline</a>() (deadline <b>Time</b>, ok <a href="builtin.html#name-bool">bool</a>)
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-BeginningOfDay">BeginningOfDay</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-BeginningOfHour">BeginningOfHour</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-BeginningOfMinute">BeginningOfMinute</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-BeginningOfMonth">BeginningOfMonth</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-BeginningOfQuarter">BeginningOfQuarter</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-BeginningOfWeek">BeginningOfWeek</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-BeginningOfYear">BeginningOfYear</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfDay">EndOfDay</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfHour">EndOfHour</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfMinute">EndOfMinute</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfMonth">EndOfMonth</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfQuarter">EndOfQuarter</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfSunday">EndOfSunday</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfWeek">EndOfWeek</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-EndOfYear">EndOfYear</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-Monday">Monday</a>() <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-MustParse">MustParse</a>(strs ...<a href="builtin.html#name-string">string</a>) <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-MustParseInLocation">MustParseInLocation</a>(loc *<a href="#name-Location">Location</a>, strs ...<a href="builtin.html#name-string">string</a>) <b>Time</b>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-Parse">Parse</a>(strs ...<a href="builtin.html#name-string">string</a>) (<b>Time</b>, <a href="builtin.html#name-error">error</a>)
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-ParseInLocation">ParseInLocation</a>(loc *<a href="#name-Location">Location</a>, strs ...<a href="builtin.html#name-string">string</a>) (<b>Time</b>, <a href="builtin.html#name-error">error</a>)
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-Sunday">Sunday</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Config">Config</a>).<a href="../src/github.com/jinzhu/now/main.go.html#line-54">MustParse</a>(strs ...<a href="builtin.html#name-string">string</a>) <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Config">Config</a>).<a href="../src/github.com/jinzhu/now/main.go.html#line-45">Parse</a>(strs ...<a href="builtin.html#name-string">string</a>) (<b>Time</b>, <a href="builtin.html#name-error">error</a>)
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-21">BeginningOfDay</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-57">BeginningOfHalf</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-15">BeginningOfHour</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-10">BeginningOfMinute</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-44">BeginningOfMonth</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-50">BeginningOfQuarter</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-27">BeginningOfWeek</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-64">BeginningOfYear</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-80">EndOfDay</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-101">EndOfHalf</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-75">EndOfHour</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-70">EndOfMinute</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-91">EndOfMonth</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-96">EndOfQuarter</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-131">EndOfSunday</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-86">EndOfWeek</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-106">EndOfYear</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-111">Monday</a>() <b>Time</b>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-200">MustParse</a>(strs ...<a href="builtin.html#name-string">string</a>) (t <b>Time</b>)
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-151">Parse</a>(strs ...<a href="builtin.html#name-string">string</a>) (t <b>Time</b>, err <a href="builtin.html#name-error">error</a>)
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Now">Now</a>).<a href="../src/github.com/jinzhu/now/now.go.html#line-121">Sunday</a>() <b>Time</b>
+			func net/http.<a href="net/http.html#name-ParseTime">ParseTime</a>(text <a href="builtin.html#name-string">string</a>) (t <b>Time</b>, err <a href="builtin.html#name-error">error</a>)
+			func os.<a href="os.html#name-FileInfo">FileInfo</a>.<a href="../src/os/types.go.html#line-25">ModTime</a>() <b>Time</b></span>
+		<input type='checkbox' class="stat" id="Time-stat-params"><label for="Time-stat-params">As Inputs Of (35+)</label><span id='Time-stat-params-content' class="stat-content">
+			func <a href="#name-Since">Since</a>(t <b>Time</b>) <a href="#name-Duration">Duration</a>
+			func <a href="#name-Until">Until</a>(t <b>Time</b>) <a href="#name-Duration">Duration</a>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-241">After</a>(u <b>Time</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-251">Before</a>(u <b>Time</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-265">Equal</a>(u <b>Time</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-841">Sub</a>(u <b>Time</b>) <a href="#name-Duration">Duration</a>
+			func context.<a href="context.html#name-WithDeadline">WithDeadline</a>(parent <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, d <b>Time</b>) (<a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, <a href="context.html">context</a>.<a href="context.html#name-CancelFunc">CancelFunc</a>)
+			func crypto/tls.(*<a href="crypto/tls.html#name-Conn">Conn</a>).<a href="../src/crypto/tls/conn.go.html#line-136">SetDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func crypto/tls.(*<a href="crypto/tls.html#name-Conn">Conn</a>).<a href="../src/crypto/tls/conn.go.html#line-142">SetReadDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func crypto/tls.(*<a href="crypto/tls.html#name-Conn">Conn</a>).<a href="../src/crypto/tls/conn.go.html#line-149">SetWriteDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func crypto/x509.(*<a href="crypto/x509.html#name-Certificate">Certificate</a>).<a href="../src/crypto/x509/x509.go.html#line-2227">CreateCRL</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, priv interface{}, revokedCerts []<a href="crypto/x509/pkix.html">pkix</a>.<a href="crypto/x509/pkix.html#name-RevokedCertificate">RevokedCertificate</a>, now, expiry <b>Time</b>) (crlBytes []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			func crypto/x509/pkix.(*<a href="crypto/x509/pkix.html#name-CertificateList">CertificateList</a>).<a href="../src/crypto/x509/pkix/pkix.go.html#line-293">HasExpired</a>(now <b>Time</b>) <a href="builtin.html#name-bool">bool</a>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-New">New</a>(t <b>Time</b>) *<a href="github.com/jinzhu/now.html">now</a>.<a href="github.com/jinzhu/now.html#name-Now">Now</a>
+			func github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-With">With</a>(t <b>Time</b>) *<a href="github.com/jinzhu/now.html">now</a>.<a href="github.com/jinzhu/now.html#name-Now">Now</a>
+			func github.com/jinzhu/now.(*<a href="github.com/jinzhu/now.html#name-Config">Config</a>).<a href="../src/github.com/jinzhu/now/main.go.html#line-40">With</a>(t <b>Time</b>) *<a href="github.com/jinzhu/now.html">now</a>.<a href="github.com/jinzhu/now.html#name-Now">Now</a>
+			func gorm.io/gorm/logger.<a href="gorm.io/gorm/logger.html#name-Interface">Interface</a>.<a href="../src/gorm.io/gorm/logger/logger.go.html#line-57">Trace</a>(ctx <a href="context.html">context</a>.<a href="context.html#name-Context">Context</a>, begin <b>Time</b>, fc func() (<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-int64">int64</a>), err <a href="builtin.html#name-error">error</a>)
+			func internal/poll.(*<a href="internal/poll.html#name-FD">FD</a>).<a href="../src/internal/poll/fd_poll_runtime.go.html#line-135">SetDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func internal/poll.(*<a href="internal/poll.html#name-FD">FD</a>).<a href="../src/internal/poll/fd_poll_runtime.go.html#line-140">SetReadDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func internal/poll.(*<a href="internal/poll.html#name-FD">FD</a>).<a href="../src/internal/poll/fd_poll_runtime.go.html#line-145">SetWriteDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.<a href="net.html#name-Conn">Conn</a>.<a href="../src/net/net.go.html#line-154">SetDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.<a href="net.html#name-Conn">Conn</a>.<a href="../src/net/net.go.html#line-159">SetReadDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.<a href="net.html#name-Conn">Conn</a>.<a href="../src/net/net.go.html#line-166">SetWriteDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.<a href="net.html#name-PacketConn">PacketConn</a>.<a href="../src/net/net.go.html#line-354">SetDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.<a href="net.html#name-PacketConn">PacketConn</a>.<a href="../src/net/net.go.html#line-359">SetReadDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.<a href="net.html#name-PacketConn">PacketConn</a>.<a href="../src/net/net.go.html#line-366">SetWriteDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.(*<a href="net.html#name-TCPListener">TCPListener</a>).<a href="../src/net/tcpsock.go.html#line-287">SetDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net.(*<a href="net.html#name-UnixListener">UnixListener</a>).<a href="../src/net/unixsock.go.html#line-286">SetDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func net/http.<a href="net/http.html#name-ServeContent">ServeContent</a>(w <a href="net/http.html">http</a>.<a href="net/http.html#name-ResponseWriter">ResponseWriter</a>, req *<a href="net/http.html">http</a>.<a href="net/http.html#name-Request">Request</a>, name <a href="builtin.html#name-string">string</a>, modtime <b>Time</b>, content <a href="io.html">io</a>.<a href="io.html#name-ReadSeeker">ReadSeeker</a>)
+			func os.<a href="os.html#name-Chtimes">Chtimes</a>(name <a href="builtin.html#name-string">string</a>, atime <b>Time</b>, mtime <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func os.<a href="os.html#name-Chtimes">Chtimes</a>(name <a href="builtin.html#name-string">string</a>, atime <b>Time</b>, mtime <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func os.(*<a href="os.html#name-File">File</a>).<a href="../src/os/file.go.html#line-560">SetDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func os.(*<a href="os.html#name-File">File</a>).<a href="../src/os/file.go.html#line-568">SetReadDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func os.(*<a href="os.html#name-File">File</a>).<a href="../src/os/file.go.html#line-578">SetWriteDeadline</a>(t <b>Time</b>) <a href="builtin.html#name-error">error</a>
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="vendor/golang.org/x/crypto/cryptobyte.html#name-Builder">Builder</a>).<a href="../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-110">AddASN1GeneralizedTime</a>(t <b>Time</b>)
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="vendor/golang.org/x/crypto/cryptobyte.html#name-String">String</a>).<a href="../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-452">ReadASN1GeneralizedTime</a>(out *<b>Time</b>) <a href="builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-Timer" data-popularity="250">	 type <a href="../src/time/sleep.go.html#line-48">Timer</a> <i>(struct)</i>
+		The Timer type represents a single event.
+		When the Timer expires, the current time will be sent on C,
+		unless the Timer was created by AfterFunc.
+		A Timer must be created with NewTimer or AfterFunc.
+
+		<input type='checkbox' class="stat" id="Timer-stat-fields"><label for="Timer-stat-fields">One Exported Field</label><span id='Timer-stat-fields-content' class="stat-content">
+			<a href="../src/time/sleep.go.html#line-49">C</a> <i>&lt;-chan <a href="#name-Time">Time</a></i></span>
+		<input type='checkbox' class="stat" id="Timer-stat-methods"><label for="Timer-stat-methods">Exported Methods (2)</label><span id='Timer-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/time/sleep.go.html#line-121">Reset</a>(d <a href="#name-Duration">Duration</a>) <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/time/sleep.go.html#line-75">Stop</a>() <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="Timer-stat-results"><label for="Timer-stat-results">As Outputs Of (2+)</label><span id='Timer-stat-results-content' class="stat-content">
+			func <a href="#name-AfterFunc">AfterFunc</a>(d <a href="#name-Duration">Duration</a>, f func()) *<b>Timer</b>
+			func <a href="#name-NewTimer">NewTimer</a>(d <a href="#name-Duration">Duration</a>) *<b>Timer</b></span></div>
+<div class="anchor" id="name-Weekday" data-popularity="190">	 type <a href="../src/time/time.go.html#line-301">Weekday</a> <a href="builtin.html#name-int">int</a>
+		A Weekday specifies a day of the week (Sunday = 0, ...).
+
+		<input type='checkbox' class="stat" id="Weekday-stat-methods"><label for="Weekday-stat-methods">One Exported Method</label><span id='Weekday-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/time/time.go.html#line-314">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Weekday-stat-impls"><label for="Weekday-stat-impls">Implements (1+)</label><span id='Weekday-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Weekday-stat-results"><label for="Weekday-stat-results">As Outputs Of (1+)</label><span id='Weekday-stat-results-content' class="stat-content">
+			func <a href="#name-Time">Time</a>.<a href="../src/time/time.go.html#line-499">Weekday</a>() <b>Weekday</b></span>
+		<input type='checkbox' class="stat" id="Weekday-stat-values"><label for="Weekday-stat-values">As Types Of (8+)</label><span id='Weekday-stat-values-content' class="stat-content">
+			const <a href="#name-Friday">Friday</a>
+			const <a href="#name-Monday">Monday</a>
+			const <a href="#name-Saturday">Saturday</a>
+			const <a href="#name-Sunday">Sunday</a>
+			const <a href="#name-Thursday">Thursday</a>
+			const <a href="#name-Tuesday">Tuesday</a>
+			const <a href="#name-Wednesday">Wednesday</a>
+			  var github.com/jinzhu/now.<a href="github.com/jinzhu/now.html#name-WeekStartDay">WeekStartDay</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-After">	 func <a href="../src/time/sleep.go.html#line-147">After</a>(d <a href="#name-Duration">Duration</a>) &lt;-chan <a href="#name-Time">Time</a>
+		After waits for the duration to elapse and then sends the current time
+		on the returned channel.
+		It is equivalent to NewTimer(d).C.
+		The underlying Timer is not recovered by the garbage collector
+		until the timer fires. If efficiency is a concern, use NewTimer
+		instead and call Timer.Stop if the timer is no longer needed.</div>
+<div class="anchor" id="name-AfterFunc">	 func <a href="../src/time/sleep.go.html#line-154">AfterFunc</a>(d <a href="#name-Duration">Duration</a>, f func()) *<a href="#name-Timer">Timer</a>
+		AfterFunc waits for the duration to elapse and then calls f
+		in its own goroutine. It returns a Timer that can
+		be used to cancel the call using its Stop method.</div>
+<div class="anchor" id="name-ANSIC">	const <a href="../src/time/format.go.html#line-74">ANSIC</a> = "Mon Jan _2 15:04:05 2006"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-April">	const <a href="../src/time/time.go.html#line-279">April</a> <a href="#name-Month">Month</a> = 4</div>
+<div class="anchor" id="name-August">	const <a href="../src/time/time.go.html#line-283">August</a> <a href="#name-Month">Month</a> = 8</div>
+<div class="anchor" id="name-Date">	 func <a href="../src/time/time.go.html#line-1342">Date</a>(year <a href="builtin.html#name-int">int</a>, month <a href="#name-Month">Month</a>, day, hour, min, sec, nsec <a href="builtin.html#name-int">int</a>, loc *<a href="#name-Location">Location</a>) <a href="#name-Time">Time</a>
+		Date returns the Time corresponding to
+			yyyy-mm-dd hh:mm:ss + nsec nanoseconds
+		in the appropriate zone for that time in the given location.
+
+		The month, day, hour, min, sec, and nsec values may be outside
+		their usual ranges and will be normalized during the conversion.
+		For example, October 32 converts to November 1.
+
+		A daylight savings time transition skips or repeats times.
+		For example, in the United States, March 13, 2011 2:15am never occurred,
+		while November 6, 2011 1:15am occurred twice. In such cases, the
+		choice of time zone, and therefore the time, is not well-defined.
+		Date returns a time that is correct in one of the two zones involved
+		in the transition, but it does not guarantee which.
+
+		Date panics if loc is nil.</div>
+<div class="anchor" id="name-December">	const <a href="../src/time/time.go.html#line-287">December</a> <a href="#name-Month">Month</a> = 12</div>
+<div class="anchor" id="name-February">	const <a href="../src/time/time.go.html#line-277">February</a> <a href="#name-Month">Month</a> = 2</div>
+<div class="anchor" id="name-FixedZone">	 func <a href="../src/time/zoneinfo.go.html#line-105">FixedZone</a>(name <a href="builtin.html#name-string">string</a>, offset <a href="builtin.html#name-int">int</a>) *<a href="#name-Location">Location</a>
+		FixedZone returns a Location that always uses
+		the given zone name and offset (seconds east of UTC).</div>
+<div class="anchor" id="name-Friday">	const <a href="../src/time/time.go.html#line-309">Friday</a> <a href="#name-Weekday">Weekday</a> = 5</div>
+<div class="anchor" id="name-Hour">	const <a href="../src/time/time.go.html#line-607">Hour</a> <a href="#name-Duration">Duration</a> = 3600000000000
+		Common durations. There is no definition for units of Day or larger
+		to avoid confusion across daylight savings time zone transitions.
+
+		To count the number of units in a Duration, divide:
+			second := time.Second
+			fmt.Print(int64(second/time.Millisecond)) // prints 1000
+
+		To convert an integer number of units to a Duration, multiply:
+			seconds := 10
+			fmt.Print(time.Duration(seconds)*time.Second) // prints 10s</div>
+<div class="anchor" id="name-January">	const <a href="../src/time/time.go.html#line-276">January</a> <a href="#name-Month">Month</a> = 1</div>
+<div class="anchor" id="name-July">	const <a href="../src/time/time.go.html#line-282">July</a> <a href="#name-Month">Month</a> = 7</div>
+<div class="anchor" id="name-June">	const <a href="../src/time/time.go.html#line-281">June</a> <a href="#name-Month">Month</a> = 6</div>
+<div class="anchor" id="name-Kitchen">	const <a href="../src/time/format.go.html#line-84">Kitchen</a> = "3:04PM"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-LoadLocation">	 func <a href="../src/time/zoneinfo.go.html#line-629">LoadLocation</a>(name <a href="builtin.html#name-string">string</a>) (*<a href="#name-Location">Location</a>, <a href="builtin.html#name-error">error</a>)
+		LoadLocation returns the Location with the given name.
+
+		If the name is "" or "UTC", LoadLocation returns UTC.
+		If the name is "Local", LoadLocation returns Local.
+
+		Otherwise, the name is taken to be a location name corresponding to a file
+		in the IANA Time Zone database, such as "America/New_York".
+
+		The time zone database needed by LoadLocation may not be
+		present on all systems, especially non-Unix systems.
+		LoadLocation looks in the directory or uncompressed zip file
+		named by the ZONEINFO environment variable, if any, then looks in
+		known installation locations on Unix systems,
+		and finally looks in $GOROOT/lib/time/zoneinfo.zip.</div>
+<div class="anchor" id="name-LoadLocationFromTZData">	 func <a href="../src/time/zoneinfo_read.go.html#line-116">LoadLocationFromTZData</a>(name <a href="builtin.html#name-string">string</a>, data []<a href="builtin.html#name-byte">byte</a>) (*<a href="#name-Location">Location</a>, <a href="builtin.html#name-error">error</a>)
+		LoadLocationFromTZData returns a Location with the given name
+		initialized from the IANA Time Zone database-formatted data.
+		The data should be in the format of a standard IANA time zone file
+		(for example, the content of /etc/localtime on Unix systems).</div>
+<div class="anchor" id="name-Local">	  var <a href="../src/time/zoneinfo.go.html#line-80">Local</a> *<a href="#name-Location">Location</a>
+		Local represents the system's local time zone.
+		On Unix systems, Local consults the TZ environment
+		variable to find the time zone to use. No TZ means
+		use the system default /etc/localtime.
+		TZ="" means use UTC.
+		TZ="foo" means use file foo in the system timezone directory.</div>
+<div class="anchor" id="name-March">	const <a href="../src/time/time.go.html#line-278">March</a> <a href="#name-Month">Month</a> = 3</div>
+<div class="anchor" id="name-May">	const <a href="../src/time/time.go.html#line-280">May</a> <a href="#name-Month">Month</a> = 5</div>
+<div class="anchor" id="name-Microsecond">	const <a href="../src/time/time.go.html#line-603">Microsecond</a> <a href="#name-Duration">Duration</a> = 1000
+		Common durations. There is no definition for units of Day or larger
+		to avoid confusion across daylight savings time zone transitions.
+
+		To count the number of units in a Duration, divide:
+			second := time.Second
+			fmt.Print(int64(second/time.Millisecond)) // prints 1000
+
+		To convert an integer number of units to a Duration, multiply:
+			seconds := 10
+			fmt.Print(time.Duration(seconds)*time.Second) // prints 10s</div>
+<div class="anchor" id="name-Millisecond">	const <a href="../src/time/time.go.html#line-604">Millisecond</a> <a href="#name-Duration">Duration</a> = 1000000
+		Common durations. There is no definition for units of Day or larger
+		to avoid confusion across daylight savings time zone transitions.
+
+		To count the number of units in a Duration, divide:
+			second := time.Second
+			fmt.Print(int64(second/time.Millisecond)) // prints 1000
+
+		To convert an integer number of units to a Duration, multiply:
+			seconds := 10
+			fmt.Print(time.Duration(seconds)*time.Second) // prints 10s</div>
+<div class="anchor" id="name-Minute">	const <a href="../src/time/time.go.html#line-606">Minute</a> <a href="#name-Duration">Duration</a> = 60000000000
+		Common durations. There is no definition for units of Day or larger
+		to avoid confusion across daylight savings time zone transitions.
+
+		To count the number of units in a Duration, divide:
+			second := time.Second
+			fmt.Print(int64(second/time.Millisecond)) // prints 1000
+
+		To convert an integer number of units to a Duration, multiply:
+			seconds := 10
+			fmt.Print(time.Duration(seconds)*time.Second) // prints 10s</div>
+<div class="anchor" id="name-Monday">	const <a href="../src/time/time.go.html#line-305">Monday</a> <a href="#name-Weekday">Weekday</a> = 1</div>
+<div class="anchor" id="name-Nanosecond">	const <a href="../src/time/time.go.html#line-602">Nanosecond</a> <a href="#name-Duration">Duration</a> = 1
+		Common durations. There is no definition for units of Day or larger
+		to avoid confusion across daylight savings time zone transitions.
+
+		To count the number of units in a Duration, divide:
+			second := time.Second
+			fmt.Print(int64(second/time.Millisecond)) // prints 1000
+
+		To convert an integer number of units to a Duration, multiply:
+			seconds := 10
+			fmt.Print(time.Duration(seconds)*time.Second) // prints 10s</div>
+<div class="anchor" id="name-NewTicker">	 func <a href="../src/time/tick.go.html#line-21">NewTicker</a>(d <a href="#name-Duration">Duration</a>) *<a href="#name-Ticker">Ticker</a>
+		NewTicker returns a new Ticker containing a channel that will send the
+		time with a period specified by the duration argument.
+		It adjusts the intervals or drops ticks to make up for slow receivers.
+		The duration d must be greater than zero; if not, NewTicker will panic.
+		Stop the ticker to release associated resources.</div>
+<div class="anchor" id="name-NewTimer">	 func <a href="../src/time/sleep.go.html#line-84">NewTimer</a>(d <a href="#name-Duration">Duration</a>) *<a href="#name-Timer">Timer</a>
+		NewTimer creates a new Timer that will send
+		the current time on its channel after at least duration d.</div>
+<div class="anchor" id="name-November">	const <a href="../src/time/time.go.html#line-286">November</a> <a href="#name-Month">Month</a> = 11</div>
+<div class="anchor" id="name-Now">	 func <a href="../src/time/time.go.html#line-1066">Now</a>() <a href="#name-Time">Time</a>
+		Now returns the current local time.</div>
+<div class="anchor" id="name-October">	const <a href="../src/time/time.go.html#line-285">October</a> <a href="#name-Month">Month</a> = 10</div>
+<div class="anchor" id="name-Parse">	 func <a href="../src/time/format.go.html#line-814">Parse</a>(layout, value <a href="builtin.html#name-string">string</a>) (<a href="#name-Time">Time</a>, <a href="builtin.html#name-error">error</a>)
+		Parse parses a formatted string and returns the time value it represents.
+		The layout defines the format by showing how the reference time,
+		defined to be
+			Mon Jan 2 15:04:05 -0700 MST 2006
+		would be interpreted if it were the value; it serves as an example of
+		the input format. The same interpretation will then be made to the
+		input string.
+
+		Predefined layouts ANSIC, UnixDate, RFC3339 and others describe standard
+		and convenient representations of the reference time. For more information
+		about the formats and the definition of the reference time, see the
+		documentation for ANSIC and the other constants defined by this package.
+		Also, the executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Elements omitted from the value are assumed to be zero or, when
+		zero is impossible, one, so parsing "3:04pm" returns the time
+		corresponding to Jan 1, year 0, 15:04:00 UTC (note that because the year is
+		0, this time is before the zero Time).
+		Years must be in the range 0000..9999. The day of the week is checked
+		for syntax but it is otherwise ignored.
+
+		For layouts specifying the two-digit year 06, a value NN &gt;= 69 will be treated
+		as 19NN and a value NN &lt; 69 will be treated as 20NN.
+
+		In the absence of a time zone indicator, Parse returns a time in UTC.
+
+		When parsing a time with a zone offset like -0700, if the offset corresponds
+		to a time zone used by the current location (Local), then Parse uses that
+		location and zone in the returned time. Otherwise it records the time as
+		being in a fabricated location with time fixed at the given zone offset.
+
+		When parsing a time with a zone abbreviation like MST, if the zone abbreviation
+		has a defined offset in the current location, then that offset is used.
+		The zone abbreviation "UTC" is recognized as UTC regardless of location.
+		If the zone abbreviation is unknown, Parse records the time as being
+		in a fabricated location with the given zone abbreviation and a zero offset.
+		This choice means that such a time can be parsed and reformatted with the
+		same layout losslessly, but the exact instant used in the representation will
+		differ by the actual zone offset. To avoid such problems, prefer time layouts
+		that use a numeric zone offset, or use ParseInLocation.</div>
+<div class="anchor" id="name-ParseDuration">	 func <a href="../src/time/format.go.html#line-1374">ParseDuration</a>(s <a href="builtin.html#name-string">string</a>) (<a href="#name-Duration">Duration</a>, <a href="builtin.html#name-error">error</a>)
+		ParseDuration parses a duration string.
+		A duration string is a possibly signed sequence of
+		decimal numbers, each with optional fraction and a unit suffix,
+		such as "300ms", "-1.5h" or "2h45m".
+		Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".</div>
+<div class="anchor" id="name-ParseInLocation">	 func <a href="../src/time/format.go.html#line-823">ParseInLocation</a>(layout, value <a href="builtin.html#name-string">string</a>, loc *<a href="#name-Location">Location</a>) (<a href="#name-Time">Time</a>, <a href="builtin.html#name-error">error</a>)
+		ParseInLocation is like Parse but differs in two important ways.
+		First, in the absence of time zone information, Parse interprets a time as UTC;
+		ParseInLocation interprets the time as in the given location.
+		Second, when given a zone offset or abbreviation, Parse tries to match it
+		against the Local location; ParseInLocation uses the given location.</div>
+<div class="anchor" id="name-RFC1123">	const <a href="../src/time/format.go.html#line-80">RFC1123</a> = "Mon, 02 Jan 2006 15:04:05 MST"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-RFC1123Z">	const <a href="../src/time/format.go.html#line-81">RFC1123Z</a> = "Mon, 02 Jan 2006 15:04:05 -0700" // RFC1123 with numeric zone
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-RFC3339">	const <a href="../src/time/format.go.html#line-82">RFC3339</a> = "2006-01-02T15:04:05Z07:00"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-RFC3339Nano">	const <a href="../src/time/format.go.html#line-83">RFC3339Nano</a> = "2006-01-02T15:04:05.999999999Z07:00"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-RFC822">	const <a href="../src/time/format.go.html#line-77">RFC822</a> = "02 Jan 06 15:04 MST"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-RFC822Z">	const <a href="../src/time/format.go.html#line-78">RFC822Z</a> = "02 Jan 06 15:04 -0700" // RFC822 with numeric zone
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-RFC850">	const <a href="../src/time/format.go.html#line-79">RFC850</a> = "Monday, 02-Jan-06 15:04:05 MST"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-RubyDate">	const <a href="../src/time/format.go.html#line-76">RubyDate</a> = "Mon Jan 02 15:04:05 -0700 2006"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-Saturday">	const <a href="../src/time/time.go.html#line-310">Saturday</a> <a href="#name-Weekday">Weekday</a> = 6</div>
+<div class="anchor" id="name-Second">	const <a href="../src/time/time.go.html#line-605">Second</a> <a href="#name-Duration">Duration</a> = 1000000000
+		Common durations. There is no definition for units of Day or larger
+		to avoid confusion across daylight savings time zone transitions.
+
+		To count the number of units in a Duration, divide:
+			second := time.Second
+			fmt.Print(int64(second/time.Millisecond)) // prints 1000
+
+		To convert an integer number of units to a Duration, multiply:
+			seconds := 10
+			fmt.Print(time.Duration(seconds)*time.Second) // prints 10s</div>
+<div class="anchor" id="name-September">	const <a href="../src/time/time.go.html#line-284">September</a> <a href="#name-Month">Month</a> = 9</div>
+<div class="anchor" id="name-Since">	 func <a href="../src/time/time.go.html#line-868">Since</a>(t <a href="#name-Time">Time</a>) <a href="#name-Duration">Duration</a>
+		Since returns the time elapsed since t.
+		It is shorthand for time.Now().Sub(t).</div>
+<div class="anchor" id="name-Sleep">	 func <a href="../src/time/sleep.go.html#line-9">Sleep</a>(d <a href="#name-Duration">Duration</a>)
+		Sleep pauses the current goroutine for at least the duration d.
+		A negative or zero duration causes Sleep to return immediately.</div>
+<div class="anchor" id="name-Stamp">	const <a href="../src/time/format.go.html#line-86">Stamp</a> = "Jan _2 15:04:05"
+		Handy time stamps.</div>
+<div class="anchor" id="name-StampMicro">	const <a href="../src/time/format.go.html#line-88">StampMicro</a> = "Jan _2 15:04:05.000000"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-StampMilli">	const <a href="../src/time/format.go.html#line-87">StampMilli</a> = "Jan _2 15:04:05.000"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-StampNano">	const <a href="../src/time/format.go.html#line-89">StampNano</a> = "Jan _2 15:04:05.000000000"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-Sunday">	const <a href="../src/time/time.go.html#line-304">Sunday</a> <a href="#name-Weekday">Weekday</a> = 0</div>
+<div class="anchor" id="name-Thursday">	const <a href="../src/time/time.go.html#line-308">Thursday</a> <a href="#name-Weekday">Weekday</a> = 4</div>
+<div class="anchor" id="name-Tick">	 func <a href="../src/time/tick.go.html#line-63">Tick</a>(d <a href="#name-Duration">Duration</a>) &lt;-chan <a href="#name-Time">Time</a>
+		Tick is a convenience wrapper for NewTicker providing access to the ticking
+		channel only. While Tick is useful for clients that have no need to shut down
+		the Ticker, be aware that without a way to shut it down the underlying
+		Ticker cannot be recovered by the garbage collector; it "leaks".
+		Unlike NewTicker, Tick will return nil if d &lt;= 0.</div>
+<div class="anchor" id="name-Tuesday">	const <a href="../src/time/time.go.html#line-306">Tuesday</a> <a href="#name-Weekday">Weekday</a> = 2</div>
+<div class="anchor" id="name-Unix">	 func <a href="../src/time/time.go.html#line-1292">Unix</a>(sec <a href="builtin.html#name-int64">int64</a>, nsec <a href="builtin.html#name-int64">int64</a>) <a href="#name-Time">Time</a>
+		Unix returns the local Time corresponding to the given Unix time,
+		sec seconds and nsec nanoseconds since January 1, 1970 UTC.
+		It is valid to pass nsec outside the range [0, 999999999].
+		Not all sec values have a corresponding time value. One such
+		value is 1&lt;&lt;63-1 (the largest int64 value).</div>
+<div class="anchor" id="name-UnixDate">	const <a href="../src/time/format.go.html#line-75">UnixDate</a> = "Mon Jan _2 15:04:05 MST 2006"
+		These are predefined layouts for use in Time.Format and time.Parse.
+		The reference time used in the layouts is the specific time:
+			Mon Jan 2 15:04:05 MST 2006
+		which is Unix time 1136239445. Since MST is GMT-0700,
+		the reference time can be thought of as
+			01/02 03:04:05PM '06 -0700
+		To define your own format, write down what the reference time would look
+		like formatted your way; see the values of constants like ANSIC,
+		StampMicro or Kitchen for examples. The model is to demonstrate what the
+		reference time looks like so that the Format and Parse methods can apply
+		the same transformation to a general time value.
+
+		Some valid layouts are invalid time values for time.Parse, due to formats
+		such as _ for space padding and Z for zone information.
+
+		Within the format string, an underscore _ represents a space that may be
+		replaced by a digit if the following number (a day) has two digits; for
+		compatibility with fixed-width Unix time formats.
+
+		A decimal point followed by one or more zeros represents a fractional
+		second, printed to the given number of decimal places. A decimal point
+		followed by one or more nines represents a fractional second, printed to
+		the given number of decimal places, with trailing zeros removed.
+		When parsing (only), the input may contain a fractional second
+		field immediately after the seconds field, even if the layout does not
+		signify its presence. In that case a decimal point followed by a maximal
+		series of digits is parsed as a fractional second.
+
+		Numeric time zone offsets format as follows:
+			-0700  ±hhmm
+			-07:00 ±hh:mm
+			-07    ±hh
+		Replacing the sign in the format with a Z triggers
+		the ISO 8601 behavior of printing Z instead of an
+		offset for the UTC zone. Thus:
+			Z0700  Z or ±hhmm
+			Z07:00 Z or ±hh:mm
+			Z07    Z or ±hh
+
+		The recognized day of week formats are "Mon" and "Monday".
+		The recognized month formats are "Jan" and "January".
+
+		The formats 2, _2, and 02 are unpadded, space-padded, and zero-padded
+		day of month. The formats __2 and 002 are space-padded and zero-padded
+		three-character day of year; there is no unpadded day of year format.
+
+		Text in the format string that is not recognized as part of the reference
+		time is echoed verbatim during Format and expected to appear verbatim
+		in the input to Parse.
+
+		The executable example for Time.Format demonstrates the working
+		of the layout string in detail and is a good reference.
+
+		Note that the RFC822, RFC850, and RFC1123 formats should be applied
+		only to local times. Applying them to UTC times will use "UTC" as the
+		time zone abbreviation, while strictly speaking those RFCs require the
+		use of "GMT" in that case.
+		In general RFC1123Z should be used instead of RFC1123 for servers
+		that insist on that format, and RFC3339 should be preferred for new protocols.
+		RFC3339, RFC822, RFC822Z, RFC1123, and RFC1123Z are useful for formatting;
+		when used with time.Parse they do not accept all the time formats
+		permitted by the RFCs and they do accept time formats not formally defined.
+		The RFC3339Nano format removes trailing zeros from the seconds field
+		and thus may not sort correctly once formatted.</div>
+<div class="anchor" id="name-Until">	 func <a href="../src/time/time.go.html#line-881">Until</a>(t <a href="#name-Time">Time</a>) <a href="#name-Duration">Duration</a>
+		Until returns the duration until t.
+		It is shorthand for t.Sub(time.Now()).</div>
+<div class="anchor" id="name-UTC">	  var <a href="../src/time/zoneinfo.go.html#line-67">UTC</a> *<a href="#name-Location">Location</a>
+		UTC represents Universal Coordinated Time (UTC).</div>
+<div class="anchor" id="name-Wednesday">	const <a href="../src/time/time.go.html#line-307">Wednesday</a> <a href="#name-Weekday">Weekday</a> = 3</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

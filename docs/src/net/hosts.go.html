@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: hosts.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	hosts.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package net</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"internal/bytealg"</code></span>
+<span class="codeline" id="line-9"><code>	"sync"</code></span>
+<span class="codeline" id="line-10"><code>	"time"</code></span>
+<span class="codeline" id="line-11"><code>)</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>const cacheMaxAge = 5 * time.Second</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>func parseLiteralIP(addr string) string {</code></span>
+<span class="codeline" id="line-16"><code>	var ip IP</code></span>
+<span class="codeline" id="line-17"><code>	var zone string</code></span>
+<span class="codeline" id="line-18"><code>	ip = parseIPv4(addr)</code></span>
+<span class="codeline" id="line-19"><code>	if ip == nil {</code></span>
+<span class="codeline" id="line-20"><code>		ip, zone = parseIPv6Zone(addr)</code></span>
+<span class="codeline" id="line-21"><code>	}</code></span>
+<span class="codeline" id="line-22"><code>	if ip == nil {</code></span>
+<span class="codeline" id="line-23"><code>		return ""</code></span>
+<span class="codeline" id="line-24"><code>	}</code></span>
+<span class="codeline" id="line-25"><code>	if zone == "" {</code></span>
+<span class="codeline" id="line-26"><code>		return ip.String()</code></span>
+<span class="codeline" id="line-27"><code>	}</code></span>
+<span class="codeline" id="line-28"><code>	return ip.String() + "%" + zone</code></span>
+<span class="codeline" id="line-29"><code>}</code></span>
+<span class="codeline" id="line-30"><code></code></span>
+<span class="codeline" id="line-31"><code>// hosts contains known host entries.</code></span>
+<span class="codeline" id="line-32"><code>var hosts struct {</code></span>
+<span class="codeline" id="line-33"><code>	sync.Mutex</code></span>
+<span class="codeline" id="line-34"><code></code></span>
+<span class="codeline" id="line-35"><code>	// Key for the list of literal IP addresses must be a host</code></span>
+<span class="codeline" id="line-36"><code>	// name. It would be part of DNS labels, a FQDN or an absolute</code></span>
+<span class="codeline" id="line-37"><code>	// FQDN.</code></span>
+<span class="codeline" id="line-38"><code>	// For now the key is converted to lower case for convenience.</code></span>
+<span class="codeline" id="line-39"><code>	byName map[string][]string</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>	// Key for the list of host names must be a literal IP address</code></span>
+<span class="codeline" id="line-42"><code>	// including IPv6 address with zone identifier.</code></span>
+<span class="codeline" id="line-43"><code>	// We don't support old-classful IP address notation.</code></span>
+<span class="codeline" id="line-44"><code>	byAddr map[string][]string</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>	expire time.Time</code></span>
+<span class="codeline" id="line-47"><code>	path   string</code></span>
+<span class="codeline" id="line-48"><code>	mtime  time.Time</code></span>
+<span class="codeline" id="line-49"><code>	size   int64</code></span>
+<span class="codeline" id="line-50"><code>}</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>func readHosts() {</code></span>
+<span class="codeline" id="line-53"><code>	now := time.Now()</code></span>
+<span class="codeline" id="line-54"><code>	hp := testHookHostsPath</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>	if now.Before(hosts.expire) &amp;&amp; hosts.path == hp &amp;&amp; len(hosts.byName) &gt; 0 {</code></span>
+<span class="codeline" id="line-57"><code>		return</code></span>
+<span class="codeline" id="line-58"><code>	}</code></span>
+<span class="codeline" id="line-59"><code>	mtime, size, err := stat(hp)</code></span>
+<span class="codeline" id="line-60"><code>	if err == nil &amp;&amp; hosts.path == hp &amp;&amp; hosts.mtime.Equal(mtime) &amp;&amp; hosts.size == size {</code></span>
+<span class="codeline" id="line-61"><code>		hosts.expire = now.Add(cacheMaxAge)</code></span>
+<span class="codeline" id="line-62"><code>		return</code></span>
+<span class="codeline" id="line-63"><code>	}</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>	hs := make(map[string][]string)</code></span>
+<span class="codeline" id="line-66"><code>	is := make(map[string][]string)</code></span>
+<span class="codeline" id="line-67"><code>	var file *file</code></span>
+<span class="codeline" id="line-68"><code>	if file, _ = open(hp); file == nil {</code></span>
+<span class="codeline" id="line-69"><code>		return</code></span>
+<span class="codeline" id="line-70"><code>	}</code></span>
+<span class="codeline" id="line-71"><code>	for line, ok := file.readLine(); ok; line, ok = file.readLine() {</code></span>
+<span class="codeline" id="line-72"><code>		if i := bytealg.IndexByteString(line, '#'); i &gt;= 0 {</code></span>
+<span class="codeline" id="line-73"><code>			// Discard comments.</code></span>
+<span class="codeline" id="line-74"><code>			line = line[0:i]</code></span>
+<span class="codeline" id="line-75"><code>		}</code></span>
+<span class="codeline" id="line-76"><code>		f := getFields(line)</code></span>
+<span class="codeline" id="line-77"><code>		if len(f) &lt; 2 {</code></span>
+<span class="codeline" id="line-78"><code>			continue</code></span>
+<span class="codeline" id="line-79"><code>		}</code></span>
+<span class="codeline" id="line-80"><code>		addr := parseLiteralIP(f[0])</code></span>
+<span class="codeline" id="line-81"><code>		if addr == "" {</code></span>
+<span class="codeline" id="line-82"><code>			continue</code></span>
+<span class="codeline" id="line-83"><code>		}</code></span>
+<span class="codeline" id="line-84"><code>		for i := 1; i &lt; len(f); i++ {</code></span>
+<span class="codeline" id="line-85"><code>			name := absDomainName([]byte(f[i]))</code></span>
+<span class="codeline" id="line-86"><code>			h := []byte(f[i])</code></span>
+<span class="codeline" id="line-87"><code>			lowerASCIIBytes(h)</code></span>
+<span class="codeline" id="line-88"><code>			key := absDomainName(h)</code></span>
+<span class="codeline" id="line-89"><code>			hs[key] = append(hs[key], addr)</code></span>
+<span class="codeline" id="line-90"><code>			is[addr] = append(is[addr], name)</code></span>
+<span class="codeline" id="line-91"><code>		}</code></span>
+<span class="codeline" id="line-92"><code>	}</code></span>
+<span class="codeline" id="line-93"><code>	// Update the data cache.</code></span>
+<span class="codeline" id="line-94"><code>	hosts.expire = now.Add(cacheMaxAge)</code></span>
+<span class="codeline" id="line-95"><code>	hosts.path = hp</code></span>
+<span class="codeline" id="line-96"><code>	hosts.byName = hs</code></span>
+<span class="codeline" id="line-97"><code>	hosts.byAddr = is</code></span>
+<span class="codeline" id="line-98"><code>	hosts.mtime = mtime</code></span>
+<span class="codeline" id="line-99"><code>	hosts.size = size</code></span>
+<span class="codeline" id="line-100"><code>	file.close()</code></span>
+<span class="codeline" id="line-101"><code>}</code></span>
+<span class="codeline" id="line-102"><code></code></span>
+<span class="codeline" id="line-103"><code>// lookupStaticHost looks up the addresses for the given host from /etc/hosts.</code></span>
+<span class="codeline" id="line-104"><code>func lookupStaticHost(host string) []string {</code></span>
+<span class="codeline" id="line-105"><code>	hosts.Lock()</code></span>
+<span class="codeline" id="line-106"><code>	defer hosts.Unlock()</code></span>
+<span class="codeline" id="line-107"><code>	readHosts()</code></span>
+<span class="codeline" id="line-108"><code>	if len(hosts.byName) != 0 {</code></span>
+<span class="codeline" id="line-109"><code>		// TODO(jbd,bradfitz): avoid this alloc if host is already all lowercase?</code></span>
+<span class="codeline" id="line-110"><code>		// or linear scan the byName map if it's small enough?</code></span>
+<span class="codeline" id="line-111"><code>		lowerHost := []byte(host)</code></span>
+<span class="codeline" id="line-112"><code>		lowerASCIIBytes(lowerHost)</code></span>
+<span class="codeline" id="line-113"><code>		if ips, ok := hosts.byName[absDomainName(lowerHost)]; ok {</code></span>
+<span class="codeline" id="line-114"><code>			ipsCp := make([]string, len(ips))</code></span>
+<span class="codeline" id="line-115"><code>			copy(ipsCp, ips)</code></span>
+<span class="codeline" id="line-116"><code>			return ipsCp</code></span>
+<span class="codeline" id="line-117"><code>		}</code></span>
+<span class="codeline" id="line-118"><code>	}</code></span>
+<span class="codeline" id="line-119"><code>	return nil</code></span>
+<span class="codeline" id="line-120"><code>}</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>// lookupStaticAddr looks up the hosts for the given address from /etc/hosts.</code></span>
+<span class="codeline" id="line-123"><code>func lookupStaticAddr(addr string) []string {</code></span>
+<span class="codeline" id="line-124"><code>	hosts.Lock()</code></span>
+<span class="codeline" id="line-125"><code>	defer hosts.Unlock()</code></span>
+<span class="codeline" id="line-126"><code>	readHosts()</code></span>
+<span class="codeline" id="line-127"><code>	addr = parseLiteralIP(addr)</code></span>
+<span class="codeline" id="line-128"><code>	if addr == "" {</code></span>
+<span class="codeline" id="line-129"><code>		return nil</code></span>
+<span class="codeline" id="line-130"><code>	}</code></span>
+<span class="codeline" id="line-131"><code>	if len(hosts.byAddr) != 0 {</code></span>
+<span class="codeline" id="line-132"><code>		if hosts, ok := hosts.byAddr[addr]; ok {</code></span>
+<span class="codeline" id="line-133"><code>			hostsCp := make([]string, len(hosts))</code></span>
+<span class="codeline" id="line-134"><code>			copy(hostsCp, hosts)</code></span>
+<span class="codeline" id="line-135"><code>			return hostsCp</code></span>
+<span class="codeline" id="line-136"><code>		}</code></span>
+<span class="codeline" id="line-137"><code>	}</code></span>
+<span class="codeline" id="line-138"><code>	return nil</code></span>
+<span class="codeline" id="line-139"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: lookup_unix.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	lookup_unix.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build aix darwin dragonfly freebsd linux netbsd openbsd solaris</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>package net</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>import (</code></span>
+<span class="codeline" id="line-10"><code>	"context"</code></span>
+<span class="codeline" id="line-11"><code>	"internal/bytealg"</code></span>
+<span class="codeline" id="line-12"><code>	"sync"</code></span>
+<span class="codeline" id="line-13"><code>	"syscall"</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>	"golang.org/x/net/dns/dnsmessage"</code></span>
+<span class="codeline" id="line-16"><code>)</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>var onceReadProtocols sync.Once</code></span>
+<span class="codeline" id="line-19"><code></code></span>
+<span class="codeline" id="line-20"><code>// readProtocols loads contents of /etc/protocols into protocols map</code></span>
+<span class="codeline" id="line-21"><code>// for quick access.</code></span>
+<span class="codeline" id="line-22"><code>func readProtocols() {</code></span>
+<span class="codeline" id="line-23"><code>	file, err := open("/etc/protocols")</code></span>
+<span class="codeline" id="line-24"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-25"><code>		return</code></span>
+<span class="codeline" id="line-26"><code>	}</code></span>
+<span class="codeline" id="line-27"><code>	defer file.close()</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>	for line, ok := file.readLine(); ok; line, ok = file.readLine() {</code></span>
+<span class="codeline" id="line-30"><code>		// tcp    6   TCP    # transmission control protocol</code></span>
+<span class="codeline" id="line-31"><code>		if i := bytealg.IndexByteString(line, '#'); i &gt;= 0 {</code></span>
+<span class="codeline" id="line-32"><code>			line = line[0:i]</code></span>
+<span class="codeline" id="line-33"><code>		}</code></span>
+<span class="codeline" id="line-34"><code>		f := getFields(line)</code></span>
+<span class="codeline" id="line-35"><code>		if len(f) &lt; 2 {</code></span>
+<span class="codeline" id="line-36"><code>			continue</code></span>
+<span class="codeline" id="line-37"><code>		}</code></span>
+<span class="codeline" id="line-38"><code>		if proto, _, ok := dtoi(f[1]); ok {</code></span>
+<span class="codeline" id="line-39"><code>			if _, ok := protocols[f[0]]; !ok {</code></span>
+<span class="codeline" id="line-40"><code>				protocols[f[0]] = proto</code></span>
+<span class="codeline" id="line-41"><code>			}</code></span>
+<span class="codeline" id="line-42"><code>			for _, alias := range f[2:] {</code></span>
+<span class="codeline" id="line-43"><code>				if _, ok := protocols[alias]; !ok {</code></span>
+<span class="codeline" id="line-44"><code>					protocols[alias] = proto</code></span>
+<span class="codeline" id="line-45"><code>				}</code></span>
+<span class="codeline" id="line-46"><code>			}</code></span>
+<span class="codeline" id="line-47"><code>		}</code></span>
+<span class="codeline" id="line-48"><code>	}</code></span>
+<span class="codeline" id="line-49"><code>}</code></span>
+<span class="codeline" id="line-50"><code></code></span>
+<span class="codeline" id="line-51"><code>// lookupProtocol looks up IP protocol name in /etc/protocols and</code></span>
+<span class="codeline" id="line-52"><code>// returns correspondent protocol number.</code></span>
+<span class="codeline" id="line-53"><code>func lookupProtocol(_ context.Context, name string) (int, error) {</code></span>
+<span class="codeline" id="line-54"><code>	onceReadProtocols.Do(readProtocols)</code></span>
+<span class="codeline" id="line-55"><code>	return lookupProtocolMap(name)</code></span>
+<span class="codeline" id="line-56"><code>}</code></span>
+<span class="codeline" id="line-57"><code></code></span>
+<span class="codeline" id="line-58"><code>func (r *Resolver) dial(ctx context.Context, network, server string) (Conn, error) {</code></span>
+<span class="codeline" id="line-59"><code>	// Calling Dial here is scary -- we have to be sure not to</code></span>
+<span class="codeline" id="line-60"><code>	// dial a name that will require a DNS lookup, or Dial will</code></span>
+<span class="codeline" id="line-61"><code>	// call back here to translate it. The DNS config parser has</code></span>
+<span class="codeline" id="line-62"><code>	// already checked that all the cfg.servers are IP</code></span>
+<span class="codeline" id="line-63"><code>	// addresses, which Dial will use without a DNS lookup.</code></span>
+<span class="codeline" id="line-64"><code>	var c Conn</code></span>
+<span class="codeline" id="line-65"><code>	var err error</code></span>
+<span class="codeline" id="line-66"><code>	if r != nil &amp;&amp; r.Dial != nil {</code></span>
+<span class="codeline" id="line-67"><code>		c, err = r.Dial(ctx, network, server)</code></span>
+<span class="codeline" id="line-68"><code>	} else {</code></span>
+<span class="codeline" id="line-69"><code>		var d Dialer</code></span>
+<span class="codeline" id="line-70"><code>		c, err = d.DialContext(ctx, network, server)</code></span>
+<span class="codeline" id="line-71"><code>	}</code></span>
+<span class="codeline" id="line-72"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-73"><code>		return nil, mapErr(err)</code></span>
+<span class="codeline" id="line-74"><code>	}</code></span>
+<span class="codeline" id="line-75"><code>	return c, nil</code></span>
+<span class="codeline" id="line-76"><code>}</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>func (r *Resolver) lookupHost(ctx context.Context, host string) (addrs []string, err error) {</code></span>
+<span class="codeline" id="line-79"><code>	order := systemConf().hostLookupOrder(r, host)</code></span>
+<span class="codeline" id="line-80"><code>	if !r.preferGo() &amp;&amp; order == hostLookupCgo {</code></span>
+<span class="codeline" id="line-81"><code>		if addrs, err, ok := cgoLookupHost(ctx, host); ok {</code></span>
+<span class="codeline" id="line-82"><code>			return addrs, err</code></span>
+<span class="codeline" id="line-83"><code>		}</code></span>
+<span class="codeline" id="line-84"><code>		// cgo not available (or netgo); fall back to Go's DNS resolver</code></span>
+<span class="codeline" id="line-85"><code>		order = hostLookupFilesDNS</code></span>
+<span class="codeline" id="line-86"><code>	}</code></span>
+<span class="codeline" id="line-87"><code>	return r.goLookupHostOrder(ctx, host, order)</code></span>
+<span class="codeline" id="line-88"><code>}</code></span>
+<span class="codeline" id="line-89"><code></code></span>
+<span class="codeline" id="line-90"><code>func (r *Resolver) lookupIP(ctx context.Context, network, host string) (addrs []IPAddr, err error) {</code></span>
+<span class="codeline" id="line-91"><code>	if r.preferGo() {</code></span>
+<span class="codeline" id="line-92"><code>		return r.goLookupIP(ctx, host)</code></span>
+<span class="codeline" id="line-93"><code>	}</code></span>
+<span class="codeline" id="line-94"><code>	order := systemConf().hostLookupOrder(r, host)</code></span>
+<span class="codeline" id="line-95"><code>	if order == hostLookupCgo {</code></span>
+<span class="codeline" id="line-96"><code>		if addrs, err, ok := cgoLookupIP(ctx, network, host); ok {</code></span>
+<span class="codeline" id="line-97"><code>			return addrs, err</code></span>
+<span class="codeline" id="line-98"><code>		}</code></span>
+<span class="codeline" id="line-99"><code>		// cgo not available (or netgo); fall back to Go's DNS resolver</code></span>
+<span class="codeline" id="line-100"><code>		order = hostLookupFilesDNS</code></span>
+<span class="codeline" id="line-101"><code>	}</code></span>
+<span class="codeline" id="line-102"><code>	ips, _, err := r.goLookupIPCNAMEOrder(ctx, host, order)</code></span>
+<span class="codeline" id="line-103"><code>	return ips, err</code></span>
+<span class="codeline" id="line-104"><code>}</code></span>
+<span class="codeline" id="line-105"><code></code></span>
+<span class="codeline" id="line-106"><code>func (r *Resolver) lookupPort(ctx context.Context, network, service string) (int, error) {</code></span>
+<span class="codeline" id="line-107"><code>	if !r.preferGo() &amp;&amp; systemConf().canUseCgo() {</code></span>
+<span class="codeline" id="line-108"><code>		if port, err, ok := cgoLookupPort(ctx, network, service); ok {</code></span>
+<span class="codeline" id="line-109"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-110"><code>				// Issue 18213: if cgo fails, first check to see whether we</code></span>
+<span class="codeline" id="line-111"><code>				// have the answer baked-in to the net package.</code></span>
+<span class="codeline" id="line-112"><code>				if port, err := goLookupPort(network, service); err == nil {</code></span>
+<span class="codeline" id="line-113"><code>					return port, nil</code></span>
+<span class="codeline" id="line-114"><code>				}</code></span>
+<span class="codeline" id="line-115"><code>			}</code></span>
+<span class="codeline" id="line-116"><code>			return port, err</code></span>
+<span class="codeline" id="line-117"><code>		}</code></span>
+<span class="codeline" id="line-118"><code>	}</code></span>
+<span class="codeline" id="line-119"><code>	return goLookupPort(network, service)</code></span>
+<span class="codeline" id="line-120"><code>}</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>func (r *Resolver) lookupCNAME(ctx context.Context, name string) (string, error) {</code></span>
+<span class="codeline" id="line-123"><code>	if !r.preferGo() &amp;&amp; systemConf().canUseCgo() {</code></span>
+<span class="codeline" id="line-124"><code>		if cname, err, ok := cgoLookupCNAME(ctx, name); ok {</code></span>
+<span class="codeline" id="line-125"><code>			return cname, err</code></span>
+<span class="codeline" id="line-126"><code>		}</code></span>
+<span class="codeline" id="line-127"><code>	}</code></span>
+<span class="codeline" id="line-128"><code>	return r.goLookupCNAME(ctx, name)</code></span>
+<span class="codeline" id="line-129"><code>}</code></span>
+<span class="codeline" id="line-130"><code></code></span>
+<span class="codeline" id="line-131"><code>func (r *Resolver) lookupSRV(ctx context.Context, service, proto, name string) (string, []*SRV, error) {</code></span>
+<span class="codeline" id="line-132"><code>	var target string</code></span>
+<span class="codeline" id="line-133"><code>	if service == "" &amp;&amp; proto == "" {</code></span>
+<span class="codeline" id="line-134"><code>		target = name</code></span>
+<span class="codeline" id="line-135"><code>	} else {</code></span>
+<span class="codeline" id="line-136"><code>		target = "_" + service + "._" + proto + "." + name</code></span>
+<span class="codeline" id="line-137"><code>	}</code></span>
+<span class="codeline" id="line-138"><code>	p, server, err := r.lookup(ctx, target, dnsmessage.TypeSRV)</code></span>
+<span class="codeline" id="line-139"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-140"><code>		return "", nil, err</code></span>
+<span class="codeline" id="line-141"><code>	}</code></span>
+<span class="codeline" id="line-142"><code>	var srvs []*SRV</code></span>
+<span class="codeline" id="line-143"><code>	var cname dnsmessage.Name</code></span>
+<span class="codeline" id="line-144"><code>	for {</code></span>
+<span class="codeline" id="line-145"><code>		h, err := p.AnswerHeader()</code></span>
+<span class="codeline" id="line-146"><code>		if err == dnsmessage.ErrSectionDone {</code></span>
+<span class="codeline" id="line-147"><code>			break</code></span>
+<span class="codeline" id="line-148"><code>		}</code></span>
+<span class="codeline" id="line-149"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-150"><code>			return "", nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-151"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-152"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-153"><code>				Server: server,</code></span>
+<span class="codeline" id="line-154"><code>			}</code></span>
+<span class="codeline" id="line-155"><code>		}</code></span>
+<span class="codeline" id="line-156"><code>		if h.Type != dnsmessage.TypeSRV {</code></span>
+<span class="codeline" id="line-157"><code>			if err := p.SkipAnswer(); err != nil {</code></span>
+<span class="codeline" id="line-158"><code>				return "", nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-159"><code>					Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-160"><code>					Name:   name,</code></span>
+<span class="codeline" id="line-161"><code>					Server: server,</code></span>
+<span class="codeline" id="line-162"><code>				}</code></span>
+<span class="codeline" id="line-163"><code>			}</code></span>
+<span class="codeline" id="line-164"><code>			continue</code></span>
+<span class="codeline" id="line-165"><code>		}</code></span>
+<span class="codeline" id="line-166"><code>		if cname.Length == 0 &amp;&amp; h.Name.Length != 0 {</code></span>
+<span class="codeline" id="line-167"><code>			cname = h.Name</code></span>
+<span class="codeline" id="line-168"><code>		}</code></span>
+<span class="codeline" id="line-169"><code>		srv, err := p.SRVResource()</code></span>
+<span class="codeline" id="line-170"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-171"><code>			return "", nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-172"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-173"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-174"><code>				Server: server,</code></span>
+<span class="codeline" id="line-175"><code>			}</code></span>
+<span class="codeline" id="line-176"><code>		}</code></span>
+<span class="codeline" id="line-177"><code>		srvs = append(srvs, &amp;SRV{Target: srv.Target.String(), Port: srv.Port, Priority: srv.Priority, Weight: srv.Weight})</code></span>
+<span class="codeline" id="line-178"><code>	}</code></span>
+<span class="codeline" id="line-179"><code>	byPriorityWeight(srvs).sort()</code></span>
+<span class="codeline" id="line-180"><code>	return cname.String(), srvs, nil</code></span>
+<span class="codeline" id="line-181"><code>}</code></span>
+<span class="codeline" id="line-182"><code></code></span>
+<span class="codeline" id="line-183"><code>func (r *Resolver) lookupMX(ctx context.Context, name string) ([]*MX, error) {</code></span>
+<span class="codeline" id="line-184"><code>	p, server, err := r.lookup(ctx, name, dnsmessage.TypeMX)</code></span>
+<span class="codeline" id="line-185"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-186"><code>		return nil, err</code></span>
+<span class="codeline" id="line-187"><code>	}</code></span>
+<span class="codeline" id="line-188"><code>	var mxs []*MX</code></span>
+<span class="codeline" id="line-189"><code>	for {</code></span>
+<span class="codeline" id="line-190"><code>		h, err := p.AnswerHeader()</code></span>
+<span class="codeline" id="line-191"><code>		if err == dnsmessage.ErrSectionDone {</code></span>
+<span class="codeline" id="line-192"><code>			break</code></span>
+<span class="codeline" id="line-193"><code>		}</code></span>
+<span class="codeline" id="line-194"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-195"><code>			return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-196"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-197"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-198"><code>				Server: server,</code></span>
+<span class="codeline" id="line-199"><code>			}</code></span>
+<span class="codeline" id="line-200"><code>		}</code></span>
+<span class="codeline" id="line-201"><code>		if h.Type != dnsmessage.TypeMX {</code></span>
+<span class="codeline" id="line-202"><code>			if err := p.SkipAnswer(); err != nil {</code></span>
+<span class="codeline" id="line-203"><code>				return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-204"><code>					Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-205"><code>					Name:   name,</code></span>
+<span class="codeline" id="line-206"><code>					Server: server,</code></span>
+<span class="codeline" id="line-207"><code>				}</code></span>
+<span class="codeline" id="line-208"><code>			}</code></span>
+<span class="codeline" id="line-209"><code>			continue</code></span>
+<span class="codeline" id="line-210"><code>		}</code></span>
+<span class="codeline" id="line-211"><code>		mx, err := p.MXResource()</code></span>
+<span class="codeline" id="line-212"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-213"><code>			return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-214"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-215"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-216"><code>				Server: server,</code></span>
+<span class="codeline" id="line-217"><code>			}</code></span>
+<span class="codeline" id="line-218"><code>		}</code></span>
+<span class="codeline" id="line-219"><code>		mxs = append(mxs, &amp;MX{Host: mx.MX.String(), Pref: mx.Pref})</code></span>
+<span class="codeline" id="line-220"><code></code></span>
+<span class="codeline" id="line-221"><code>	}</code></span>
+<span class="codeline" id="line-222"><code>	byPref(mxs).sort()</code></span>
+<span class="codeline" id="line-223"><code>	return mxs, nil</code></span>
+<span class="codeline" id="line-224"><code>}</code></span>
+<span class="codeline" id="line-225"><code></code></span>
+<span class="codeline" id="line-226"><code>func (r *Resolver) lookupNS(ctx context.Context, name string) ([]*NS, error) {</code></span>
+<span class="codeline" id="line-227"><code>	p, server, err := r.lookup(ctx, name, dnsmessage.TypeNS)</code></span>
+<span class="codeline" id="line-228"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-229"><code>		return nil, err</code></span>
+<span class="codeline" id="line-230"><code>	}</code></span>
+<span class="codeline" id="line-231"><code>	var nss []*NS</code></span>
+<span class="codeline" id="line-232"><code>	for {</code></span>
+<span class="codeline" id="line-233"><code>		h, err := p.AnswerHeader()</code></span>
+<span class="codeline" id="line-234"><code>		if err == dnsmessage.ErrSectionDone {</code></span>
+<span class="codeline" id="line-235"><code>			break</code></span>
+<span class="codeline" id="line-236"><code>		}</code></span>
+<span class="codeline" id="line-237"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-238"><code>			return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-239"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-240"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-241"><code>				Server: server,</code></span>
+<span class="codeline" id="line-242"><code>			}</code></span>
+<span class="codeline" id="line-243"><code>		}</code></span>
+<span class="codeline" id="line-244"><code>		if h.Type != dnsmessage.TypeNS {</code></span>
+<span class="codeline" id="line-245"><code>			if err := p.SkipAnswer(); err != nil {</code></span>
+<span class="codeline" id="line-246"><code>				return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-247"><code>					Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-248"><code>					Name:   name,</code></span>
+<span class="codeline" id="line-249"><code>					Server: server,</code></span>
+<span class="codeline" id="line-250"><code>				}</code></span>
+<span class="codeline" id="line-251"><code>			}</code></span>
+<span class="codeline" id="line-252"><code>			continue</code></span>
+<span class="codeline" id="line-253"><code>		}</code></span>
+<span class="codeline" id="line-254"><code>		ns, err := p.NSResource()</code></span>
+<span class="codeline" id="line-255"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-256"><code>			return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-257"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-258"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-259"><code>				Server: server,</code></span>
+<span class="codeline" id="line-260"><code>			}</code></span>
+<span class="codeline" id="line-261"><code>		}</code></span>
+<span class="codeline" id="line-262"><code>		nss = append(nss, &amp;NS{Host: ns.NS.String()})</code></span>
+<span class="codeline" id="line-263"><code>	}</code></span>
+<span class="codeline" id="line-264"><code>	return nss, nil</code></span>
+<span class="codeline" id="line-265"><code>}</code></span>
+<span class="codeline" id="line-266"><code></code></span>
+<span class="codeline" id="line-267"><code>func (r *Resolver) lookupTXT(ctx context.Context, name string) ([]string, error) {</code></span>
+<span class="codeline" id="line-268"><code>	p, server, err := r.lookup(ctx, name, dnsmessage.TypeTXT)</code></span>
+<span class="codeline" id="line-269"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-270"><code>		return nil, err</code></span>
+<span class="codeline" id="line-271"><code>	}</code></span>
+<span class="codeline" id="line-272"><code>	var txts []string</code></span>
+<span class="codeline" id="line-273"><code>	for {</code></span>
+<span class="codeline" id="line-274"><code>		h, err := p.AnswerHeader()</code></span>
+<span class="codeline" id="line-275"><code>		if err == dnsmessage.ErrSectionDone {</code></span>
+<span class="codeline" id="line-276"><code>			break</code></span>
+<span class="codeline" id="line-277"><code>		}</code></span>
+<span class="codeline" id="line-278"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-279"><code>			return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-280"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-281"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-282"><code>				Server: server,</code></span>
+<span class="codeline" id="line-283"><code>			}</code></span>
+<span class="codeline" id="line-284"><code>		}</code></span>
+<span class="codeline" id="line-285"><code>		if h.Type != dnsmessage.TypeTXT {</code></span>
+<span class="codeline" id="line-286"><code>			if err := p.SkipAnswer(); err != nil {</code></span>
+<span class="codeline" id="line-287"><code>				return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-288"><code>					Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-289"><code>					Name:   name,</code></span>
+<span class="codeline" id="line-290"><code>					Server: server,</code></span>
+<span class="codeline" id="line-291"><code>				}</code></span>
+<span class="codeline" id="line-292"><code>			}</code></span>
+<span class="codeline" id="line-293"><code>			continue</code></span>
+<span class="codeline" id="line-294"><code>		}</code></span>
+<span class="codeline" id="line-295"><code>		txt, err := p.TXTResource()</code></span>
+<span class="codeline" id="line-296"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-297"><code>			return nil, &amp;DNSError{</code></span>
+<span class="codeline" id="line-298"><code>				Err:    "cannot unmarshal DNS message",</code></span>
+<span class="codeline" id="line-299"><code>				Name:   name,</code></span>
+<span class="codeline" id="line-300"><code>				Server: server,</code></span>
+<span class="codeline" id="line-301"><code>			}</code></span>
+<span class="codeline" id="line-302"><code>		}</code></span>
+<span class="codeline" id="line-303"><code>		// Multiple strings in one TXT record need to be</code></span>
+<span class="codeline" id="line-304"><code>		// concatenated without separator to be consistent</code></span>
+<span class="codeline" id="line-305"><code>		// with previous Go resolver.</code></span>
+<span class="codeline" id="line-306"><code>		n := 0</code></span>
+<span class="codeline" id="line-307"><code>		for _, s := range txt.TXT {</code></span>
+<span class="codeline" id="line-308"><code>			n += len(s)</code></span>
+<span class="codeline" id="line-309"><code>		}</code></span>
+<span class="codeline" id="line-310"><code>		txtJoin := make([]byte, 0, n)</code></span>
+<span class="codeline" id="line-311"><code>		for _, s := range txt.TXT {</code></span>
+<span class="codeline" id="line-312"><code>			txtJoin = append(txtJoin, s...)</code></span>
+<span class="codeline" id="line-313"><code>		}</code></span>
+<span class="codeline" id="line-314"><code>		if len(txts) == 0 {</code></span>
+<span class="codeline" id="line-315"><code>			txts = make([]string, 0, 1)</code></span>
+<span class="codeline" id="line-316"><code>		}</code></span>
+<span class="codeline" id="line-317"><code>		txts = append(txts, string(txtJoin))</code></span>
+<span class="codeline" id="line-318"><code>	}</code></span>
+<span class="codeline" id="line-319"><code>	return txts, nil</code></span>
+<span class="codeline" id="line-320"><code>}</code></span>
+<span class="codeline" id="line-321"><code></code></span>
+<span class="codeline" id="line-322"><code>func (r *Resolver) lookupAddr(ctx context.Context, addr string) ([]string, error) {</code></span>
+<span class="codeline" id="line-323"><code>	if !r.preferGo() &amp;&amp; systemConf().canUseCgo() {</code></span>
+<span class="codeline" id="line-324"><code>		if ptrs, err, ok := cgoLookupPTR(ctx, addr); ok {</code></span>
+<span class="codeline" id="line-325"><code>			return ptrs, err</code></span>
+<span class="codeline" id="line-326"><code>		}</code></span>
+<span class="codeline" id="line-327"><code>	}</code></span>
+<span class="codeline" id="line-328"><code>	return r.goLookupPTR(ctx, addr)</code></span>
+<span class="codeline" id="line-329"><code>}</code></span>
+<span class="codeline" id="line-330"><code></code></span>
+<span class="codeline" id="line-331"><code>// concurrentThreadsLimit returns the number of threads we permit to</code></span>
+<span class="codeline" id="line-332"><code>// run concurrently doing DNS lookups via cgo. A DNS lookup may use a</code></span>
+<span class="codeline" id="line-333"><code>// file descriptor so we limit this to less than the number of</code></span>
+<span class="codeline" id="line-334"><code>// permitted open files. On some systems, notably Darwin, if</code></span>
+<span class="codeline" id="line-335"><code>// getaddrinfo is unable to open a file descriptor it simply returns</code></span>
+<span class="codeline" id="line-336"><code>// EAI_NONAME rather than a useful error. Limiting the number of</code></span>
+<span class="codeline" id="line-337"><code>// concurrent getaddrinfo calls to less than the permitted number of</code></span>
+<span class="codeline" id="line-338"><code>// file descriptors makes that error less likely. We don't bother to</code></span>
+<span class="codeline" id="line-339"><code>// apply the same limit to DNS lookups run directly from Go, because</code></span>
+<span class="codeline" id="line-340"><code>// there we will return a meaningful "too many open files" error.</code></span>
+<span class="codeline" id="line-341"><code>func concurrentThreadsLimit() int {</code></span>
+<span class="codeline" id="line-342"><code>	var rlim syscall.Rlimit</code></span>
+<span class="codeline" id="line-343"><code>	if err := syscall.Getrlimit(syscall.RLIMIT_NOFILE, &amp;rlim); err != nil {</code></span>
+<span class="codeline" id="line-344"><code>		return 500</code></span>
+<span class="codeline" id="line-345"><code>	}</code></span>
+<span class="codeline" id="line-346"><code>	r := int(rlim.Cur)</code></span>
+<span class="codeline" id="line-347"><code>	if r &gt; 500 {</code></span>
+<span class="codeline" id="line-348"><code>		r = 500</code></span>
+<span class="codeline" id="line-349"><code>	} else if r &gt; 30 {</code></span>
+<span class="codeline" id="line-350"><code>		r -= 30</code></span>
+<span class="codeline" id="line-351"><code>	}</code></span>
+<span class="codeline" id="line-352"><code>	return r</code></span>
+<span class="codeline" id="line-353"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

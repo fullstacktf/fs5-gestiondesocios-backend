@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dependency Relation: fmt</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>fmt</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../pkg/fmt.html">fmt</a>
+
+<span class="title">Imports</span>
+<code>       1. <a href="../pkg/errors.html">errors</a></code>
+<code>       2. <a href="../pkg/internal/fmtsort.html">internal/fmtsort</a></code>
+<code>       3. <a href="../pkg/io.html">io</a></code>
+<code>       4. <a href="../pkg/math.html">math</a></code>
+<code>       5. <a href="../pkg/os.html">os</a></code>
+<code>       6. <a href="../pkg/reflect.html">reflect</a></code>
+<code>       7. <a href="../pkg/strconv.html">strconv</a></code>
+<code>       8. <a href="../pkg/sync.html">sync</a></code>
+<code>       9. <a href="../pkg/unicode/utf8.html">unicode/utf8</a></code>
+
+<span class="title" id="imported-by">Imported By</span>
+<code>        1. <a href="../pkg/compress/flate.html">compress/flate</a></code>
+<code>        2. <a href="../pkg/compress/gzip.html" class="path-duplicate">compress/</a><a href="../pkg/compress/gzip.html">gzip</a></code>
+<code>        3. <a href="../pkg/crypto/tls.html">crypto/tls</a></code>
+<code>        4. <a href="../pkg/crypto/x509.html" class="path-duplicate">crypto/</a><a href="../pkg/crypto/x509.html">x509</a></code>
+<code>        5. <a href="../pkg/crypto/x509/pkix.html" class="path-duplicate">crypto/x509/</a><a href="../pkg/crypto/x509/pkix.html">pkix</a></code>
+<code>        6. <a href="../pkg/database/sql.html">database/sql</a></code>
+<code>        7. <a href="../pkg/database/sql/driver.html" class="path-duplicate">database/sql/</a><a href="../pkg/database/sql/driver.html">driver</a></code>
+<code>        8. <a href="../pkg/encoding/asn1.html">encoding/asn1</a></code>
+<code>        9. <a href="../pkg/encoding/hex.html" class="path-duplicate">encoding/</a><a href="../pkg/encoding/hex.html">hex</a></code>
+<code>       10. <a href="../pkg/encoding/json.html" class="path-duplicate">encoding/</a><a href="../pkg/encoding/json.html">json</a></code>
+<code>   <a href="../src/fs5-gestiondesocios-backend/src/main.go.html#line-32">m-&gt;</a> 11. <a href="../pkg/fs5-gestiondesocios-backend/src.html">fs5-gestiondesocios-backend/src</a></code>
+<code>       12. <a href="../pkg/fs5-gestiondesocios-backend/src/api/utils.html" class="path-duplicate">fs5-gestiondesocios-backend/src/</a><a href="../pkg/fs5-gestiondesocios-backend/src/api/utils.html">api/utils</a></code>
+<code>       13. <a href="../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a></code>
+<code>       14. <a href="../pkg/github.com/gorilla/mux.html" class="path-duplicate">github.com/</a><a href="../pkg/github.com/gorilla/mux.html">gorilla/mux</a></code>
+<code>       15. <a href="../pkg/go/ast.html">go/ast</a></code>
+<code>       16. <a href="../pkg/go/scanner.html" class="path-duplicate">go/</a><a href="../pkg/go/scanner.html">scanner</a></code>
+<code>       17. <a href="../pkg/go/token.html" class="path-duplicate">go/</a><a href="../pkg/go/token.html">token</a></code>
+<code>       18. <a href="../pkg/gorm.io/driver/mysql.html">gorm.io/driver/mysql</a></code>
+<code>       19. <a href="../pkg/gorm.io/gorm.html" class="path-duplicate">gorm.io/</a><a href="../pkg/gorm.io/gorm.html">gorm</a></code>
+<code>       20. <a href="../pkg/gorm.io/gorm/callbacks.html" class="path-duplicate">gorm.io/gorm/</a><a href="../pkg/gorm.io/gorm/callbacks.html">callbacks</a></code>
+<code>       21. <a href="../pkg/gorm.io/gorm/logger.html" class="path-duplicate">gorm.io/gorm/</a><a href="../pkg/gorm.io/gorm/logger.html">logger</a></code>
+<code>       22. <a href="../pkg/gorm.io/gorm/migrator.html" class="path-duplicate">gorm.io/gorm/</a><a href="../pkg/gorm.io/gorm/migrator.html">migrator</a></code>
+<code>       23. <a href="../pkg/gorm.io/gorm/schema.html" class="path-duplicate">gorm.io/gorm/</a><a href="../pkg/gorm.io/gorm/schema.html">schema</a></code>
+<code>       24. <a href="../pkg/gorm.io/gorm/utils.html" class="path-duplicate">gorm.io/gorm/</a><a href="../pkg/gorm.io/gorm/utils.html">utils</a></code>
+<code>       25. <a href="../pkg/log.html">log</a></code>
+<code>       26. <a href="../pkg/math/big.html">math/big</a></code>
+<code>       27. <a href="../pkg/mime.html">mime</a></code>
+<code>       28. <a href="../pkg/mime/multipart.html" class="path-duplicate">mime/</a><a href="../pkg/mime/multipart.html">multipart</a></code>
+<code>       29. <a href="../pkg/mime/quotedprintable.html" class="path-duplicate">mime/</a><a href="../pkg/mime/quotedprintable.html">quotedprintable</a></code>
+<code>       30. <a href="../pkg/net/http.html">net/http</a></code>
+<code>       31. <a href="../pkg/net/http/internal.html" class="path-duplicate">net/http/</a><a href="../pkg/net/http/internal.html">internal</a></code>
+<code>       32. <a href="../pkg/net/textproto.html" class="path-duplicate">net/</a><a href="../pkg/net/textproto.html">textproto</a></code>
+<code>       33. <a href="../pkg/net/url.html" class="path-duplicate">net/</a><a href="../pkg/net/url.html">url</a></code>
+<code>       34. <a href="../pkg/vendor/golang.org/x/crypto/cryptobyte.html">vendor/golang.org/x/crypto/cryptobyte</a></code>
+<code>       35. <a href="../pkg/vendor/golang.org/x/crypto/curve25519.html" class="path-duplicate">vendor/golang.org/x/crypto/</a><a href="../pkg/vendor/golang.org/x/crypto/curve25519.html">curve25519</a></code>
+<code>       36. <a href="../pkg/vendor/golang.org/x/net/http/httpproxy.html" class="path-duplicate">vendor/golang.org/x/</a><a href="../pkg/vendor/golang.org/x/net/http/httpproxy.html">net/http/httpproxy</a></code>
+<code>       37. <a href="../pkg/vendor/golang.org/x/net/http2/hpack.html" class="path-duplicate">vendor/golang.org/x/net/</a><a href="../pkg/vendor/golang.org/x/net/http2/hpack.html">http2/hpack</a></code>
+<code>       38. <a href="../pkg/vendor/golang.org/x/net/idna.html" class="path-duplicate">vendor/golang.org/x/net/</a><a href="../pkg/vendor/golang.org/x/net/idna.html">idna</a></code>
+<code>       39. <a href="../pkg/vendor/golang.org/x/text/unicode/bidi.html" class="path-duplicate">vendor/golang.org/x/</a><a href="../pkg/vendor/golang.org/x/text/unicode/bidi.html">text/unicode/bidi</a></code>
+<code>       40. <a href="../pkg/vendor/golang.org/x/text/unicode/norm.html" class="path-duplicate">vendor/golang.org/x/text/unicode/</a><a href="../pkg/vendor/golang.org/x/text/unicode/norm.html">norm</a></code><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

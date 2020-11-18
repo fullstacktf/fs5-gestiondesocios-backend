@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/text/unicode/bidi</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>bidi</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../../index.html#pkg-vendor/golang.org/x/text/unicode/bidi">vendor/golang.org/x/text/unicode/bidi</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/text/unicode/bidi/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/text/unicode/bidi" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../../dep/vendor/golang.org/x/text/unicode/bidi.html">5 packages</a>, and imported by <a href="../../../../../../dep/vendor/golang.org/x/text/unicode/bidi.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#doc">d-&gt;</a> <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html">bidi.go</a>
+	    <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bracket.go.html">bracket.go</a>
+	    <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/core.go.html">core.go</a>
+	    <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html">prop.go</a>
+	    <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/tables12.0.0.go.html">tables12.0.0.go</a>
+	    <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html">trieval.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Class" data-popularity="90">	 type <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-6">Class</a> <a href="../../../../../builtin.html#name-uint">uint</a>
+		Class is the Unicode BiDi class. Each rune has a single class.
+
+		<input type='checkbox' class="stat" id="Class-stat-results"><label for="Class-stat-results">As Outputs Of (1+)</label><span id='Class-stat-results-content' class="stat-content">
+			func <a href="#name-Properties">Properties</a>.<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-28">Class</a>() <b>Class</b></span>
+		<input type='checkbox' class="stat" id="Class-stat-values"><label for="Class-stat-values">As Types Of (24+)</label><span id='Class-stat-values-content' class="stat-content">
+			const <a href="#name-AL">AL</a>
+			const <a href="#name-AN">AN</a>
+			const <a href="#name-B">B</a>
+			const <a href="#name-BN">BN</a>
+			const <a href="#name-Control">Control</a>
+			const <a href="#name-CS">CS</a>
+			const <a href="#name-EN">EN</a>
+			const <a href="#name-ES">ES</a>
+			const <a href="#name-ET">ET</a>
+			const <a href="#name-FSI">FSI</a>
+			const <a href="#name-L">L</a>
+			const <a href="#name-LRE">LRE</a>
+			const <a href="#name-LRI">LRI</a>
+			const <a href="#name-LRO">LRO</a>
+			const <a href="#name-NSM">NSM</a>
+			const <a href="#name-ON">ON</a>
+			const <a href="#name-PDF">PDF</a>
+			const <a href="#name-PDI">PDI</a>
+			const <a href="#name-R">R</a>
+			const <a href="#name-RLE">RLE</a>
+			const <a href="#name-RLI">RLI</a>
+			const <a href="#name-RLO">RLO</a>
+			const <a href="#name-S">S</a>
+			const <a href="#name-WS">WS</a></span></div>
+<div class="anchor" id="name-Direction" data-popularity="425">	 type <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-30">Direction</a> <a href="../../../../../builtin.html#name-int">int</a>
+		A Direction indicates the overall flow of text.
+
+		<input type='checkbox' class="stat" id="Direction-stat-results"><label for="Direction-stat-results">As Outputs Of (5+)</label><span id='Direction-stat-results-content' class="stat-content">
+			func (*<a href="#name-Ordering">Ordering</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-135">Direction</a>() <b>Direction</b>
+			func (*<a href="#name-Paragraph">Paragraph</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-105">Direction</a>() <b>Direction</b>
+			func (*<a href="#name-Run">Run</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-176">Direction</a>() <b>Direction</b>
+			func vendor/golang.org/x/text/secure/bidirule.<a href="../secure/bidirule.html#name-Direction">Direction</a>(b []<a href="../../../../../builtin.html#name-byte">byte</a>) <b>Direction</b>
+			func vendor/golang.org/x/text/secure/bidirule.<a href="../secure/bidirule.html#name-DirectionString">DirectionString</a>(s <a href="../../../../../builtin.html#name-string">string</a>) <b>Direction</b></span>
+		<input type='checkbox' class="stat" id="Direction-stat-params"><label for="Direction-stat-params">As Inputs Of (1+)</label><span id='Direction-stat-params-content' class="stat-content">
+			func <a href="#name-DefaultDirection">DefaultDirection</a>(d <b>Direction</b>) <a href="#name-Option">Option</a></span>
+		<input type='checkbox' class="stat" id="Direction-stat-values"><label for="Direction-stat-values">As Types Of (4+)</label><span id='Direction-stat-values-content' class="stat-content">
+			const <a href="#name-LeftToRight">LeftToRight</a>
+			const <a href="#name-Mixed">Mixed</a>
+			const <a href="#name-Neutral">Neutral</a>
+			const <a href="#name-RightToLeft">RightToLeft</a></span></div>
+<div class="anchor" id="name-Option" data-popularity="145">	 type <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-55">Option</a> <i>(func)</i>
+		An Option is an option for Bidi processing.
+
+		<input type='checkbox' class="stat" id="Option-stat-results"><label for="Option-stat-results">As Outputs Of (1+)</label><span id='Option-stat-results-content' class="stat-content">
+			func <a href="#name-DefaultDirection">DefaultDirection</a>(d <a href="#name-Direction">Direction</a>) <b>Option</b></span>
+		<input type='checkbox' class="stat" id="Option-stat-params"><label for="Option-stat-params">As Inputs Of (2+)</label><span id='Option-stat-params-content' class="stat-content">
+			func (*<a href="#name-Paragraph">Paragraph</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-82">SetBytes</a>(b []<a href="../../../../../builtin.html#name-byte">byte</a>, opts ...<b>Option</b>) (n <a href="../../../../../builtin.html#name-int">int</a>, err <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Paragraph">Paragraph</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-91">SetString</a>(s <a href="../../../../../builtin.html#name-string">string</a>, opts ...<b>Option</b>) (n <a href="../../../../../builtin.html#name-int">int</a>, err <a href="../../../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Ordering" data-popularity="300">	 type <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-130">Ordering</a> <i>(struct)</i>
+		An Ordering holds the computed visual order of runs of a Paragraph. Calling
+		SetBytes or SetString on the originating Paragraph invalidates an Ordering.
+		The methods of an Ordering should only be called by one goroutine at a time.
+
+		<input type='checkbox' class="stat" id="Ordering-stat-methods"><label for="Ordering-stat-methods">Exported Methods (3)</label><span id='Ordering-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-135">Direction</a>() <a href="#name-Direction">Direction</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-140">NumRuns</a>() <a href="../../../../../builtin.html#name-int">int</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-145">Run</a>(i <a href="../../../../../builtin.html#name-int">int</a>) <a href="#name-Run">Run</a></span>
+		<input type='checkbox' class="stat" id="Ordering-stat-results"><label for="Ordering-stat-results">As Outputs Of (2+)</label><span id='Ordering-stat-results-content' class="stat-content">
+			func (*<a href="#name-Paragraph">Paragraph</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-123">Line</a>(start, end <a href="../../../../../builtin.html#name-int">int</a>) (<b>Ordering</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Paragraph">Paragraph</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-117">Order</a>() (<b>Ordering</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Paragraph" data-popularity="350">	 type <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-73">Paragraph</a> <i>(struct)</i>
+		A Paragraph holds a single Paragraph for Bidi processing.
+
+		<input type='checkbox' class="stat" id="Paragraph-stat-methods"><label for="Paragraph-stat-methods">Exported Methods (7)</label><span id='Paragraph-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-105">Direction</a>() <a href="#name-Direction">Direction</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-98">IsLeftToRight</a>() <a href="../../../../../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-123">Line</a>(start, end <a href="../../../../../builtin.html#name-int">int</a>) (<a href="#name-Ordering">Ordering</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-117">Order</a>() (<a href="#name-Ordering">Ordering</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-112">RunAt</a>(pos <a href="../../../../../builtin.html#name-int">int</a>) <a href="#name-Run">Run</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-82">SetBytes</a>(b []<a href="../../../../../builtin.html#name-byte">byte</a>, opts ...<a href="#name-Option">Option</a>) (n <a href="../../../../../builtin.html#name-int">int</a>, err <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-91">SetString</a>(s <a href="../../../../../builtin.html#name-string">string</a>, opts ...<a href="#name-Option">Option</a>) (n <a href="../../../../../builtin.html#name-int">int</a>, err <a href="../../../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Properties" data-popularity="375">	 type <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-10">Properties</a> <i>(struct)</i>
+		Properties provides access to BiDi properties of runes.
+
+		<input type='checkbox' class="stat" id="Properties-stat-methods"><label for="Properties-stat-methods">Exported Methods (3)</label><span id='Properties-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-28">Class</a>() <a href="#name-Class">Class</a>
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-37">IsBracket</a>() <a href="../../../../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-41">IsOpeningBracket</a>() <a href="../../../../../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="Properties-stat-results"><label for="Properties-stat-results">As Outputs Of (3+)</label><span id='Properties-stat-results-content' class="stat-content">
+			func <a href="#name-Lookup">Lookup</a>(s []<a href="../../../../../builtin.html#name-byte">byte</a>) (p <b>Properties</b>, sz <a href="../../../../../builtin.html#name-int">int</a>)
+			func <a href="#name-LookupRune">LookupRune</a>(r <a href="../../../../../builtin.html#name-rune">rune</a>) (p <b>Properties</b>, size <a href="../../../../../builtin.html#name-int">int</a>)
+			func <a href="#name-LookupString">LookupString</a>(s <a href="../../../../../builtin.html#name-string">string</a>) (p <b>Properties</b>, sz <a href="../../../../../builtin.html#name-int">int</a>)</span></div>
+<div class="anchor" id="name-Run" data-popularity="400">	 type <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-157">Run</a> <i>(struct)</i>
+		A Run is a continuous sequence of characters of a single direction.
+
+		<input type='checkbox' class="stat" id="Run-stat-methods"><label for="Run-stat-methods">Exported Methods (4)</label><span id='Run-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-166">Bytes</a>() []<a href="../../../../../builtin.html#name-byte">byte</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-176">Direction</a>() <a href="#name-Direction">Direction</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-182">Pos</a>() (start, end <a href="../../../../../builtin.html#name-int">int</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-161">String</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Run-stat-impls"><label for="Run-stat-impls">Implements (1+)</label><span id='Run-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Run-stat-results"><label for="Run-stat-results">As Outputs Of (2+)</label><span id='Run-stat-results-content' class="stat-content">
+			func (*<a href="#name-Ordering">Ordering</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-145">Run</a>(i <a href="../../../../../builtin.html#name-int">int</a>) <b>Run</b>
+			func (*<a href="#name-Paragraph">Paragraph</a>).<a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-112">RunAt</a>(pos <a href="../../../../../builtin.html#name-int">int</a>) <b>Run</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-AL">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-22">AL</a> <a href="#name-Class">Class</a> = 13 // ArabicLetter</div>
+<div class="anchor" id="name-AN">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-14">AN</a> <a href="#name-Class">Class</a> = 5 // ArabicNumber</div>
+<div class="anchor" id="name-AppendReverse">	 func <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-189">AppendReverse</a>(out, in []<a href="../../../../../builtin.html#name-byte">byte</a>) []<a href="../../../../../builtin.html#name-byte">byte</a>
+		AppendReverse reverses the order of characters of in, appends them to out,
+		and returns the result. Modifiers will still follow the runes they modify.
+		Brackets are replaced with their counterparts.</div>
+<div class="anchor" id="name-B">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-16">B</a> <a href="#name-Class">Class</a> = 7 // ParagraphSeparator</div>
+<div class="anchor" id="name-BN">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-20">BN</a> <a href="#name-Class">Class</a> = 11 // BoundaryNeutral</div>
+<div class="anchor" id="name-Control">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-23">Control</a> <a href="#name-Class">Class</a> = 14 // Control LRO - PDI</div>
+<div class="anchor" id="name-CS">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-15">CS</a> <a href="#name-Class">Class</a> = 6 // CommonSeparator</div>
+<div class="anchor" id="name-DefaultDirection">	 func <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-68">DefaultDirection</a>(d <a href="#name-Direction">Direction</a>) <a href="#name-Option">Option</a>
+		DefaultDirection sets the default direction for a Paragraph. The direction is
+		overridden if the text contains directional characters.</div>
+<div class="anchor" id="name-EN">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-11">EN</a> <a href="#name-Class">Class</a> = 2 // EuropeanNumber</div>
+<div class="anchor" id="name-ES">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-12">ES</a> <a href="#name-Class">Class</a> = 3 // EuropeanSeparator</div>
+<div class="anchor" id="name-ET">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-13">ET</a> <a href="#name-Class">Class</a> = 4 // EuropeanTerminator</div>
+<div class="anchor" id="name-FSI">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-34">FSI</a> <a href="#name-Class">Class</a> = 23 // FirstStrongIsolate</div>
+<div class="anchor" id="name-L">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-9">L</a> <a href="#name-Class">Class</a> = 0 // LeftToRight</div>
+<div class="anchor" id="name-LeftToRight">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-36">LeftToRight</a> <a href="#name-Direction">Direction</a> = 0
+		LeftToRight indicates the text contains no right-to-left characters and
+		that either there are some left-to-right characters or the option
+		DefaultDirection(LeftToRight) was passed.</div>
+<div class="anchor" id="name-Lookup">	 func <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-85">Lookup</a>(s []<a href="../../../../../builtin.html#name-byte">byte</a>) (p <a href="#name-Properties">Properties</a>, sz <a href="../../../../../builtin.html#name-int">int</a>)
+		Lookup returns properties for the first rune in s and the width in bytes of
+		its encoding. The size will be 0 if s does not hold enough bytes to complete
+		the encoding.</div>
+<div class="anchor" id="name-LookupRune">	 func <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-61">LookupRune</a>(r <a href="../../../../../builtin.html#name-rune">rune</a>) (p <a href="#name-Properties">Properties</a>, size <a href="../../../../../builtin.html#name-int">int</a>)
+		LookupRune returns properties for r.</div>
+<div class="anchor" id="name-LookupString">	 func <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/prop.go.html#line-148">LookupString</a>(s <a href="../../../../../builtin.html#name-string">string</a>) (p <a href="#name-Properties">Properties</a>, sz <a href="../../../../../builtin.html#name-int">int</a>)
+		LookupString returns properties for the first rune in s and the width in
+		bytes of its encoding. The size will be 0 if s does not hold enough bytes to
+		complete the encoding.</div>
+<div class="anchor" id="name-LRE">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-29">LRE</a> <a href="#name-Class">Class</a> = 18 // LeftToRightEmbedding</div>
+<div class="anchor" id="name-LRI">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-32">LRI</a> <a href="#name-Class">Class</a> = 21 // LeftToRightIsolate</div>
+<div class="anchor" id="name-LRO">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-27">LRO</a> <a href="#name-Class">Class</a> = 16 // LeftToRightOverride</div>
+<div class="anchor" id="name-Mixed">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-45">Mixed</a> <a href="#name-Direction">Direction</a> = 2
+		Mixed indicates text contains both left-to-right and right-to-left
+		characters.</div>
+<div class="anchor" id="name-Neutral">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-49">Neutral</a> <a href="#name-Direction">Direction</a> = 3
+		Neutral means that text contains no left-to-right and right-to-left
+		characters and that no default direction has been set.</div>
+<div class="anchor" id="name-NSM">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-21">NSM</a> <a href="#name-Class">Class</a> = 12 // NonspacingMark</div>
+<div class="anchor" id="name-ON">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-19">ON</a> <a href="#name-Class">Class</a> = 10 // OtherNeutral</div>
+<div class="anchor" id="name-PDF">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-31">PDF</a> <a href="#name-Class">Class</a> = 20 // PopDirectionalFormat</div>
+<div class="anchor" id="name-PDI">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-35">PDI</a> <a href="#name-Class">Class</a> = 24 // PopDirectionalIsolate</div>
+<div class="anchor" id="name-R">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-10">R</a> <a href="#name-Class">Class</a> = 1 // RightToLeft</div>
+<div class="anchor" id="name-ReverseString">	 func <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-196">ReverseString</a>(s <a href="../../../../../builtin.html#name-string">string</a>) <a href="../../../../../builtin.html#name-string">string</a>
+		ReverseString reverses the order of characters in s and returns a new string.
+		Modifiers will still follow the runes they modify. Brackets are replaced with
+		their counterparts.</div>
+<div class="anchor" id="name-RightToLeft">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/bidi.go.html#line-41">RightToLeft</a> <a href="#name-Direction">Direction</a> = 1
+		RightToLeft indicates the text contains no left-to-right characters and
+		that either there are some right-to-left characters or the option
+		DefaultDirection(RightToLeft) was passed.</div>
+<div class="anchor" id="name-RLE">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-30">RLE</a> <a href="#name-Class">Class</a> = 19 // RightToLeftEmbedding</div>
+<div class="anchor" id="name-RLI">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-33">RLI</a> <a href="#name-Class">Class</a> = 22 // RightToLeftIsolate</div>
+<div class="anchor" id="name-RLO">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-28">RLO</a> <a href="#name-Class">Class</a> = 17 // RightToLeftOverride</div>
+<div class="anchor" id="name-S">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-17">S</a> <a href="#name-Class">Class</a> = 8 // SegmentSeparator</div>
+<div class="anchor" id="name-UnicodeVersion">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/tables12.0.0.go.html#line-8">UnicodeVersion</a> = "12.0.0"
+		UnicodeVersion is the Unicode version from which the tables in this package are derived.</div>
+<div class="anchor" id="name-WS">	const <a href="../../../../../../src/vendor/golang.org/x/text/unicode/bidi/trieval.go.html#line-18">WS</a> <a href="#name-Class">Class</a> = 9 // WhiteSpace</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

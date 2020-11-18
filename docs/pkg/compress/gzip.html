@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: compress/gzip</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>gzip</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-compress/gzip">compress/gzip</a><i> (on <a href="https://golang.org/pkg/compress/gzip/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/compress/gzip" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/compress/gzip.html">8 packages</a>, and imported by <a href="../../dep/compress/gzip.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/compress/gzip/gunzip.go.html#doc">d-&gt;</a> <a href="../../src/compress/gzip/gunzip.go.html">gunzip.go</a>
+	    <a href="../../src/compress/gzip/gzip.go.html">gzip.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Header" data-popularity="0">	 type <a href="../../src/compress/gzip/gunzip.go.html#line-52">Header</a> <i>(struct)</i>
+		The gzip file stores a header giving metadata about the compressed file.
+		That header is exposed as the fields of the Writer and Reader structs.
+
+		Strings must be UTF-8 encoded and may only contain Unicode code points
+		U+0001 through U+00FF, due to limitations of the GZIP file format.
+
+		<input type='checkbox' class="stat" id="Header-stat-fields"><label for="Header-stat-fields">Exported Fields (5)</label><span id='Header-stat-fields-content' class="stat-content">
+			<a href="../../src/compress/gzip/gunzip.go.html#line-53">Comment</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-54">Extra</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-55">ModTime</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-56">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-57">OS</a> <i><a href="../builtin.html#name-byte">byte</a></i></span></div>
+<div class="anchor" id="name-Reader" data-popularity="425">	 type <a href="../../src/compress/gzip/gunzip.go.html#line-74">Reader</a> <i>(struct)</i>
+		A Reader is an io.Reader that can be read to retrieve
+		uncompressed data from a gzip-format compressed file.
+
+		In general, a gzip file can be a concatenation of gzip files,
+		each with its own header. Reads from the Reader
+		return the concatenation of the uncompressed data of each.
+		Only the first header is recorded in the Reader fields.
+
+		Gzip files store a length and checksum of the uncompressed data.
+		The Reader will return an ErrChecksum when Read
+		reaches the end of the uncompressed data if it does not
+		have the expected length or checksum. Clients should treat data
+		returned by Read as tentative until they receive the io.EOF
+		marking the end of the data.
+
+		<input type='checkbox' class="stat" id="Reader-stat-fields"><label for="Reader-stat-fields">Exported Fields (6)</label><span id='Reader-stat-fields-content' class="stat-content">
+			<a href="../../src/compress/gzip/gunzip.go.html#line-75">Header</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-75" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-53">Comment</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-75" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-54">Extra</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-75" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-55">ModTime</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-75" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-56">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/compress/gzip/gunzip.go.html#line-75" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-57">OS</a> <i><a href="../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">Exported Methods (4)</label><span id='Reader-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/compress/gzip/gunzip.go.html#line-292">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/compress/gzip/gunzip.go.html#line-133">Multistream</a>(ok <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/compress/gzip/gunzip.go.html#line-246">Read</a>(p []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/compress/gzip/gunzip.go.html#line-103">Reset</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Reader-stat-impls"><label for="Reader-stat-impls">Implements (3+)</label><span id='Reader-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a>
+			*T : io.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+			*T : io.<a href="../io.html#name-Reader">Reader</a></span>
+		<input type='checkbox' class="stat" id="Reader-stat-results"><label for="Reader-stat-results">As Outputs Of (1+)</label><span id='Reader-stat-results-content' class="stat-content">
+			func <a href="#name-NewReader">NewReader</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<b>Reader</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Writer" data-popularity="500">	 type <a href="../../src/compress/gzip/gzip.go.html#line-28">Writer</a> <i>(struct)</i>
+		A Writer is an io.WriteCloser.
+		Writes to a Writer are compressed and written to w.
+
+		<input type='checkbox' class="stat" id="Writer-stat-fields"><label for="Writer-stat-fields">Exported Fields (6)</label><span id='Writer-stat-fields-content' class="stat-content">
+			<a href="../../src/compress/gzip/gzip.go.html#line-29">Header</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../src/compress/gzip/gzip.go.html#line-29" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-53">Comment</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/compress/gzip/gzip.go.html#line-29" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-54">Extra</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/compress/gzip/gzip.go.html#line-29" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-55">ModTime</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/compress/gzip/gzip.go.html#line-29" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-56">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/compress/gzip/gzip.go.html#line-29" class="path-duplicate">Header</a>.<a href="../../src/compress/gzip/gunzip.go.html#line-57">OS</a> <i><a href="../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">Exported Methods (4)</label><span id='Writer-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/compress/gzip/gzip.go.html#line-228">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/compress/gzip/gzip.go.html#line-208">Flush</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/compress/gzip/gzip.go.html#line-88">Reset</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>)
+			(*T) <a href="../../src/compress/gzip/gzip.go.html#line-139">Write</a>(p []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impls"><label for="Writer-stat-impls">Implements (3+)</label><span id='Writer-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a>
+			*T : io.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="../io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Writer-stat-results"><label for="Writer-stat-results">As Outputs Of (2+)</label><span id='Writer-stat-results-content' class="stat-content">
+			func <a href="#name-NewWriter">NewWriter</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) *<b>Writer</b>
+			func <a href="#name-NewWriterLevel">NewWriterLevel</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, level <a href="../builtin.html#name-int">int</a>) (*<b>Writer</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BestCompression">	const <a href="../../src/compress/gzip/gzip.go.html#line-21">BestCompression</a> = 9
+		These constants are copied from the flate package, so that code that imports
+		"compress/gzip" does not also have to import "compress/flate".</div>
+<div class="anchor" id="name-BestSpeed">	const <a href="../../src/compress/gzip/gzip.go.html#line-20">BestSpeed</a> = 1
+		These constants are copied from the flate package, so that code that imports
+		"compress/gzip" does not also have to import "compress/flate".</div>
+<div class="anchor" id="name-DefaultCompression">	const <a href="../../src/compress/gzip/gzip.go.html#line-22">DefaultCompression</a> = -1
+		These constants are copied from the flate package, so that code that imports
+		"compress/gzip" does not also have to import "compress/flate".</div>
+<div class="anchor" id="name-ErrChecksum">	  var <a href="../../src/compress/gzip/gunzip.go.html#line-32">ErrChecksum</a> <a href="../builtin.html#name-error">error</a>
+		ErrChecksum is returned when reading GZIP data that has an invalid checksum.</div>
+<div class="anchor" id="name-ErrHeader">	  var <a href="../../src/compress/gzip/gunzip.go.html#line-34">ErrHeader</a> <a href="../builtin.html#name-error">error</a>
+		ErrHeader is returned when reading GZIP data that has an invalid header.</div>
+<div class="anchor" id="name-HuffmanOnly">	const <a href="../../src/compress/gzip/gzip.go.html#line-23">HuffmanOnly</a> = -2
+		These constants are copied from the flate package, so that code that imports
+		"compress/gzip" does not also have to import "compress/flate".</div>
+<div class="anchor" id="name-NewReader">	 func <a href="../../src/compress/gzip/gunzip.go.html#line-92">NewReader</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<a href="#name-Reader">Reader</a>, <a href="../builtin.html#name-error">error</a>)
+		NewReader creates a new Reader reading the given reader.
+		If r does not also implement io.ByteReader,
+		the decompressor may read more data than necessary from r.
+
+		It is the caller's responsibility to call Close on the Reader when done.
+
+		The Reader.Header fields will be valid in the Reader returned.</div>
+<div class="anchor" id="name-NewWriter">	 func <a href="../../src/compress/gzip/gzip.go.html#line-49">NewWriter</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) *<a href="#name-Writer">Writer</a>
+		NewWriter returns a new Writer.
+		Writes to the returned writer are compressed and written to w.
+
+		It is the caller's responsibility to call Close on the Writer when done.
+		Writes may be buffered and not flushed until Close.
+
+		Callers that wish to set the fields in Writer.Header must do so before
+		the first call to Write, Flush, or Close.</div>
+<div class="anchor" id="name-NewWriterLevel">	 func <a href="../../src/compress/gzip/gzip.go.html#line-60">NewWriterLevel</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, level <a href="../builtin.html#name-int">int</a>) (*<a href="#name-Writer">Writer</a>, <a href="../builtin.html#name-error">error</a>)
+		NewWriterLevel is like NewWriter but specifies the compression level instead
+		of assuming DefaultCompression.
+
+		The compression level can be DefaultCompression, NoCompression, HuffmanOnly
+		or any integer value between BestSpeed and BestCompression inclusive.
+		The error returned will be nil if the level is valid.</div>
+<div class="anchor" id="name-NoCompression">	const <a href="../../src/compress/gzip/gzip.go.html#line-19">NoCompression</a> = 0
+		These constants are copied from the flate package, so that code that imports
+		"compress/gzip" does not also have to import "compress/flate".</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

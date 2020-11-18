@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: doc.go in package github.com/gorilla/mux</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	doc.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/gorilla/mux.html">github.com/gorilla/mux</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2012 The Gorilla Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<div class="anchor" id="doc"><span class="codeline" id="line-5"><code>/*</code></span>
+<span class="codeline" id="line-6"><code>Package mux implements a request router and dispatcher.</code></span>
+<span class="codeline" id="line-7"><code></code></span>
+<span class="codeline" id="line-8"><code>The name mux stands for "HTTP request multiplexer". Like the standard</code></span>
+<span class="codeline" id="line-9"><code>http.ServeMux, mux.Router matches incoming requests against a list of</code></span>
+<span class="codeline" id="line-10"><code>registered routes and calls a handler for the route that matches the URL</code></span>
+<span class="codeline" id="line-11"><code>or other conditions. The main features are:</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>	* Requests can be matched based on URL host, path, path prefix, schemes,</code></span>
+<span class="codeline" id="line-14"><code>	  header and query values, HTTP methods or using custom matchers.</code></span>
+<span class="codeline" id="line-15"><code>	* URL hosts, paths and query values can have variables with an optional</code></span>
+<span class="codeline" id="line-16"><code>	  regular expression.</code></span>
+<span class="codeline" id="line-17"><code>	* Registered URLs can be built, or "reversed", which helps maintaining</code></span>
+<span class="codeline" id="line-18"><code>	  references to resources.</code></span>
+<span class="codeline" id="line-19"><code>	* Routes can be used as subrouters: nested routes are only tested if the</code></span>
+<span class="codeline" id="line-20"><code>	  parent route matches. This is useful to define groups of routes that</code></span>
+<span class="codeline" id="line-21"><code>	  share common conditions like a host, a path prefix or other repeated</code></span>
+<span class="codeline" id="line-22"><code>	  attributes. As a bonus, this optimizes request matching.</code></span>
+<span class="codeline" id="line-23"><code>	* It implements the http.Handler interface so it is compatible with the</code></span>
+<span class="codeline" id="line-24"><code>	  standard http.ServeMux.</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>Let's start registering a couple of URL paths and handlers:</code></span>
+<span class="codeline" id="line-27"><code></code></span>
+<span class="codeline" id="line-28"><code>	func main() {</code></span>
+<span class="codeline" id="line-29"><code>		r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-30"><code>		r.HandleFunc("/", HomeHandler)</code></span>
+<span class="codeline" id="line-31"><code>		r.HandleFunc("/products", ProductsHandler)</code></span>
+<span class="codeline" id="line-32"><code>		r.HandleFunc("/articles", ArticlesHandler)</code></span>
+<span class="codeline" id="line-33"><code>		http.Handle("/", r)</code></span>
+<span class="codeline" id="line-34"><code>	}</code></span>
+<span class="codeline" id="line-35"><code></code></span>
+<span class="codeline" id="line-36"><code>Here we register three routes mapping URL paths to handlers. This is</code></span>
+<span class="codeline" id="line-37"><code>equivalent to how http.HandleFunc() works: if an incoming request URL matches</code></span>
+<span class="codeline" id="line-38"><code>one of the paths, the corresponding handler is called passing</code></span>
+<span class="codeline" id="line-39"><code>(http.ResponseWriter, *http.Request) as parameters.</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>Paths can have variables. They are defined using the format {name} or</code></span>
+<span class="codeline" id="line-42"><code>{name:pattern}. If a regular expression pattern is not defined, the matched</code></span>
+<span class="codeline" id="line-43"><code>variable will be anything until the next slash. For example:</code></span>
+<span class="codeline" id="line-44"><code></code></span>
+<span class="codeline" id="line-45"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-46"><code>	r.HandleFunc("/products/{key}", ProductHandler)</code></span>
+<span class="codeline" id="line-47"><code>	r.HandleFunc("/articles/{category}/", ArticlesCategoryHandler)</code></span>
+<span class="codeline" id="line-48"><code>	r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler)</code></span>
+<span class="codeline" id="line-49"><code></code></span>
+<span class="codeline" id="line-50"><code>Groups can be used inside patterns, as long as they are non-capturing (?:re). For example:</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>	r.HandleFunc("/articles/{category}/{sort:(?:asc|desc|new)}", ArticlesCategoryHandler)</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>The names are used to create a map of route variables which can be retrieved</code></span>
+<span class="codeline" id="line-55"><code>calling mux.Vars():</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>	vars := mux.Vars(request)</code></span>
+<span class="codeline" id="line-58"><code>	category := vars["category"]</code></span>
+<span class="codeline" id="line-59"><code></code></span>
+<span class="codeline" id="line-60"><code>Note that if any capturing groups are present, mux will panic() during parsing. To prevent</code></span>
+<span class="codeline" id="line-61"><code>this, convert any capturing groups to non-capturing, e.g. change "/{sort:(asc|desc)}" to</code></span>
+<span class="codeline" id="line-62"><code>"/{sort:(?:asc|desc)}". This is a change from prior versions which behaved unpredictably</code></span>
+<span class="codeline" id="line-63"><code>when capturing groups were present.</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>And this is all you need to know about the basic usage. More advanced options</code></span>
+<span class="codeline" id="line-66"><code>are explained below.</code></span>
+<span class="codeline" id="line-67"><code></code></span>
+<span class="codeline" id="line-68"><code>Routes can also be restricted to a domain or subdomain. Just define a host</code></span>
+<span class="codeline" id="line-69"><code>pattern to be matched. They can also have variables:</code></span>
+<span class="codeline" id="line-70"><code></code></span>
+<span class="codeline" id="line-71"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-72"><code>	// Only matches if domain is "www.example.com".</code></span>
+<span class="codeline" id="line-73"><code>	r.Host("www.example.com")</code></span>
+<span class="codeline" id="line-74"><code>	// Matches a dynamic subdomain.</code></span>
+<span class="codeline" id="line-75"><code>	r.Host("{subdomain:[a-z]+}.domain.com")</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>There are several other matchers that can be added. To match path prefixes:</code></span>
+<span class="codeline" id="line-78"><code></code></span>
+<span class="codeline" id="line-79"><code>	r.PathPrefix("/products/")</code></span>
+<span class="codeline" id="line-80"><code></code></span>
+<span class="codeline" id="line-81"><code>...or HTTP methods:</code></span>
+<span class="codeline" id="line-82"><code></code></span>
+<span class="codeline" id="line-83"><code>	r.Methods("GET", "POST")</code></span>
+<span class="codeline" id="line-84"><code></code></span>
+<span class="codeline" id="line-85"><code>...or URL schemes:</code></span>
+<span class="codeline" id="line-86"><code></code></span>
+<span class="codeline" id="line-87"><code>	r.Schemes("https")</code></span>
+<span class="codeline" id="line-88"><code></code></span>
+<span class="codeline" id="line-89"><code>...or header values:</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>	r.Headers("X-Requested-With", "XMLHttpRequest")</code></span>
+<span class="codeline" id="line-92"><code></code></span>
+<span class="codeline" id="line-93"><code>...or query values:</code></span>
+<span class="codeline" id="line-94"><code></code></span>
+<span class="codeline" id="line-95"><code>	r.Queries("key", "value")</code></span>
+<span class="codeline" id="line-96"><code></code></span>
+<span class="codeline" id="line-97"><code>...or to use a custom matcher function:</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>	r.MatcherFunc(func(r *http.Request, rm *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-100"><code>		return r.ProtoMajor == 0</code></span>
+<span class="codeline" id="line-101"><code>	})</code></span>
+<span class="codeline" id="line-102"><code></code></span>
+<span class="codeline" id="line-103"><code>...and finally, it is possible to combine several matchers in a single route:</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>	r.HandleFunc("/products", ProductsHandler).</code></span>
+<span class="codeline" id="line-106"><code>	  Host("www.example.com").</code></span>
+<span class="codeline" id="line-107"><code>	  Methods("GET").</code></span>
+<span class="codeline" id="line-108"><code>	  Schemes("http")</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>Setting the same matching conditions again and again can be boring, so we have</code></span>
+<span class="codeline" id="line-111"><code>a way to group several routes that share the same requirements.</code></span>
+<span class="codeline" id="line-112"><code>We call it "subrouting".</code></span>
+<span class="codeline" id="line-113"><code></code></span>
+<span class="codeline" id="line-114"><code>For example, let's say we have several URLs that should only match when the</code></span>
+<span class="codeline" id="line-115"><code>host is "www.example.com". Create a route for that host and get a "subrouter"</code></span>
+<span class="codeline" id="line-116"><code>from it:</code></span>
+<span class="codeline" id="line-117"><code></code></span>
+<span class="codeline" id="line-118"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-119"><code>	s := r.Host("www.example.com").Subrouter()</code></span>
+<span class="codeline" id="line-120"><code></code></span>
+<span class="codeline" id="line-121"><code>Then register routes in the subrouter:</code></span>
+<span class="codeline" id="line-122"><code></code></span>
+<span class="codeline" id="line-123"><code>	s.HandleFunc("/products/", ProductsHandler)</code></span>
+<span class="codeline" id="line-124"><code>	s.HandleFunc("/products/{key}", ProductHandler)</code></span>
+<span class="codeline" id="line-125"><code>	s.HandleFunc("/articles/{category}/{id:[0-9]+}"), ArticleHandler)</code></span>
+<span class="codeline" id="line-126"><code></code></span>
+<span class="codeline" id="line-127"><code>The three URL paths we registered above will only be tested if the domain is</code></span>
+<span class="codeline" id="line-128"><code>"www.example.com", because the subrouter is tested first. This is not</code></span>
+<span class="codeline" id="line-129"><code>only convenient, but also optimizes request matching. You can create</code></span>
+<span class="codeline" id="line-130"><code>subrouters combining any attribute matchers accepted by a route.</code></span>
+<span class="codeline" id="line-131"><code></code></span>
+<span class="codeline" id="line-132"><code>Subrouters can be used to create domain or path "namespaces": you define</code></span>
+<span class="codeline" id="line-133"><code>subrouters in a central place and then parts of the app can register its</code></span>
+<span class="codeline" id="line-134"><code>paths relatively to a given subrouter.</code></span>
+<span class="codeline" id="line-135"><code></code></span>
+<span class="codeline" id="line-136"><code>There's one more thing about subroutes. When a subrouter has a path prefix,</code></span>
+<span class="codeline" id="line-137"><code>the inner routes use it as base for their paths:</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-140"><code>	s := r.PathPrefix("/products").Subrouter()</code></span>
+<span class="codeline" id="line-141"><code>	// "/products/"</code></span>
+<span class="codeline" id="line-142"><code>	s.HandleFunc("/", ProductsHandler)</code></span>
+<span class="codeline" id="line-143"><code>	// "/products/{key}/"</code></span>
+<span class="codeline" id="line-144"><code>	s.HandleFunc("/{key}/", ProductHandler)</code></span>
+<span class="codeline" id="line-145"><code>	// "/products/{key}/details"</code></span>
+<span class="codeline" id="line-146"><code>	s.HandleFunc("/{key}/details", ProductDetailsHandler)</code></span>
+<span class="codeline" id="line-147"><code></code></span>
+<span class="codeline" id="line-148"><code>Note that the path provided to PathPrefix() represents a "wildcard": calling</code></span>
+<span class="codeline" id="line-149"><code>PathPrefix("/static/").Handler(...) means that the handler will be passed any</code></span>
+<span class="codeline" id="line-150"><code>request that matches "/static/*". This makes it easy to serve static files with mux:</code></span>
+<span class="codeline" id="line-151"><code></code></span>
+<span class="codeline" id="line-152"><code>	func main() {</code></span>
+<span class="codeline" id="line-153"><code>		var dir string</code></span>
+<span class="codeline" id="line-154"><code></code></span>
+<span class="codeline" id="line-155"><code>		flag.StringVar(&amp;dir, "dir", ".", "the directory to serve files from. Defaults to the current dir")</code></span>
+<span class="codeline" id="line-156"><code>		flag.Parse()</code></span>
+<span class="codeline" id="line-157"><code>		r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-158"><code></code></span>
+<span class="codeline" id="line-159"><code>		// This will serve files under http://localhost:8000/static/&lt;filename&gt;</code></span>
+<span class="codeline" id="line-160"><code>		r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir))))</code></span>
+<span class="codeline" id="line-161"><code></code></span>
+<span class="codeline" id="line-162"><code>		srv := &amp;http.Server{</code></span>
+<span class="codeline" id="line-163"><code>			Handler:      r,</code></span>
+<span class="codeline" id="line-164"><code>			Addr:         "127.0.0.1:8000",</code></span>
+<span class="codeline" id="line-165"><code>			// Good practice: enforce timeouts for servers you create!</code></span>
+<span class="codeline" id="line-166"><code>			WriteTimeout: 15 * time.Second,</code></span>
+<span class="codeline" id="line-167"><code>			ReadTimeout:  15 * time.Second,</code></span>
+<span class="codeline" id="line-168"><code>		}</code></span>
+<span class="codeline" id="line-169"><code></code></span>
+<span class="codeline" id="line-170"><code>		log.Fatal(srv.ListenAndServe())</code></span>
+<span class="codeline" id="line-171"><code>	}</code></span>
+<span class="codeline" id="line-172"><code></code></span>
+<span class="codeline" id="line-173"><code>Now let's see how to build registered URLs.</code></span>
+<span class="codeline" id="line-174"><code></code></span>
+<span class="codeline" id="line-175"><code>Routes can be named. All routes that define a name can have their URLs built,</code></span>
+<span class="codeline" id="line-176"><code>or "reversed". We define a name calling Name() on a route. For example:</code></span>
+<span class="codeline" id="line-177"><code></code></span>
+<span class="codeline" id="line-178"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-179"><code>	r.HandleFunc("/articles/{category}/{id:[0-9]+}", ArticleHandler).</code></span>
+<span class="codeline" id="line-180"><code>	  Name("article")</code></span>
+<span class="codeline" id="line-181"><code></code></span>
+<span class="codeline" id="line-182"><code>To build a URL, get the route and call the URL() method, passing a sequence of</code></span>
+<span class="codeline" id="line-183"><code>key/value pairs for the route variables. For the previous route, we would do:</code></span>
+<span class="codeline" id="line-184"><code></code></span>
+<span class="codeline" id="line-185"><code>	url, err := r.Get("article").URL("category", "technology", "id", "42")</code></span>
+<span class="codeline" id="line-186"><code></code></span>
+<span class="codeline" id="line-187"><code>...and the result will be a url.URL with the following path:</code></span>
+<span class="codeline" id="line-188"><code></code></span>
+<span class="codeline" id="line-189"><code>	"/articles/technology/42"</code></span>
+<span class="codeline" id="line-190"><code></code></span>
+<span class="codeline" id="line-191"><code>This also works for host and query value variables:</code></span>
+<span class="codeline" id="line-192"><code></code></span>
+<span class="codeline" id="line-193"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-194"><code>	r.Host("{subdomain}.domain.com").</code></span>
+<span class="codeline" id="line-195"><code>	  Path("/articles/{category}/{id:[0-9]+}").</code></span>
+<span class="codeline" id="line-196"><code>	  Queries("filter", "{filter}").</code></span>
+<span class="codeline" id="line-197"><code>	  HandlerFunc(ArticleHandler).</code></span>
+<span class="codeline" id="line-198"><code>	  Name("article")</code></span>
+<span class="codeline" id="line-199"><code></code></span>
+<span class="codeline" id="line-200"><code>	// url.String() will be "http://news.domain.com/articles/technology/42?filter=gorilla"</code></span>
+<span class="codeline" id="line-201"><code>	url, err := r.Get("article").URL("subdomain", "news",</code></span>
+<span class="codeline" id="line-202"><code>	                                 "category", "technology",</code></span>
+<span class="codeline" id="line-203"><code>	                                 "id", "42",</code></span>
+<span class="codeline" id="line-204"><code>	                                 "filter", "gorilla")</code></span>
+<span class="codeline" id="line-205"><code></code></span>
+<span class="codeline" id="line-206"><code>All variables defined in the route are required, and their values must</code></span>
+<span class="codeline" id="line-207"><code>conform to the corresponding patterns. These requirements guarantee that a</code></span>
+<span class="codeline" id="line-208"><code>generated URL will always match a registered route -- the only exception is</code></span>
+<span class="codeline" id="line-209"><code>for explicitly defined "build-only" routes which never match.</code></span>
+<span class="codeline" id="line-210"><code></code></span>
+<span class="codeline" id="line-211"><code>Regex support also exists for matching Headers within a route. For example, we could do:</code></span>
+<span class="codeline" id="line-212"><code></code></span>
+<span class="codeline" id="line-213"><code>	r.HeadersRegexp("Content-Type", "application/(text|json)")</code></span>
+<span class="codeline" id="line-214"><code></code></span>
+<span class="codeline" id="line-215"><code>...and the route will match both requests with a Content-Type of `application/json` as well as</code></span>
+<span class="codeline" id="line-216"><code>`application/text`</code></span>
+<span class="codeline" id="line-217"><code></code></span>
+<span class="codeline" id="line-218"><code>There's also a way to build only the URL host or path for a route:</code></span>
+<span class="codeline" id="line-219"><code>use the methods URLHost() or URLPath() instead. For the previous route,</code></span>
+<span class="codeline" id="line-220"><code>we would do:</code></span>
+<span class="codeline" id="line-221"><code></code></span>
+<span class="codeline" id="line-222"><code>	// "http://news.domain.com/"</code></span>
+<span class="codeline" id="line-223"><code>	host, err := r.Get("article").URLHost("subdomain", "news")</code></span>
+<span class="codeline" id="line-224"><code></code></span>
+<span class="codeline" id="line-225"><code>	// "/articles/technology/42"</code></span>
+<span class="codeline" id="line-226"><code>	path, err := r.Get("article").URLPath("category", "technology", "id", "42")</code></span>
+<span class="codeline" id="line-227"><code></code></span>
+<span class="codeline" id="line-228"><code>And if you use subrouters, host and path defined separately can be built</code></span>
+<span class="codeline" id="line-229"><code>as well:</code></span>
+<span class="codeline" id="line-230"><code></code></span>
+<span class="codeline" id="line-231"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-232"><code>	s := r.Host("{subdomain}.domain.com").Subrouter()</code></span>
+<span class="codeline" id="line-233"><code>	s.Path("/articles/{category}/{id:[0-9]+}").</code></span>
+<span class="codeline" id="line-234"><code>	  HandlerFunc(ArticleHandler).</code></span>
+<span class="codeline" id="line-235"><code>	  Name("article")</code></span>
+<span class="codeline" id="line-236"><code></code></span>
+<span class="codeline" id="line-237"><code>	// "http://news.domain.com/articles/technology/42"</code></span>
+<span class="codeline" id="line-238"><code>	url, err := r.Get("article").URL("subdomain", "news",</code></span>
+<span class="codeline" id="line-239"><code>	                                 "category", "technology",</code></span>
+<span class="codeline" id="line-240"><code>	                                 "id", "42")</code></span>
+<span class="codeline" id="line-241"><code></code></span>
+<span class="codeline" id="line-242"><code>Mux supports the addition of middlewares to a Router, which are executed in the order they are added if a match is found, including its subrouters. Middlewares are (typically) small pieces of code which take one request, do something with it, and pass it down to another middleware or the final handler. Some common use cases for middleware are request logging, header manipulation, or ResponseWriter hijacking.</code></span>
+<span class="codeline" id="line-243"><code></code></span>
+<span class="codeline" id="line-244"><code>	type MiddlewareFunc func(http.Handler) http.Handler</code></span>
+<span class="codeline" id="line-245"><code></code></span>
+<span class="codeline" id="line-246"><code>Typically, the returned handler is a closure which does something with the http.ResponseWriter and http.Request passed to it, and then calls the handler passed as parameter to the MiddlewareFunc (closures can access variables from the context where they are created).</code></span>
+<span class="codeline" id="line-247"><code></code></span>
+<span class="codeline" id="line-248"><code>A very basic middleware which logs the URI of the request being handled could be written as:</code></span>
+<span class="codeline" id="line-249"><code></code></span>
+<span class="codeline" id="line-250"><code>	func simpleMw(next http.Handler) http.Handler {</code></span>
+<span class="codeline" id="line-251"><code>		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {</code></span>
+<span class="codeline" id="line-252"><code>			// Do stuff here</code></span>
+<span class="codeline" id="line-253"><code>			log.Println(r.RequestURI)</code></span>
+<span class="codeline" id="line-254"><code>			// Call the next handler, which can be another middleware in the chain, or the final handler.</code></span>
+<span class="codeline" id="line-255"><code>			next.ServeHTTP(w, r)</code></span>
+<span class="codeline" id="line-256"><code>		})</code></span>
+<span class="codeline" id="line-257"><code>	}</code></span>
+<span class="codeline" id="line-258"><code></code></span>
+<span class="codeline" id="line-259"><code>Middlewares can be added to a router using `Router.Use()`:</code></span>
+<span class="codeline" id="line-260"><code></code></span>
+<span class="codeline" id="line-261"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-262"><code>	r.HandleFunc("/", handler)</code></span>
+<span class="codeline" id="line-263"><code>	r.Use(simpleMw)</code></span>
+<span class="codeline" id="line-264"><code></code></span>
+<span class="codeline" id="line-265"><code>A more complex authentication middleware, which maps session token to users, could be written as:</code></span>
+<span class="codeline" id="line-266"><code></code></span>
+<span class="codeline" id="line-267"><code>	// Define our struct</code></span>
+<span class="codeline" id="line-268"><code>	type authenticationMiddleware struct {</code></span>
+<span class="codeline" id="line-269"><code>		tokenUsers map[string]string</code></span>
+<span class="codeline" id="line-270"><code>	}</code></span>
+<span class="codeline" id="line-271"><code></code></span>
+<span class="codeline" id="line-272"><code>	// Initialize it somewhere</code></span>
+<span class="codeline" id="line-273"><code>	func (amw *authenticationMiddleware) Populate() {</code></span>
+<span class="codeline" id="line-274"><code>		amw.tokenUsers["00000000"] = "user0"</code></span>
+<span class="codeline" id="line-275"><code>		amw.tokenUsers["aaaaaaaa"] = "userA"</code></span>
+<span class="codeline" id="line-276"><code>		amw.tokenUsers["05f717e5"] = "randomUser"</code></span>
+<span class="codeline" id="line-277"><code>		amw.tokenUsers["deadbeef"] = "user0"</code></span>
+<span class="codeline" id="line-278"><code>	}</code></span>
+<span class="codeline" id="line-279"><code></code></span>
+<span class="codeline" id="line-280"><code>	// Middleware function, which will be called for each request</code></span>
+<span class="codeline" id="line-281"><code>	func (amw *authenticationMiddleware) Middleware(next http.Handler) http.Handler {</code></span>
+<span class="codeline" id="line-282"><code>		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {</code></span>
+<span class="codeline" id="line-283"><code>			token := r.Header.Get("X-Session-Token")</code></span>
+<span class="codeline" id="line-284"><code></code></span>
+<span class="codeline" id="line-285"><code>			if user, found := amw.tokenUsers[token]; found {</code></span>
+<span class="codeline" id="line-286"><code>				// We found the token in our map</code></span>
+<span class="codeline" id="line-287"><code>				log.Printf("Authenticated user %s\n", user)</code></span>
+<span class="codeline" id="line-288"><code>				next.ServeHTTP(w, r)</code></span>
+<span class="codeline" id="line-289"><code>			} else {</code></span>
+<span class="codeline" id="line-290"><code>				http.Error(w, "Forbidden", http.StatusForbidden)</code></span>
+<span class="codeline" id="line-291"><code>			}</code></span>
+<span class="codeline" id="line-292"><code>		})</code></span>
+<span class="codeline" id="line-293"><code>	}</code></span>
+<span class="codeline" id="line-294"><code></code></span>
+<span class="codeline" id="line-295"><code>	r := mux.NewRouter()</code></span>
+<span class="codeline" id="line-296"><code>	r.HandleFunc("/", handler)</code></span>
+<span class="codeline" id="line-297"><code></code></span>
+<span class="codeline" id="line-298"><code>	amw := authenticationMiddleware{tokenUsers: make(map[string]string)}</code></span>
+<span class="codeline" id="line-299"><code>	amw.Populate()</code></span>
+<span class="codeline" id="line-300"><code></code></span>
+<span class="codeline" id="line-301"><code>	r.Use(amw.Middleware)</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>Note: The handler chain will be stopped if your middleware doesn't call `next.ServeHTTP()` with the corresponding parameters. This can be used to abort a request if the middleware writer wants to.</code></span>
+<span class="codeline" id="line-304"><code></code></span>
+<span class="codeline" id="line-305"><code>*/</code></span></div><span class="codeline" id="line-306"><code>package mux</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: gorm.io/gorm/migrator</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>migrator</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-gorm.io/gorm/migrator">gorm.io/gorm/migrator</a><i> (on <a href="https://pkg.go.dev/gorm.io/gorm/migrator" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/gorm.io/gorm/migrator.html">8 packages</a>, and imported by <a href="../../../dep/gorm.io/gorm/migrator.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html">migrator.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-BuildIndexOptionsInterface" data-popularity="350">	 type <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-533">BuildIndexOptionsInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="BuildIndexOptionsInterface-stat-methods"><label for="BuildIndexOptionsInterface-stat-methods">One Exported Method</label><span id='BuildIndexOptionsInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-534">BuildIndexOptions</a>([]<a href="schema.html">schema</a>.<a href="schema.html#name-IndexOption">IndexOption</a>, *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) []interface{}</span>
+		<input type='checkbox' class="stat" id="BuildIndexOptionsInterface-stat-impledby"><label for="BuildIndexOptionsInterface-stat-impledby">Implemented By (2+)</label><span id='BuildIndexOptionsInterface-stat-impledby-content' class="stat-content">
+			<a href="#name-Migrator">Migrator</a>
+			gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Migrator">Migrator</a></span></div>
+<div class="anchor" id="name-Config" data-popularity="500">	 type <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-21">Config</a> <i>(struct)</i>
+		Config schema config
+
+		<input type='checkbox' class="stat" id="Config-stat-fields"><label for="Config-stat-fields">Exported Fields (3)</label><span id='Config-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-22">CreateIndexAfterCreateTable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-23">DB</a> <i>*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a></i>
+			<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-24">Dialector</a> <i><a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Dialector">Dialector</a></i></span>
+		<input type='checkbox' class="stat" id="Config-stat-methods"><label for="Config-stat-methods">Exported Methods (8)</label><span id='Config-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <a href="clause.html">clause</a>.<a href="clause.html#name-Writer">Writer</a>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, v interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-16">DataTypeOf</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <a href="clause.html">clause</a>.<a href="clause.html#name-Expression">Expression</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-20">Explain</a>(sql <a href="../../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-14">Initialize</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-15">Migrator</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Migrator">Migrator</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-13">Name</a>() <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-19">QuoteTo</a>(<a href="clause.html">clause</a>.<a href="clause.html#name-Writer">Writer</a>, <a href="../../builtin.html#name-string">string</a>)</span>
+		<input type='checkbox' class="stat" id="Config-stat-impls"><label for="Config-stat-impls">Implements (2+)</label><span id='Config-stat-impls-content' class="stat-content">
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Plugin">Plugin</a></span></div>
+<div class="anchor" id="name-GormDataTypeInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-27">GormDataTypeInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="GormDataTypeInterface-stat-methods"><label for="GormDataTypeInterface-stat-methods">One Exported Method</label><span id='GormDataTypeInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-28">GormDBDataType</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <a href="../../builtin.html#name-string">string</a></span></div>
+<div class="anchor" id="name-Migrator" data-popularity="1950">	 type <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-16">Migrator</a> <i>(struct)</i>
+		Migrator m struct
+
+		<input type='checkbox' class="stat" id="Migrator-stat-fields"><label for="Migrator-stat-fields">Exported Fields (4)</label><span id='Migrator-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-17">Config</a> <i><a href="#name-Config">Config</a></i>
+			<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-17" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-22">CreateIndexAfterCreateTable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-17" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-23">DB</a> <i>*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a></i>
+			<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-17" class="path-duplicate">Config</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-24">Dialector</a> <i><a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Dialector">Dialector</a></i></span>
+		<input type='checkbox' class="stat" id="Migrator-stat-methods"><label for="Migrator-stat-methods">Exported Methods (35)</label><span id='Migrator-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-288">AddColumn</a>(value interface{}, field <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-312">AlterColumn</a>(value interface{}, field <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-83">AutoMigrate</a>(values ...interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <a href="clause.html">clause</a>.<a href="clause.html#name-Writer">Writer</a>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, v interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-512">BuildIndexOptions</a>(opts []<a href="schema.html">schema</a>.<a href="schema.html#name-IndexOption">IndexOption</a>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) (results []interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-404">ColumnTypes</a>(value interface{}) (columnTypes []<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ColumnType">ColumnType</a>, err <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-452">CreateConstraint</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-537">CreateIndex</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-155">CreateTable</a>(values ...interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-422">CreateView</a>(name <a href="../../builtin.html#name-string">string</a>, option <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ViewOption">ViewOption</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-600">CurrentDatabase</a>() (name <a href="../../builtin.html#name-string">string</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-701">CurrentTable</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) interface{}
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-47">DataTypeOf</a>(field *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <a href="clause.html">clause</a>.<a href="clause.html#name-Expression">Expression</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-300">DropColumn</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-490">DropConstraint</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-564">DropIndex</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-237">DropTable</a>(values ...interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-426">DropView</a>(name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-20">Explain</a>(sql <a href="../../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-58">FullDataTypeOf</a>(field *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) (expr <a href="clause.html">clause</a>.<a href="clause.html#name-Expr">Expr</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-326">HasColumn</a>(value interface{}, field <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-499">HasConstraint</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-574">HasIndex</a>(value interface{}, name <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-250">HasTable</a>(value interface{}) <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-14">Initialize</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-361">MigrateColumn</a>(value interface{}, field *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>, columnType <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ColumnType">ColumnType</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-15">Migrator</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Migrator">Migrator</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-13">Name</a>() <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/interfaces.go.html#line-19">QuoteTo</a>(<a href="clause.html">clause</a>.<a href="clause.html#name-Writer">Writer</a>, <a href="../../builtin.html#name-string">string</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-344">RenameColumn</a>(value interface{}, oldName, newName <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-591">RenameIndex</a>(value interface{}, oldName, newName <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-261">RenameTable</a>(oldName, newName interface{}) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-606">ReorderModels</a>(values []interface{}, autoAdd <a href="../../builtin.html#name-bool">bool</a>) (results []interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-31">RunWithValue</a>(value interface{}, fc func(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) <a href="../../builtin.html#name-error">error</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Migrator-stat-impls"><label for="Migrator-stat-impls">Implements (4+)</label><span id='Migrator-stat-impls-content' class="stat-content">
+			 T : <a href="#name-BuildIndexOptionsInterface">BuildIndexOptionsInterface</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Migrator">Migrator</a>
+			 T : gorm.io/gorm.<a href="../gorm.html#name-Plugin">Plugin</a></span></div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

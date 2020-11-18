@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: syscall_darwin_amd64.go in package syscall</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	syscall_darwin_amd64.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/syscall.html">syscall</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package syscall</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import "unsafe"</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>func setTimespec(sec, nsec int64) Timespec {</code></span>
+<span class="codeline" id="line-10"><code>	return Timespec{Sec: sec, Nsec: nsec}</code></span>
+<span class="codeline" id="line-11"><code>}</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>func setTimeval(sec, usec int64) Timeval {</code></span>
+<span class="codeline" id="line-14"><code>	return Timeval{Sec: sec, Usec: int32(usec)}</code></span>
+<span class="codeline" id="line-15"><code>}</code></span>
+<span class="codeline" id="line-16"><code></code></span>
+<span class="codeline" id="line-17"><code>//sys	Fstat(fd int, stat *Stat_t) (err error) = SYS_fstat64</code></span>
+<span class="codeline" id="line-18"><code>//sys	Fstatfs(fd int, stat *Statfs_t) (err error) = SYS_fstatfs64</code></span>
+<span class="codeline" id="line-19"><code>//sysnb	Gettimeofday(tp *Timeval) (err error)</code></span>
+<span class="codeline" id="line-20"><code>//sys	Lstat(path string, stat *Stat_t) (err error) = SYS_lstat64</code></span>
+<span class="codeline" id="line-21"><code>//sys	Stat(path string, stat *Stat_t) (err error) = SYS_stat64</code></span>
+<span class="codeline" id="line-22"><code>//sys	Statfs(path string, stat *Statfs_t) (err error) = SYS_statfs64</code></span>
+<span class="codeline" id="line-23"><code>//sys   fstatat(fd int, path string, stat *Stat_t, flags int) (err error) = SYS_fstatat64</code></span>
+<span class="codeline" id="line-24"><code>//sys   ptrace(request int, pid int, addr uintptr, data uintptr) (err error)</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>func SetKevent(k *Kevent_t, fd, mode, flags int) {</code></span>
+<span class="codeline" id="line-27"><code>	k.Ident = uint64(fd)</code></span>
+<span class="codeline" id="line-28"><code>	k.Filter = int16(mode)</code></span>
+<span class="codeline" id="line-29"><code>	k.Flags = uint16(flags)</code></span>
+<span class="codeline" id="line-30"><code>}</code></span>
+<span class="codeline" id="line-31"><code></code></span>
+<span class="codeline" id="line-32"><code>func (iov *Iovec) SetLen(length int) {</code></span>
+<span class="codeline" id="line-33"><code>	iov.Len = uint64(length)</code></span>
+<span class="codeline" id="line-34"><code>}</code></span>
+<span class="codeline" id="line-35"><code></code></span>
+<span class="codeline" id="line-36"><code>func (msghdr *Msghdr) SetControllen(length int) {</code></span>
+<span class="codeline" id="line-37"><code>	msghdr.Controllen = uint32(length)</code></span>
+<span class="codeline" id="line-38"><code>}</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>func (cmsg *Cmsghdr) SetLen(length int) {</code></span>
+<span class="codeline" id="line-41"><code>	cmsg.Len = uint32(length)</code></span>
+<span class="codeline" id="line-42"><code>}</code></span>
+<span class="codeline" id="line-43"><code></code></span>
+<span class="codeline" id="line-44"><code>func sendfile(outfd int, infd int, offset *int64, count int) (written int, err error) {</code></span>
+<span class="codeline" id="line-45"><code>	var length = uint64(count)</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>	_, _, e1 := syscall6(funcPC(libc_sendfile_trampoline), uintptr(infd), uintptr(outfd), uintptr(*offset), uintptr(unsafe.Pointer(&amp;length)), 0, 0)</code></span>
+<span class="codeline" id="line-48"><code></code></span>
+<span class="codeline" id="line-49"><code>	written = int(length)</code></span>
+<span class="codeline" id="line-50"><code></code></span>
+<span class="codeline" id="line-51"><code>	if e1 != 0 {</code></span>
+<span class="codeline" id="line-52"><code>		err = e1</code></span>
+<span class="codeline" id="line-53"><code>	}</code></span>
+<span class="codeline" id="line-54"><code>	return</code></span>
+<span class="codeline" id="line-55"><code>}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>func libc_sendfile_trampoline()</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>//go:linkname libc_sendfile libc_sendfile</code></span>
+<span class="codeline" id="line-60"><code>//go:cgo_import_dynamic libc_sendfile sendfile "/usr/lib/libSystem.B.dylib"</code></span>
+<span class="codeline" id="line-61"><code></code></span>
+<span class="codeline" id="line-62"><code>// Implemented in the runtime package (runtime/sys_darwin_64.go)</code></span>
+<span class="codeline" id="line-63"><code>func syscallX(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>func Syscall9(trap, a1, a2, a3, a4, a5, a6, a7, a8, a9 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

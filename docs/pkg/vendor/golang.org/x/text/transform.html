@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/text/transform</title>
+<link href="../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>transform</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../index.html#pkg-vendor/golang.org/x/text/transform">vendor/golang.org/x/text/transform</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/text/transform/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/text/transform" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../dep/vendor/golang.org/x/text/transform.html">4 packages</a>, and imported by <a href="../../../../../dep/vendor/golang.org/x/text/transform.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#doc">d-&gt;</a> <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html">transform.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-NopResetter" data-popularity="50">	 type <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-104">NopResetter</a> <i>(struct)</i>
+		NopResetter can be embedded by implementations of Transformer to add a nop
+		Reset method.
+
+		<input type='checkbox' class="stat" id="NopResetter-stat-methods"><label for="NopResetter-stat-methods">One Exported Method</label><span id='NopResetter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-107">Reset</a>()</span></div>
+<div class="anchor" id="name-Reader" data-popularity="175">	 type <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-110">Reader</a> <i>(struct)</i>
+		Reader wraps another io.Reader by transforming the bytes read.
+
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">One Exported Method</label><span id='Reader-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-145">Read</a>(p []<a href="../../../../builtin.html#name-byte">byte</a>) (<a href="../../../../builtin.html#name-int">int</a>, <a href="../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-impls"><label for="Reader-stat-impls">Implements (1+)</label><span id='Reader-stat-impls-content' class="stat-content">
+			*T : io.<a href="../../../../io.html#name-Reader">Reader</a></span>
+		<input type='checkbox' class="stat" id="Reader-stat-results"><label for="Reader-stat-results">As Outputs Of (1+)</label><span id='Reader-stat-results-content' class="stat-content">
+			func <a href="#name-NewReader">NewReader</a>(r <a href="../../../../io.html">io</a>.<a href="../../../../io.html#name-Reader">Reader</a>, t <a href="#name-Transformer">Transformer</a>) *<b>Reader</b></span></div>
+<div class="anchor" id="name-SpanningTransformer" data-popularity="505">	 type <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-69">SpanningTransformer</a> <b<i>(interface)</i></b>
+		SpanningTransformer extends the Transformer interface with a Span method
+		that determines how much of the input already conforms to the Transformer.
+
+		<input type='checkbox' class="stat" id="SpanningTransformer-stat-methods"><label for="SpanningTransformer-stat-methods">Exported Methods (3)</label><span id='SpanningTransformer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-64">Reset</a>()
+			 (T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-99">Span</a>(src []<a href="../../../../builtin.html#name-byte">byte</a>, atEOF <a href="../../../../builtin.html#name-bool">bool</a>) (n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-61">Transform</a>(dst, src []<a href="../../../../builtin.html#name-byte">byte</a>, atEOF <a href="../../../../builtin.html#name-bool">bool</a>) (nDst, nSrc <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="SpanningTransformer-stat-impledby"><label for="SpanningTransformer-stat-impledby">Implemented By (2+)</label><span id='SpanningTransformer-stat-impledby-content' class="stat-content">
+			vendor/golang.org/x/text/secure/bidirule.(*<a href="secure/bidirule.html#name-Transformer">Transformer</a>)
+			vendor/golang.org/x/text/unicode/norm.<a href="unicode/norm.html#name-Form">Form</a></span>
+		<input type='checkbox' class="stat" id="SpanningTransformer-stat-impls"><label for="SpanningTransformer-stat-impls">Implements (1+)</label><span id='SpanningTransformer-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Transformer">Transformer</a></span>
+		<input type='checkbox' class="stat" id="SpanningTransformer-stat-values"><label for="SpanningTransformer-stat-values">As Types Of (1+)</label><span id='SpanningTransformer-stat-values-content' class="stat-content">
+			  var <a href="#name-Nop">Nop</a></span></div>
+<div class="anchor" id="name-Transformer" data-popularity="915">	 type <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-41">Transformer</a> <b<i>(interface)</i></b>
+		Transformer transforms bytes.
+
+		<input type='checkbox' class="stat" id="Transformer-stat-methods"><label for="Transformer-stat-methods">Exported Methods (2)</label><span id='Transformer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-64">Reset</a>()
+			 (T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-61">Transform</a>(dst, src []<a href="../../../../builtin.html#name-byte">byte</a>, atEOF <a href="../../../../builtin.html#name-bool">bool</a>) (nDst, nSrc <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Transformer-stat-impledby"><label for="Transformer-stat-impledby">Implemented By (3+)</label><span id='Transformer-stat-impledby-content' class="stat-content">
+			<a href="#name-SpanningTransformer">SpanningTransformer</a> <i>(interface)</i>
+			vendor/golang.org/x/text/secure/bidirule.(*<a href="secure/bidirule.html#name-Transformer">Transformer</a>)
+			vendor/golang.org/x/text/unicode/norm.<a href="unicode/norm.html#name-Form">Form</a></span>
+		<input type='checkbox' class="stat" id="Transformer-stat-results"><label for="Transformer-stat-results">As Outputs Of (2+)</label><span id='Transformer-stat-results-content' class="stat-content">
+			func <a href="#name-Chain">Chain</a>(t ...<b>Transformer</b>) <b>Transformer</b>
+			func <a href="#name-RemoveFunc">RemoveFunc</a>(f func(r <a href="../../../../builtin.html#name-rune">rune</a>) <a href="../../../../builtin.html#name-bool">bool</a>) <b>Transformer</b></span>
+		<input type='checkbox' class="stat" id="Transformer-stat-params"><label for="Transformer-stat-params">As Inputs Of (6+)</label><span id='Transformer-stat-params-content' class="stat-content">
+			func <a href="#name-Append">Append</a>(t <b>Transformer</b>, dst, src []<a href="../../../../builtin.html#name-byte">byte</a>) (result []<a href="../../../../builtin.html#name-byte">byte</a>, n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)
+			func <a href="#name-Bytes">Bytes</a>(t <b>Transformer</b>, b []<a href="../../../../builtin.html#name-byte">byte</a>) (result []<a href="../../../../builtin.html#name-byte">byte</a>, n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)
+			func <a href="#name-Chain">Chain</a>(t ...<b>Transformer</b>) <b>Transformer</b>
+			func <a href="#name-NewReader">NewReader</a>(r <a href="../../../../io.html">io</a>.<a href="../../../../io.html#name-Reader">Reader</a>, t <b>Transformer</b>) *<a href="#name-Reader">Reader</a>
+			func <a href="#name-NewWriter">NewWriter</a>(w <a href="../../../../io.html">io</a>.<a href="../../../../io.html#name-Writer">Writer</a>, t <b>Transformer</b>) *<a href="#name-Writer">Writer</a>
+			func <a href="#name-String">String</a>(t <b>Transformer</b>, s <a href="../../../../builtin.html#name-string">string</a>) (result <a href="../../../../builtin.html#name-string">string</a>, n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Transformer-stat-values"><label for="Transformer-stat-values">As Types Of (1+)</label><span id='Transformer-stat-values-content' class="stat-content">
+			  var <a href="#name-Discard">Discard</a></span></div>
+<div class="anchor" id="name-Writer" data-popularity="325">	 type <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-209">Writer</a> <i>(struct)</i>
+		Writer wraps another io.Writer by transforming the bytes read.
+		The user needs to call Close to flush unwritten bytes that may
+		be buffered.
+
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">Exported Methods (2)</label><span id='Writer-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-296">Close</a>() <a href="../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-234">Write</a>(data []<a href="../../../../builtin.html#name-byte">byte</a>) (n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impls"><label for="Writer-stat-impls">Implements (3+)</label><span id='Writer-stat-impls-content' class="stat-content">
+			*T : io.<a href="../../../../io.html#name-Closer">Closer</a>
+			*T : io.<a href="../../../../io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="../../../../io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Writer-stat-results"><label for="Writer-stat-results">As Outputs Of (1+)</label><span id='Writer-stat-results-content' class="stat-content">
+			func <a href="#name-NewWriter">NewWriter</a>(w <a href="../../../../io.html">io</a>.<a href="../../../../io.html#name-Writer">Writer</a>, t <a href="#name-Transformer">Transformer</a>) *<b>Writer</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Append">	 func <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-679">Append</a>(t <a href="#name-Transformer">Transformer</a>, dst, src []<a href="../../../../builtin.html#name-byte">byte</a>) (result []<a href="../../../../builtin.html#name-byte">byte</a>, n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)
+		Append appends the result of converting src[:n] using t to dst, where
+		n &lt;= len(src), If err == nil, n will be len(src). It calls Reset on t.</div>
+<div class="anchor" id="name-Bytes">	 func <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-673">Bytes</a>(t <a href="#name-Transformer">Transformer</a>, b []<a href="../../../../builtin.html#name-byte">byte</a>) (result []<a href="../../../../builtin.html#name-byte">byte</a>, n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)
+		Bytes returns a new byte slice with the result of converting b[:n] using t,
+		where n &lt;= len(b). If err == nil, n will be len(b). It calls Reset on t.</div>
+<div class="anchor" id="name-Chain">	 func <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-378">Chain</a>(t ...<a href="#name-Transformer">Transformer</a>) <a href="#name-Transformer">Transformer</a>
+		Chain returns a Transformer that applies t in sequence.</div>
+<div class="anchor" id="name-Discard">	  var <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-333">Discard</a> <a href="#name-Transformer">Transformer</a>
+		Discard is a Transformer for which all Transform calls succeed
+		by consuming all bytes and writing nothing.</div>
+<div class="anchor" id="name-ErrEndOfSpan">	  var <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-29">ErrEndOfSpan</a> <a href="../../../../builtin.html#name-error">error</a>
+		ErrEndOfSpan means that the input and output (the transformed input)
+		are not identical.</div>
+<div class="anchor" id="name-ErrShortDst">	  var <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-21">ErrShortDst</a> <a href="../../../../builtin.html#name-error">error</a>
+		ErrShortDst means that the destination buffer was too short to
+		receive all of the transformed bytes.</div>
+<div class="anchor" id="name-ErrShortSrc">	  var <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-25">ErrShortSrc</a> <a href="../../../../builtin.html#name-error">error</a>
+		ErrShortSrc means that the source buffer has insufficient data to
+		complete the transformation.</div>
+<div class="anchor" id="name-NewReader">	 func <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-134">NewReader</a>(r <a href="../../../../io.html">io</a>.<a href="../../../../io.html#name-Reader">Reader</a>, t <a href="#name-Transformer">Transformer</a>) *<a href="#name-Reader">Reader</a>
+		NewReader returns a new Reader that wraps r by transforming the bytes read
+		via t. It calls Reset on t.</div>
+<div class="anchor" id="name-NewWriter">	 func <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-221">NewWriter</a>(w <a href="../../../../io.html">io</a>.<a href="../../../../io.html#name-Writer">Writer</a>, t <a href="#name-Transformer">Transformer</a>) *<a href="#name-Writer">Writer</a>
+		NewWriter returns a new Writer that wraps w by transforming the bytes written
+		via t. It calls Reset on t.</div>
+<div class="anchor" id="name-Nop">	  var <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-336">Nop</a> <a href="#name-SpanningTransformer">SpanningTransformer</a>
+		Nop is a SpanningTransformer that copies src to dst.</div>
+<div class="anchor" id="name-RemoveFunc">	 func <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-497">RemoveFunc</a>(f func(r <a href="../../../../builtin.html#name-rune">rune</a>) <a href="../../../../builtin.html#name-bool">bool</a>) <a href="#name-Transformer">Transformer</a>
+		Deprecated: Use runes.Remove instead.</div>
+<div class="anchor" id="name-String">	 func <a href="../../../../../src/vendor/golang.org/x/text/transform/transform.go.html#line-568">String</a>(t <a href="#name-Transformer">Transformer</a>, s <a href="../../../../builtin.html#name-string">string</a>) (result <a href="../../../../builtin.html#name-string">string</a>, n <a href="../../../../builtin.html#name-int">int</a>, err <a href="../../../../builtin.html#name-error">error</a>)
+		String returns a string with the result of converting s[:n] using t, where
+		n &lt;= len(s). If err == nil, n will be len(s). It calls Reset on t.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

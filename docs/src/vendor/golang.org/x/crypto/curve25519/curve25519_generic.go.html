@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: curve25519_generic.go in package vendor/golang.org/x/crypto/curve25519</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	curve25519_generic.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../pkg/vendor/golang.org/x/crypto/curve25519.html">vendor/golang.org/x/crypto/curve25519</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2013 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package curve25519</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import "encoding/binary"</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>// This code is a port of the public domain, "ref10" implementation of</code></span>
+<span class="codeline" id="line-10"><code>// curve25519 from SUPERCOP 20130419 by D. J. Bernstein.</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>// fieldElement represents an element of the field GF(2^255 - 19). An element</code></span>
+<span class="codeline" id="line-13"><code>// t, entries t[0]...t[9], represents the integer t[0]+2^26 t[1]+2^51 t[2]+2^77</code></span>
+<span class="codeline" id="line-14"><code>// t[3]+2^102 t[4]+...+2^230 t[9]. Bounds on each t[i] vary depending on</code></span>
+<span class="codeline" id="line-15"><code>// context.</code></span>
+<span class="codeline" id="line-16"><code>type fieldElement [10]int32</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>func feZero(fe *fieldElement) {</code></span>
+<span class="codeline" id="line-19"><code>	for i := range fe {</code></span>
+<span class="codeline" id="line-20"><code>		fe[i] = 0</code></span>
+<span class="codeline" id="line-21"><code>	}</code></span>
+<span class="codeline" id="line-22"><code>}</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>func feOne(fe *fieldElement) {</code></span>
+<span class="codeline" id="line-25"><code>	feZero(fe)</code></span>
+<span class="codeline" id="line-26"><code>	fe[0] = 1</code></span>
+<span class="codeline" id="line-27"><code>}</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>func feAdd(dst, a, b *fieldElement) {</code></span>
+<span class="codeline" id="line-30"><code>	for i := range dst {</code></span>
+<span class="codeline" id="line-31"><code>		dst[i] = a[i] + b[i]</code></span>
+<span class="codeline" id="line-32"><code>	}</code></span>
+<span class="codeline" id="line-33"><code>}</code></span>
+<span class="codeline" id="line-34"><code></code></span>
+<span class="codeline" id="line-35"><code>func feSub(dst, a, b *fieldElement) {</code></span>
+<span class="codeline" id="line-36"><code>	for i := range dst {</code></span>
+<span class="codeline" id="line-37"><code>		dst[i] = a[i] - b[i]</code></span>
+<span class="codeline" id="line-38"><code>	}</code></span>
+<span class="codeline" id="line-39"><code>}</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>func feCopy(dst, src *fieldElement) {</code></span>
+<span class="codeline" id="line-42"><code>	for i := range dst {</code></span>
+<span class="codeline" id="line-43"><code>		dst[i] = src[i]</code></span>
+<span class="codeline" id="line-44"><code>	}</code></span>
+<span class="codeline" id="line-45"><code>}</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>// feCSwap replaces (f,g) with (g,f) if b == 1; replaces (f,g) with (f,g) if b == 0.</code></span>
+<span class="codeline" id="line-48"><code>//</code></span>
+<span class="codeline" id="line-49"><code>// Preconditions: b in {0,1}.</code></span>
+<span class="codeline" id="line-50"><code>func feCSwap(f, g *fieldElement, b int32) {</code></span>
+<span class="codeline" id="line-51"><code>	b = -b</code></span>
+<span class="codeline" id="line-52"><code>	for i := range f {</code></span>
+<span class="codeline" id="line-53"><code>		t := b &amp; (f[i] ^ g[i])</code></span>
+<span class="codeline" id="line-54"><code>		f[i] ^= t</code></span>
+<span class="codeline" id="line-55"><code>		g[i] ^= t</code></span>
+<span class="codeline" id="line-56"><code>	}</code></span>
+<span class="codeline" id="line-57"><code>}</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>// load3 reads a 24-bit, little-endian value from in.</code></span>
+<span class="codeline" id="line-60"><code>func load3(in []byte) int64 {</code></span>
+<span class="codeline" id="line-61"><code>	var r int64</code></span>
+<span class="codeline" id="line-62"><code>	r = int64(in[0])</code></span>
+<span class="codeline" id="line-63"><code>	r |= int64(in[1]) &lt;&lt; 8</code></span>
+<span class="codeline" id="line-64"><code>	r |= int64(in[2]) &lt;&lt; 16</code></span>
+<span class="codeline" id="line-65"><code>	return r</code></span>
+<span class="codeline" id="line-66"><code>}</code></span>
+<span class="codeline" id="line-67"><code></code></span>
+<span class="codeline" id="line-68"><code>// load4 reads a 32-bit, little-endian value from in.</code></span>
+<span class="codeline" id="line-69"><code>func load4(in []byte) int64 {</code></span>
+<span class="codeline" id="line-70"><code>	return int64(binary.LittleEndian.Uint32(in))</code></span>
+<span class="codeline" id="line-71"><code>}</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>func feFromBytes(dst *fieldElement, src *[32]byte) {</code></span>
+<span class="codeline" id="line-74"><code>	h0 := load4(src[:])</code></span>
+<span class="codeline" id="line-75"><code>	h1 := load3(src[4:]) &lt;&lt; 6</code></span>
+<span class="codeline" id="line-76"><code>	h2 := load3(src[7:]) &lt;&lt; 5</code></span>
+<span class="codeline" id="line-77"><code>	h3 := load3(src[10:]) &lt;&lt; 3</code></span>
+<span class="codeline" id="line-78"><code>	h4 := load3(src[13:]) &lt;&lt; 2</code></span>
+<span class="codeline" id="line-79"><code>	h5 := load4(src[16:])</code></span>
+<span class="codeline" id="line-80"><code>	h6 := load3(src[20:]) &lt;&lt; 7</code></span>
+<span class="codeline" id="line-81"><code>	h7 := load3(src[23:]) &lt;&lt; 5</code></span>
+<span class="codeline" id="line-82"><code>	h8 := load3(src[26:]) &lt;&lt; 4</code></span>
+<span class="codeline" id="line-83"><code>	h9 := (load3(src[29:]) &amp; 0x7fffff) &lt;&lt; 2</code></span>
+<span class="codeline" id="line-84"><code></code></span>
+<span class="codeline" id="line-85"><code>	var carry [10]int64</code></span>
+<span class="codeline" id="line-86"><code>	carry[9] = (h9 + 1&lt;&lt;24) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-87"><code>	h0 += carry[9] * 19</code></span>
+<span class="codeline" id="line-88"><code>	h9 -= carry[9] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-89"><code>	carry[1] = (h1 + 1&lt;&lt;24) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-90"><code>	h2 += carry[1]</code></span>
+<span class="codeline" id="line-91"><code>	h1 -= carry[1] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-92"><code>	carry[3] = (h3 + 1&lt;&lt;24) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-93"><code>	h4 += carry[3]</code></span>
+<span class="codeline" id="line-94"><code>	h3 -= carry[3] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-95"><code>	carry[5] = (h5 + 1&lt;&lt;24) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-96"><code>	h6 += carry[5]</code></span>
+<span class="codeline" id="line-97"><code>	h5 -= carry[5] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-98"><code>	carry[7] = (h7 + 1&lt;&lt;24) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-99"><code>	h8 += carry[7]</code></span>
+<span class="codeline" id="line-100"><code>	h7 -= carry[7] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-101"><code></code></span>
+<span class="codeline" id="line-102"><code>	carry[0] = (h0 + 1&lt;&lt;25) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-103"><code>	h1 += carry[0]</code></span>
+<span class="codeline" id="line-104"><code>	h0 -= carry[0] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-105"><code>	carry[2] = (h2 + 1&lt;&lt;25) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-106"><code>	h3 += carry[2]</code></span>
+<span class="codeline" id="line-107"><code>	h2 -= carry[2] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-108"><code>	carry[4] = (h4 + 1&lt;&lt;25) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-109"><code>	h5 += carry[4]</code></span>
+<span class="codeline" id="line-110"><code>	h4 -= carry[4] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-111"><code>	carry[6] = (h6 + 1&lt;&lt;25) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-112"><code>	h7 += carry[6]</code></span>
+<span class="codeline" id="line-113"><code>	h6 -= carry[6] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-114"><code>	carry[8] = (h8 + 1&lt;&lt;25) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-115"><code>	h9 += carry[8]</code></span>
+<span class="codeline" id="line-116"><code>	h8 -= carry[8] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-117"><code></code></span>
+<span class="codeline" id="line-118"><code>	dst[0] = int32(h0)</code></span>
+<span class="codeline" id="line-119"><code>	dst[1] = int32(h1)</code></span>
+<span class="codeline" id="line-120"><code>	dst[2] = int32(h2)</code></span>
+<span class="codeline" id="line-121"><code>	dst[3] = int32(h3)</code></span>
+<span class="codeline" id="line-122"><code>	dst[4] = int32(h4)</code></span>
+<span class="codeline" id="line-123"><code>	dst[5] = int32(h5)</code></span>
+<span class="codeline" id="line-124"><code>	dst[6] = int32(h6)</code></span>
+<span class="codeline" id="line-125"><code>	dst[7] = int32(h7)</code></span>
+<span class="codeline" id="line-126"><code>	dst[8] = int32(h8)</code></span>
+<span class="codeline" id="line-127"><code>	dst[9] = int32(h9)</code></span>
+<span class="codeline" id="line-128"><code>}</code></span>
+<span class="codeline" id="line-129"><code></code></span>
+<span class="codeline" id="line-130"><code>// feToBytes marshals h to s.</code></span>
+<span class="codeline" id="line-131"><code>// Preconditions:</code></span>
+<span class="codeline" id="line-132"><code>//   |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.</code></span>
+<span class="codeline" id="line-133"><code>//</code></span>
+<span class="codeline" id="line-134"><code>// Write p=2^255-19; q=floor(h/p).</code></span>
+<span class="codeline" id="line-135"><code>// Basic claim: q = floor(2^(-255)(h + 19 2^(-25)h9 + 2^(-1))).</code></span>
+<span class="codeline" id="line-136"><code>//</code></span>
+<span class="codeline" id="line-137"><code>// Proof:</code></span>
+<span class="codeline" id="line-138"><code>//   Have |h|&lt;=p so |q|&lt;=1 so |19^2 2^(-255) q|&lt;1/4.</code></span>
+<span class="codeline" id="line-139"><code>//   Also have |h-2^230 h9|&lt;2^230 so |19 2^(-255)(h-2^230 h9)|&lt;1/4.</code></span>
+<span class="codeline" id="line-140"><code>//</code></span>
+<span class="codeline" id="line-141"><code>//   Write y=2^(-1)-19^2 2^(-255)q-19 2^(-255)(h-2^230 h9).</code></span>
+<span class="codeline" id="line-142"><code>//   Then 0&lt;y&lt;1.</code></span>
+<span class="codeline" id="line-143"><code>//</code></span>
+<span class="codeline" id="line-144"><code>//   Write r=h-pq.</code></span>
+<span class="codeline" id="line-145"><code>//   Have 0&lt;=r&lt;=p-1=2^255-20.</code></span>
+<span class="codeline" id="line-146"><code>//   Thus 0&lt;=r+19(2^-255)r&lt;r+19(2^-255)2^255&lt;=2^255-1.</code></span>
+<span class="codeline" id="line-147"><code>//</code></span>
+<span class="codeline" id="line-148"><code>//   Write x=r+19(2^-255)r+y.</code></span>
+<span class="codeline" id="line-149"><code>//   Then 0&lt;x&lt;2^255 so floor(2^(-255)x) = 0 so floor(q+2^(-255)x) = q.</code></span>
+<span class="codeline" id="line-150"><code>//</code></span>
+<span class="codeline" id="line-151"><code>//   Have q+2^(-255)x = 2^(-255)(h + 19 2^(-25) h9 + 2^(-1))</code></span>
+<span class="codeline" id="line-152"><code>//   so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.</code></span>
+<span class="codeline" id="line-153"><code>func feToBytes(s *[32]byte, h *fieldElement) {</code></span>
+<span class="codeline" id="line-154"><code>	var carry [10]int32</code></span>
+<span class="codeline" id="line-155"><code></code></span>
+<span class="codeline" id="line-156"><code>	q := (19*h[9] + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-157"><code>	q = (h[0] + q) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-158"><code>	q = (h[1] + q) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-159"><code>	q = (h[2] + q) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-160"><code>	q = (h[3] + q) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-161"><code>	q = (h[4] + q) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-162"><code>	q = (h[5] + q) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-163"><code>	q = (h[6] + q) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-164"><code>	q = (h[7] + q) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-165"><code>	q = (h[8] + q) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-166"><code>	q = (h[9] + q) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-167"><code></code></span>
+<span class="codeline" id="line-168"><code>	// Goal: Output h-(2^255-19)q, which is between 0 and 2^255-20.</code></span>
+<span class="codeline" id="line-169"><code>	h[0] += 19 * q</code></span>
+<span class="codeline" id="line-170"><code>	// Goal: Output h-2^255 q, which is between 0 and 2^255-20.</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>	carry[0] = h[0] &gt;&gt; 26</code></span>
+<span class="codeline" id="line-173"><code>	h[1] += carry[0]</code></span>
+<span class="codeline" id="line-174"><code>	h[0] -= carry[0] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-175"><code>	carry[1] = h[1] &gt;&gt; 25</code></span>
+<span class="codeline" id="line-176"><code>	h[2] += carry[1]</code></span>
+<span class="codeline" id="line-177"><code>	h[1] -= carry[1] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-178"><code>	carry[2] = h[2] &gt;&gt; 26</code></span>
+<span class="codeline" id="line-179"><code>	h[3] += carry[2]</code></span>
+<span class="codeline" id="line-180"><code>	h[2] -= carry[2] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-181"><code>	carry[3] = h[3] &gt;&gt; 25</code></span>
+<span class="codeline" id="line-182"><code>	h[4] += carry[3]</code></span>
+<span class="codeline" id="line-183"><code>	h[3] -= carry[3] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-184"><code>	carry[4] = h[4] &gt;&gt; 26</code></span>
+<span class="codeline" id="line-185"><code>	h[5] += carry[4]</code></span>
+<span class="codeline" id="line-186"><code>	h[4] -= carry[4] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-187"><code>	carry[5] = h[5] &gt;&gt; 25</code></span>
+<span class="codeline" id="line-188"><code>	h[6] += carry[5]</code></span>
+<span class="codeline" id="line-189"><code>	h[5] -= carry[5] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-190"><code>	carry[6] = h[6] &gt;&gt; 26</code></span>
+<span class="codeline" id="line-191"><code>	h[7] += carry[6]</code></span>
+<span class="codeline" id="line-192"><code>	h[6] -= carry[6] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-193"><code>	carry[7] = h[7] &gt;&gt; 25</code></span>
+<span class="codeline" id="line-194"><code>	h[8] += carry[7]</code></span>
+<span class="codeline" id="line-195"><code>	h[7] -= carry[7] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-196"><code>	carry[8] = h[8] &gt;&gt; 26</code></span>
+<span class="codeline" id="line-197"><code>	h[9] += carry[8]</code></span>
+<span class="codeline" id="line-198"><code>	h[8] -= carry[8] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-199"><code>	carry[9] = h[9] &gt;&gt; 25</code></span>
+<span class="codeline" id="line-200"><code>	h[9] -= carry[9] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-201"><code>	// h10 = carry9</code></span>
+<span class="codeline" id="line-202"><code></code></span>
+<span class="codeline" id="line-203"><code>	// Goal: Output h[0]+...+2^255 h10-2^255 q, which is between 0 and 2^255-20.</code></span>
+<span class="codeline" id="line-204"><code>	// Have h[0]+...+2^230 h[9] between 0 and 2^255-1;</code></span>
+<span class="codeline" id="line-205"><code>	// evidently 2^255 h10-2^255 q = 0.</code></span>
+<span class="codeline" id="line-206"><code>	// Goal: Output h[0]+...+2^230 h[9].</code></span>
+<span class="codeline" id="line-207"><code></code></span>
+<span class="codeline" id="line-208"><code>	s[0] = byte(h[0] &gt;&gt; 0)</code></span>
+<span class="codeline" id="line-209"><code>	s[1] = byte(h[0] &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-210"><code>	s[2] = byte(h[0] &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-211"><code>	s[3] = byte((h[0] &gt;&gt; 24) | (h[1] &lt;&lt; 2))</code></span>
+<span class="codeline" id="line-212"><code>	s[4] = byte(h[1] &gt;&gt; 6)</code></span>
+<span class="codeline" id="line-213"><code>	s[5] = byte(h[1] &gt;&gt; 14)</code></span>
+<span class="codeline" id="line-214"><code>	s[6] = byte((h[1] &gt;&gt; 22) | (h[2] &lt;&lt; 3))</code></span>
+<span class="codeline" id="line-215"><code>	s[7] = byte(h[2] &gt;&gt; 5)</code></span>
+<span class="codeline" id="line-216"><code>	s[8] = byte(h[2] &gt;&gt; 13)</code></span>
+<span class="codeline" id="line-217"><code>	s[9] = byte((h[2] &gt;&gt; 21) | (h[3] &lt;&lt; 5))</code></span>
+<span class="codeline" id="line-218"><code>	s[10] = byte(h[3] &gt;&gt; 3)</code></span>
+<span class="codeline" id="line-219"><code>	s[11] = byte(h[3] &gt;&gt; 11)</code></span>
+<span class="codeline" id="line-220"><code>	s[12] = byte((h[3] &gt;&gt; 19) | (h[4] &lt;&lt; 6))</code></span>
+<span class="codeline" id="line-221"><code>	s[13] = byte(h[4] &gt;&gt; 2)</code></span>
+<span class="codeline" id="line-222"><code>	s[14] = byte(h[4] &gt;&gt; 10)</code></span>
+<span class="codeline" id="line-223"><code>	s[15] = byte(h[4] &gt;&gt; 18)</code></span>
+<span class="codeline" id="line-224"><code>	s[16] = byte(h[5] &gt;&gt; 0)</code></span>
+<span class="codeline" id="line-225"><code>	s[17] = byte(h[5] &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-226"><code>	s[18] = byte(h[5] &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-227"><code>	s[19] = byte((h[5] &gt;&gt; 24) | (h[6] &lt;&lt; 1))</code></span>
+<span class="codeline" id="line-228"><code>	s[20] = byte(h[6] &gt;&gt; 7)</code></span>
+<span class="codeline" id="line-229"><code>	s[21] = byte(h[6] &gt;&gt; 15)</code></span>
+<span class="codeline" id="line-230"><code>	s[22] = byte((h[6] &gt;&gt; 23) | (h[7] &lt;&lt; 3))</code></span>
+<span class="codeline" id="line-231"><code>	s[23] = byte(h[7] &gt;&gt; 5)</code></span>
+<span class="codeline" id="line-232"><code>	s[24] = byte(h[7] &gt;&gt; 13)</code></span>
+<span class="codeline" id="line-233"><code>	s[25] = byte((h[7] &gt;&gt; 21) | (h[8] &lt;&lt; 4))</code></span>
+<span class="codeline" id="line-234"><code>	s[26] = byte(h[8] &gt;&gt; 4)</code></span>
+<span class="codeline" id="line-235"><code>	s[27] = byte(h[8] &gt;&gt; 12)</code></span>
+<span class="codeline" id="line-236"><code>	s[28] = byte((h[8] &gt;&gt; 20) | (h[9] &lt;&lt; 6))</code></span>
+<span class="codeline" id="line-237"><code>	s[29] = byte(h[9] &gt;&gt; 2)</code></span>
+<span class="codeline" id="line-238"><code>	s[30] = byte(h[9] &gt;&gt; 10)</code></span>
+<span class="codeline" id="line-239"><code>	s[31] = byte(h[9] &gt;&gt; 18)</code></span>
+<span class="codeline" id="line-240"><code>}</code></span>
+<span class="codeline" id="line-241"><code></code></span>
+<span class="codeline" id="line-242"><code>// feMul calculates h = f * g</code></span>
+<span class="codeline" id="line-243"><code>// Can overlap h with f or g.</code></span>
+<span class="codeline" id="line-244"><code>//</code></span>
+<span class="codeline" id="line-245"><code>// Preconditions:</code></span>
+<span class="codeline" id="line-246"><code>//    |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.</code></span>
+<span class="codeline" id="line-247"><code>//    |g| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.</code></span>
+<span class="codeline" id="line-248"><code>//</code></span>
+<span class="codeline" id="line-249"><code>// Postconditions:</code></span>
+<span class="codeline" id="line-250"><code>//    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.</code></span>
+<span class="codeline" id="line-251"><code>//</code></span>
+<span class="codeline" id="line-252"><code>// Notes on implementation strategy:</code></span>
+<span class="codeline" id="line-253"><code>//</code></span>
+<span class="codeline" id="line-254"><code>// Using schoolbook multiplication.</code></span>
+<span class="codeline" id="line-255"><code>// Karatsuba would save a little in some cost models.</code></span>
+<span class="codeline" id="line-256"><code>//</code></span>
+<span class="codeline" id="line-257"><code>// Most multiplications by 2 and 19 are 32-bit precomputations;</code></span>
+<span class="codeline" id="line-258"><code>// cheaper than 64-bit postcomputations.</code></span>
+<span class="codeline" id="line-259"><code>//</code></span>
+<span class="codeline" id="line-260"><code>// There is one remaining multiplication by 19 in the carry chain;</code></span>
+<span class="codeline" id="line-261"><code>// one *19 precomputation can be merged into this,</code></span>
+<span class="codeline" id="line-262"><code>// but the resulting data flow is considerably less clean.</code></span>
+<span class="codeline" id="line-263"><code>//</code></span>
+<span class="codeline" id="line-264"><code>// There are 12 carries below.</code></span>
+<span class="codeline" id="line-265"><code>// 10 of them are 2-way parallelizable and vectorizable.</code></span>
+<span class="codeline" id="line-266"><code>// Can get away with 11 carries, but then data flow is much deeper.</code></span>
+<span class="codeline" id="line-267"><code>//</code></span>
+<span class="codeline" id="line-268"><code>// With tighter constraints on inputs can squeeze carries into int32.</code></span>
+<span class="codeline" id="line-269"><code>func feMul(h, f, g *fieldElement) {</code></span>
+<span class="codeline" id="line-270"><code>	f0 := f[0]</code></span>
+<span class="codeline" id="line-271"><code>	f1 := f[1]</code></span>
+<span class="codeline" id="line-272"><code>	f2 := f[2]</code></span>
+<span class="codeline" id="line-273"><code>	f3 := f[3]</code></span>
+<span class="codeline" id="line-274"><code>	f4 := f[4]</code></span>
+<span class="codeline" id="line-275"><code>	f5 := f[5]</code></span>
+<span class="codeline" id="line-276"><code>	f6 := f[6]</code></span>
+<span class="codeline" id="line-277"><code>	f7 := f[7]</code></span>
+<span class="codeline" id="line-278"><code>	f8 := f[8]</code></span>
+<span class="codeline" id="line-279"><code>	f9 := f[9]</code></span>
+<span class="codeline" id="line-280"><code>	g0 := g[0]</code></span>
+<span class="codeline" id="line-281"><code>	g1 := g[1]</code></span>
+<span class="codeline" id="line-282"><code>	g2 := g[2]</code></span>
+<span class="codeline" id="line-283"><code>	g3 := g[3]</code></span>
+<span class="codeline" id="line-284"><code>	g4 := g[4]</code></span>
+<span class="codeline" id="line-285"><code>	g5 := g[5]</code></span>
+<span class="codeline" id="line-286"><code>	g6 := g[6]</code></span>
+<span class="codeline" id="line-287"><code>	g7 := g[7]</code></span>
+<span class="codeline" id="line-288"><code>	g8 := g[8]</code></span>
+<span class="codeline" id="line-289"><code>	g9 := g[9]</code></span>
+<span class="codeline" id="line-290"><code>	g1_19 := 19 * g1 // 1.4*2^29</code></span>
+<span class="codeline" id="line-291"><code>	g2_19 := 19 * g2 // 1.4*2^30; still ok</code></span>
+<span class="codeline" id="line-292"><code>	g3_19 := 19 * g3</code></span>
+<span class="codeline" id="line-293"><code>	g4_19 := 19 * g4</code></span>
+<span class="codeline" id="line-294"><code>	g5_19 := 19 * g5</code></span>
+<span class="codeline" id="line-295"><code>	g6_19 := 19 * g6</code></span>
+<span class="codeline" id="line-296"><code>	g7_19 := 19 * g7</code></span>
+<span class="codeline" id="line-297"><code>	g8_19 := 19 * g8</code></span>
+<span class="codeline" id="line-298"><code>	g9_19 := 19 * g9</code></span>
+<span class="codeline" id="line-299"><code>	f1_2 := 2 * f1</code></span>
+<span class="codeline" id="line-300"><code>	f3_2 := 2 * f3</code></span>
+<span class="codeline" id="line-301"><code>	f5_2 := 2 * f5</code></span>
+<span class="codeline" id="line-302"><code>	f7_2 := 2 * f7</code></span>
+<span class="codeline" id="line-303"><code>	f9_2 := 2 * f9</code></span>
+<span class="codeline" id="line-304"><code>	f0g0 := int64(f0) * int64(g0)</code></span>
+<span class="codeline" id="line-305"><code>	f0g1 := int64(f0) * int64(g1)</code></span>
+<span class="codeline" id="line-306"><code>	f0g2 := int64(f0) * int64(g2)</code></span>
+<span class="codeline" id="line-307"><code>	f0g3 := int64(f0) * int64(g3)</code></span>
+<span class="codeline" id="line-308"><code>	f0g4 := int64(f0) * int64(g4)</code></span>
+<span class="codeline" id="line-309"><code>	f0g5 := int64(f0) * int64(g5)</code></span>
+<span class="codeline" id="line-310"><code>	f0g6 := int64(f0) * int64(g6)</code></span>
+<span class="codeline" id="line-311"><code>	f0g7 := int64(f0) * int64(g7)</code></span>
+<span class="codeline" id="line-312"><code>	f0g8 := int64(f0) * int64(g8)</code></span>
+<span class="codeline" id="line-313"><code>	f0g9 := int64(f0) * int64(g9)</code></span>
+<span class="codeline" id="line-314"><code>	f1g0 := int64(f1) * int64(g0)</code></span>
+<span class="codeline" id="line-315"><code>	f1g1_2 := int64(f1_2) * int64(g1)</code></span>
+<span class="codeline" id="line-316"><code>	f1g2 := int64(f1) * int64(g2)</code></span>
+<span class="codeline" id="line-317"><code>	f1g3_2 := int64(f1_2) * int64(g3)</code></span>
+<span class="codeline" id="line-318"><code>	f1g4 := int64(f1) * int64(g4)</code></span>
+<span class="codeline" id="line-319"><code>	f1g5_2 := int64(f1_2) * int64(g5)</code></span>
+<span class="codeline" id="line-320"><code>	f1g6 := int64(f1) * int64(g6)</code></span>
+<span class="codeline" id="line-321"><code>	f1g7_2 := int64(f1_2) * int64(g7)</code></span>
+<span class="codeline" id="line-322"><code>	f1g8 := int64(f1) * int64(g8)</code></span>
+<span class="codeline" id="line-323"><code>	f1g9_38 := int64(f1_2) * int64(g9_19)</code></span>
+<span class="codeline" id="line-324"><code>	f2g0 := int64(f2) * int64(g0)</code></span>
+<span class="codeline" id="line-325"><code>	f2g1 := int64(f2) * int64(g1)</code></span>
+<span class="codeline" id="line-326"><code>	f2g2 := int64(f2) * int64(g2)</code></span>
+<span class="codeline" id="line-327"><code>	f2g3 := int64(f2) * int64(g3)</code></span>
+<span class="codeline" id="line-328"><code>	f2g4 := int64(f2) * int64(g4)</code></span>
+<span class="codeline" id="line-329"><code>	f2g5 := int64(f2) * int64(g5)</code></span>
+<span class="codeline" id="line-330"><code>	f2g6 := int64(f2) * int64(g6)</code></span>
+<span class="codeline" id="line-331"><code>	f2g7 := int64(f2) * int64(g7)</code></span>
+<span class="codeline" id="line-332"><code>	f2g8_19 := int64(f2) * int64(g8_19)</code></span>
+<span class="codeline" id="line-333"><code>	f2g9_19 := int64(f2) * int64(g9_19)</code></span>
+<span class="codeline" id="line-334"><code>	f3g0 := int64(f3) * int64(g0)</code></span>
+<span class="codeline" id="line-335"><code>	f3g1_2 := int64(f3_2) * int64(g1)</code></span>
+<span class="codeline" id="line-336"><code>	f3g2 := int64(f3) * int64(g2)</code></span>
+<span class="codeline" id="line-337"><code>	f3g3_2 := int64(f3_2) * int64(g3)</code></span>
+<span class="codeline" id="line-338"><code>	f3g4 := int64(f3) * int64(g4)</code></span>
+<span class="codeline" id="line-339"><code>	f3g5_2 := int64(f3_2) * int64(g5)</code></span>
+<span class="codeline" id="line-340"><code>	f3g6 := int64(f3) * int64(g6)</code></span>
+<span class="codeline" id="line-341"><code>	f3g7_38 := int64(f3_2) * int64(g7_19)</code></span>
+<span class="codeline" id="line-342"><code>	f3g8_19 := int64(f3) * int64(g8_19)</code></span>
+<span class="codeline" id="line-343"><code>	f3g9_38 := int64(f3_2) * int64(g9_19)</code></span>
+<span class="codeline" id="line-344"><code>	f4g0 := int64(f4) * int64(g0)</code></span>
+<span class="codeline" id="line-345"><code>	f4g1 := int64(f4) * int64(g1)</code></span>
+<span class="codeline" id="line-346"><code>	f4g2 := int64(f4) * int64(g2)</code></span>
+<span class="codeline" id="line-347"><code>	f4g3 := int64(f4) * int64(g3)</code></span>
+<span class="codeline" id="line-348"><code>	f4g4 := int64(f4) * int64(g4)</code></span>
+<span class="codeline" id="line-349"><code>	f4g5 := int64(f4) * int64(g5)</code></span>
+<span class="codeline" id="line-350"><code>	f4g6_19 := int64(f4) * int64(g6_19)</code></span>
+<span class="codeline" id="line-351"><code>	f4g7_19 := int64(f4) * int64(g7_19)</code></span>
+<span class="codeline" id="line-352"><code>	f4g8_19 := int64(f4) * int64(g8_19)</code></span>
+<span class="codeline" id="line-353"><code>	f4g9_19 := int64(f4) * int64(g9_19)</code></span>
+<span class="codeline" id="line-354"><code>	f5g0 := int64(f5) * int64(g0)</code></span>
+<span class="codeline" id="line-355"><code>	f5g1_2 := int64(f5_2) * int64(g1)</code></span>
+<span class="codeline" id="line-356"><code>	f5g2 := int64(f5) * int64(g2)</code></span>
+<span class="codeline" id="line-357"><code>	f5g3_2 := int64(f5_2) * int64(g3)</code></span>
+<span class="codeline" id="line-358"><code>	f5g4 := int64(f5) * int64(g4)</code></span>
+<span class="codeline" id="line-359"><code>	f5g5_38 := int64(f5_2) * int64(g5_19)</code></span>
+<span class="codeline" id="line-360"><code>	f5g6_19 := int64(f5) * int64(g6_19)</code></span>
+<span class="codeline" id="line-361"><code>	f5g7_38 := int64(f5_2) * int64(g7_19)</code></span>
+<span class="codeline" id="line-362"><code>	f5g8_19 := int64(f5) * int64(g8_19)</code></span>
+<span class="codeline" id="line-363"><code>	f5g9_38 := int64(f5_2) * int64(g9_19)</code></span>
+<span class="codeline" id="line-364"><code>	f6g0 := int64(f6) * int64(g0)</code></span>
+<span class="codeline" id="line-365"><code>	f6g1 := int64(f6) * int64(g1)</code></span>
+<span class="codeline" id="line-366"><code>	f6g2 := int64(f6) * int64(g2)</code></span>
+<span class="codeline" id="line-367"><code>	f6g3 := int64(f6) * int64(g3)</code></span>
+<span class="codeline" id="line-368"><code>	f6g4_19 := int64(f6) * int64(g4_19)</code></span>
+<span class="codeline" id="line-369"><code>	f6g5_19 := int64(f6) * int64(g5_19)</code></span>
+<span class="codeline" id="line-370"><code>	f6g6_19 := int64(f6) * int64(g6_19)</code></span>
+<span class="codeline" id="line-371"><code>	f6g7_19 := int64(f6) * int64(g7_19)</code></span>
+<span class="codeline" id="line-372"><code>	f6g8_19 := int64(f6) * int64(g8_19)</code></span>
+<span class="codeline" id="line-373"><code>	f6g9_19 := int64(f6) * int64(g9_19)</code></span>
+<span class="codeline" id="line-374"><code>	f7g0 := int64(f7) * int64(g0)</code></span>
+<span class="codeline" id="line-375"><code>	f7g1_2 := int64(f7_2) * int64(g1)</code></span>
+<span class="codeline" id="line-376"><code>	f7g2 := int64(f7) * int64(g2)</code></span>
+<span class="codeline" id="line-377"><code>	f7g3_38 := int64(f7_2) * int64(g3_19)</code></span>
+<span class="codeline" id="line-378"><code>	f7g4_19 := int64(f7) * int64(g4_19)</code></span>
+<span class="codeline" id="line-379"><code>	f7g5_38 := int64(f7_2) * int64(g5_19)</code></span>
+<span class="codeline" id="line-380"><code>	f7g6_19 := int64(f7) * int64(g6_19)</code></span>
+<span class="codeline" id="line-381"><code>	f7g7_38 := int64(f7_2) * int64(g7_19)</code></span>
+<span class="codeline" id="line-382"><code>	f7g8_19 := int64(f7) * int64(g8_19)</code></span>
+<span class="codeline" id="line-383"><code>	f7g9_38 := int64(f7_2) * int64(g9_19)</code></span>
+<span class="codeline" id="line-384"><code>	f8g0 := int64(f8) * int64(g0)</code></span>
+<span class="codeline" id="line-385"><code>	f8g1 := int64(f8) * int64(g1)</code></span>
+<span class="codeline" id="line-386"><code>	f8g2_19 := int64(f8) * int64(g2_19)</code></span>
+<span class="codeline" id="line-387"><code>	f8g3_19 := int64(f8) * int64(g3_19)</code></span>
+<span class="codeline" id="line-388"><code>	f8g4_19 := int64(f8) * int64(g4_19)</code></span>
+<span class="codeline" id="line-389"><code>	f8g5_19 := int64(f8) * int64(g5_19)</code></span>
+<span class="codeline" id="line-390"><code>	f8g6_19 := int64(f8) * int64(g6_19)</code></span>
+<span class="codeline" id="line-391"><code>	f8g7_19 := int64(f8) * int64(g7_19)</code></span>
+<span class="codeline" id="line-392"><code>	f8g8_19 := int64(f8) * int64(g8_19)</code></span>
+<span class="codeline" id="line-393"><code>	f8g9_19 := int64(f8) * int64(g9_19)</code></span>
+<span class="codeline" id="line-394"><code>	f9g0 := int64(f9) * int64(g0)</code></span>
+<span class="codeline" id="line-395"><code>	f9g1_38 := int64(f9_2) * int64(g1_19)</code></span>
+<span class="codeline" id="line-396"><code>	f9g2_19 := int64(f9) * int64(g2_19)</code></span>
+<span class="codeline" id="line-397"><code>	f9g3_38 := int64(f9_2) * int64(g3_19)</code></span>
+<span class="codeline" id="line-398"><code>	f9g4_19 := int64(f9) * int64(g4_19)</code></span>
+<span class="codeline" id="line-399"><code>	f9g5_38 := int64(f9_2) * int64(g5_19)</code></span>
+<span class="codeline" id="line-400"><code>	f9g6_19 := int64(f9) * int64(g6_19)</code></span>
+<span class="codeline" id="line-401"><code>	f9g7_38 := int64(f9_2) * int64(g7_19)</code></span>
+<span class="codeline" id="line-402"><code>	f9g8_19 := int64(f9) * int64(g8_19)</code></span>
+<span class="codeline" id="line-403"><code>	f9g9_38 := int64(f9_2) * int64(g9_19)</code></span>
+<span class="codeline" id="line-404"><code>	h0 := f0g0 + f1g9_38 + f2g8_19 + f3g7_38 + f4g6_19 + f5g5_38 + f6g4_19 + f7g3_38 + f8g2_19 + f9g1_38</code></span>
+<span class="codeline" id="line-405"><code>	h1 := f0g1 + f1g0 + f2g9_19 + f3g8_19 + f4g7_19 + f5g6_19 + f6g5_19 + f7g4_19 + f8g3_19 + f9g2_19</code></span>
+<span class="codeline" id="line-406"><code>	h2 := f0g2 + f1g1_2 + f2g0 + f3g9_38 + f4g8_19 + f5g7_38 + f6g6_19 + f7g5_38 + f8g4_19 + f9g3_38</code></span>
+<span class="codeline" id="line-407"><code>	h3 := f0g3 + f1g2 + f2g1 + f3g0 + f4g9_19 + f5g8_19 + f6g7_19 + f7g6_19 + f8g5_19 + f9g4_19</code></span>
+<span class="codeline" id="line-408"><code>	h4 := f0g4 + f1g3_2 + f2g2 + f3g1_2 + f4g0 + f5g9_38 + f6g8_19 + f7g7_38 + f8g6_19 + f9g5_38</code></span>
+<span class="codeline" id="line-409"><code>	h5 := f0g5 + f1g4 + f2g3 + f3g2 + f4g1 + f5g0 + f6g9_19 + f7g8_19 + f8g7_19 + f9g6_19</code></span>
+<span class="codeline" id="line-410"><code>	h6 := f0g6 + f1g5_2 + f2g4 + f3g3_2 + f4g2 + f5g1_2 + f6g0 + f7g9_38 + f8g8_19 + f9g7_38</code></span>
+<span class="codeline" id="line-411"><code>	h7 := f0g7 + f1g6 + f2g5 + f3g4 + f4g3 + f5g2 + f6g1 + f7g0 + f8g9_19 + f9g8_19</code></span>
+<span class="codeline" id="line-412"><code>	h8 := f0g8 + f1g7_2 + f2g6 + f3g5_2 + f4g4 + f5g3_2 + f6g2 + f7g1_2 + f8g0 + f9g9_38</code></span>
+<span class="codeline" id="line-413"><code>	h9 := f0g9 + f1g8 + f2g7 + f3g6 + f4g5 + f5g4 + f6g3 + f7g2 + f8g1 + f9g0</code></span>
+<span class="codeline" id="line-414"><code>	var carry [10]int64</code></span>
+<span class="codeline" id="line-415"><code></code></span>
+<span class="codeline" id="line-416"><code>	// |h0| &lt;= (1.1*1.1*2^52*(1+19+19+19+19)+1.1*1.1*2^50*(38+38+38+38+38))</code></span>
+<span class="codeline" id="line-417"><code>	//   i.e. |h0| &lt;= 1.2*2^59; narrower ranges for h2, h4, h6, h8</code></span>
+<span class="codeline" id="line-418"><code>	// |h1| &lt;= (1.1*1.1*2^51*(1+1+19+19+19+19+19+19+19+19))</code></span>
+<span class="codeline" id="line-419"><code>	//   i.e. |h1| &lt;= 1.5*2^58; narrower ranges for h3, h5, h7, h9</code></span>
+<span class="codeline" id="line-420"><code></code></span>
+<span class="codeline" id="line-421"><code>	carry[0] = (h0 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-422"><code>	h1 += carry[0]</code></span>
+<span class="codeline" id="line-423"><code>	h0 -= carry[0] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-424"><code>	carry[4] = (h4 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-425"><code>	h5 += carry[4]</code></span>
+<span class="codeline" id="line-426"><code>	h4 -= carry[4] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-427"><code>	// |h0| &lt;= 2^25</code></span>
+<span class="codeline" id="line-428"><code>	// |h4| &lt;= 2^25</code></span>
+<span class="codeline" id="line-429"><code>	// |h1| &lt;= 1.51*2^58</code></span>
+<span class="codeline" id="line-430"><code>	// |h5| &lt;= 1.51*2^58</code></span>
+<span class="codeline" id="line-431"><code></code></span>
+<span class="codeline" id="line-432"><code>	carry[1] = (h1 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-433"><code>	h2 += carry[1]</code></span>
+<span class="codeline" id="line-434"><code>	h1 -= carry[1] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-435"><code>	carry[5] = (h5 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-436"><code>	h6 += carry[5]</code></span>
+<span class="codeline" id="line-437"><code>	h5 -= carry[5] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-438"><code>	// |h1| &lt;= 2^24; from now on fits into int32</code></span>
+<span class="codeline" id="line-439"><code>	// |h5| &lt;= 2^24; from now on fits into int32</code></span>
+<span class="codeline" id="line-440"><code>	// |h2| &lt;= 1.21*2^59</code></span>
+<span class="codeline" id="line-441"><code>	// |h6| &lt;= 1.21*2^59</code></span>
+<span class="codeline" id="line-442"><code></code></span>
+<span class="codeline" id="line-443"><code>	carry[2] = (h2 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-444"><code>	h3 += carry[2]</code></span>
+<span class="codeline" id="line-445"><code>	h2 -= carry[2] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-446"><code>	carry[6] = (h6 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-447"><code>	h7 += carry[6]</code></span>
+<span class="codeline" id="line-448"><code>	h6 -= carry[6] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-449"><code>	// |h2| &lt;= 2^25; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-450"><code>	// |h6| &lt;= 2^25; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-451"><code>	// |h3| &lt;= 1.51*2^58</code></span>
+<span class="codeline" id="line-452"><code>	// |h7| &lt;= 1.51*2^58</code></span>
+<span class="codeline" id="line-453"><code></code></span>
+<span class="codeline" id="line-454"><code>	carry[3] = (h3 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-455"><code>	h4 += carry[3]</code></span>
+<span class="codeline" id="line-456"><code>	h3 -= carry[3] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-457"><code>	carry[7] = (h7 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-458"><code>	h8 += carry[7]</code></span>
+<span class="codeline" id="line-459"><code>	h7 -= carry[7] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-460"><code>	// |h3| &lt;= 2^24; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-461"><code>	// |h7| &lt;= 2^24; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-462"><code>	// |h4| &lt;= 1.52*2^33</code></span>
+<span class="codeline" id="line-463"><code>	// |h8| &lt;= 1.52*2^33</code></span>
+<span class="codeline" id="line-464"><code></code></span>
+<span class="codeline" id="line-465"><code>	carry[4] = (h4 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-466"><code>	h5 += carry[4]</code></span>
+<span class="codeline" id="line-467"><code>	h4 -= carry[4] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-468"><code>	carry[8] = (h8 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-469"><code>	h9 += carry[8]</code></span>
+<span class="codeline" id="line-470"><code>	h8 -= carry[8] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-471"><code>	// |h4| &lt;= 2^25; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-472"><code>	// |h8| &lt;= 2^25; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-473"><code>	// |h5| &lt;= 1.01*2^24</code></span>
+<span class="codeline" id="line-474"><code>	// |h9| &lt;= 1.51*2^58</code></span>
+<span class="codeline" id="line-475"><code></code></span>
+<span class="codeline" id="line-476"><code>	carry[9] = (h9 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-477"><code>	h0 += carry[9] * 19</code></span>
+<span class="codeline" id="line-478"><code>	h9 -= carry[9] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-479"><code>	// |h9| &lt;= 2^24; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-480"><code>	// |h0| &lt;= 1.8*2^37</code></span>
+<span class="codeline" id="line-481"><code></code></span>
+<span class="codeline" id="line-482"><code>	carry[0] = (h0 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-483"><code>	h1 += carry[0]</code></span>
+<span class="codeline" id="line-484"><code>	h0 -= carry[0] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-485"><code>	// |h0| &lt;= 2^25; from now on fits into int32 unchanged</code></span>
+<span class="codeline" id="line-486"><code>	// |h1| &lt;= 1.01*2^24</code></span>
+<span class="codeline" id="line-487"><code></code></span>
+<span class="codeline" id="line-488"><code>	h[0] = int32(h0)</code></span>
+<span class="codeline" id="line-489"><code>	h[1] = int32(h1)</code></span>
+<span class="codeline" id="line-490"><code>	h[2] = int32(h2)</code></span>
+<span class="codeline" id="line-491"><code>	h[3] = int32(h3)</code></span>
+<span class="codeline" id="line-492"><code>	h[4] = int32(h4)</code></span>
+<span class="codeline" id="line-493"><code>	h[5] = int32(h5)</code></span>
+<span class="codeline" id="line-494"><code>	h[6] = int32(h6)</code></span>
+<span class="codeline" id="line-495"><code>	h[7] = int32(h7)</code></span>
+<span class="codeline" id="line-496"><code>	h[8] = int32(h8)</code></span>
+<span class="codeline" id="line-497"><code>	h[9] = int32(h9)</code></span>
+<span class="codeline" id="line-498"><code>}</code></span>
+<span class="codeline" id="line-499"><code></code></span>
+<span class="codeline" id="line-500"><code>// feSquare calculates h = f*f. Can overlap h with f.</code></span>
+<span class="codeline" id="line-501"><code>//</code></span>
+<span class="codeline" id="line-502"><code>// Preconditions:</code></span>
+<span class="codeline" id="line-503"><code>//    |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.</code></span>
+<span class="codeline" id="line-504"><code>//</code></span>
+<span class="codeline" id="line-505"><code>// Postconditions:</code></span>
+<span class="codeline" id="line-506"><code>//    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.</code></span>
+<span class="codeline" id="line-507"><code>func feSquare(h, f *fieldElement) {</code></span>
+<span class="codeline" id="line-508"><code>	f0 := f[0]</code></span>
+<span class="codeline" id="line-509"><code>	f1 := f[1]</code></span>
+<span class="codeline" id="line-510"><code>	f2 := f[2]</code></span>
+<span class="codeline" id="line-511"><code>	f3 := f[3]</code></span>
+<span class="codeline" id="line-512"><code>	f4 := f[4]</code></span>
+<span class="codeline" id="line-513"><code>	f5 := f[5]</code></span>
+<span class="codeline" id="line-514"><code>	f6 := f[6]</code></span>
+<span class="codeline" id="line-515"><code>	f7 := f[7]</code></span>
+<span class="codeline" id="line-516"><code>	f8 := f[8]</code></span>
+<span class="codeline" id="line-517"><code>	f9 := f[9]</code></span>
+<span class="codeline" id="line-518"><code>	f0_2 := 2 * f0</code></span>
+<span class="codeline" id="line-519"><code>	f1_2 := 2 * f1</code></span>
+<span class="codeline" id="line-520"><code>	f2_2 := 2 * f2</code></span>
+<span class="codeline" id="line-521"><code>	f3_2 := 2 * f3</code></span>
+<span class="codeline" id="line-522"><code>	f4_2 := 2 * f4</code></span>
+<span class="codeline" id="line-523"><code>	f5_2 := 2 * f5</code></span>
+<span class="codeline" id="line-524"><code>	f6_2 := 2 * f6</code></span>
+<span class="codeline" id="line-525"><code>	f7_2 := 2 * f7</code></span>
+<span class="codeline" id="line-526"><code>	f5_38 := 38 * f5 // 1.31*2^30</code></span>
+<span class="codeline" id="line-527"><code>	f6_19 := 19 * f6 // 1.31*2^30</code></span>
+<span class="codeline" id="line-528"><code>	f7_38 := 38 * f7 // 1.31*2^30</code></span>
+<span class="codeline" id="line-529"><code>	f8_19 := 19 * f8 // 1.31*2^30</code></span>
+<span class="codeline" id="line-530"><code>	f9_38 := 38 * f9 // 1.31*2^30</code></span>
+<span class="codeline" id="line-531"><code>	f0f0 := int64(f0) * int64(f0)</code></span>
+<span class="codeline" id="line-532"><code>	f0f1_2 := int64(f0_2) * int64(f1)</code></span>
+<span class="codeline" id="line-533"><code>	f0f2_2 := int64(f0_2) * int64(f2)</code></span>
+<span class="codeline" id="line-534"><code>	f0f3_2 := int64(f0_2) * int64(f3)</code></span>
+<span class="codeline" id="line-535"><code>	f0f4_2 := int64(f0_2) * int64(f4)</code></span>
+<span class="codeline" id="line-536"><code>	f0f5_2 := int64(f0_2) * int64(f5)</code></span>
+<span class="codeline" id="line-537"><code>	f0f6_2 := int64(f0_2) * int64(f6)</code></span>
+<span class="codeline" id="line-538"><code>	f0f7_2 := int64(f0_2) * int64(f7)</code></span>
+<span class="codeline" id="line-539"><code>	f0f8_2 := int64(f0_2) * int64(f8)</code></span>
+<span class="codeline" id="line-540"><code>	f0f9_2 := int64(f0_2) * int64(f9)</code></span>
+<span class="codeline" id="line-541"><code>	f1f1_2 := int64(f1_2) * int64(f1)</code></span>
+<span class="codeline" id="line-542"><code>	f1f2_2 := int64(f1_2) * int64(f2)</code></span>
+<span class="codeline" id="line-543"><code>	f1f3_4 := int64(f1_2) * int64(f3_2)</code></span>
+<span class="codeline" id="line-544"><code>	f1f4_2 := int64(f1_2) * int64(f4)</code></span>
+<span class="codeline" id="line-545"><code>	f1f5_4 := int64(f1_2) * int64(f5_2)</code></span>
+<span class="codeline" id="line-546"><code>	f1f6_2 := int64(f1_2) * int64(f6)</code></span>
+<span class="codeline" id="line-547"><code>	f1f7_4 := int64(f1_2) * int64(f7_2)</code></span>
+<span class="codeline" id="line-548"><code>	f1f8_2 := int64(f1_2) * int64(f8)</code></span>
+<span class="codeline" id="line-549"><code>	f1f9_76 := int64(f1_2) * int64(f9_38)</code></span>
+<span class="codeline" id="line-550"><code>	f2f2 := int64(f2) * int64(f2)</code></span>
+<span class="codeline" id="line-551"><code>	f2f3_2 := int64(f2_2) * int64(f3)</code></span>
+<span class="codeline" id="line-552"><code>	f2f4_2 := int64(f2_2) * int64(f4)</code></span>
+<span class="codeline" id="line-553"><code>	f2f5_2 := int64(f2_2) * int64(f5)</code></span>
+<span class="codeline" id="line-554"><code>	f2f6_2 := int64(f2_2) * int64(f6)</code></span>
+<span class="codeline" id="line-555"><code>	f2f7_2 := int64(f2_2) * int64(f7)</code></span>
+<span class="codeline" id="line-556"><code>	f2f8_38 := int64(f2_2) * int64(f8_19)</code></span>
+<span class="codeline" id="line-557"><code>	f2f9_38 := int64(f2) * int64(f9_38)</code></span>
+<span class="codeline" id="line-558"><code>	f3f3_2 := int64(f3_2) * int64(f3)</code></span>
+<span class="codeline" id="line-559"><code>	f3f4_2 := int64(f3_2) * int64(f4)</code></span>
+<span class="codeline" id="line-560"><code>	f3f5_4 := int64(f3_2) * int64(f5_2)</code></span>
+<span class="codeline" id="line-561"><code>	f3f6_2 := int64(f3_2) * int64(f6)</code></span>
+<span class="codeline" id="line-562"><code>	f3f7_76 := int64(f3_2) * int64(f7_38)</code></span>
+<span class="codeline" id="line-563"><code>	f3f8_38 := int64(f3_2) * int64(f8_19)</code></span>
+<span class="codeline" id="line-564"><code>	f3f9_76 := int64(f3_2) * int64(f9_38)</code></span>
+<span class="codeline" id="line-565"><code>	f4f4 := int64(f4) * int64(f4)</code></span>
+<span class="codeline" id="line-566"><code>	f4f5_2 := int64(f4_2) * int64(f5)</code></span>
+<span class="codeline" id="line-567"><code>	f4f6_38 := int64(f4_2) * int64(f6_19)</code></span>
+<span class="codeline" id="line-568"><code>	f4f7_38 := int64(f4) * int64(f7_38)</code></span>
+<span class="codeline" id="line-569"><code>	f4f8_38 := int64(f4_2) * int64(f8_19)</code></span>
+<span class="codeline" id="line-570"><code>	f4f9_38 := int64(f4) * int64(f9_38)</code></span>
+<span class="codeline" id="line-571"><code>	f5f5_38 := int64(f5) * int64(f5_38)</code></span>
+<span class="codeline" id="line-572"><code>	f5f6_38 := int64(f5_2) * int64(f6_19)</code></span>
+<span class="codeline" id="line-573"><code>	f5f7_76 := int64(f5_2) * int64(f7_38)</code></span>
+<span class="codeline" id="line-574"><code>	f5f8_38 := int64(f5_2) * int64(f8_19)</code></span>
+<span class="codeline" id="line-575"><code>	f5f9_76 := int64(f5_2) * int64(f9_38)</code></span>
+<span class="codeline" id="line-576"><code>	f6f6_19 := int64(f6) * int64(f6_19)</code></span>
+<span class="codeline" id="line-577"><code>	f6f7_38 := int64(f6) * int64(f7_38)</code></span>
+<span class="codeline" id="line-578"><code>	f6f8_38 := int64(f6_2) * int64(f8_19)</code></span>
+<span class="codeline" id="line-579"><code>	f6f9_38 := int64(f6) * int64(f9_38)</code></span>
+<span class="codeline" id="line-580"><code>	f7f7_38 := int64(f7) * int64(f7_38)</code></span>
+<span class="codeline" id="line-581"><code>	f7f8_38 := int64(f7_2) * int64(f8_19)</code></span>
+<span class="codeline" id="line-582"><code>	f7f9_76 := int64(f7_2) * int64(f9_38)</code></span>
+<span class="codeline" id="line-583"><code>	f8f8_19 := int64(f8) * int64(f8_19)</code></span>
+<span class="codeline" id="line-584"><code>	f8f9_38 := int64(f8) * int64(f9_38)</code></span>
+<span class="codeline" id="line-585"><code>	f9f9_38 := int64(f9) * int64(f9_38)</code></span>
+<span class="codeline" id="line-586"><code>	h0 := f0f0 + f1f9_76 + f2f8_38 + f3f7_76 + f4f6_38 + f5f5_38</code></span>
+<span class="codeline" id="line-587"><code>	h1 := f0f1_2 + f2f9_38 + f3f8_38 + f4f7_38 + f5f6_38</code></span>
+<span class="codeline" id="line-588"><code>	h2 := f0f2_2 + f1f1_2 + f3f9_76 + f4f8_38 + f5f7_76 + f6f6_19</code></span>
+<span class="codeline" id="line-589"><code>	h3 := f0f3_2 + f1f2_2 + f4f9_38 + f5f8_38 + f6f7_38</code></span>
+<span class="codeline" id="line-590"><code>	h4 := f0f4_2 + f1f3_4 + f2f2 + f5f9_76 + f6f8_38 + f7f7_38</code></span>
+<span class="codeline" id="line-591"><code>	h5 := f0f5_2 + f1f4_2 + f2f3_2 + f6f9_38 + f7f8_38</code></span>
+<span class="codeline" id="line-592"><code>	h6 := f0f6_2 + f1f5_4 + f2f4_2 + f3f3_2 + f7f9_76 + f8f8_19</code></span>
+<span class="codeline" id="line-593"><code>	h7 := f0f7_2 + f1f6_2 + f2f5_2 + f3f4_2 + f8f9_38</code></span>
+<span class="codeline" id="line-594"><code>	h8 := f0f8_2 + f1f7_4 + f2f6_2 + f3f5_4 + f4f4 + f9f9_38</code></span>
+<span class="codeline" id="line-595"><code>	h9 := f0f9_2 + f1f8_2 + f2f7_2 + f3f6_2 + f4f5_2</code></span>
+<span class="codeline" id="line-596"><code>	var carry [10]int64</code></span>
+<span class="codeline" id="line-597"><code></code></span>
+<span class="codeline" id="line-598"><code>	carry[0] = (h0 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-599"><code>	h1 += carry[0]</code></span>
+<span class="codeline" id="line-600"><code>	h0 -= carry[0] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-601"><code>	carry[4] = (h4 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-602"><code>	h5 += carry[4]</code></span>
+<span class="codeline" id="line-603"><code>	h4 -= carry[4] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-604"><code></code></span>
+<span class="codeline" id="line-605"><code>	carry[1] = (h1 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-606"><code>	h2 += carry[1]</code></span>
+<span class="codeline" id="line-607"><code>	h1 -= carry[1] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-608"><code>	carry[5] = (h5 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-609"><code>	h6 += carry[5]</code></span>
+<span class="codeline" id="line-610"><code>	h5 -= carry[5] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-611"><code></code></span>
+<span class="codeline" id="line-612"><code>	carry[2] = (h2 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-613"><code>	h3 += carry[2]</code></span>
+<span class="codeline" id="line-614"><code>	h2 -= carry[2] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-615"><code>	carry[6] = (h6 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-616"><code>	h7 += carry[6]</code></span>
+<span class="codeline" id="line-617"><code>	h6 -= carry[6] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-618"><code></code></span>
+<span class="codeline" id="line-619"><code>	carry[3] = (h3 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-620"><code>	h4 += carry[3]</code></span>
+<span class="codeline" id="line-621"><code>	h3 -= carry[3] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-622"><code>	carry[7] = (h7 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-623"><code>	h8 += carry[7]</code></span>
+<span class="codeline" id="line-624"><code>	h7 -= carry[7] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-625"><code></code></span>
+<span class="codeline" id="line-626"><code>	carry[4] = (h4 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-627"><code>	h5 += carry[4]</code></span>
+<span class="codeline" id="line-628"><code>	h4 -= carry[4] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-629"><code>	carry[8] = (h8 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-630"><code>	h9 += carry[8]</code></span>
+<span class="codeline" id="line-631"><code>	h8 -= carry[8] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-632"><code></code></span>
+<span class="codeline" id="line-633"><code>	carry[9] = (h9 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-634"><code>	h0 += carry[9] * 19</code></span>
+<span class="codeline" id="line-635"><code>	h9 -= carry[9] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-636"><code></code></span>
+<span class="codeline" id="line-637"><code>	carry[0] = (h0 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-638"><code>	h1 += carry[0]</code></span>
+<span class="codeline" id="line-639"><code>	h0 -= carry[0] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-640"><code></code></span>
+<span class="codeline" id="line-641"><code>	h[0] = int32(h0)</code></span>
+<span class="codeline" id="line-642"><code>	h[1] = int32(h1)</code></span>
+<span class="codeline" id="line-643"><code>	h[2] = int32(h2)</code></span>
+<span class="codeline" id="line-644"><code>	h[3] = int32(h3)</code></span>
+<span class="codeline" id="line-645"><code>	h[4] = int32(h4)</code></span>
+<span class="codeline" id="line-646"><code>	h[5] = int32(h5)</code></span>
+<span class="codeline" id="line-647"><code>	h[6] = int32(h6)</code></span>
+<span class="codeline" id="line-648"><code>	h[7] = int32(h7)</code></span>
+<span class="codeline" id="line-649"><code>	h[8] = int32(h8)</code></span>
+<span class="codeline" id="line-650"><code>	h[9] = int32(h9)</code></span>
+<span class="codeline" id="line-651"><code>}</code></span>
+<span class="codeline" id="line-652"><code></code></span>
+<span class="codeline" id="line-653"><code>// feMul121666 calculates h = f * 121666. Can overlap h with f.</code></span>
+<span class="codeline" id="line-654"><code>//</code></span>
+<span class="codeline" id="line-655"><code>// Preconditions:</code></span>
+<span class="codeline" id="line-656"><code>//    |f| bounded by 1.1*2^26,1.1*2^25,1.1*2^26,1.1*2^25,etc.</code></span>
+<span class="codeline" id="line-657"><code>//</code></span>
+<span class="codeline" id="line-658"><code>// Postconditions:</code></span>
+<span class="codeline" id="line-659"><code>//    |h| bounded by 1.1*2^25,1.1*2^24,1.1*2^25,1.1*2^24,etc.</code></span>
+<span class="codeline" id="line-660"><code>func feMul121666(h, f *fieldElement) {</code></span>
+<span class="codeline" id="line-661"><code>	h0 := int64(f[0]) * 121666</code></span>
+<span class="codeline" id="line-662"><code>	h1 := int64(f[1]) * 121666</code></span>
+<span class="codeline" id="line-663"><code>	h2 := int64(f[2]) * 121666</code></span>
+<span class="codeline" id="line-664"><code>	h3 := int64(f[3]) * 121666</code></span>
+<span class="codeline" id="line-665"><code>	h4 := int64(f[4]) * 121666</code></span>
+<span class="codeline" id="line-666"><code>	h5 := int64(f[5]) * 121666</code></span>
+<span class="codeline" id="line-667"><code>	h6 := int64(f[6]) * 121666</code></span>
+<span class="codeline" id="line-668"><code>	h7 := int64(f[7]) * 121666</code></span>
+<span class="codeline" id="line-669"><code>	h8 := int64(f[8]) * 121666</code></span>
+<span class="codeline" id="line-670"><code>	h9 := int64(f[9]) * 121666</code></span>
+<span class="codeline" id="line-671"><code>	var carry [10]int64</code></span>
+<span class="codeline" id="line-672"><code></code></span>
+<span class="codeline" id="line-673"><code>	carry[9] = (h9 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-674"><code>	h0 += carry[9] * 19</code></span>
+<span class="codeline" id="line-675"><code>	h9 -= carry[9] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-676"><code>	carry[1] = (h1 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-677"><code>	h2 += carry[1]</code></span>
+<span class="codeline" id="line-678"><code>	h1 -= carry[1] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-679"><code>	carry[3] = (h3 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-680"><code>	h4 += carry[3]</code></span>
+<span class="codeline" id="line-681"><code>	h3 -= carry[3] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-682"><code>	carry[5] = (h5 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-683"><code>	h6 += carry[5]</code></span>
+<span class="codeline" id="line-684"><code>	h5 -= carry[5] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-685"><code>	carry[7] = (h7 + (1 &lt;&lt; 24)) &gt;&gt; 25</code></span>
+<span class="codeline" id="line-686"><code>	h8 += carry[7]</code></span>
+<span class="codeline" id="line-687"><code>	h7 -= carry[7] &lt;&lt; 25</code></span>
+<span class="codeline" id="line-688"><code></code></span>
+<span class="codeline" id="line-689"><code>	carry[0] = (h0 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-690"><code>	h1 += carry[0]</code></span>
+<span class="codeline" id="line-691"><code>	h0 -= carry[0] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-692"><code>	carry[2] = (h2 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-693"><code>	h3 += carry[2]</code></span>
+<span class="codeline" id="line-694"><code>	h2 -= carry[2] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-695"><code>	carry[4] = (h4 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-696"><code>	h5 += carry[4]</code></span>
+<span class="codeline" id="line-697"><code>	h4 -= carry[4] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-698"><code>	carry[6] = (h6 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-699"><code>	h7 += carry[6]</code></span>
+<span class="codeline" id="line-700"><code>	h6 -= carry[6] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-701"><code>	carry[8] = (h8 + (1 &lt;&lt; 25)) &gt;&gt; 26</code></span>
+<span class="codeline" id="line-702"><code>	h9 += carry[8]</code></span>
+<span class="codeline" id="line-703"><code>	h8 -= carry[8] &lt;&lt; 26</code></span>
+<span class="codeline" id="line-704"><code></code></span>
+<span class="codeline" id="line-705"><code>	h[0] = int32(h0)</code></span>
+<span class="codeline" id="line-706"><code>	h[1] = int32(h1)</code></span>
+<span class="codeline" id="line-707"><code>	h[2] = int32(h2)</code></span>
+<span class="codeline" id="line-708"><code>	h[3] = int32(h3)</code></span>
+<span class="codeline" id="line-709"><code>	h[4] = int32(h4)</code></span>
+<span class="codeline" id="line-710"><code>	h[5] = int32(h5)</code></span>
+<span class="codeline" id="line-711"><code>	h[6] = int32(h6)</code></span>
+<span class="codeline" id="line-712"><code>	h[7] = int32(h7)</code></span>
+<span class="codeline" id="line-713"><code>	h[8] = int32(h8)</code></span>
+<span class="codeline" id="line-714"><code>	h[9] = int32(h9)</code></span>
+<span class="codeline" id="line-715"><code>}</code></span>
+<span class="codeline" id="line-716"><code></code></span>
+<span class="codeline" id="line-717"><code>// feInvert sets out = z^-1.</code></span>
+<span class="codeline" id="line-718"><code>func feInvert(out, z *fieldElement) {</code></span>
+<span class="codeline" id="line-719"><code>	var t0, t1, t2, t3 fieldElement</code></span>
+<span class="codeline" id="line-720"><code>	var i int</code></span>
+<span class="codeline" id="line-721"><code></code></span>
+<span class="codeline" id="line-722"><code>	feSquare(&amp;t0, z)</code></span>
+<span class="codeline" id="line-723"><code>	for i = 1; i &lt; 1; i++ {</code></span>
+<span class="codeline" id="line-724"><code>		feSquare(&amp;t0, &amp;t0)</code></span>
+<span class="codeline" id="line-725"><code>	}</code></span>
+<span class="codeline" id="line-726"><code>	feSquare(&amp;t1, &amp;t0)</code></span>
+<span class="codeline" id="line-727"><code>	for i = 1; i &lt; 2; i++ {</code></span>
+<span class="codeline" id="line-728"><code>		feSquare(&amp;t1, &amp;t1)</code></span>
+<span class="codeline" id="line-729"><code>	}</code></span>
+<span class="codeline" id="line-730"><code>	feMul(&amp;t1, z, &amp;t1)</code></span>
+<span class="codeline" id="line-731"><code>	feMul(&amp;t0, &amp;t0, &amp;t1)</code></span>
+<span class="codeline" id="line-732"><code>	feSquare(&amp;t2, &amp;t0)</code></span>
+<span class="codeline" id="line-733"><code>	for i = 1; i &lt; 1; i++ {</code></span>
+<span class="codeline" id="line-734"><code>		feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-735"><code>	}</code></span>
+<span class="codeline" id="line-736"><code>	feMul(&amp;t1, &amp;t1, &amp;t2)</code></span>
+<span class="codeline" id="line-737"><code>	feSquare(&amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-738"><code>	for i = 1; i &lt; 5; i++ {</code></span>
+<span class="codeline" id="line-739"><code>		feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-740"><code>	}</code></span>
+<span class="codeline" id="line-741"><code>	feMul(&amp;t1, &amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-742"><code>	feSquare(&amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-743"><code>	for i = 1; i &lt; 10; i++ {</code></span>
+<span class="codeline" id="line-744"><code>		feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-745"><code>	}</code></span>
+<span class="codeline" id="line-746"><code>	feMul(&amp;t2, &amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-747"><code>	feSquare(&amp;t3, &amp;t2)</code></span>
+<span class="codeline" id="line-748"><code>	for i = 1; i &lt; 20; i++ {</code></span>
+<span class="codeline" id="line-749"><code>		feSquare(&amp;t3, &amp;t3)</code></span>
+<span class="codeline" id="line-750"><code>	}</code></span>
+<span class="codeline" id="line-751"><code>	feMul(&amp;t2, &amp;t3, &amp;t2)</code></span>
+<span class="codeline" id="line-752"><code>	feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-753"><code>	for i = 1; i &lt; 10; i++ {</code></span>
+<span class="codeline" id="line-754"><code>		feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-755"><code>	}</code></span>
+<span class="codeline" id="line-756"><code>	feMul(&amp;t1, &amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-757"><code>	feSquare(&amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-758"><code>	for i = 1; i &lt; 50; i++ {</code></span>
+<span class="codeline" id="line-759"><code>		feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-760"><code>	}</code></span>
+<span class="codeline" id="line-761"><code>	feMul(&amp;t2, &amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-762"><code>	feSquare(&amp;t3, &amp;t2)</code></span>
+<span class="codeline" id="line-763"><code>	for i = 1; i &lt; 100; i++ {</code></span>
+<span class="codeline" id="line-764"><code>		feSquare(&amp;t3, &amp;t3)</code></span>
+<span class="codeline" id="line-765"><code>	}</code></span>
+<span class="codeline" id="line-766"><code>	feMul(&amp;t2, &amp;t3, &amp;t2)</code></span>
+<span class="codeline" id="line-767"><code>	feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-768"><code>	for i = 1; i &lt; 50; i++ {</code></span>
+<span class="codeline" id="line-769"><code>		feSquare(&amp;t2, &amp;t2)</code></span>
+<span class="codeline" id="line-770"><code>	}</code></span>
+<span class="codeline" id="line-771"><code>	feMul(&amp;t1, &amp;t2, &amp;t1)</code></span>
+<span class="codeline" id="line-772"><code>	feSquare(&amp;t1, &amp;t1)</code></span>
+<span class="codeline" id="line-773"><code>	for i = 1; i &lt; 5; i++ {</code></span>
+<span class="codeline" id="line-774"><code>		feSquare(&amp;t1, &amp;t1)</code></span>
+<span class="codeline" id="line-775"><code>	}</code></span>
+<span class="codeline" id="line-776"><code>	feMul(out, &amp;t1, &amp;t0)</code></span>
+<span class="codeline" id="line-777"><code>}</code></span>
+<span class="codeline" id="line-778"><code></code></span>
+<span class="codeline" id="line-779"><code>func scalarMultGeneric(out, in, base *[32]byte) {</code></span>
+<span class="codeline" id="line-780"><code>	var e [32]byte</code></span>
+<span class="codeline" id="line-781"><code></code></span>
+<span class="codeline" id="line-782"><code>	copy(e[:], in[:])</code></span>
+<span class="codeline" id="line-783"><code>	e[0] &amp;= 248</code></span>
+<span class="codeline" id="line-784"><code>	e[31] &amp;= 127</code></span>
+<span class="codeline" id="line-785"><code>	e[31] |= 64</code></span>
+<span class="codeline" id="line-786"><code></code></span>
+<span class="codeline" id="line-787"><code>	var x1, x2, z2, x3, z3, tmp0, tmp1 fieldElement</code></span>
+<span class="codeline" id="line-788"><code>	feFromBytes(&amp;x1, base)</code></span>
+<span class="codeline" id="line-789"><code>	feOne(&amp;x2)</code></span>
+<span class="codeline" id="line-790"><code>	feCopy(&amp;x3, &amp;x1)</code></span>
+<span class="codeline" id="line-791"><code>	feOne(&amp;z3)</code></span>
+<span class="codeline" id="line-792"><code></code></span>
+<span class="codeline" id="line-793"><code>	swap := int32(0)</code></span>
+<span class="codeline" id="line-794"><code>	for pos := 254; pos &gt;= 0; pos-- {</code></span>
+<span class="codeline" id="line-795"><code>		b := e[pos/8] &gt;&gt; uint(pos&amp;7)</code></span>
+<span class="codeline" id="line-796"><code>		b &amp;= 1</code></span>
+<span class="codeline" id="line-797"><code>		swap ^= int32(b)</code></span>
+<span class="codeline" id="line-798"><code>		feCSwap(&amp;x2, &amp;x3, swap)</code></span>
+<span class="codeline" id="line-799"><code>		feCSwap(&amp;z2, &amp;z3, swap)</code></span>
+<span class="codeline" id="line-800"><code>		swap = int32(b)</code></span>
+<span class="codeline" id="line-801"><code></code></span>
+<span class="codeline" id="line-802"><code>		feSub(&amp;tmp0, &amp;x3, &amp;z3)</code></span>
+<span class="codeline" id="line-803"><code>		feSub(&amp;tmp1, &amp;x2, &amp;z2)</code></span>
+<span class="codeline" id="line-804"><code>		feAdd(&amp;x2, &amp;x2, &amp;z2)</code></span>
+<span class="codeline" id="line-805"><code>		feAdd(&amp;z2, &amp;x3, &amp;z3)</code></span>
+<span class="codeline" id="line-806"><code>		feMul(&amp;z3, &amp;tmp0, &amp;x2)</code></span>
+<span class="codeline" id="line-807"><code>		feMul(&amp;z2, &amp;z2, &amp;tmp1)</code></span>
+<span class="codeline" id="line-808"><code>		feSquare(&amp;tmp0, &amp;tmp1)</code></span>
+<span class="codeline" id="line-809"><code>		feSquare(&amp;tmp1, &amp;x2)</code></span>
+<span class="codeline" id="line-810"><code>		feAdd(&amp;x3, &amp;z3, &amp;z2)</code></span>
+<span class="codeline" id="line-811"><code>		feSub(&amp;z2, &amp;z3, &amp;z2)</code></span>
+<span class="codeline" id="line-812"><code>		feMul(&amp;x2, &amp;tmp1, &amp;tmp0)</code></span>
+<span class="codeline" id="line-813"><code>		feSub(&amp;tmp1, &amp;tmp1, &amp;tmp0)</code></span>
+<span class="codeline" id="line-814"><code>		feSquare(&amp;z2, &amp;z2)</code></span>
+<span class="codeline" id="line-815"><code>		feMul121666(&amp;z3, &amp;tmp1)</code></span>
+<span class="codeline" id="line-816"><code>		feSquare(&amp;x3, &amp;x3)</code></span>
+<span class="codeline" id="line-817"><code>		feAdd(&amp;tmp0, &amp;tmp0, &amp;z3)</code></span>
+<span class="codeline" id="line-818"><code>		feMul(&amp;z3, &amp;x1, &amp;z2)</code></span>
+<span class="codeline" id="line-819"><code>		feMul(&amp;z2, &amp;tmp1, &amp;tmp0)</code></span>
+<span class="codeline" id="line-820"><code>	}</code></span>
+<span class="codeline" id="line-821"><code></code></span>
+<span class="codeline" id="line-822"><code>	feCSwap(&amp;x2, &amp;x3, swap)</code></span>
+<span class="codeline" id="line-823"><code>	feCSwap(&amp;z2, &amp;z3, swap)</code></span>
+<span class="codeline" id="line-824"><code></code></span>
+<span class="codeline" id="line-825"><code>	feInvert(&amp;z2, &amp;z2)</code></span>
+<span class="codeline" id="line-826"><code>	feMul(&amp;x2, &amp;x2, &amp;z2)</code></span>
+<span class="codeline" id="line-827"><code>	feToBytes(out, &amp;x2)</code></span>
+<span class="codeline" id="line-828"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

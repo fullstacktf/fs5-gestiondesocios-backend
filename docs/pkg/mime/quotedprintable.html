@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: mime/quotedprintable</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>quotedprintable</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-mime/quotedprintable">mime/quotedprintable</a><i> (on <a href="https://golang.org/pkg/mime/quotedprintable/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/mime/quotedprintable" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/mime/quotedprintable.html">4 packages</a>, and imported by <a href="../../dep/mime/quotedprintable.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/mime/quotedprintable/reader.go.html#doc">d-&gt;</a> <a href="../../src/mime/quotedprintable/reader.go.html">reader.go</a>
+	    <a href="../../src/mime/quotedprintable/writer.go.html">writer.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Reader" data-popularity="175">	 type <a href="../../src/mime/quotedprintable/reader.go.html#line-17">Reader</a> <i>(struct)</i>
+		Reader is a quoted-printable decoder.
+
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">One Exported Method</label><span id='Reader-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/mime/quotedprintable/reader.go.html#line-72">Read</a>(p []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-impls"><label for="Reader-stat-impls">Implements (1+)</label><span id='Reader-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Reader">Reader</a></span>
+		<input type='checkbox' class="stat" id="Reader-stat-results"><label for="Reader-stat-results">As Outputs Of (1+)</label><span id='Reader-stat-results-content' class="stat-content">
+			func <a href="#name-NewReader">NewReader</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) *<b>Reader</b></span></div>
+<div class="anchor" id="name-Writer" data-popularity="325">	 type <a href="../../src/mime/quotedprintable/writer.go.html#line-12">Writer</a> <i>(struct)</i>
+		A Writer is a quoted-printable writer that implements io.WriteCloser.
+
+		<input type='checkbox' class="stat" id="Writer-stat-fields"><label for="Writer-stat-fields">One Exported Field</label><span id='Writer-stat-fields-content' class="stat-content">
+			<a href="../../src/mime/quotedprintable/writer.go.html#line-15">Binary</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">Exported Methods (2)</label><span id='Writer-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/mime/quotedprintable/writer.go.html#line-67">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/mime/quotedprintable/writer.go.html#line-31">Write</a>(p []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impls"><label for="Writer-stat-impls">Implements (3+)</label><span id='Writer-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a>
+			*T : io.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="../io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Writer-stat-results"><label for="Writer-stat-results">As Outputs Of (1+)</label><span id='Writer-stat-results-content' class="stat-content">
+			func <a href="#name-NewWriter">NewWriter</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) *<b>Writer</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-NewReader">	 func <a href="../../src/mime/quotedprintable/reader.go.html#line-24">NewReader</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) *<a href="#name-Reader">Reader</a>
+		NewReader returns a quoted-printable reader, decoding from r.</div>
+<div class="anchor" id="name-NewWriter">	 func <a href="../../src/mime/quotedprintable/writer.go.html#line-24">NewWriter</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) *<a href="#name-Writer">Writer</a>
+		NewWriter returns a new Writer that writes to w.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: go/scanner</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>scanner</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-go/scanner">go/scanner</a><i> (on <a href="https://golang.org/pkg/go/scanner/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/go/scanner" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/go/scanner.html">9 packages</a>, and imported by <a href="../../dep/go/scanner.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/go/scanner/errors.go.html">errors.go</a>
+	<a href="../../src/go/scanner/scanner.go.html#doc">d-&gt;</a> <a href="../../src/go/scanner/scanner.go.html">scanner.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Error" data-popularity="100">	 type <a href="../../src/go/scanner/errors.go.html#line-19">Error</a> <i>(struct)</i>
+		In an ErrorList, an error is represented by an *Error.
+		The position Pos, if valid, points to the beginning of
+		the offending token, and the error condition is described
+		by Msg.
+
+		<input type='checkbox' class="stat" id="Error-stat-fields"><label for="Error-stat-fields">Exported Fields (2)</label><span id='Error-stat-fields-content' class="stat-content">
+			<a href="../../src/go/scanner/errors.go.html#line-21">Msg</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/go/scanner/errors.go.html#line-20">Pos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Position">Position</a></i></span>
+		<input type='checkbox' class="stat" id="Error-stat-methods"><label for="Error-stat-methods">One Exported Method</label><span id='Error-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/scanner/errors.go.html#line-25">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Error-stat-impls"><label for="Error-stat-impls">Implements (1+)</label><span id='Error-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-ErrorHandler" data-popularity="35">	 type <a href="../../src/go/scanner/scanner.go.html#line-26">ErrorHandler</a> <i>(func)</i>
+		An ErrorHandler may be provided to Scanner.Init. If a syntax error is
+		encountered and a handler was installed, the handler is called with a
+		position and an error message. The position points to the beginning of
+		the offending token.
+
+		<input type='checkbox' class="stat" id="ErrorHandler-stat-params"><label for="ErrorHandler-stat-params">As Inputs Of (1+)</label><span id='ErrorHandler-stat-params-content' class="stat-content">
+			func (*<a href="#name-Scanner">Scanner</a>).<a href="../../src/go/scanner/scanner.go.html#line-122">Init</a>(file *<a href="token.html">token</a>.<a href="token.html#name-File">File</a>, src []<a href="../builtin.html#name-byte">byte</a>, err <b>ErrorHandler</b>, mode <a href="#name-Mode">Mode</a>)</span></div>
+<div class="anchor" id="name-ErrorList" data-popularity="550">	 type <a href="../../src/go/scanner/errors.go.html#line-37">ErrorList</a> <i>([])</i>
+		ErrorList is a list of *Errors.
+		The zero value for an ErrorList is an empty ErrorList ready to use.
+
+		<input type='checkbox' class="stat" id="ErrorList-stat-methods"><label for="ErrorList-stat-methods">Exported Methods (9)</label><span id='ErrorList-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/scanner/errors.go.html#line-40">Add</a>(pos <a href="token.html">token</a>.<a href="token.html#name-Position">Position</a>, msg <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/go/scanner/errors.go.html#line-105">Err</a>() <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/go/scanner/errors.go.html#line-93">Error</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/go/scanner/errors.go.html#line-48">Len</a>() <a href="../builtin.html#name-int">int</a>
+			 (T) <a href="../../src/go/scanner/errors.go.html#line-51">Less</a>(i, j <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/go/scanner/errors.go.html#line-78">RemoveMultiples</a>()
+			(*T) <a href="../../src/go/scanner/errors.go.html#line-45">Reset</a>()
+			 (T) <a href="../../src/go/scanner/errors.go.html#line-73">Sort</a>()
+			 (T) <a href="../../src/go/scanner/errors.go.html#line-49">Swap</a>(i, j <a href="../builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="ErrorList-stat-impls"><label for="ErrorList-stat-impls">Implements (2+)</label><span id='ErrorList-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a>
+			 T : sort.<a href="../sort.html#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Mode" data-popularity="40">	 type <a href="../../src/go/scanner/scanner.go.html#line-100">Mode</a> <a href="../builtin.html#name-uint">uint</a>
+		A mode value is a set of flags (or 0).
+		They control scanner behavior.
+
+		<input type='checkbox' class="stat" id="Mode-stat-params"><label for="Mode-stat-params">As Inputs Of (1+)</label><span id='Mode-stat-params-content' class="stat-content">
+			func (*<a href="#name-Scanner">Scanner</a>).<a href="../../src/go/scanner/scanner.go.html#line-122">Init</a>(file *<a href="token.html">token</a>.<a href="token.html#name-File">File</a>, src []<a href="../builtin.html#name-byte">byte</a>, err <a href="#name-ErrorHandler">ErrorHandler</a>, mode <b>Mode</b>)</span>
+		<input type='checkbox' class="stat" id="Mode-stat-values"><label for="Mode-stat-values">As Types Of (1+)</label><span id='Mode-stat-values-content' class="stat-content">
+			const <a href="#name-ScanComments">ScanComments</a></span></div>
+<div class="anchor" id="name-Scanner" data-popularity="100">	 type <a href="../../src/go/scanner/scanner.go.html#line-32">Scanner</a> <i>(struct)</i>
+		A Scanner holds the scanner's internal state while processing
+		a given text. It can be allocated as part of another data
+		structure but must be initialized via Init before use.
+
+		<input type='checkbox' class="stat" id="Scanner-stat-fields"><label for="Scanner-stat-fields">One Exported Field</label><span id='Scanner-stat-fields-content' class="stat-content">
+			<a href="../../src/go/scanner/scanner.go.html#line-48">ErrorCount</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="Scanner-stat-methods"><label for="Scanner-stat-methods">Exported Methods (2)</label><span id='Scanner-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/scanner/scanner.go.html#line-122">Init</a>(file *<a href="token.html">token</a>.<a href="token.html#name-File">File</a>, src []<a href="../builtin.html#name-byte">byte</a>, err <a href="#name-ErrorHandler">ErrorHandler</a>, mode <a href="#name-Mode">Mode</a>)
+			(*T) <a href="../../src/go/scanner/scanner.go.html#line-782">Scan</a>() (pos <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>, tok <a href="token.html">token</a>.<a href="token.html#name-Token">Token</a>, lit <a href="../builtin.html#name-string">string</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-PrintError">	 func <a href="../../src/go/scanner/errors.go.html#line-116">PrintError</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, err <a href="../builtin.html#name-error">error</a>)
+		PrintError is a utility function that prints a list of errors to w,
+		one error per line, if the err parameter is an ErrorList. Otherwise
+		it prints the err string.</div>
+<div class="anchor" id="name-ScanComments">	const <a href="../../src/go/scanner/scanner.go.html#line-103">ScanComments</a> <a href="#name-Mode">Mode</a> = 1 // return comments as COMMENT tokens</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

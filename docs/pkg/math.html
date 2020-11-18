@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: math</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>math</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-math">math</a><i> (on <a href="https://golang.org/pkg/math/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/math" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/math.html">3 packages</a>, and imported by <a href="../dep/math.html#imported-by">14 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/math/abs.go.html">abs.go</a>
+	    <a href="../src/math/acosh.go.html">acosh.go</a>
+	    <a href="../src/math/asin.go.html">asin.go</a>
+	    <a href="../src/math/asinh.go.html">asinh.go</a>
+	    <a href="../src/math/atan.go.html">atan.go</a>
+	    <a href="../src/math/atan2.go.html">atan2.go</a>
+	    <a href="../src/math/atanh.go.html">atanh.go</a>
+	    <a href="../src/math/bits.go.html">bits.go</a>
+	    <a href="../src/math/cbrt.go.html">cbrt.go</a>
+	<a href="../src/math/const.go.html#doc">d-&gt;</a> <a href="../src/math/const.go.html">const.go</a>
+	    <a href="../src/math/copysign.go.html">copysign.go</a>
+	    <a href="../src/math/dim.go.html">dim.go</a>
+	    <a href="../src/math/erf.go.html">erf.go</a>
+	    <a href="../src/math/erfinv.go.html">erfinv.go</a>
+	    <a href="../src/math/exp.go.html">exp.go</a>
+	    <a href="../src/math/exp_asm.go.html">exp_asm.go</a>
+	    <a href="../src/math/expm1.go.html">expm1.go</a>
+	    <a href="../src/math/floor.go.html">floor.go</a>
+	    <a href="../src/math/fma.go.html">fma.go</a>
+	    <a href="../src/math/frexp.go.html">frexp.go</a>
+	    <a href="../src/math/gamma.go.html">gamma.go</a>
+	    <a href="../src/math/hypot.go.html">hypot.go</a>
+	    <a href="../src/math/j0.go.html">j0.go</a>
+	    <a href="../src/math/j1.go.html">j1.go</a>
+	    <a href="../src/math/jn.go.html">jn.go</a>
+	    <a href="../src/math/ldexp.go.html">ldexp.go</a>
+	    <a href="../src/math/lgamma.go.html">lgamma.go</a>
+	    <a href="../src/math/log.go.html">log.go</a>
+	    <a href="../src/math/log10.go.html">log10.go</a>
+	    <a href="../src/math/log1p.go.html">log1p.go</a>
+	    <a href="../src/math/logb.go.html">logb.go</a>
+	    <a href="../src/math/mod.go.html">mod.go</a>
+	    <a href="../src/math/modf.go.html">modf.go</a>
+	    <a href="../src/math/nextafter.go.html">nextafter.go</a>
+	    <a href="../src/math/pow.go.html">pow.go</a>
+	    <a href="../src/math/pow10.go.html">pow10.go</a>
+	    <a href="../src/math/remainder.go.html">remainder.go</a>
+	    <a href="../src/math/signbit.go.html">signbit.go</a>
+	    <a href="../src/math/sin.go.html">sin.go</a>
+	    <a href="../src/math/sincos.go.html">sincos.go</a>
+	    <a href="../src/math/sinh.go.html">sinh.go</a>
+	    <a href="../src/math/sqrt.go.html">sqrt.go</a>
+	    <a href="../src/math/tan.go.html">tan.go</a>
+	    <a href="../src/math/tanh.go.html">tanh.go</a>
+	    <a href="../src/math/trig_reduce.go.html">trig_reduce.go</a>
+	    <a href="../src/math/unsafe.go.html">unsafe.go</a>
+	    <a href="../src/math/dim_amd64.s.html">dim_amd64.s</a>
+	    <a href="../src/math/exp_amd64.s.html">exp_amd64.s</a>
+	    <a href="../src/math/floor_amd64.s.html">floor_amd64.s</a>
+	    <a href="../src/math/hypot_amd64.s.html">hypot_amd64.s</a>
+	    <a href="../src/math/log_amd64.s.html">log_amd64.s</a>
+	    <a href="../src/math/sqrt_amd64.s.html">sqrt_amd64.s</a>
+	    <a href="../src/math/stubs_amd64.s.html">stubs_amd64.s</a>
+
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Abs">	 func <a href="../src/math/abs.go.html#line-12">Abs</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Abs returns the absolute value of x.
+
+		Special cases are:
+			Abs(±Inf) = +Inf
+			Abs(NaN) = NaN</div>
+<div class="anchor" id="name-Acos">	 func <a href="../src/math/asin.go.html#line-51">Acos</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Acos returns the arccosine, in radians, of x.
+
+		Special case is:
+			Acos(x) = NaN if x &lt; -1 or x &gt; 1</div>
+<div class="anchor" id="name-Acosh">	 func <a href="../src/math/acosh.go.html#line-42">Acosh</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Acosh returns the inverse hyperbolic cosine of x.
+
+		Special cases are:
+			Acosh(+Inf) = +Inf
+			Acosh(x) = NaN if x &lt; 1
+			Acosh(NaN) = NaN</div>
+<div class="anchor" id="name-Asin">	 func <a href="../src/math/asin.go.html#line-19">Asin</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Asin returns the arcsine, in radians, of x.
+
+		Special cases are:
+			Asin(±0) = ±0
+			Asin(x) = NaN if x &lt; -1 or x &gt; 1</div>
+<div class="anchor" id="name-Asinh">	 func <a href="../src/math/asinh.go.html#line-39">Asinh</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Asinh returns the inverse hyperbolic sine of x.
+
+		Special cases are:
+			Asinh(±0) = ±0
+			Asinh(±Inf) = ±Inf
+			Asinh(NaN) = NaN</div>
+<div class="anchor" id="name-Atan">	 func <a href="../src/math/atan.go.html#line-95">Atan</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Atan returns the arctangent, in radians, of x.
+
+		Special cases are:
+		     Atan(±0) = ±0
+		     Atan(±Inf) = ±Pi/2</div>
+<div class="anchor" id="name-Atan2">	 func <a href="../src/math/atan2.go.html#line-29">Atan2</a>(y, x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Atan2 returns the arc tangent of y/x, using
+		the signs of the two to determine the quadrant
+		of the return value.
+
+		Special cases are (in order):
+			Atan2(y, NaN) = NaN
+			Atan2(NaN, x) = NaN
+			Atan2(+0, x&gt;=0) = +0
+			Atan2(-0, x&gt;=0) = -0
+			Atan2(+0, x&lt;=-0) = +Pi
+			Atan2(-0, x&lt;=-0) = -Pi
+			Atan2(y&gt;0, 0) = +Pi/2
+			Atan2(y&lt;0, 0) = -Pi/2
+			Atan2(+Inf, +Inf) = +Pi/4
+			Atan2(-Inf, +Inf) = -Pi/4
+			Atan2(+Inf, -Inf) = 3Pi/4
+			Atan2(-Inf, -Inf) = -3Pi/4
+			Atan2(y, +Inf) = 0
+			Atan2(y&gt;0, -Inf) = +Pi
+			Atan2(y&lt;0, -Inf) = -Pi
+			Atan2(+Inf, x) = +Pi/2
+			Atan2(-Inf, x) = -Pi/2</div>
+<div class="anchor" id="name-Atanh">	 func <a href="../src/math/atanh.go.html#line-47">Atanh</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Atanh returns the inverse hyperbolic tangent of x.
+
+		Special cases are:
+			Atanh(1) = +Inf
+			Atanh(±0) = ±0
+			Atanh(-1) = -Inf
+			Atanh(x) = NaN if x &lt; -1 or x &gt; 1
+			Atanh(NaN) = NaN</div>
+<div class="anchor" id="name-Cbrt">	 func <a href="../src/math/cbrt.go.html#line-25">Cbrt</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Cbrt returns the cube root of x.
+
+		Special cases are:
+			Cbrt(±0) = ±0
+			Cbrt(±Inf) = ±Inf
+			Cbrt(NaN) = NaN</div>
+<div class="anchor" id="name-Ceil">	 func <a href="../src/math/floor.go.html#line-36">Ceil</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Ceil returns the least integer value greater than or equal to x.
+
+		Special cases are:
+			Ceil(±0) = ±0
+			Ceil(±Inf) = ±Inf
+			Ceil(NaN) = NaN</div>
+<div class="anchor" id="name-Copysign">	 func <a href="../src/math/copysign.go.html#line-9">Copysign</a>(x, y <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Copysign returns a value with the magnitude
+		of x and the sign of y.</div>
+<div class="anchor" id="name-Cos">	 func <a href="../src/math/sin.go.html#line-117">Cos</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Cos returns the cosine of the radian argument x.
+
+		Special cases are:
+			Cos(±Inf) = NaN
+			Cos(NaN) = NaN</div>
+<div class="anchor" id="name-Cosh">	 func <a href="../src/math/sinh.go.html#line-72">Cosh</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Cosh returns the hyperbolic cosine of x.
+
+		Special cases are:
+			Cosh(±0) = 1
+			Cosh(±Inf) = +Inf
+			Cosh(NaN) = NaN</div>
+<div class="anchor" id="name-Dim">	 func <a href="../src/math/dim.go.html#line-13">Dim</a>(x, y <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Dim returns the maximum of x-y or 0.
+
+		Special cases are:
+			Dim(+Inf, +Inf) = NaN
+			Dim(-Inf, -Inf) = NaN
+			Dim(x, NaN) = Dim(NaN, x) = NaN</div>
+<div class="anchor" id="name-E">	const <a href="../src/math/const.go.html#line-12">E</a> = 2.71828 // https://oeis.org/A001113
+		Mathematical constants.</div>
+<div class="anchor" id="name-Erf">	 func <a href="../src/math/erf.go.html#line-188">Erf</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Erf returns the error function of x.
+
+		Special cases are:
+			Erf(+Inf) = 1
+			Erf(-Inf) = -1
+			Erf(NaN) = NaN</div>
+<div class="anchor" id="name-Erfc">	 func <a href="../src/math/erf.go.html#line-267">Erfc</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Erfc returns the complementary error function of x.
+
+		Special cases are:
+			Erfc(+Inf) = 0
+			Erfc(-Inf) = 2
+			Erfc(NaN) = NaN</div>
+<div class="anchor" id="name-Erfcinv">	 func <a href="../src/math/erfinv.go.html#line-125">Erfcinv</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Erfcinv returns the inverse of Erfc(x).
+
+		Special cases are:
+			Erfcinv(0) = +Inf
+			Erfcinv(2) = -Inf
+			Erfcinv(x) = NaN if x &lt; 0 or x &gt; 2
+			Erfcinv(NaN) = NaN</div>
+<div class="anchor" id="name-Erfinv">	 func <a href="../src/math/erfinv.go.html#line-76">Erfinv</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Erfinv returns the inverse error function of x.
+
+		Special cases are:
+			Erfinv(1) = +Inf
+			Erfinv(-1) = -Inf
+			Erfinv(x) = NaN if x &lt; -1 or x &gt; 1
+			Erfinv(NaN) = NaN</div>
+<div class="anchor" id="name-Exp">	 func <a href="../src/math/exp.go.html#line-14">Exp</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Exp returns e**x, the base-e exponential of x.
+
+		Special cases are:
+			Exp(+Inf) = +Inf
+			Exp(NaN) = NaN
+		Very large values overflow to 0 or +Inf.
+		Very small values underflow to 1.</div>
+<div class="anchor" id="name-Exp2">	 func <a href="../src/math/exp.go.html#line-135">Exp2</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Exp2 returns 2**x, the base-2 exponential of x.
+
+		Special cases are the same as Exp.</div>
+<div class="anchor" id="name-Expm1">	 func <a href="../src/math/expm1.go.html#line-124">Expm1</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Expm1 returns e**x - 1, the base-e exponential of x minus 1.
+		It is more accurate than Exp(x) - 1 when x is near zero.
+
+		Special cases are:
+			Expm1(+Inf) = +Inf
+			Expm1(-Inf) = -1
+			Expm1(NaN) = NaN
+		Very large values overflow to -1 or +Inf.</div>
+<div class="anchor" id="name-Float32bits">	 func <a href="../src/math/unsafe.go.html#line-12">Float32bits</a>(f <a href="builtin.html#name-float32">float32</a>) <a href="builtin.html#name-uint32">uint32</a>
+		Float32bits returns the IEEE 754 binary representation of f,
+		with the sign bit of f and the result in the same bit position.
+		Float32bits(Float32frombits(x)) == x.</div>
+<div class="anchor" id="name-Float32frombits">	 func <a href="../src/math/unsafe.go.html#line-18">Float32frombits</a>(b <a href="builtin.html#name-uint32">uint32</a>) <a href="builtin.html#name-float32">float32</a>
+		Float32frombits returns the floating-point number corresponding
+		to the IEEE 754 binary representation b, with the sign bit of b
+		and the result in the same bit position.
+		Float32frombits(Float32bits(x)) == x.</div>
+<div class="anchor" id="name-Float64bits">	 func <a href="../src/math/unsafe.go.html#line-23">Float64bits</a>(f <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-uint64">uint64</a>
+		Float64bits returns the IEEE 754 binary representation of f,
+		with the sign bit of f and the result in the same bit position,
+		and Float64bits(Float64frombits(x)) == x.</div>
+<div class="anchor" id="name-Float64frombits">	 func <a href="../src/math/unsafe.go.html#line-29">Float64frombits</a>(b <a href="builtin.html#name-uint64">uint64</a>) <a href="builtin.html#name-float64">float64</a>
+		Float64frombits returns the floating-point number corresponding
+		to the IEEE 754 binary representation b, with the sign bit of b
+		and the result in the same bit position.
+		Float64frombits(Float64bits(x)) == x.</div>
+<div class="anchor" id="name-Floor">	 func <a href="../src/math/floor.go.html#line-13">Floor</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Floor returns the greatest integer value less than or equal to x.
+
+		Special cases are:
+			Floor(±0) = ±0
+			Floor(±Inf) = ±Inf
+			Floor(NaN) = NaN</div>
+<div class="anchor" id="name-FMA">	 func <a href="../src/math/fma.go.html#line-95">FMA</a>(x, y, z <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		FMA returns x * y + z, computed with only one rounding.
+		(That is, FMA returns the fused multiply-add of x, y, and z.)</div>
+<div class="anchor" id="name-Frexp">	 func <a href="../src/math/frexp.go.html#line-16">Frexp</a>(f <a href="builtin.html#name-float64">float64</a>) (frac <a href="builtin.html#name-float64">float64</a>, exp <a href="builtin.html#name-int">int</a>)
+		Frexp breaks f into a normalized fraction
+		and an integral power of two.
+		It returns frac and exp satisfying f == frac × 2**exp,
+		with the absolute value of frac in the interval [½, 1).
+
+		Special cases are:
+			Frexp(±0) = ±0, 0
+			Frexp(±Inf) = ±Inf, 0
+			Frexp(NaN) = NaN, 0</div>
+<div class="anchor" id="name-Gamma">	 func <a href="../src/math/gamma.go.html#line-130">Gamma</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Gamma returns the Gamma function of x.
+
+		Special cases are:
+			Gamma(+Inf) = +Inf
+			Gamma(+0) = +Inf
+			Gamma(-0) = -Inf
+			Gamma(x) = NaN for integer x &lt; 0
+			Gamma(-Inf) = NaN
+			Gamma(NaN) = NaN</div>
+<div class="anchor" id="name-Hypot">	 func <a href="../src/math/hypot.go.html#line-19">Hypot</a>(p, q <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Hypot returns Sqrt(p*p + q*q), taking care to avoid
+		unnecessary overflow and underflow.
+
+		Special cases are:
+			Hypot(±Inf, q) = +Inf
+			Hypot(p, ±Inf) = +Inf
+			Hypot(NaN, q) = NaN
+			Hypot(p, NaN) = NaN</div>
+<div class="anchor" id="name-Ilogb">	 func <a href="../src/math/logb.go.html#line-32">Ilogb</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-int">int</a>
+		Ilogb returns the binary exponent of x as an integer.
+
+		Special cases are:
+			Ilogb(±Inf) = MaxInt32
+			Ilogb(0) = MinInt32
+			Ilogb(NaN) = MaxInt32</div>
+<div class="anchor" id="name-Inf">	 func <a href="../src/math/bits.go.html#line-20">Inf</a>(sign <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-float64">float64</a>
+		Inf returns positive infinity if sign &gt;= 0, negative infinity if sign &lt; 0.</div>
+<div class="anchor" id="name-IsInf">	 func <a href="../src/math/bits.go.html#line-46">IsInf</a>(f <a href="builtin.html#name-float64">float64</a>, sign <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>
+		IsInf reports whether f is an infinity, according to sign.
+		If sign &gt; 0, IsInf reports whether f is positive infinity.
+		If sign &lt; 0, IsInf reports whether f is negative infinity.
+		If sign == 0, IsInf reports whether f is either infinity.</div>
+<div class="anchor" id="name-IsNaN">	 func <a href="../src/math/bits.go.html#line-34">IsNaN</a>(f <a href="builtin.html#name-float64">float64</a>) (is <a href="builtin.html#name-bool">bool</a>)
+		IsNaN reports whether f is an IEEE 754 ``not-a-number'' value.</div>
+<div class="anchor" id="name-J0">	 func <a href="../src/math/j0.go.html#line-76">J0</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		J0 returns the order-zero Bessel function of the first kind.
+
+		Special cases are:
+			J0(±Inf) = 0
+			J0(0) = 1
+			J0(NaN) = NaN</div>
+<div class="anchor" id="name-J1">	 func <a href="../src/math/j1.go.html#line-74">J1</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		J1 returns the order-one Bessel function of the first kind.
+
+		Special cases are:
+			J1(±Inf) = 0
+			J1(NaN) = NaN</div>
+<div class="anchor" id="name-Jn">	 func <a href="../src/math/jn.go.html#line-53">Jn</a>(n <a href="builtin.html#name-int">int</a>, x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Jn returns the order-n Bessel function of the first kind.
+
+		Special cases are:
+			Jn(n, ±Inf) = 0
+			Jn(n, NaN) = NaN</div>
+<div class="anchor" id="name-Ldexp">	 func <a href="../src/math/ldexp.go.html#line-14">Ldexp</a>(frac <a href="builtin.html#name-float64">float64</a>, exp <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-float64">float64</a>
+		Ldexp is the inverse of Frexp.
+		It returns frac × 2**exp.
+
+		Special cases are:
+			Ldexp(±0, exp) = ±0
+			Ldexp(±Inf, exp) = ±Inf
+			Ldexp(NaN, exp) = NaN</div>
+<div class="anchor" id="name-Lgamma">	 func <a href="../src/math/lgamma.go.html#line-174">Lgamma</a>(x <a href="builtin.html#name-float64">float64</a>) (lgamma <a href="builtin.html#name-float64">float64</a>, sign <a href="builtin.html#name-int">int</a>)
+		Lgamma returns the natural logarithm and sign (-1 or +1) of Gamma(x).
+
+		Special cases are:
+			Lgamma(+Inf) = +Inf
+			Lgamma(0) = +Inf
+			Lgamma(-integer) = +Inf
+			Lgamma(-Inf) = -Inf
+			Lgamma(NaN) = NaN</div>
+<div class="anchor" id="name-Ln10">	const <a href="../src/math/const.go.html#line-23">Ln10</a> = 2.30259 // https://oeis.org/A002392
+		Mathematical constants.</div>
+<div class="anchor" id="name-Ln2">	const <a href="../src/math/const.go.html#line-21">Ln2</a> = 0.693147 // https://oeis.org/A002162
+		Mathematical constants.</div>
+<div class="anchor" id="name-Log">	 func <a href="../src/math/log.go.html#line-80">Log</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Log returns the natural logarithm of x.
+
+		Special cases are:
+			Log(+Inf) = +Inf
+			Log(0) = -Inf
+			Log(x &lt; 0) = NaN
+			Log(NaN) = NaN</div>
+<div class="anchor" id="name-Log10">	 func <a href="../src/math/log10.go.html#line-9">Log10</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Log10 returns the decimal logarithm of x.
+		The special cases are the same as for Log.</div>
+<div class="anchor" id="name-Log10E">	const <a href="../src/math/const.go.html#line-24">Log10E</a> = 0.434294
+		Mathematical constants.</div>
+<div class="anchor" id="name-Log1p">	 func <a href="../src/math/log1p.go.html#line-95">Log1p</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Log1p returns the natural logarithm of 1 plus its argument x.
+		It is more accurate than Log(1 + x) when x is near zero.
+
+		Special cases are:
+			Log1p(+Inf) = +Inf
+			Log1p(±0) = ±0
+			Log1p(-1) = -Inf
+			Log1p(x &lt; -1) = NaN
+			Log1p(NaN) = NaN</div>
+<div class="anchor" id="name-Log2">	 func <a href="../src/math/log10.go.html#line-17">Log2</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Log2 returns the binary logarithm of x.
+		The special cases are the same as for Log.</div>
+<div class="anchor" id="name-Log2E">	const <a href="../src/math/const.go.html#line-22">Log2E</a> = 1.4427
+		Mathematical constants.</div>
+<div class="anchor" id="name-Logb">	 func <a href="../src/math/logb.go.html#line-13">Logb</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Logb returns the binary exponent of x.
+
+		Special cases are:
+			Logb(±Inf) = +Inf
+			Logb(0) = -Inf
+			Logb(NaN) = NaN</div>
+<div class="anchor" id="name-Max">	 func <a href="../src/math/dim.go.html#line-35">Max</a>(x, y <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Max returns the larger of x or y.
+
+		Special cases are:
+			Max(x, +Inf) = Max(+Inf, x) = +Inf
+			Max(x, NaN) = Max(NaN, x) = NaN
+			Max(+0, ±0) = Max(±0, +0) = +0
+			Max(-0, -0) = -0</div>
+<div class="anchor" id="name-MaxFloat32">	const <a href="../src/math/const.go.html#line-31">MaxFloat32</a> = 3.40282e+38 // 2**127 * (2**24 - 1) / 2**23
+		Floating-point limit values.
+		Max is the largest finite value representable by the type.
+		SmallestNonzero is the smallest positive, non-zero value representable by the type.</div>
+<div class="anchor" id="name-MaxFloat64">	const <a href="../src/math/const.go.html#line-34">MaxFloat64</a> = 1.79769e+308 // 2**1023 * (2**53 - 1) / 2**52
+		Floating-point limit values.
+		Max is the largest finite value representable by the type.
+		SmallestNonzero is the smallest positive, non-zero value representable by the type.</div>
+<div class="anchor" id="name-MaxInt16">	const <a href="../src/math/const.go.html#line-42">MaxInt16</a> = 32767
+		Integer limit values.</div>
+<div class="anchor" id="name-MaxInt32">	const <a href="../src/math/const.go.html#line-44">MaxInt32</a> = 2147483647
+		Integer limit values.</div>
+<div class="anchor" id="name-MaxInt64">	const <a href="../src/math/const.go.html#line-46">MaxInt64</a> = 9223372036854775807
+		Integer limit values.</div>
+<div class="anchor" id="name-MaxInt8">	const <a href="../src/math/const.go.html#line-40">MaxInt8</a> = 127
+		Integer limit values.</div>
+<div class="anchor" id="name-MaxUint16">	const <a href="../src/math/const.go.html#line-49">MaxUint16</a> = 65535
+		Integer limit values.</div>
+<div class="anchor" id="name-MaxUint32">	const <a href="../src/math/const.go.html#line-50">MaxUint32</a> = 4294967295
+		Integer limit values.</div>
+<div class="anchor" id="name-MaxUint64">	const <a href="../src/math/const.go.html#line-51">MaxUint64</a> = 18446744073709551615
+		Integer limit values.</div>
+<div class="anchor" id="name-MaxUint8">	const <a href="../src/math/const.go.html#line-48">MaxUint8</a> = 255
+		Integer limit values.</div>
+<div class="anchor" id="name-Min">	 func <a href="../src/math/dim.go.html#line-62">Min</a>(x, y <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Min returns the smaller of x or y.
+
+		Special cases are:
+			Min(x, -Inf) = Min(-Inf, x) = -Inf
+			Min(x, NaN) = Min(NaN, x) = NaN
+			Min(-0, ±0) = Min(±0, -0) = -0</div>
+<div class="anchor" id="name-MinInt16">	const <a href="../src/math/const.go.html#line-43">MinInt16</a> = -32768
+		Integer limit values.</div>
+<div class="anchor" id="name-MinInt32">	const <a href="../src/math/const.go.html#line-45">MinInt32</a> = -2147483648
+		Integer limit values.</div>
+<div class="anchor" id="name-MinInt64">	const <a href="../src/math/const.go.html#line-47">MinInt64</a> = -9223372036854775808
+		Integer limit values.</div>
+<div class="anchor" id="name-MinInt8">	const <a href="../src/math/const.go.html#line-41">MinInt8</a> = -128
+		Integer limit values.</div>
+<div class="anchor" id="name-Mod">	 func <a href="../src/math/mod.go.html#line-21">Mod</a>(x, y <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Mod returns the floating-point remainder of x/y.
+		The magnitude of the result is less than y and its
+		sign agrees with that of x.
+
+		Special cases are:
+			Mod(±Inf, y) = NaN
+			Mod(NaN, y) = NaN
+			Mod(x, 0) = NaN
+			Mod(x, ±Inf) = x
+			Mod(x, NaN) = NaN</div>
+<div class="anchor" id="name-Modf">	 func <a href="../src/math/modf.go.html#line-13">Modf</a>(f <a href="builtin.html#name-float64">float64</a>) (int <a href="builtin.html#name-float64">float64</a>, frac <a href="builtin.html#name-float64">float64</a>)
+		Modf returns integer and fractional floating-point numbers
+		that sum to f. Both values have the same sign as f.
+
+		Special cases are:
+			Modf(±Inf) = ±Inf, NaN
+			Modf(NaN) = NaN, NaN</div>
+<div class="anchor" id="name-NaN">	 func <a href="../src/math/bits.go.html#line-31">NaN</a>() <a href="builtin.html#name-float64">float64</a>
+		NaN returns an IEEE 754 ``not-a-number'' value.</div>
+<div class="anchor" id="name-Nextafter">	 func <a href="../src/math/nextafter.go.html#line-35">Nextafter</a>(x, y <a href="builtin.html#name-float64">float64</a>) (r <a href="builtin.html#name-float64">float64</a>)
+		Nextafter returns the next representable float64 value after x towards y.
+
+		Special cases are:
+			Nextafter(x, x)   = x
+			Nextafter(NaN, y) = NaN
+			Nextafter(x, NaN) = NaN</div>
+<div class="anchor" id="name-Nextafter32">	 func <a href="../src/math/nextafter.go.html#line-13">Nextafter32</a>(x, y <a href="builtin.html#name-float32">float32</a>) (r <a href="builtin.html#name-float32">float32</a>)
+		Nextafter32 returns the next representable float32 value after x towards y.
+
+		Special cases are:
+			Nextafter32(x, x)   = x
+			Nextafter32(NaN, y) = NaN
+			Nextafter32(x, NaN) = NaN</div>
+<div class="anchor" id="name-Phi">	const <a href="../src/math/const.go.html#line-14">Phi</a> = 1.61803 // https://oeis.org/A001622
+		Mathematical constants.</div>
+<div class="anchor" id="name-Pi">	const <a href="../src/math/const.go.html#line-13">Pi</a> = 3.14159 // https://oeis.org/A000796
+		Mathematical constants.</div>
+<div class="anchor" id="name-Pow">	 func <a href="../src/math/pow.go.html#line-38">Pow</a>(x, y <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Pow returns x**y, the base-x exponential of y.
+
+		Special cases are (in order):
+			Pow(x, ±0) = 1 for any x
+			Pow(1, y) = 1 for any y
+			Pow(x, 1) = x for any x
+			Pow(NaN, y) = NaN
+			Pow(x, NaN) = NaN
+			Pow(±0, y) = ±Inf for y an odd integer &lt; 0
+			Pow(±0, -Inf) = +Inf
+			Pow(±0, +Inf) = +0
+			Pow(±0, y) = +Inf for finite y &lt; 0 and not an odd integer
+			Pow(±0, y) = ±0 for y an odd integer &gt; 0
+			Pow(±0, y) = +0 for finite y &gt; 0 and not an odd integer
+			Pow(-1, ±Inf) = 1
+			Pow(x, +Inf) = +Inf for |x| &gt; 1
+			Pow(x, -Inf) = +0 for |x| &gt; 1
+			Pow(x, +Inf) = +0 for |x| &lt; 1
+			Pow(x, -Inf) = +Inf for |x| &lt; 1
+			Pow(+Inf, y) = +Inf for y &gt; 0
+			Pow(+Inf, y) = +0 for y &lt; 0
+			Pow(-Inf, y) = Pow(-0, -y)
+			Pow(x, y) = NaN for finite x &lt; 0 and finite non-integer y</div>
+<div class="anchor" id="name-Pow10">	 func <a href="../src/math/pow10.go.html#line-30">Pow10</a>(n <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-float64">float64</a>
+		Pow10 returns 10**n, the base-10 exponential of n.
+
+		Special cases are:
+			Pow10(n) =    0 for n &lt; -323
+			Pow10(n) = +Inf for n &gt; 308</div>
+<div class="anchor" id="name-Remainder">	 func <a href="../src/math/remainder.go.html#line-37">Remainder</a>(x, y <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Remainder returns the IEEE 754 floating-point remainder of x/y.
+
+		Special cases are:
+			Remainder(±Inf, y) = NaN
+			Remainder(NaN, y) = NaN
+			Remainder(x, 0) = NaN
+			Remainder(x, ±Inf) = x
+			Remainder(x, NaN) = NaN</div>
+<div class="anchor" id="name-Round">	 func <a href="../src/math/floor.go.html#line-64">Round</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Round returns the nearest integer, rounding half away from zero.
+
+		Special cases are:
+			Round(±0) = ±0
+			Round(±Inf) = ±Inf
+			Round(NaN) = NaN</div>
+<div class="anchor" id="name-RoundToEven">	 func <a href="../src/math/floor.go.html#line-101">RoundToEven</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		RoundToEven returns the nearest integer, rounding ties to even.
+
+		Special cases are:
+			RoundToEven(±0) = ±0
+			RoundToEven(±Inf) = ±Inf
+			RoundToEven(NaN) = NaN</div>
+<div class="anchor" id="name-Signbit">	 func <a href="../src/math/signbit.go.html#line-8">Signbit</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-bool">bool</a>
+		Signbit reports whether x is negative or negative zero.</div>
+<div class="anchor" id="name-Sin">	 func <a href="../src/math/sin.go.html#line-178">Sin</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Sin returns the sine of the radian argument x.
+
+		Special cases are:
+			Sin(±0) = ±0
+			Sin(±Inf) = NaN
+			Sin(NaN) = NaN</div>
+<div class="anchor" id="name-Sincos">	 func <a href="../src/math/sincos.go.html#line-15">Sincos</a>(x <a href="builtin.html#name-float64">float64</a>) (sin, cos <a href="builtin.html#name-float64">float64</a>)
+		Sincos returns Sin(x), Cos(x).
+
+		Special cases are:
+			Sincos(±0) = ±0, 1
+			Sincos(±Inf) = NaN, NaN
+			Sincos(NaN) = NaN, NaN</div>
+<div class="anchor" id="name-Sinh">	 func <a href="../src/math/sinh.go.html#line-25">Sinh</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Sinh returns the hyperbolic sine of x.
+
+		Special cases are:
+			Sinh(±0) = ±0
+			Sinh(±Inf) = ±Inf
+			Sinh(NaN) = NaN</div>
+<div class="anchor" id="name-SmallestNonzeroFloat32">	const <a href="../src/math/const.go.html#line-32">SmallestNonzeroFloat32</a> = 1.4013e-45 // 1 / 2**(127 - 1 + 23)
+		Floating-point limit values.
+		Max is the largest finite value representable by the type.
+		SmallestNonzero is the smallest positive, non-zero value representable by the type.</div>
+<div class="anchor" id="name-SmallestNonzeroFloat64">	const <a href="../src/math/const.go.html#line-35">SmallestNonzeroFloat64</a> = 4.94066e-324 // 1 / 2**(1023 - 1 + 52)
+		Floating-point limit values.
+		Max is the largest finite value representable by the type.
+		SmallestNonzero is the smallest positive, non-zero value representable by the type.</div>
+<div class="anchor" id="name-Sqrt">	 func <a href="../src/math/sqrt.go.html#line-92">Sqrt</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Sqrt returns the square root of x.
+
+		Special cases are:
+			Sqrt(+Inf) = +Inf
+			Sqrt(±0) = ±0
+			Sqrt(x &lt; 0) = NaN
+			Sqrt(NaN) = NaN</div>
+<div class="anchor" id="name-Sqrt2">	const <a href="../src/math/const.go.html#line-16">Sqrt2</a> = 1.41421 // https://oeis.org/A002193
+		Mathematical constants.</div>
+<div class="anchor" id="name-SqrtE">	const <a href="../src/math/const.go.html#line-17">SqrtE</a> = 1.64872 // https://oeis.org/A019774
+		Mathematical constants.</div>
+<div class="anchor" id="name-SqrtPhi">	const <a href="../src/math/const.go.html#line-19">SqrtPhi</a> = 1.27202 // https://oeis.org/A139339
+		Mathematical constants.</div>
+<div class="anchor" id="name-SqrtPi">	const <a href="../src/math/const.go.html#line-18">SqrtPi</a> = 1.77245 // https://oeis.org/A002161
+		Mathematical constants.</div>
+<div class="anchor" id="name-Tan">	 func <a href="../src/math/tan.go.html#line-82">Tan</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Tan returns the tangent of the radian argument x.
+
+		Special cases are:
+			Tan(±0) = ±0
+			Tan(±Inf) = NaN
+			Tan(NaN) = NaN</div>
+<div class="anchor" id="name-Tanh">	 func <a href="../src/math/tanh.go.html#line-74">Tanh</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Tanh returns the hyperbolic tangent of x.
+
+		Special cases are:
+			Tanh(±0) = ±0
+			Tanh(±Inf) = ±1
+			Tanh(NaN) = NaN</div>
+<div class="anchor" id="name-Trunc">	 func <a href="../src/math/floor.go.html#line-48">Trunc</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Trunc returns the integer value of x.
+
+		Special cases are:
+			Trunc(±0) = ±0
+			Trunc(±Inf) = ±Inf
+			Trunc(NaN) = NaN</div>
+<div class="anchor" id="name-Y0">	 func <a href="../src/math/j0.go.html#line-154">Y0</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Y0 returns the order-zero Bessel function of the second kind.
+
+		Special cases are:
+			Y0(+Inf) = 0
+			Y0(0) = -Inf
+			Y0(x &lt; 0) = NaN
+			Y0(NaN) = NaN</div>
+<div class="anchor" id="name-Y1">	 func <a href="../src/math/j1.go.html#line-154">Y1</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Y1 returns the order-one Bessel function of the second kind.
+
+		Special cases are:
+			Y1(+Inf) = 0
+			Y1(0) = -Inf
+			Y1(x &lt; 0) = NaN
+			Y1(NaN) = NaN</div>
+<div class="anchor" id="name-Yn">	 func <a href="../src/math/jn.go.html#line-233">Yn</a>(n <a href="builtin.html#name-int">int</a>, x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-float64">float64</a>
+		Yn returns the order-n Bessel function of the second kind.
+
+		Special cases are:
+			Yn(n, +Inf) = 0
+			Yn(n ≥ 0, 0) = -Inf
+			Yn(n &lt; 0, 0) = +Inf if n is odd, -Inf if n is even
+			Yn(n, x &lt; 0) = NaN
+			Yn(n, NaN) = NaN</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

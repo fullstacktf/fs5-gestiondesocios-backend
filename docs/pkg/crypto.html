@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>crypto</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-crypto">crypto</a><i> (on <a href="https://golang.org/pkg/crypto/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/crypto.html">3 packages</a>, and imported by <a href="../dep/crypto.html#imported-by">9 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../src/crypto/crypto.go.html#doc">d-&gt;</a> <a href="../src/crypto/crypto.go.html">crypto.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Decrypter" data-popularity="250">	 type <a href="../src/crypto/crypto.go.html#line-192">Decrypter</a> <b<i>(interface)</i></b>
+		Decrypter is an interface for an opaque private key that can be used for
+		asymmetric decryption operations. An example would be an RSA key
+		kept in a hardware module.
+
+		<input type='checkbox' class="stat" id="Decrypter-stat-methods"><label for="Decrypter-stat-methods">Exported Methods (2)</label><span id='Decrypter-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/crypto/crypto.go.html#line-200">Decrypt</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, msg []<a href="builtin.html#name-byte">byte</a>, opts <a href="#name-DecrypterOpts">DecrypterOpts</a>) (plaintext []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			 (T) <a href="../src/crypto/crypto.go.html#line-195">Public</a>() <a href="#name-PublicKey">PublicKey</a></span>
+		<input type='checkbox' class="stat" id="Decrypter-stat-impledby"><label for="Decrypter-stat-impledby">Implemented By (1+)</label><span id='Decrypter-stat-impledby-content' class="stat-content">
+			crypto/rsa.(*<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>)</span></div>
+<div class="anchor" id="name-DecrypterOpts" data-popularity="70">	 type <a href="../src/crypto/crypto.go.html#line-203">DecrypterOpts</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="DecrypterOpts-stat-params"><label for="DecrypterOpts-stat-params">As Inputs Of (2+)</label><span id='DecrypterOpts-stat-params-content' class="stat-content">
+			func <a href="#name-Decrypter">Decrypter</a>.<a href="../src/crypto/crypto.go.html#line-200">Decrypt</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, msg []<a href="builtin.html#name-byte">byte</a>, opts <b>DecrypterOpts</b>) (plaintext []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			func crypto/rsa.(*<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>).<a href="../src/crypto/rsa/rsa.go.html#line-155">Decrypt</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, ciphertext []<a href="builtin.html#name-byte">byte</a>, opts <b>DecrypterOpts</b>) (plaintext []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Hash" data-popularity="765">	 type <a href="../src/crypto/crypto.go.html#line-16">Hash</a> <a href="builtin.html#name-uint">uint</a>
+		Hash identifies a cryptographic hash function that is implemented in another
+		package.
+
+		<input type='checkbox' class="stat" id="Hash-stat-methods"><label for="Hash-stat-methods">Exported Methods (5)</label><span id='Hash-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/crypto/crypto.go.html#line-138">Available</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/crypto/crypto.go.html#line-19">HashFunc</a>() <b>Hash</b>
+			 (T) <a href="../src/crypto/crypto.go.html#line-127">New</a>() <a href="hash.html">hash</a>.<a href="hash.html#name-Hash">Hash</a>
+			 (T) <a href="../src/crypto/crypto.go.html#line-116">Size</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/crypto/crypto.go.html#line-23">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Hash-stat-impls"><label for="Hash-stat-impls">Implements (2+)</label><span id='Hash-stat-impls-content' class="stat-content">
+			 T : <a href="#name-SignerOpts">SignerOpts</a>
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Hash-stat-results"><label for="Hash-stat-results">As Outputs Of (3+)</label><span id='Hash-stat-results-content' class="stat-content">
+			func <a href="#name-Hash">Hash</a>.<a href="../src/crypto/crypto.go.html#line-19">HashFunc</a>() <b>Hash</b>
+			func <a href="#name-SignerOpts">SignerOpts</a>.<a href="../src/crypto/crypto.go.html#line-186">HashFunc</a>() <b>Hash</b>
+			func crypto/rsa.(*<a href="crypto/rsa.html#name-PSSOptions">PSSOptions</a>).<a href="../src/crypto/rsa/pss.go.html#line-248">HashFunc</a>() <b>Hash</b></span>
+		<input type='checkbox' class="stat" id="Hash-stat-params"><label for="Hash-stat-params">As Inputs Of (5+)</label><span id='Hash-stat-params-content' class="stat-content">
+			func <a href="#name-RegisterHash">RegisterHash</a>(h <b>Hash</b>, f func() <a href="hash.html">hash</a>.<a href="hash.html#name-Hash">Hash</a>)
+			func crypto/rsa.<a href="crypto/rsa.html#name-SignPKCS1v15">SignPKCS1v15</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, priv *<a href="crypto/rsa.html">rsa</a>.<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>, hash <b>Hash</b>, hashed []<a href="builtin.html#name-byte">byte</a>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			func crypto/rsa.<a href="crypto/rsa.html#name-SignPSS">SignPSS</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, priv *<a href="crypto/rsa.html">rsa</a>.<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>, hash <b>Hash</b>, digest []<a href="builtin.html#name-byte">byte</a>, opts *<a href="crypto/rsa.html">rsa</a>.<a href="crypto/rsa.html#name-PSSOptions">PSSOptions</a>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			func crypto/rsa.<a href="crypto/rsa.html#name-VerifyPKCS1v15">VerifyPKCS1v15</a>(pub *<a href="crypto/rsa.html">rsa</a>.<a href="crypto/rsa.html#name-PublicKey">PublicKey</a>, hash <b>Hash</b>, hashed []<a href="builtin.html#name-byte">byte</a>, sig []<a href="builtin.html#name-byte">byte</a>) <a href="builtin.html#name-error">error</a>
+			func crypto/rsa.<a href="crypto/rsa.html#name-VerifyPSS">VerifyPSS</a>(pub *<a href="crypto/rsa.html">rsa</a>.<a href="crypto/rsa.html#name-PublicKey">PublicKey</a>, hash <b>Hash</b>, digest []<a href="builtin.html#name-byte">byte</a>, sig []<a href="builtin.html#name-byte">byte</a>, opts *<a href="crypto/rsa.html">rsa</a>.<a href="crypto/rsa.html#name-PSSOptions">PSSOptions</a>) <a href="builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Hash-stat-values"><label for="Hash-stat-values">As Types Of (19+)</label><span id='Hash-stat-values-content' class="stat-content">
+			const <a href="#name-BLAKE2b_256">BLAKE2b_256</a>
+			const <a href="#name-BLAKE2b_384">BLAKE2b_384</a>
+			const <a href="#name-BLAKE2b_512">BLAKE2b_512</a>
+			const <a href="#name-BLAKE2s_256">BLAKE2s_256</a>
+			const <a href="#name-MD4">MD4</a>
+			const <a href="#name-MD5">MD5</a>
+			const <a href="#name-MD5SHA1">MD5SHA1</a>
+			const <a href="#name-RIPEMD160">RIPEMD160</a>
+			const <a href="#name-SHA1">SHA1</a>
+			const <a href="#name-SHA224">SHA224</a>
+			const <a href="#name-SHA256">SHA256</a>
+			const <a href="#name-SHA384">SHA384</a>
+			const <a href="#name-SHA3_224">SHA3_224</a>
+			const <a href="#name-SHA3_256">SHA3_256</a>
+			const <a href="#name-SHA3_384">SHA3_384</a>
+			const <a href="#name-SHA3_512">SHA3_512</a>
+			const <a href="#name-SHA512">SHA512</a>
+			const <a href="#name-SHA512_224">SHA512_224</a>
+			const <a href="#name-SHA512_256">SHA512_256</a></span></div>
+<div class="anchor" id="name-PrivateKey" data-popularity="105">	 type <a href="../src/crypto/crypto.go.html#line-156">PrivateKey</a> <b<i>(interface)</i></b>
+		PrivateKey represents a private key using an unspecified algorithm.
+
+		<input type='checkbox' class="stat" id="PrivateKey-stat-params"><label for="PrivateKey-stat-params">As Inputs Of (3+)</label><span id='PrivateKey-stat-params-content' class="stat-content">
+			func crypto/ecdsa.(*<a href="crypto/ecdsa.html#name-PrivateKey">PrivateKey</a>).<a href="../src/crypto/ecdsa/ecdsa.go.html#line-100">Equal</a>(x <b>PrivateKey</b>) <a href="builtin.html#name-bool">bool</a>
+			func crypto/ed25519.<a href="crypto/ed25519.html#name-PrivateKey">PrivateKey</a>.<a href="../src/crypto/ed25519/ed25519.go.html#line-66">Equal</a>(x <b>PrivateKey</b>) <a href="builtin.html#name-bool">bool</a>
+			func crypto/rsa.(*<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>).<a href="../src/crypto/rsa/rsa.go.html#line-117">Equal</a>(x <b>PrivateKey</b>) <a href="builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-PublicKey" data-popularity="480">	 type <a href="../src/crypto/crypto.go.html#line-153">PublicKey</a> <b<i>(interface)</i></b>
+		PublicKey represents a public key using an unspecified algorithm.
+
+		<input type='checkbox' class="stat" id="PublicKey-stat-results"><label for="PublicKey-stat-results">As Outputs Of (5+)</label><span id='PublicKey-stat-results-content' class="stat-content">
+			func <a href="#name-Decrypter">Decrypter</a>.<a href="../src/crypto/crypto.go.html#line-195">Public</a>() <b>PublicKey</b>
+			func <a href="#name-Signer">Signer</a>.<a href="../src/crypto/crypto.go.html#line-163">Public</a>() <b>PublicKey</b>
+			func crypto/ecdsa.(*<a href="crypto/ecdsa.html#name-PrivateKey">PrivateKey</a>).<a href="../src/crypto/ecdsa/ecdsa.go.html#line-93">Public</a>() <b>PublicKey</b>
+			func crypto/ed25519.<a href="crypto/ed25519.html#name-PrivateKey">PrivateKey</a>.<a href="../src/crypto/ed25519/ed25519.go.html#line-59">Public</a>() <b>PublicKey</b>
+			func crypto/rsa.(*<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>).<a href="../src/crypto/rsa/rsa.go.html#line-111">Public</a>() <b>PublicKey</b></span>
+		<input type='checkbox' class="stat" id="PublicKey-stat-params"><label for="PublicKey-stat-params">As Inputs Of (3+)</label><span id='PublicKey-stat-params-content' class="stat-content">
+			func crypto/ecdsa.(*<a href="crypto/ecdsa.html#name-PublicKey">PublicKey</a>).<a href="../src/crypto/ecdsa/ecdsa.go.html#line-73">Equal</a>(x <b>PublicKey</b>) <a href="builtin.html#name-bool">bool</a>
+			func crypto/ed25519.<a href="crypto/ed25519.html#name-PublicKey">PublicKey</a>.<a href="../src/crypto/ed25519/ed25519.go.html#line-47">Equal</a>(x <b>PublicKey</b>) <a href="builtin.html#name-bool">bool</a>
+			func crypto/rsa.(*<a href="crypto/rsa.html#name-PublicKey">PublicKey</a>).<a href="../src/crypto/rsa/rsa.go.html#line-57">Equal</a>(x <b>PublicKey</b>) <a href="builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-Signer" data-popularity="585">	 type <a href="../src/crypto/crypto.go.html#line-160">Signer</a> <b<i>(interface)</i></b>
+		Signer is an interface for an opaque private key that can be used for
+		signing operations. For example, an RSA key kept in a hardware module.
+
+		<input type='checkbox' class="stat" id="Signer-stat-methods"><label for="Signer-stat-methods">Exported Methods (2)</label><span id='Signer-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/crypto/crypto.go.html#line-163">Public</a>() <a href="#name-PublicKey">PublicKey</a>
+			 (T) <a href="../src/crypto/crypto.go.html#line-178">Sign</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, digest []<a href="builtin.html#name-byte">byte</a>, opts <a href="#name-SignerOpts">SignerOpts</a>) (signature []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Signer-stat-impledby"><label for="Signer-stat-impledby">Implemented By (3+)</label><span id='Signer-stat-impledby-content' class="stat-content">
+			crypto/ecdsa.(*<a href="crypto/ecdsa.html#name-PrivateKey">PrivateKey</a>)
+			crypto/ed25519.<a href="crypto/ed25519.html#name-PrivateKey">PrivateKey</a>
+			crypto/rsa.(*<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>)</span>
+		<input type='checkbox' class="stat" id="Signer-stat-params"><label for="Signer-stat-params">As Inputs Of (1+)</label><span id='Signer-stat-params-content' class="stat-content">
+			func crypto/x509.<a href="crypto/x509.html#name-CreateRevocationList">CreateRevocationList</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, template *<a href="crypto/x509.html">x509</a>.<a href="crypto/x509.html#name-RevocationList">RevocationList</a>, issuer *<a href="crypto/x509.html">x509</a>.<a href="crypto/x509.html#name-Certificate">Certificate</a>, priv <b>Signer</b>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-SignerOpts" data-popularity="490">	 type <a href="../src/crypto/crypto.go.html#line-182">SignerOpts</a> <b<i>(interface)</i></b>
+		SignerOpts contains options for signing with a Signer.
+
+		<input type='checkbox' class="stat" id="SignerOpts-stat-methods"><label for="SignerOpts-stat-methods">One Exported Method</label><span id='SignerOpts-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/crypto/crypto.go.html#line-186">HashFunc</a>() <a href="#name-Hash">Hash</a></span>
+		<input type='checkbox' class="stat" id="SignerOpts-stat-impledby"><label for="SignerOpts-stat-impledby">Implemented By (2+)</label><span id='SignerOpts-stat-impledby-content' class="stat-content">
+			<a href="#name-Hash">Hash</a>
+			crypto/rsa.(*<a href="crypto/rsa.html#name-PSSOptions">PSSOptions</a>)</span>
+		<input type='checkbox' class="stat" id="SignerOpts-stat-params"><label for="SignerOpts-stat-params">As Inputs Of (4+)</label><span id='SignerOpts-stat-params-content' class="stat-content">
+			func <a href="#name-Signer">Signer</a>.<a href="../src/crypto/crypto.go.html#line-178">Sign</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, digest []<a href="builtin.html#name-byte">byte</a>, opts <b>SignerOpts</b>) (signature []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			func crypto/ecdsa.(*<a href="crypto/ecdsa.html#name-PrivateKey">PrivateKey</a>).<a href="../src/crypto/ecdsa/ecdsa.go.html#line-115">Sign</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, digest []<a href="builtin.html#name-byte">byte</a>, opts <b>SignerOpts</b>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)
+			func crypto/ed25519.<a href="crypto/ed25519.html#name-PrivateKey">PrivateKey</a>.<a href="../src/crypto/ed25519/ed25519.go.html#line-88">Sign</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, message []<a href="builtin.html#name-byte">byte</a>, opts <b>SignerOpts</b>) (signature []<a href="builtin.html#name-byte">byte</a>, err <a href="builtin.html#name-error">error</a>)
+			func crypto/rsa.(*<a href="crypto/rsa.html#name-PrivateKey">PrivateKey</a>).<a href="../src/crypto/rsa/rsa.go.html#line-144">Sign</a>(rand <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>, digest []<a href="builtin.html#name-byte">byte</a>, opts <b>SignerOpts</b>) ([]<a href="builtin.html#name-byte">byte</a>, <a href="builtin.html#name-error">error</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BLAKE2b_256">	const <a href="../src/crypto/crypto.go.html#line-85">BLAKE2b_256</a> <a href="#name-Hash">Hash</a> = 17 // import golang.org/x/crypto/blake2b</div>
+<div class="anchor" id="name-BLAKE2b_384">	const <a href="../src/crypto/crypto.go.html#line-86">BLAKE2b_384</a> <a href="#name-Hash">Hash</a> = 18 // import golang.org/x/crypto/blake2b</div>
+<div class="anchor" id="name-BLAKE2b_512">	const <a href="../src/crypto/crypto.go.html#line-87">BLAKE2b_512</a> <a href="#name-Hash">Hash</a> = 19 // import golang.org/x/crypto/blake2b</div>
+<div class="anchor" id="name-BLAKE2s_256">	const <a href="../src/crypto/crypto.go.html#line-84">BLAKE2s_256</a> <a href="#name-Hash">Hash</a> = 16 // import golang.org/x/crypto/blake2s</div>
+<div class="anchor" id="name-MD4">	const <a href="../src/crypto/crypto.go.html#line-69">MD4</a> <a href="#name-Hash">Hash</a> = 1 // import golang.org/x/crypto/md4</div>
+<div class="anchor" id="name-MD5">	const <a href="../src/crypto/crypto.go.html#line-70">MD5</a> <a href="#name-Hash">Hash</a> = 2 // import crypto/md5</div>
+<div class="anchor" id="name-MD5SHA1">	const <a href="../src/crypto/crypto.go.html#line-76">MD5SHA1</a> <a href="#name-Hash">Hash</a> = 8 // no implementation; MD5+SHA1 used for TLS RSA</div>
+<div class="anchor" id="name-RegisterHash">	 func <a href="../src/crypto/crypto.go.html#line-145">RegisterHash</a>(h <a href="#name-Hash">Hash</a>, f func() <a href="hash.html">hash</a>.<a href="hash.html#name-Hash">Hash</a>)
+		RegisterHash registers a function that returns a new instance of the given
+		hash function. This is intended to be called from the init function in
+		packages that implement hash functions.</div>
+<div class="anchor" id="name-RIPEMD160">	const <a href="../src/crypto/crypto.go.html#line-77">RIPEMD160</a> <a href="#name-Hash">Hash</a> = 9 // import golang.org/x/crypto/ripemd160</div>
+<div class="anchor" id="name-SHA1">	const <a href="../src/crypto/crypto.go.html#line-71">SHA1</a> <a href="#name-Hash">Hash</a> = 3 // import crypto/sha1</div>
+<div class="anchor" id="name-SHA224">	const <a href="../src/crypto/crypto.go.html#line-72">SHA224</a> <a href="#name-Hash">Hash</a> = 4 // import crypto/sha256</div>
+<div class="anchor" id="name-SHA256">	const <a href="../src/crypto/crypto.go.html#line-73">SHA256</a> <a href="#name-Hash">Hash</a> = 5 // import crypto/sha256</div>
+<div class="anchor" id="name-SHA384">	const <a href="../src/crypto/crypto.go.html#line-74">SHA384</a> <a href="#name-Hash">Hash</a> = 6 // import crypto/sha512</div>
+<div class="anchor" id="name-SHA3_224">	const <a href="../src/crypto/crypto.go.html#line-78">SHA3_224</a> <a href="#name-Hash">Hash</a> = 10 // import golang.org/x/crypto/sha3</div>
+<div class="anchor" id="name-SHA3_256">	const <a href="../src/crypto/crypto.go.html#line-79">SHA3_256</a> <a href="#name-Hash">Hash</a> = 11 // import golang.org/x/crypto/sha3</div>
+<div class="anchor" id="name-SHA3_384">	const <a href="../src/crypto/crypto.go.html#line-80">SHA3_384</a> <a href="#name-Hash">Hash</a> = 12 // import golang.org/x/crypto/sha3</div>
+<div class="anchor" id="name-SHA3_512">	const <a href="../src/crypto/crypto.go.html#line-81">SHA3_512</a> <a href="#name-Hash">Hash</a> = 13 // import golang.org/x/crypto/sha3</div>
+<div class="anchor" id="name-SHA512">	const <a href="../src/crypto/crypto.go.html#line-75">SHA512</a> <a href="#name-Hash">Hash</a> = 7 // import crypto/sha512</div>
+<div class="anchor" id="name-SHA512_224">	const <a href="../src/crypto/crypto.go.html#line-82">SHA512_224</a> <a href="#name-Hash">Hash</a> = 14 // import crypto/sha512</div>
+<div class="anchor" id="name-SHA512_256">	const <a href="../src/crypto/crypto.go.html#line-83">SHA512_256</a> <a href="#name-Hash">Hash</a> = 15 // import crypto/sha512</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

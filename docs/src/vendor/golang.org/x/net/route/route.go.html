@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: route.go in package vendor/golang.org/x/net/route</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	route.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../pkg/vendor/golang.org/x/net/route.html">vendor/golang.org/x/net/route</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2016 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build darwin dragonfly freebsd netbsd openbsd</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<div class="anchor" id="doc"><span class="codeline" id="line-7"><code>// Package route provides basic functions for the manipulation of</code></span>
+<span class="codeline" id="line-8"><code>// packet routing facilities on BSD variants.</code></span>
+<span class="codeline" id="line-9"><code>//</code></span>
+<span class="codeline" id="line-10"><code>// The package supports any version of Darwin, any version of</code></span>
+<span class="codeline" id="line-11"><code>// DragonFly BSD, FreeBSD 7 and above, NetBSD 6 and above, and OpenBSD</code></span>
+<span class="codeline" id="line-12"><code>// 5.6 and above.</code></span></div><span class="codeline" id="line-13"><code>package route</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>import (</code></span>
+<span class="codeline" id="line-16"><code>	"errors"</code></span>
+<span class="codeline" id="line-17"><code>	"os"</code></span>
+<span class="codeline" id="line-18"><code>	"syscall"</code></span>
+<span class="codeline" id="line-19"><code>)</code></span>
+<span class="codeline" id="line-20"><code></code></span>
+<span class="codeline" id="line-21"><code>var (</code></span>
+<span class="codeline" id="line-22"><code>	errUnsupportedMessage = errors.New("unsupported message")</code></span>
+<span class="codeline" id="line-23"><code>	errMessageMismatch    = errors.New("message mismatch")</code></span>
+<span class="codeline" id="line-24"><code>	errMessageTooShort    = errors.New("message too short")</code></span>
+<span class="codeline" id="line-25"><code>	errInvalidMessage     = errors.New("invalid message")</code></span>
+<span class="codeline" id="line-26"><code>	errInvalidAddr        = errors.New("invalid address")</code></span>
+<span class="codeline" id="line-27"><code>	errShortBuffer        = errors.New("short buffer")</code></span>
+<span class="codeline" id="line-28"><code>)</code></span>
+<span class="codeline" id="line-29"><code></code></span>
+<span class="codeline" id="line-30"><code>// A RouteMessage represents a message conveying an address prefix, a</code></span>
+<span class="codeline" id="line-31"><code>// nexthop address and an output interface.</code></span>
+<span class="codeline" id="line-32"><code>//</code></span>
+<span class="codeline" id="line-33"><code>// Unlike other messages, this message can be used to query adjacency</code></span>
+<span class="codeline" id="line-34"><code>// information for the given address prefix, to add a new route, and</code></span>
+<span class="codeline" id="line-35"><code>// to delete or modify the existing route from the routing information</code></span>
+<span class="codeline" id="line-36"><code>// base inside the kernel by writing and reading route messages on a</code></span>
+<span class="codeline" id="line-37"><code>// routing socket.</code></span>
+<span class="codeline" id="line-38"><code>//</code></span>
+<span class="codeline" id="line-39"><code>// For the manipulation of routing information, the route message must</code></span>
+<span class="codeline" id="line-40"><code>// contain appropriate fields that include:</code></span>
+<span class="codeline" id="line-41"><code>//</code></span>
+<span class="codeline" id="line-42"><code>//	Version       = &lt;must be specified&gt;</code></span>
+<span class="codeline" id="line-43"><code>//	Type          = &lt;must be specified&gt;</code></span>
+<span class="codeline" id="line-44"><code>//	Flags         = &lt;must be specified&gt;</code></span>
+<span class="codeline" id="line-45"><code>//	Index         = &lt;must be specified if necessary&gt;</code></span>
+<span class="codeline" id="line-46"><code>//	ID            = &lt;must be specified&gt;</code></span>
+<span class="codeline" id="line-47"><code>//	Seq           = &lt;must be specified&gt;</code></span>
+<span class="codeline" id="line-48"><code>//	Addrs         = &lt;must be specified&gt;</code></span>
+<span class="codeline" id="line-49"><code>//</code></span>
+<span class="codeline" id="line-50"><code>// The Type field specifies a type of manipulation, the Flags field</code></span>
+<span class="codeline" id="line-51"><code>// specifies a class of target information and the Addrs field</code></span>
+<span class="codeline" id="line-52"><code>// specifies target information like the following:</code></span>
+<span class="codeline" id="line-53"><code>//</code></span>
+<span class="codeline" id="line-54"><code>//	route.RouteMessage{</code></span>
+<span class="codeline" id="line-55"><code>//		Version: RTM_VERSION,</code></span>
+<span class="codeline" id="line-56"><code>//		Type: RTM_GET,</code></span>
+<span class="codeline" id="line-57"><code>//		Flags: RTF_UP | RTF_HOST,</code></span>
+<span class="codeline" id="line-58"><code>//		ID: uintptr(os.Getpid()),</code></span>
+<span class="codeline" id="line-59"><code>//		Seq: 1,</code></span>
+<span class="codeline" id="line-60"><code>//		Addrs: []route.Addrs{</code></span>
+<span class="codeline" id="line-61"><code>//			RTAX_DST: &amp;route.Inet4Addr{ ... },</code></span>
+<span class="codeline" id="line-62"><code>//			RTAX_IFP: &amp;route.LinkAddr{ ... },</code></span>
+<span class="codeline" id="line-63"><code>//			RTAX_BRD: &amp;route.Inet4Addr{ ... },</code></span>
+<span class="codeline" id="line-64"><code>//		},</code></span>
+<span class="codeline" id="line-65"><code>//	}</code></span>
+<span class="codeline" id="line-66"><code>//</code></span>
+<span class="codeline" id="line-67"><code>// The values for the above fields depend on the implementation of</code></span>
+<span class="codeline" id="line-68"><code>// each operating system.</code></span>
+<span class="codeline" id="line-69"><code>//</code></span>
+<span class="codeline" id="line-70"><code>// The Err field on a response message contains an error value on the</code></span>
+<span class="codeline" id="line-71"><code>// requested operation. If non-nil, the requested operation is failed.</code></span>
+<span class="codeline" id="line-72"><code>type RouteMessage struct {</code></span>
+<span class="codeline" id="line-73"><code>	Version int     // message version</code></span>
+<span class="codeline" id="line-74"><code>	Type    int     // message type</code></span>
+<span class="codeline" id="line-75"><code>	Flags   int     // route flags</code></span>
+<span class="codeline" id="line-76"><code>	Index   int     // interface index when attached</code></span>
+<span class="codeline" id="line-77"><code>	ID      uintptr // sender's identifier; usually process ID</code></span>
+<span class="codeline" id="line-78"><code>	Seq     int     // sequence number</code></span>
+<span class="codeline" id="line-79"><code>	Err     error   // error on requested operation</code></span>
+<span class="codeline" id="line-80"><code>	Addrs   []Addr  // addresses</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>	extOff int    // offset of header extension</code></span>
+<span class="codeline" id="line-83"><code>	raw    []byte // raw message</code></span>
+<span class="codeline" id="line-84"><code>}</code></span>
+<span class="codeline" id="line-85"><code></code></span>
+<span class="codeline" id="line-86"><code>// Marshal returns the binary encoding of m.</code></span>
+<span class="codeline" id="line-87"><code>func (m *RouteMessage) Marshal() ([]byte, error) {</code></span>
+<span class="codeline" id="line-88"><code>	return m.marshal()</code></span>
+<span class="codeline" id="line-89"><code>}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>// A RIBType represents a type of routing information base.</code></span>
+<span class="codeline" id="line-92"><code>type RIBType int</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>const (</code></span>
+<span class="codeline" id="line-95"><code>	RIBTypeRoute     RIBType = syscall.NET_RT_DUMP</code></span>
+<span class="codeline" id="line-96"><code>	RIBTypeInterface RIBType = syscall.NET_RT_IFLIST</code></span>
+<span class="codeline" id="line-97"><code>)</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>// FetchRIB fetches a routing information base from the operating</code></span>
+<span class="codeline" id="line-100"><code>// system.</code></span>
+<span class="codeline" id="line-101"><code>//</code></span>
+<span class="codeline" id="line-102"><code>// The provided af must be an address family.</code></span>
+<span class="codeline" id="line-103"><code>//</code></span>
+<span class="codeline" id="line-104"><code>// The provided arg must be a RIBType-specific argument.</code></span>
+<span class="codeline" id="line-105"><code>// When RIBType is related to routes, arg might be a set of route</code></span>
+<span class="codeline" id="line-106"><code>// flags. When RIBType is related to network interfaces, arg might be</code></span>
+<span class="codeline" id="line-107"><code>// an interface index or a set of interface flags. In most cases, zero</code></span>
+<span class="codeline" id="line-108"><code>// means a wildcard.</code></span>
+<span class="codeline" id="line-109"><code>func FetchRIB(af int, typ RIBType, arg int) ([]byte, error) {</code></span>
+<span class="codeline" id="line-110"><code>	mib := [6]int32{sysCTL_NET, sysAF_ROUTE, 0, int32(af), int32(typ), int32(arg)}</code></span>
+<span class="codeline" id="line-111"><code>	n := uintptr(0)</code></span>
+<span class="codeline" id="line-112"><code>	if err := sysctl(mib[:], nil, &amp;n, nil, 0); err != nil {</code></span>
+<span class="codeline" id="line-113"><code>		return nil, os.NewSyscallError("sysctl", err)</code></span>
+<span class="codeline" id="line-114"><code>	}</code></span>
+<span class="codeline" id="line-115"><code>	if n == 0 {</code></span>
+<span class="codeline" id="line-116"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-117"><code>	}</code></span>
+<span class="codeline" id="line-118"><code>	b := make([]byte, n)</code></span>
+<span class="codeline" id="line-119"><code>	if err := sysctl(mib[:], &amp;b[0], &amp;n, nil, 0); err != nil {</code></span>
+<span class="codeline" id="line-120"><code>		return nil, os.NewSyscallError("sysctl", err)</code></span>
+<span class="codeline" id="line-121"><code>	}</code></span>
+<span class="codeline" id="line-122"><code>	return b[:n], nil</code></span>
+<span class="codeline" id="line-123"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

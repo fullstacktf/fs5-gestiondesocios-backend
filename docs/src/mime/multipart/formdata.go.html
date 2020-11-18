@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: formdata.go in package mime/multipart</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	formdata.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/mime/multipart.html">mime/multipart</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package multipart</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"bytes"</code></span>
+<span class="codeline" id="line-9"><code>	"errors"</code></span>
+<span class="codeline" id="line-10"><code>	"io"</code></span>
+<span class="codeline" id="line-11"><code>	"io/ioutil"</code></span>
+<span class="codeline" id="line-12"><code>	"net/textproto"</code></span>
+<span class="codeline" id="line-13"><code>	"os"</code></span>
+<span class="codeline" id="line-14"><code>)</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>// ErrMessageTooLarge is returned by ReadForm if the message form</code></span>
+<span class="codeline" id="line-17"><code>// data is too large to be processed.</code></span>
+<span class="codeline" id="line-18"><code>var ErrMessageTooLarge = errors.New("multipart: message too large")</code></span>
+<span class="codeline" id="line-19"><code></code></span>
+<span class="codeline" id="line-20"><code>// TODO(adg,bradfitz): find a way to unify the DoS-prevention strategy here</code></span>
+<span class="codeline" id="line-21"><code>// with that of the http package's ParseForm.</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>// ReadForm parses an entire multipart message whose parts have</code></span>
+<span class="codeline" id="line-24"><code>// a Content-Disposition of "form-data".</code></span>
+<span class="codeline" id="line-25"><code>// It stores up to maxMemory bytes + 10MB (reserved for non-file parts)</code></span>
+<span class="codeline" id="line-26"><code>// in memory. File parts which can't be stored in memory will be stored on</code></span>
+<span class="codeline" id="line-27"><code>// disk in temporary files.</code></span>
+<span class="codeline" id="line-28"><code>// It returns ErrMessageTooLarge if all non-file parts can't be stored in</code></span>
+<span class="codeline" id="line-29"><code>// memory.</code></span>
+<span class="codeline" id="line-30"><code>func (r *Reader) ReadForm(maxMemory int64) (*Form, error) {</code></span>
+<span class="codeline" id="line-31"><code>	return r.readForm(maxMemory)</code></span>
+<span class="codeline" id="line-32"><code>}</code></span>
+<span class="codeline" id="line-33"><code></code></span>
+<span class="codeline" id="line-34"><code>func (r *Reader) readForm(maxMemory int64) (_ *Form, err error) {</code></span>
+<span class="codeline" id="line-35"><code>	form := &amp;Form{make(map[string][]string), make(map[string][]*FileHeader)}</code></span>
+<span class="codeline" id="line-36"><code>	defer func() {</code></span>
+<span class="codeline" id="line-37"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-38"><code>			form.RemoveAll()</code></span>
+<span class="codeline" id="line-39"><code>		}</code></span>
+<span class="codeline" id="line-40"><code>	}()</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>	// Reserve an additional 10 MB for non-file parts.</code></span>
+<span class="codeline" id="line-43"><code>	maxValueBytes := maxMemory + int64(10&lt;&lt;20)</code></span>
+<span class="codeline" id="line-44"><code>	for {</code></span>
+<span class="codeline" id="line-45"><code>		p, err := r.NextPart()</code></span>
+<span class="codeline" id="line-46"><code>		if err == io.EOF {</code></span>
+<span class="codeline" id="line-47"><code>			break</code></span>
+<span class="codeline" id="line-48"><code>		}</code></span>
+<span class="codeline" id="line-49"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-50"><code>			return nil, err</code></span>
+<span class="codeline" id="line-51"><code>		}</code></span>
+<span class="codeline" id="line-52"><code></code></span>
+<span class="codeline" id="line-53"><code>		name := p.FormName()</code></span>
+<span class="codeline" id="line-54"><code>		if name == "" {</code></span>
+<span class="codeline" id="line-55"><code>			continue</code></span>
+<span class="codeline" id="line-56"><code>		}</code></span>
+<span class="codeline" id="line-57"><code>		filename := p.FileName()</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>		var b bytes.Buffer</code></span>
+<span class="codeline" id="line-60"><code></code></span>
+<span class="codeline" id="line-61"><code>		if filename == "" {</code></span>
+<span class="codeline" id="line-62"><code>			// value, store as string in memory</code></span>
+<span class="codeline" id="line-63"><code>			n, err := io.CopyN(&amp;b, p, maxValueBytes+1)</code></span>
+<span class="codeline" id="line-64"><code>			if err != nil &amp;&amp; err != io.EOF {</code></span>
+<span class="codeline" id="line-65"><code>				return nil, err</code></span>
+<span class="codeline" id="line-66"><code>			}</code></span>
+<span class="codeline" id="line-67"><code>			maxValueBytes -= n</code></span>
+<span class="codeline" id="line-68"><code>			if maxValueBytes &lt; 0 {</code></span>
+<span class="codeline" id="line-69"><code>				return nil, ErrMessageTooLarge</code></span>
+<span class="codeline" id="line-70"><code>			}</code></span>
+<span class="codeline" id="line-71"><code>			form.Value[name] = append(form.Value[name], b.String())</code></span>
+<span class="codeline" id="line-72"><code>			continue</code></span>
+<span class="codeline" id="line-73"><code>		}</code></span>
+<span class="codeline" id="line-74"><code></code></span>
+<span class="codeline" id="line-75"><code>		// file, store in memory or on disk</code></span>
+<span class="codeline" id="line-76"><code>		fh := &amp;FileHeader{</code></span>
+<span class="codeline" id="line-77"><code>			Filename: filename,</code></span>
+<span class="codeline" id="line-78"><code>			Header:   p.Header,</code></span>
+<span class="codeline" id="line-79"><code>		}</code></span>
+<span class="codeline" id="line-80"><code>		n, err := io.CopyN(&amp;b, p, maxMemory+1)</code></span>
+<span class="codeline" id="line-81"><code>		if err != nil &amp;&amp; err != io.EOF {</code></span>
+<span class="codeline" id="line-82"><code>			return nil, err</code></span>
+<span class="codeline" id="line-83"><code>		}</code></span>
+<span class="codeline" id="line-84"><code>		if n &gt; maxMemory {</code></span>
+<span class="codeline" id="line-85"><code>			// too big, write to disk and flush buffer</code></span>
+<span class="codeline" id="line-86"><code>			file, err := ioutil.TempFile("", "multipart-")</code></span>
+<span class="codeline" id="line-87"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-88"><code>				return nil, err</code></span>
+<span class="codeline" id="line-89"><code>			}</code></span>
+<span class="codeline" id="line-90"><code>			size, err := io.Copy(file, io.MultiReader(&amp;b, p))</code></span>
+<span class="codeline" id="line-91"><code>			if cerr := file.Close(); err == nil {</code></span>
+<span class="codeline" id="line-92"><code>				err = cerr</code></span>
+<span class="codeline" id="line-93"><code>			}</code></span>
+<span class="codeline" id="line-94"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-95"><code>				os.Remove(file.Name())</code></span>
+<span class="codeline" id="line-96"><code>				return nil, err</code></span>
+<span class="codeline" id="line-97"><code>			}</code></span>
+<span class="codeline" id="line-98"><code>			fh.tmpfile = file.Name()</code></span>
+<span class="codeline" id="line-99"><code>			fh.Size = size</code></span>
+<span class="codeline" id="line-100"><code>		} else {</code></span>
+<span class="codeline" id="line-101"><code>			fh.content = b.Bytes()</code></span>
+<span class="codeline" id="line-102"><code>			fh.Size = int64(len(fh.content))</code></span>
+<span class="codeline" id="line-103"><code>			maxMemory -= n</code></span>
+<span class="codeline" id="line-104"><code>			maxValueBytes -= n</code></span>
+<span class="codeline" id="line-105"><code>		}</code></span>
+<span class="codeline" id="line-106"><code>		form.File[name] = append(form.File[name], fh)</code></span>
+<span class="codeline" id="line-107"><code>	}</code></span>
+<span class="codeline" id="line-108"><code></code></span>
+<span class="codeline" id="line-109"><code>	return form, nil</code></span>
+<span class="codeline" id="line-110"><code>}</code></span>
+<span class="codeline" id="line-111"><code></code></span>
+<span class="codeline" id="line-112"><code>// Form is a parsed multipart form.</code></span>
+<span class="codeline" id="line-113"><code>// Its File parts are stored either in memory or on disk,</code></span>
+<span class="codeline" id="line-114"><code>// and are accessible via the *FileHeader's Open method.</code></span>
+<span class="codeline" id="line-115"><code>// Its Value parts are stored as strings.</code></span>
+<span class="codeline" id="line-116"><code>// Both are keyed by field name.</code></span>
+<span class="codeline" id="line-117"><code>type Form struct {</code></span>
+<span class="codeline" id="line-118"><code>	Value map[string][]string</code></span>
+<span class="codeline" id="line-119"><code>	File  map[string][]*FileHeader</code></span>
+<span class="codeline" id="line-120"><code>}</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>// RemoveAll removes any temporary files associated with a Form.</code></span>
+<span class="codeline" id="line-123"><code>func (f *Form) RemoveAll() error {</code></span>
+<span class="codeline" id="line-124"><code>	var err error</code></span>
+<span class="codeline" id="line-125"><code>	for _, fhs := range f.File {</code></span>
+<span class="codeline" id="line-126"><code>		for _, fh := range fhs {</code></span>
+<span class="codeline" id="line-127"><code>			if fh.tmpfile != "" {</code></span>
+<span class="codeline" id="line-128"><code>				e := os.Remove(fh.tmpfile)</code></span>
+<span class="codeline" id="line-129"><code>				if e != nil &amp;&amp; err == nil {</code></span>
+<span class="codeline" id="line-130"><code>					err = e</code></span>
+<span class="codeline" id="line-131"><code>				}</code></span>
+<span class="codeline" id="line-132"><code>			}</code></span>
+<span class="codeline" id="line-133"><code>		}</code></span>
+<span class="codeline" id="line-134"><code>	}</code></span>
+<span class="codeline" id="line-135"><code>	return err</code></span>
+<span class="codeline" id="line-136"><code>}</code></span>
+<span class="codeline" id="line-137"><code></code></span>
+<span class="codeline" id="line-138"><code>// A FileHeader describes a file part of a multipart request.</code></span>
+<span class="codeline" id="line-139"><code>type FileHeader struct {</code></span>
+<span class="codeline" id="line-140"><code>	Filename string</code></span>
+<span class="codeline" id="line-141"><code>	Header   textproto.MIMEHeader</code></span>
+<span class="codeline" id="line-142"><code>	Size     int64</code></span>
+<span class="codeline" id="line-143"><code></code></span>
+<span class="codeline" id="line-144"><code>	content []byte</code></span>
+<span class="codeline" id="line-145"><code>	tmpfile string</code></span>
+<span class="codeline" id="line-146"><code>}</code></span>
+<span class="codeline" id="line-147"><code></code></span>
+<span class="codeline" id="line-148"><code>// Open opens and returns the FileHeader's associated File.</code></span>
+<span class="codeline" id="line-149"><code>func (fh *FileHeader) Open() (File, error) {</code></span>
+<span class="codeline" id="line-150"><code>	if b := fh.content; b != nil {</code></span>
+<span class="codeline" id="line-151"><code>		r := io.NewSectionReader(bytes.NewReader(b), 0, int64(len(b)))</code></span>
+<span class="codeline" id="line-152"><code>		return sectionReadCloser{r}, nil</code></span>
+<span class="codeline" id="line-153"><code>	}</code></span>
+<span class="codeline" id="line-154"><code>	return os.Open(fh.tmpfile)</code></span>
+<span class="codeline" id="line-155"><code>}</code></span>
+<span class="codeline" id="line-156"><code></code></span>
+<span class="codeline" id="line-157"><code>// File is an interface to access the file part of a multipart message.</code></span>
+<span class="codeline" id="line-158"><code>// Its contents may be either stored in memory or on disk.</code></span>
+<span class="codeline" id="line-159"><code>// If stored on disk, the File's underlying concrete type will be an *os.File.</code></span>
+<span class="codeline" id="line-160"><code>type File interface {</code></span>
+<span class="codeline" id="line-161"><code>	io.Reader</code></span>
+<span class="codeline" id="line-162"><code>	io.ReaderAt</code></span>
+<span class="codeline" id="line-163"><code>	io.Seeker</code></span>
+<span class="codeline" id="line-164"><code>	io.Closer</code></span>
+<span class="codeline" id="line-165"><code>}</code></span>
+<span class="codeline" id="line-166"><code></code></span>
+<span class="codeline" id="line-167"><code>// helper types to turn a []byte into a File</code></span>
+<span class="codeline" id="line-168"><code></code></span>
+<span class="codeline" id="line-169"><code>type sectionReadCloser struct {</code></span>
+<span class="codeline" id="line-170"><code>	*io.SectionReader</code></span>
+<span class="codeline" id="line-171"><code>}</code></span>
+<span class="codeline" id="line-172"><code></code></span>
+<span class="codeline" id="line-173"><code>func (rc sectionReadCloser) Close() error {</code></span>
+<span class="codeline" id="line-174"><code>	return nil</code></span>
+<span class="codeline" id="line-175"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

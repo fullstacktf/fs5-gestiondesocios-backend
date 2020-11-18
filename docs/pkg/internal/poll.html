@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: internal/poll</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>poll</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-internal/poll">internal/poll</a><i> (on <a href="https://golang.org/pkg/internal/poll/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/internal/poll" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/internal/poll.html">7 packages</a>, and imported by <a href="../../dep/internal/poll.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/internal/poll/errno_unix.go.html">errno_unix.go</a>
+	    <a href="../../src/internal/poll/fcntl_libc.go.html">fcntl_libc.go</a>
+	<a href="../../src/internal/poll/fd.go.html#doc">d-&gt;</a> <a href="../../src/internal/poll/fd.go.html">fd.go</a>
+	    <a href="../../src/internal/poll/fd_fsync_darwin.go.html">fd_fsync_darwin.go</a>
+	    <a href="../../src/internal/poll/fd_mutex.go.html">fd_mutex.go</a>
+	    <a href="../../src/internal/poll/fd_opendir_darwin.go.html">fd_opendir_darwin.go</a>
+	    <a href="../../src/internal/poll/fd_poll_runtime.go.html">fd_poll_runtime.go</a>
+	    <a href="../../src/internal/poll/fd_posix.go.html">fd_posix.go</a>
+	    <a href="../../src/internal/poll/fd_unix.go.html">fd_unix.go</a>
+	    <a href="../../src/internal/poll/fd_writev_darwin.go.html">fd_writev_darwin.go</a>
+	    <a href="../../src/internal/poll/hook_unix.go.html">hook_unix.go</a>
+	    <a href="../../src/internal/poll/sockopt.go.html">sockopt.go</a>
+	    <a href="../../src/internal/poll/sockopt_unix.go.html">sockopt_unix.go</a>
+	    <a href="../../src/internal/poll/sockoptip.go.html">sockoptip.go</a>
+	    <a href="../../src/internal/poll/sys_cloexec.go.html">sys_cloexec.go</a>
+	    <a href="../../src/internal/poll/writev.go.html">writev.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-DeadlineExceededError" data-popularity="250">	 type <a href="../../src/internal/poll/fd.go.html#line-43">DeadlineExceededError</a> <i>(struct)</i>
+		DeadlineExceededError is returned for an expired deadline.
+
+		<input type='checkbox' class="stat" id="DeadlineExceededError-stat-methods"><label for="DeadlineExceededError-stat-methods">Exported Methods (3)</label><span id='DeadlineExceededError-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/internal/poll/fd.go.html#line-49">Error</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/internal/poll/fd.go.html#line-51">Temporary</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/internal/poll/fd.go.html#line-50">Timeout</a>() <a href="../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="DeadlineExceededError-stat-impls"><label for="DeadlineExceededError-stat-impls">Implements (2+)</label><span id='DeadlineExceededError-stat-impls-content' class="stat-content">
+			*T : <a href="../builtin.html#name-error">error</a>
+			*T : net.<a href="../net.html#name-Error">Error</a></span></div>
+<div class="anchor" id="name-FD" data-popularity="2450">	 type <a href="../../src/internal/poll/fd_unix.go.html#line-17">FD</a> <i>(struct)</i>
+		FD is a file descriptor. The net and os packages use this type as a
+		field of a larger type representing a network connection or OS file.
+
+		<input type='checkbox' class="stat" id="FD-stat-fields"><label for="FD-stat-fields">Exported Fields (3)</label><span id='FD-stat-fields-content' class="stat-content">
+			<a href="../../src/internal/poll/fd_unix.go.html#line-38">IsStream</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/internal/poll/fd_unix.go.html#line-22">Sysfd</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/internal/poll/fd_unix.go.html#line-42">ZeroReadIsEOF</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="FD-stat-methods"><label for="FD-stat-methods">Exported Methods (38)</label><span id='FD-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-375">Accept</a>() (<a href="../builtin.html#name-int">int</a>, <a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Sockaddr">Sockaddr</a>, <a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-85">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-496">Dup</a>() (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-441">Fchdir</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_posix.go.html#line-33">Fchmod</a>(mode <a href="../builtin.html#name-uint32">uint32</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_posix.go.html#line-42">Fchown</a>(uid, gid <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-450">Fstat</a>(s *<a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Stat_t">Stat_t</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_fsync_darwin.go.html#line-12">Fsync</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_posix.go.html#line-51">Ftruncate</a>(size <a href="../builtin.html#name-int64">int64</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-53">Init</a>(net <a href="../builtin.html#name-string">string</a>, pollable <a href="../builtin.html#name-bool">bool</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_opendir_darwin.go.html#line-15">OpenDir</a>() (<a href="../builtin.html#name-uintptr">uintptr</a>, <a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-170">Pread</a>(p []<a href="../builtin.html#name-byte">byte</a>, off <a href="../builtin.html#name-int64">int64</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-289">Pwrite</a>(p []<a href="../builtin.html#name-byte">byte</a>, off <a href="../builtin.html#name-int64">int64</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_posix.go.html#line-61">RawControl</a>(f func(<a href="../builtin.html#name-uintptr">uintptr</a>)) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-521">RawRead</a>(f func(<a href="../builtin.html#name-uintptr">uintptr</a>) <a href="../builtin.html#name-bool">bool</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-540">RawWrite</a>(f func(<a href="../builtin.html#name-uintptr">uintptr</a>) <a href="../builtin.html#name-bool">bool</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-135">Read</a>(p []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-420">ReadDirent</a>(buf []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-199">ReadFrom</a>(p []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Sockaddr">Sockaddr</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-226">ReadMsg</a>(p []<a href="../builtin.html#name-byte">byte</a>, oob []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-int">int</a>, <a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Sockaddr">Sockaddr</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-409">Seek</a>(offset <a href="../builtin.html#name-int64">int64</a>, whence <a href="../builtin.html#name-int">int</a>) (<a href="../builtin.html#name-int64">int64</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-115">SetBlocking</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_poll_runtime.go.html#line-135">SetDeadline</a>(t <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_poll_runtime.go.html#line-140">SetReadDeadline</a>(t <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_poll_runtime.go.html#line-145">SetWriteDeadline</a>(t <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/sockopt_unix.go.html#line-12">SetsockoptByte</a>(level, name <a href="../builtin.html#name-int">int</a>, arg <a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/sockoptip.go.html#line-12">SetsockoptIPMreq</a>(level, name <a href="../builtin.html#name-int">int</a>, mreq *<a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-IPMreq">IPMreq</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/sockoptip.go.html#line-21">SetsockoptIPv6Mreq</a>(level, name <a href="../builtin.html#name-int">int</a>, mreq *<a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-IPv6Mreq">IPv6Mreq</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/sockopt.go.html#line-21">SetsockoptInet4Addr</a>(level, name <a href="../builtin.html#name-int">int</a>, arg [4]<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/sockopt.go.html#line-12">SetsockoptInt</a>(level, name, arg <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/sockopt.go.html#line-30">SetsockoptLinger</a>(level, name <a href="../builtin.html#name-int">int</a>, l *<a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Linger">Linger</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_posix.go.html#line-24">Shutdown</a>(how <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-507">WaitWrite</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-253">Write</a>(p []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-349">WriteMsg</a>(p []<a href="../builtin.html#name-byte">byte</a>, oob []<a href="../builtin.html#name-byte">byte</a>, sa <a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Sockaddr">Sockaddr</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-512">WriteOnce</a>(p []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/fd_unix.go.html#line-323">WriteTo</a>(p []<a href="../builtin.html#name-byte">byte</a>, sa <a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Sockaddr">Sockaddr</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/internal/poll/writev.go.html#line-15">Writev</a>(v *[][]<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int64">int64</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="FD-stat-impls"><label for="FD-stat-impls">Implements (11+)</label><span id='FD-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a>
+			*T : io.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+			*T : io.<a href="../io.html#name-Reader">Reader</a>
+			*T : io.<a href="../io.html#name-ReadSeeker">ReadSeeker</a>
+			*T : io.<a href="../io.html#name-ReadWriteCloser">ReadWriteCloser</a>
+			*T : io.<a href="../io.html#name-ReadWriter">ReadWriter</a>
+			*T : io.<a href="../io.html#name-ReadWriteSeeker">ReadWriteSeeker</a>
+			*T : io.<a href="../io.html#name-Seeker">Seeker</a>
+			*T : io.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="../io.html#name-Writer">Writer</a>
+			*T : io.<a href="../io.html#name-WriteSeeker">WriteSeeker</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-AcceptFunc">	  var <a href="../../src/internal/poll/hook_unix.go.html#line-15">AcceptFunc</a> (<a href="../builtin.html#name-int">int</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../syscall.html">syscall</a>.<a href="../syscall.html#name-Sockaddr">Sockaddr</a>, <a href="../builtin.html#name-error">error</a>)
+		AcceptFunc is used to hook the accept call.</div>
+<div class="anchor" id="name-CloseFunc">	  var <a href="../../src/internal/poll/hook_unix.go.html#line-12">CloseFunc</a> (<a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-error">error</a>
+		CloseFunc is used to hook the close call.</div>
+<div class="anchor" id="name-DupCloseOnExec">	 func <a href="../../src/internal/poll/fd_unix.go.html#line-463">DupCloseOnExec</a>(fd <a href="../builtin.html#name-int">int</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+		DupCloseOnExec dups fd and marks it close-on-exec.</div>
+<div class="anchor" id="name-ErrDeadlineExceeded">	  var <a href="../../src/internal/poll/fd.go.html#line-40">ErrDeadlineExceeded</a> <a href="../builtin.html#name-error">error</a>
+		ErrDeadlineExceeded is returned for an expired deadline.
+		This is exported by the os package as os.ErrDeadlineExceeded.</div>
+<div class="anchor" id="name-ErrFileClosing">	  var <a href="../../src/internal/poll/fd.go.html#line-24">ErrFileClosing</a> <a href="../builtin.html#name-error">error</a>
+		ErrFileClosing is returned when a file descriptor is used after it
+		has been closed.</div>
+<div class="anchor" id="name-ErrNetClosing">	  var <a href="../../src/internal/poll/fd.go.html#line-20">ErrNetClosing</a> <a href="../builtin.html#name-error">error</a>
+		ErrNetClosing is returned when a network descriptor is used after
+		it has been closed. Keep this string consistent because of issue
+		#4373: since historically programs have not been able to detect
+		this error, they look for the string.</div>
+<div class="anchor" id="name-ErrNoDeadline">	  var <a href="../../src/internal/poll/fd.go.html#line-28">ErrNoDeadline</a> <a href="../builtin.html#name-error">error</a>
+		ErrNoDeadline is returned when a request is made to set a deadline
+		on a file type that does not use the poller.</div>
+<div class="anchor" id="name-ErrNotPollable">	  var <a href="../../src/internal/poll/fd.go.html#line-55">ErrNotPollable</a> <a href="../builtin.html#name-error">error</a>
+		ErrNotPollable is returned when the file or socket is not suitable
+		for event notification.</div>
+<div class="anchor" id="name-IsPollDescriptor">	 func <a href="../../src/internal/poll/fd_poll_runtime.go.html#line-170">IsPollDescriptor</a>(fd <a href="../builtin.html#name-uintptr">uintptr</a>) <a href="../builtin.html#name-bool">bool</a>
+		IsPollDescriptor reports whether fd is the descriptor being used by the poller.
+		This is only used for testing.</div>
+<div class="anchor" id="name-TestHookDidWritev">	  var <a href="../../src/internal/poll/fd.go.html#line-71">TestHookDidWritev</a> func(wrote <a href="../builtin.html#name-int">int</a>)
+		TestHookDidWritev is a hook for testing writev.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

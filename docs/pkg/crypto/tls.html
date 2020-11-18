@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/tls</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>tls</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/tls">crypto/tls</a><i> (on <a href="https://golang.org/pkg/crypto/tls/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/tls" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/tls.html">38 packages</a>, and imported by <a href="../../dep/crypto/tls.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/crypto/tls/alert.go.html">alert.go</a>
+	    <a href="../../src/crypto/tls/auth.go.html">auth.go</a>
+	    <a href="../../src/crypto/tls/cipher_suites.go.html">cipher_suites.go</a>
+	    <a href="../../src/crypto/tls/common.go.html">common.go</a>
+	    <a href="../../src/crypto/tls/common_string.go.html">common_string.go</a>
+	    <a href="../../src/crypto/tls/conn.go.html">conn.go</a>
+	    <a href="../../src/crypto/tls/handshake_client.go.html">handshake_client.go</a>
+	    <a href="../../src/crypto/tls/handshake_client_tls13.go.html">handshake_client_tls13.go</a>
+	    <a href="../../src/crypto/tls/handshake_messages.go.html">handshake_messages.go</a>
+	    <a href="../../src/crypto/tls/handshake_server.go.html">handshake_server.go</a>
+	    <a href="../../src/crypto/tls/handshake_server_tls13.go.html">handshake_server_tls13.go</a>
+	    <a href="../../src/crypto/tls/key_agreement.go.html">key_agreement.go</a>
+	    <a href="../../src/crypto/tls/key_schedule.go.html">key_schedule.go</a>
+	    <a href="../../src/crypto/tls/prf.go.html">prf.go</a>
+	    <a href="../../src/crypto/tls/ticket.go.html">ticket.go</a>
+	<a href="../../src/crypto/tls/tls.go.html#doc">d-&gt;</a> <a href="../../src/crypto/tls/tls.go.html">tls.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Certificate" data-popularity="220">	 type <a href="../../src/crypto/tls/common.go.html#line-1283">Certificate</a> <i>(struct)</i>
+		A Certificate is a chain of one or more certificates, leaf first.
+
+		<input type='checkbox' class="stat" id="Certificate-stat-fields"><label for="Certificate-stat-fields">Exported Fields (6)</label><span id='Certificate-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/common.go.html#line-1284">Certificate</a> <i>[][]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-1302">Leaf</a> <i>*<a href="x509.html">x509</a>.<a href="x509.html#name-Certificate">Certificate</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-1295">OCSPStaple</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-1289">PrivateKey</a> <i><a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-PrivateKey">PrivateKey</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-1298">SignedCertificateTimestamps</a> <i>[][]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-1292">SupportedSignatureAlgorithms</a> <i>[]<a href="#name-SignatureScheme">SignatureScheme</a></i></span>
+		<input type='checkbox' class="stat" id="Certificate-stat-results"><label for="Certificate-stat-results">As Outputs Of (2+)</label><span id='Certificate-stat-results-content' class="stat-content">
+			func <a href="#name-LoadX509KeyPair">LoadX509KeyPair</a>(certFile, keyFile <a href="../builtin.html#name-string">string</a>) (<b>Certificate</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-X509KeyPair">X509KeyPair</a>(certPEMBlock, keyPEMBlock []<a href="../builtin.html#name-byte">byte</a>) (<b>Certificate</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Certificate-stat-params"><label for="Certificate-stat-params">As Inputs Of (2+)</label><span id='Certificate-stat-params-content' class="stat-content">
+			func (*<a href="#name-CertificateRequestInfo">CertificateRequestInfo</a>).<a href="../../src/crypto/tls/common.go.html#line-1203">SupportsCertificate</a>(c *<b>Certificate</b>) <a href="../builtin.html#name-error">error</a>
+			func (*<a href="#name-ClientHelloInfo">ClientHelloInfo</a>).<a href="../../src/crypto/tls/common.go.html#line-1050">SupportsCertificate</a>(c *<b>Certificate</b>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-CertificateRequestInfo" data-popularity="50">	 type <a href="../../src/crypto/tls/common.go.html#line-436">CertificateRequestInfo</a> <i>(struct)</i>
+		CertificateRequestInfo contains information from a server's
+		CertificateRequest message, which is used to demand a certificate and proof
+		of control from a client.
+
+		<input type='checkbox' class="stat" id="CertificateRequestInfo-stat-fields"><label for="CertificateRequestInfo-stat-fields">Exported Fields (3)</label><span id='CertificateRequestInfo-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/common.go.html#line-441">AcceptableCAs</a> <i>[][]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-445">SignatureSchemes</a> <i>[]<a href="#name-SignatureScheme">SignatureScheme</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-448">Version</a> <i><a href="../builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="CertificateRequestInfo-stat-methods"><label for="CertificateRequestInfo-stat-methods">One Exported Method</label><span id='CertificateRequestInfo-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/tls/common.go.html#line-1203">SupportsCertificate</a>(c *<a href="#name-Certificate">Certificate</a>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-CipherSuite" data-popularity="150">	 type <a href="../../src/crypto/tls/cipher_suites.go.html#line-25">CipherSuite</a> <i>(struct)</i>
+		CipherSuite is a TLS cipher suite. Note that most functions in this package
+		accept and expose cipher suite IDs instead of this type.
+
+		<input type='checkbox' class="stat" id="CipherSuite-stat-fields"><label for="CipherSuite-stat-fields">Exported Fields (4)</label><span id='CipherSuite-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/cipher_suites.go.html#line-26">ID</a> <i><a href="../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../src/crypto/tls/cipher_suites.go.html#line-35">Insecure</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/cipher_suites.go.html#line-27">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/cipher_suites.go.html#line-31">SupportedVersions</a> <i>[]<a href="../builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="CipherSuite-stat-results"><label for="CipherSuite-stat-results">As Outputs Of (2+)</label><span id='CipherSuite-stat-results-content' class="stat-content">
+			func <a href="#name-CipherSuites">CipherSuites</a>() []*<b>CipherSuite</b>
+			func <a href="#name-InsecureCipherSuites">InsecureCipherSuites</a>() []*<b>CipherSuite</b></span></div>
+<div class="anchor" id="name-ClientAuthType" data-popularity="115">	 type <a href="../../src/crypto/tls/common.go.html#line-294">ClientAuthType</a> <a href="../builtin.html#name-int">int</a>
+		ClientAuthType declares the policy the server will follow for
+		TLS Client Authentication.
+
+		<input type='checkbox' class="stat" id="ClientAuthType-stat-methods"><label for="ClientAuthType-stat-methods">One Exported Method</label><span id='ClientAuthType-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/tls/common_string.go.html#line-111">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ClientAuthType-stat-impls"><label for="ClientAuthType-stat-impls">Implements (1+)</label><span id='ClientAuthType-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="ClientAuthType-stat-values"><label for="ClientAuthType-stat-values">As Types Of (5+)</label><span id='ClientAuthType-stat-values-content' class="stat-content">
+			const <a href="#name-NoClientCert">NoClientCert</a>
+			const <a href="#name-RequestClientCert">RequestClientCert</a>
+			const <a href="#name-RequireAndVerifyClientCert">RequireAndVerifyClientCert</a>
+			const <a href="#name-RequireAnyClientCert">RequireAnyClientCert</a>
+			const <a href="#name-VerifyClientCertIfGiven">VerifyClientCertIfGiven</a></span></div>
+<div class="anchor" id="name-ClientHelloInfo" data-popularity="50">	 type <a href="../../src/crypto/tls/common.go.html#line-384">ClientHelloInfo</a> <i>(struct)</i>
+		ClientHelloInfo contains information from a ClientHello message in order to
+		guide application logic in the GetCertificate and GetConfigForClient callbacks.
+
+		<input type='checkbox' class="stat" id="ClientHelloInfo-stat-fields"><label for="ClientHelloInfo-stat-fields">Exported Fields (8)</label><span id='ClientHelloInfo-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/common.go.html#line-387">CipherSuites</a> <i>[]<a href="../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-426">Conn</a> <i><a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-392">ServerName</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-407">SignatureSchemes</a> <i>[]<a href="#name-SignatureScheme">SignatureScheme</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-397">SupportedCurves</a> <i>[]<a href="#name-CurveID">CurveID</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-402">SupportedPoints</a> <i>[]<a href="../builtin.html#name-uint8">uint8</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-415">SupportedProtos</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-421">SupportedVersions</a> <i>[]<a href="../builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="ClientHelloInfo-stat-methods"><label for="ClientHelloInfo-stat-methods">One Exported Method</label><span id='ClientHelloInfo-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/tls/common.go.html#line-1050">SupportsCertificate</a>(c *<a href="#name-Certificate">Certificate</a>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-ClientSessionCache" data-popularity="175">	 type <a href="../../src/crypto/tls/common.go.html#line-340">ClientSessionCache</a> <b<i>(interface)</i></b>
+		ClientSessionCache is a cache of ClientSessionState objects that can be used
+		by a client to resume a TLS session with a given server. ClientSessionCache
+		implementations should expect to be called concurrently from different
+		goroutines. Up to TLS 1.2, only ticket-based resumption is supported, not
+		SessionID-based resumption. In TLS 1.3 they were merged into PSK modes, which
+		are supported via this interface.
+
+		<input type='checkbox' class="stat" id="ClientSessionCache-stat-methods"><label for="ClientSessionCache-stat-methods">Exported Methods (2)</label><span id='ClientSessionCache-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/tls/common.go.html#line-343">Get</a>(sessionKey <a href="../builtin.html#name-string">string</a>) (session *<a href="#name-ClientSessionState">ClientSessionState</a>, ok <a href="../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../src/crypto/tls/common.go.html#line-349">Put</a>(sessionKey <a href="../builtin.html#name-string">string</a>, cs *<a href="#name-ClientSessionState">ClientSessionState</a>)</span>
+		<input type='checkbox' class="stat" id="ClientSessionCache-stat-results"><label for="ClientSessionCache-stat-results">As Outputs Of (1+)</label><span id='ClientSessionCache-stat-results-content' class="stat-content">
+			func <a href="#name-NewLRUClientSessionCache">NewLRUClientSessionCache</a>(capacity <a href="../builtin.html#name-int">int</a>) <b>ClientSessionCache</b></span></div>
+<div class="anchor" id="name-ClientSessionState" data-popularity="110">	 type <a href="../../src/crypto/tls/common.go.html#line-317">ClientSessionState</a> <i>(struct)</i>
+		ClientSessionState contains the state needed by clients to resume TLS
+		sessions.
+
+		<input type='checkbox' class="stat" id="ClientSessionState-stat-results"><label for="ClientSessionState-stat-results">As Outputs Of (1+)</label><span id='ClientSessionState-stat-results-content' class="stat-content">
+			func <a href="#name-ClientSessionCache">ClientSessionCache</a>.<a href="../../src/crypto/tls/common.go.html#line-343">Get</a>(sessionKey <a href="../builtin.html#name-string">string</a>) (session *<b>ClientSessionState</b>, ok <a href="../builtin.html#name-bool">bool</a>)</span>
+		<input type='checkbox' class="stat" id="ClientSessionState-stat-params"><label for="ClientSessionState-stat-params">As Inputs Of (1+)</label><span id='ClientSessionState-stat-params-content' class="stat-content">
+			func <a href="#name-ClientSessionCache">ClientSessionCache</a>.<a href="../../src/crypto/tls/common.go.html#line-349">Put</a>(sessionKey <a href="../builtin.html#name-string">string</a>, cs *<b>ClientSessionState</b>)</span></div>
+<div class="anchor" id="name-Config" data-popularity="470">	 type <a href="../../src/crypto/tls/common.go.html#line-484">Config</a> <i>(struct)</i>
+		A Config structure is used to configure a TLS client or server.
+		After one has been passed to a TLS function it must not be
+		modified. A Config may be reused; the tls package will also not
+		modify it.
+
+		<input type='checkbox' class="stat" id="Config-stat-fields"><label for="Config-stat-fields">Exported Fields (26)</label><span id='Config-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/common.go.html#line-506">Certificates</a> <i>[]<a href="#name-Certificate">Certificate</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-616">CipherSuites</a> <i>[]<a href="../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-596">ClientAuth</a> <i><a href="#name-ClientAuthType">ClientAuthType</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-601">ClientCAs</a> <i>*<a href="x509.html">x509</a>.<a href="x509.html#name-CertPool">CertPool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-641">ClientSessionCache</a> <i><a href="#name-ClientSessionCache">ClientSessionCache</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-656">CurvePreferences</a> <i>[]<a href="#name-CurveID">CurveID</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-662">DynamicRecordSizingDisabled</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-524">GetCertificate</a> <i>func(*<a href="#name-ClientHelloInfo">ClientHelloInfo</a>) (*<a href="#name-Certificate">Certificate</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/crypto/tls/common.go.html#line-539">GetClientCertificate</a> <i>func(*<a href="#name-CertificateRequestInfo">CertificateRequestInfo</a>) (*<a href="#name-Certificate">Certificate</a>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/crypto/tls/common.go.html#line-554">GetConfigForClient</a> <i>func(*<a href="#name-ClientHelloInfo">ClientHelloInfo</a>) (*<b>Config</b>, <a href="../builtin.html#name-error">error</a>)</i>
+			<a href="../../src/crypto/tls/common.go.html#line-609">InsecureSkipVerify</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-674">KeyLogWriter</a> <i><a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-650">MaxVersion</a> <i><a href="../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-645">MinVersion</a> <i><a href="../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-515">NameToCertificate</a> <i>map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-Certificate">Certificate</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-586">NextProtos</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-622">PreferServerCipherSuites</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-489">Rand</a> <i><a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-666">Renegotiation</a> <i><a href="#name-RenegotiationSupport">RenegotiationSupport</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-582">RootCAs</a> <i>*<a href="x509.html">x509</a>.<a href="x509.html#name-CertPool">CertPool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-592">ServerName</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-637">SessionTicketKey</a> <i>[32]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-627">SessionTicketsDisabled</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-493">Time</a> <i>func() <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-577">VerifyConnection</a> <i>func(<a href="#name-ConnectionState">ConnectionState</a>) <a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-567">VerifyPeerCertificate</a> <i>func(rawCerts [][]<a href="../builtin.html#name-byte">byte</a>, verifiedChains [][]*<a href="x509.html">x509</a>.<a href="x509.html#name-Certificate">Certificate</a>) <a href="../builtin.html#name-error">error</a></i></span>
+		<input type='checkbox' class="stat" id="Config-stat-methods"><label for="Config-stat-methods">Exported Methods (3)</label><span id='Config-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/tls/common.go.html#line-1239">BuildNameToCertificate</a>()
+			(*T) <a href="../../src/crypto/tls/common.go.html#line-732">Clone</a>() *<b>Config</b>
+			(*T) <a href="../../src/crypto/tls/common.go.html#line-878">SetSessionTicketKeys</a>(keys [][32]<a href="../builtin.html#name-byte">byte</a>)</span>
+		<input type='checkbox' class="stat" id="Config-stat-results"><label for="Config-stat-results">As Outputs Of (1+)</label><span id='Config-stat-results-content' class="stat-content">
+			func (*<a href="#name-Config">Config</a>).<a href="../../src/crypto/tls/common.go.html#line-732">Clone</a>() *<b>Config</b></span>
+		<input type='checkbox' class="stat" id="Config-stat-params"><label for="Config-stat-params">As Inputs Of (7+)</label><span id='Config-stat-params-content' class="stat-content">
+			func <a href="#name-Client">Client</a>(conn <a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, config *<b>Config</b>) *<a href="#name-Conn">Conn</a>
+			func <a href="#name-Dial">Dial</a>(network, addr <a href="../builtin.html#name-string">string</a>, config *<b>Config</b>) (*<a href="#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-DialWithDialer">DialWithDialer</a>(dialer *<a href="../net.html">net</a>.<a href="../net.html#name-Dialer">Dialer</a>, network, addr <a href="../builtin.html#name-string">string</a>, config *<b>Config</b>) (*<a href="#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-Listen">Listen</a>(network, laddr <a href="../builtin.html#name-string">string</a>, config *<b>Config</b>) (<a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-NewListener">NewListener</a>(inner <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, config *<b>Config</b>) <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>
+			func <a href="#name-Server">Server</a>(conn <a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, config *<b>Config</b>) *<a href="#name-Conn">Conn</a>
+			func github.com/go-sql-driver/mysql.<a href="../github.com/go-sql-driver/mysql.html#name-RegisterTLSConfig">RegisterTLSConfig</a>(key <a href="../builtin.html#name-string">string</a>, config *<b>Config</b>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Conn" data-popularity="1350">	 type <a href="../../src/crypto/tls/conn.go.html#line-25">Conn</a> <i>(struct)</i>
+		A Conn represents a secured connection.
+		It implements the net.Conn interface.
+
+		<input type='checkbox' class="stat" id="Conn-stat-methods"><label for="Conn-stat-methods">Exported Methods (13)</label><span id='Conn-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1282">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1321">CloseWrite</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1379">ConnectionState</a>() <a href="#name-ConnectionState">ConnectionState</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1348">Handshake</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-124">LocalAddr</a>() <a href="../net.html">net</a>.<a href="../net.html#name-Addr">Addr</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1415">OCSPResponse</a>() []<a href="../builtin.html#name-byte">byte</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1238">Read</a>(b []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-129">RemoteAddr</a>() <a href="../net.html">net</a>.<a href="../net.html#name-Addr">Addr</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-136">SetDeadline</a>(t <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-142">SetReadDeadline</a>(t <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-149">SetWriteDeadline</a>(t <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1425">VerifyHostname</a>(host <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/tls/conn.go.html#line-1078">Write</a>(b []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Conn-stat-impls"><label for="Conn-stat-impls">Implements (8+)</label><span id='Conn-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a>
+			*T : io.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+			*T : io.<a href="../io.html#name-Reader">Reader</a>
+			*T : io.<a href="../io.html#name-ReadWriteCloser">ReadWriteCloser</a>
+			*T : io.<a href="../io.html#name-ReadWriter">ReadWriter</a>
+			*T : io.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="../io.html#name-Writer">Writer</a>
+			*T : net.<a href="../net.html#name-Conn">Conn</a></span>
+		<input type='checkbox' class="stat" id="Conn-stat-results"><label for="Conn-stat-results">As Outputs Of (4+)</label><span id='Conn-stat-results-content' class="stat-content">
+			func <a href="#name-Client">Client</a>(conn <a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, config *<a href="#name-Config">Config</a>) *<b>Conn</b>
+			func <a href="#name-Dial">Dial</a>(network, addr <a href="../builtin.html#name-string">string</a>, config *<a href="#name-Config">Config</a>) (*<b>Conn</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-DialWithDialer">DialWithDialer</a>(dialer *<a href="../net.html">net</a>.<a href="../net.html#name-Dialer">Dialer</a>, network, addr <a href="../builtin.html#name-string">string</a>, config *<a href="#name-Config">Config</a>) (*<b>Conn</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-Server">Server</a>(conn <a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, config *<a href="#name-Config">Config</a>) *<b>Conn</b></span></div>
+<div class="anchor" id="name-ConnectionState" data-popularity="125">	 type <a href="../../src/crypto/tls/common.go.html#line-215">ConnectionState</a> <i>(struct)</i>
+		ConnectionState records basic TLS details about the connection.
+
+		<input type='checkbox' class="stat" id="ConnectionState-stat-fields"><label for="ConnectionState-stat-fields">Exported Fields (12)</label><span id='ConnectionState-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/common.go.html#line-228">CipherSuite</a> <i><a href="../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-224">DidResume</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-220">HandshakeComplete</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-234">NegotiatedProtocol</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-239">NegotiatedProtocolIsMutual</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-269">OCSPResponse</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-252">PeerCertificates</a> <i>[]*<a href="x509.html">x509</a>.<a href="x509.html#name-Certificate">Certificate</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-243">ServerName</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-265">SignedCertificateTimestamps</a> <i>[][]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-278">TLSUnique</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-261">VerifiedChains</a> <i>[][]*<a href="x509.html">x509</a>.<a href="x509.html#name-Certificate">Certificate</a></i>
+			<a href="../../src/crypto/tls/common.go.html#line-217">Version</a> <i><a href="../builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="ConnectionState-stat-methods"><label for="ConnectionState-stat-methods">One Exported Method</label><span id='ConnectionState-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/tls/common.go.html#line-288">ExportKeyingMaterial</a>(label <a href="../builtin.html#name-string">string</a>, context []<a href="../builtin.html#name-byte">byte</a>, length <a href="../builtin.html#name-int">int</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="ConnectionState-stat-results"><label for="ConnectionState-stat-results">As Outputs Of (1+)</label><span id='ConnectionState-stat-results-content' class="stat-content">
+			func (*<a href="#name-Conn">Conn</a>).<a href="../../src/crypto/tls/conn.go.html#line-1379">ConnectionState</a>() <b>ConnectionState</b></span></div>
+<div class="anchor" id="name-CurveID" data-popularity="115">	 type <a href="../../src/crypto/tls/common.go.html#line-115">CurveID</a> <a href="../builtin.html#name-uint16">uint16</a>
+		CurveID is the type of a TLS identifier for an elliptic curve. See
+		https://www.iana.org/assignments/tls-parameters/tls-parameters.xml#tls-parameters-8.
+
+		In TLS 1.3, this type is called NamedGroup, but at this time this library
+		only supports Elliptic Curve based groups. See RFC 8446, Section 4.2.7.
+
+		<input type='checkbox' class="stat" id="CurveID-stat-methods"><label for="CurveID-stat-methods">One Exported Method</label><span id='CurveID-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/tls/common_string.go.html#line-85">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="CurveID-stat-impls"><label for="CurveID-stat-impls">Implements (1+)</label><span id='CurveID-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="CurveID-stat-values"><label for="CurveID-stat-values">As Types Of (4+)</label><span id='CurveID-stat-values-content' class="stat-content">
+			const <a href="#name-CurveP256">CurveP256</a>
+			const <a href="#name-CurveP384">CurveP384</a>
+			const <a href="#name-CurveP521">CurveP521</a>
+			const <a href="#name-X25519">X25519</a></span></div>
+<div class="anchor" id="name-Dialer" data-popularity="100">	 type <a href="../../src/crypto/tls/tls.go.html#line-210">Dialer</a> <i>(struct)</i>
+		Dialer dials TLS connections given a configuration and a Dialer for the
+		underlying connection.
+
+		<input type='checkbox' class="stat" id="Dialer-stat-fields"><label for="Dialer-stat-fields">Exported Fields (2)</label><span id='Dialer-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/tls.go.html#line-220">Config</a> <i>*<a href="#name-Config">Config</a></i>
+			<a href="../../src/crypto/tls/tls.go.html#line-214">NetDialer</a> <i>*<a href="../net.html">net</a>.<a href="../net.html#name-Dialer">Dialer</a></i></span>
+		<input type='checkbox' class="stat" id="Dialer-stat-methods"><label for="Dialer-stat-methods">Exported Methods (2)</label><span id='Dialer-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/tls/tls.go.html#line-227">Dial</a>(network, addr <a href="../builtin.html#name-string">string</a>) (<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/crypto/tls/tls.go.html#line-247">DialContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, network, addr <a href="../builtin.html#name-string">string</a>) (<a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-RecordHeaderError" data-popularity="100">	 type <a href="../../src/crypto/tls/conn.go.html#line-553">RecordHeaderError</a> <i>(struct)</i>
+		RecordHeaderError is returned when a TLS record header is invalid.
+
+		<input type='checkbox' class="stat" id="RecordHeaderError-stat-fields"><label for="RecordHeaderError-stat-fields">Exported Fields (3)</label><span id='RecordHeaderError-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/tls/conn.go.html#line-563">Conn</a> <i><a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a></i>
+			<a href="../../src/crypto/tls/conn.go.html#line-555">Msg</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/tls/conn.go.html#line-558">RecordHeader</a> <i>[5]<a href="../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="RecordHeaderError-stat-methods"><label for="RecordHeaderError-stat-methods">One Exported Method</label><span id='RecordHeaderError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/tls/conn.go.html#line-566">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="RecordHeaderError-stat-impls"><label for="RecordHeaderError-stat-impls">Implements (1+)</label><span id='RecordHeaderError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-RenegotiationSupport" data-popularity="15">	 type <a href="../../src/crypto/tls/common.go.html#line-465">RenegotiationSupport</a> <a href="../builtin.html#name-int">int</a>
+		RenegotiationSupport enumerates the different levels of support for TLS
+		renegotiation. TLS renegotiation is the act of performing subsequent
+		handshakes on a connection after the first. This significantly complicates
+		the state machine and has been the source of numerous, subtle security
+		issues. Initiating a renegotiation is not supported, but support for
+		accepting renegotiation requests may be enabled.
+
+		Even when enabled, the server may not change its identity between handshakes
+		(i.e. the leaf certificate must be the same). Additionally, concurrent
+		handshake and application data flow is not permitted so renegotiation can
+		only be used with protocols that synchronise with the renegotiation, such as
+		HTTPS.
+
+		Renegotiation is not defined in TLS 1.3.
+
+		<input type='checkbox' class="stat" id="RenegotiationSupport-stat-values"><label for="RenegotiationSupport-stat-values">As Types Of (3+)</label><span id='RenegotiationSupport-stat-values-content' class="stat-content">
+			const <a href="#name-RenegotiateFreelyAsClient">RenegotiateFreelyAsClient</a>
+			const <a href="#name-RenegotiateNever">RenegotiateNever</a>
+			const <a href="#name-RenegotiateOnceAsClient">RenegotiateOnceAsClient</a></span></div>
+<div class="anchor" id="name-SignatureScheme" data-popularity="115">	 type <a href="../../src/crypto/tls/common.go.html#line-356">SignatureScheme</a> <a href="../builtin.html#name-uint16">uint16</a>
+		SignatureScheme identifies a signature algorithm supported by TLS. See
+		RFC 8446, Section 4.2.3.
+
+		<input type='checkbox' class="stat" id="SignatureScheme-stat-methods"><label for="SignatureScheme-stat-methods">One Exported Method</label><span id='SignatureScheme-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/tls/common_string.go.html#line-41">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SignatureScheme-stat-impls"><label for="SignatureScheme-stat-impls">Implements (1+)</label><span id='SignatureScheme-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="SignatureScheme-stat-values"><label for="SignatureScheme-stat-values">As Types Of (12+)</label><span id='SignatureScheme-stat-values-content' class="stat-content">
+			const <a href="#name-ECDSAWithP256AndSHA256">ECDSAWithP256AndSHA256</a>
+			const <a href="#name-ECDSAWithP384AndSHA384">ECDSAWithP384AndSHA384</a>
+			const <a href="#name-ECDSAWithP521AndSHA512">ECDSAWithP521AndSHA512</a>
+			const <a href="#name-ECDSAWithSHA1">ECDSAWithSHA1</a>
+			const <a href="#name-Ed25519">Ed25519</a>
+			const <a href="#name-PKCS1WithSHA1">PKCS1WithSHA1</a>
+			const <a href="#name-PKCS1WithSHA256">PKCS1WithSHA256</a>
+			const <a href="#name-PKCS1WithSHA384">PKCS1WithSHA384</a>
+			const <a href="#name-PKCS1WithSHA512">PKCS1WithSHA512</a>
+			const <a href="#name-PSSWithSHA256">PSSWithSHA256</a>
+			const <a href="#name-PSSWithSHA384">PSSWithSHA384</a>
+			const <a href="#name-PSSWithSHA512">PSSWithSHA512</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-CipherSuiteName">	 func <a href="../../src/crypto/tls/cipher_suites.go.html#line-97">CipherSuiteName</a>(id <a href="../builtin.html#name-uint16">uint16</a>) <a href="../builtin.html#name-string">string</a>
+		CipherSuiteName returns the standard name for the passed cipher suite ID
+		(e.g. "TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256"), or a fallback representation
+		of the ID value if the cipher suite is not implemented by this package.</div>
+<div class="anchor" id="name-CipherSuites">	 func <a href="../../src/crypto/tls/cipher_suites.go.html#line-50">CipherSuites</a>() []*<a href="#name-CipherSuite">CipherSuite</a>
+		CipherSuites returns a list of cipher suites currently implemented by this
+		package, excluding those with security issues, which are returned by
+		InsecureCipherSuites.
+
+		The list is sorted by ID. Note that the default cipher suites selected by
+		this package might depend on logic that can't be captured by a static list.</div>
+<div class="anchor" id="name-Client">	 func <a href="../../src/crypto/tls/tls.go.html#line-48">Client</a>(conn <a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, config *<a href="#name-Config">Config</a>) *<a href="#name-Conn">Conn</a>
+		Client returns a new TLS client side connection
+		using conn as the underlying transport.
+		The config cannot be nil: users must set either ServerName or
+		InsecureSkipVerify in the config.</div>
+<div class="anchor" id="name-CurveP256">	const <a href="../../src/crypto/tls/common.go.html#line-118">CurveP256</a> <a href="#name-CurveID">CurveID</a> = 23</div>
+<div class="anchor" id="name-CurveP384">	const <a href="../../src/crypto/tls/common.go.html#line-119">CurveP384</a> <a href="#name-CurveID">CurveID</a> = 24</div>
+<div class="anchor" id="name-CurveP521">	const <a href="../../src/crypto/tls/common.go.html#line-120">CurveP521</a> <a href="#name-CurveID">CurveID</a> = 25</div>
+<div class="anchor" id="name-Dial">	 func <a href="../../src/crypto/tls/tls.go.html#line-204">Dial</a>(network, addr <a href="../builtin.html#name-string">string</a>, config *<a href="#name-Config">Config</a>) (*<a href="#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)
+		Dial connects to the given network address using net.Dial
+		and then initiates a TLS handshake, returning the resulting
+		TLS connection.
+		Dial interprets a nil configuration as equivalent to
+		the zero configuration; see the documentation of Config
+		for the defaults.</div>
+<div class="anchor" id="name-DialWithDialer">	 func <a href="../../src/crypto/tls/tls.go.html#line-114">DialWithDialer</a>(dialer *<a href="../net.html">net</a>.<a href="../net.html#name-Dialer">Dialer</a>, network, addr <a href="../builtin.html#name-string">string</a>, config *<a href="#name-Config">Config</a>) (*<a href="#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)
+		DialWithDialer connects to the given network address using dialer.Dial and
+		then initiates a TLS handshake, returning the resulting TLS connection. Any
+		timeout or deadline given in the dialer apply to connection and TLS
+		handshake as a whole.
+
+		DialWithDialer interprets a nil configuration as equivalent to the zero
+		configuration; see the documentation of Config for the defaults.</div>
+<div class="anchor" id="name-ECDSAWithP256AndSHA256">	const <a href="../../src/crypto/tls/common.go.html#line-370">ECDSAWithP256AndSHA256</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 1027
+		ECDSA algorithms. Only constrained to a specific curve in TLS 1.3.</div>
+<div class="anchor" id="name-ECDSAWithP384AndSHA384">	const <a href="../../src/crypto/tls/common.go.html#line-371">ECDSAWithP384AndSHA384</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 1283</div>
+<div class="anchor" id="name-ECDSAWithP521AndSHA512">	const <a href="../../src/crypto/tls/common.go.html#line-372">ECDSAWithP521AndSHA512</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 1539</div>
+<div class="anchor" id="name-ECDSAWithSHA1">	const <a href="../../src/crypto/tls/common.go.html#line-379">ECDSAWithSHA1</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 515</div>
+<div class="anchor" id="name-Ed25519">	const <a href="../../src/crypto/tls/common.go.html#line-375">Ed25519</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 2055
+		EdDSA algorithms.</div>
+<div class="anchor" id="name-InsecureCipherSuites">	 func <a href="../../src/crypto/tls/cipher_suites.go.html#line-81">InsecureCipherSuites</a>() []*<a href="#name-CipherSuite">CipherSuite</a>
+		InsecureCipherSuites returns a list of cipher suites currently implemented by
+		this package and which have security issues.
+
+		Most applications should not use the cipher suites in this list, and should
+		only use those returned by CipherSuites.</div>
+<div class="anchor" id="name-Listen">	 func <a href="../../src/crypto/tls/tls.go.html#line-89">Listen</a>(network, laddr <a href="../builtin.html#name-string">string</a>, config *<a href="#name-Config">Config</a>) (<a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, <a href="../builtin.html#name-error">error</a>)
+		Listen creates a TLS listener accepting connections on the
+		given network address using net.Listen.
+		The configuration config must be non-nil and must include
+		at least one certificate or else set GetCertificate.</div>
+<div class="anchor" id="name-LoadX509KeyPair">	 func <a href="../../src/crypto/tls/tls.go.html#line-261">LoadX509KeyPair</a>(certFile, keyFile <a href="../builtin.html#name-string">string</a>) (<a href="#name-Certificate">Certificate</a>, <a href="../builtin.html#name-error">error</a>)
+		LoadX509KeyPair reads and parses a public/private key pair from a pair
+		of files. The files must contain PEM encoded data. The certificate file
+		may contain intermediate certificates following the leaf certificate to
+		form a certificate chain. On successful return, Certificate.Leaf will
+		be nil because the parsed form of the certificate is not retained.</div>
+<div class="anchor" id="name-NewListener">	 func <a href="../../src/crypto/tls/tls.go.html#line-78">NewListener</a>(inner <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>, config *<a href="#name-Config">Config</a>) <a href="../net.html">net</a>.<a href="../net.html#name-Listener">Listener</a>
+		NewListener creates a Listener which accepts connections from an inner
+		Listener and wraps each connection with Server.
+		The configuration config must be non-nil and must include
+		at least one certificate or else set GetCertificate.</div>
+<div class="anchor" id="name-NewLRUClientSessionCache">	 func <a href="../../src/crypto/tls/common.go.html#line-1337">NewLRUClientSessionCache</a>(capacity <a href="../builtin.html#name-int">int</a>) <a href="#name-ClientSessionCache">ClientSessionCache</a>
+		NewLRUClientSessionCache returns a ClientSessionCache with the given
+		capacity that uses an LRU strategy. If capacity is &lt; 1, a default capacity
+		is used instead.</div>
+<div class="anchor" id="name-NoClientCert">	const <a href="../../src/crypto/tls/common.go.html#line-297">NoClientCert</a> <a href="#name-ClientAuthType">ClientAuthType</a> = 0</div>
+<div class="anchor" id="name-PKCS1WithSHA1">	const <a href="../../src/crypto/tls/common.go.html#line-378">PKCS1WithSHA1</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 513
+		Legacy signature and hash algorithms for TLS 1.2.</div>
+<div class="anchor" id="name-PKCS1WithSHA256">	const <a href="../../src/crypto/tls/common.go.html#line-360">PKCS1WithSHA256</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 1025
+		RSASSA-PKCS1-v1_5 algorithms.</div>
+<div class="anchor" id="name-PKCS1WithSHA384">	const <a href="../../src/crypto/tls/common.go.html#line-361">PKCS1WithSHA384</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 1281</div>
+<div class="anchor" id="name-PKCS1WithSHA512">	const <a href="../../src/crypto/tls/common.go.html#line-362">PKCS1WithSHA512</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 1537</div>
+<div class="anchor" id="name-PSSWithSHA256">	const <a href="../../src/crypto/tls/common.go.html#line-365">PSSWithSHA256</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 2052
+		RSASSA-PSS algorithms with public key OID rsaEncryption.</div>
+<div class="anchor" id="name-PSSWithSHA384">	const <a href="../../src/crypto/tls/common.go.html#line-366">PSSWithSHA384</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 2053</div>
+<div class="anchor" id="name-PSSWithSHA512">	const <a href="../../src/crypto/tls/common.go.html#line-367">PSSWithSHA512</a> <a href="#name-SignatureScheme">SignatureScheme</a> = 2054</div>
+<div class="anchor" id="name-RenegotiateFreelyAsClient">	const <a href="../../src/crypto/tls/common.go.html#line-477">RenegotiateFreelyAsClient</a> <a href="#name-RenegotiationSupport">RenegotiationSupport</a> = 2
+		RenegotiateFreelyAsClient allows a remote server to repeatedly
+		request renegotiation.</div>
+<div class="anchor" id="name-RenegotiateNever">	const <a href="../../src/crypto/tls/common.go.html#line-469">RenegotiateNever</a> <a href="#name-RenegotiationSupport">RenegotiationSupport</a> = 0
+		RenegotiateNever disables renegotiation.</div>
+<div class="anchor" id="name-RenegotiateOnceAsClient">	const <a href="../../src/crypto/tls/common.go.html#line-473">RenegotiateOnceAsClient</a> <a href="#name-RenegotiationSupport">RenegotiationSupport</a> = 1
+		RenegotiateOnceAsClient allows a remote server to request
+		renegotiation once per connection.</div>
+<div class="anchor" id="name-RequestClientCert">	const <a href="../../src/crypto/tls/common.go.html#line-298">RequestClientCert</a> <a href="#name-ClientAuthType">ClientAuthType</a> = 1</div>
+<div class="anchor" id="name-RequireAndVerifyClientCert">	const <a href="../../src/crypto/tls/common.go.html#line-301">RequireAndVerifyClientCert</a> <a href="#name-ClientAuthType">ClientAuthType</a> = 4</div>
+<div class="anchor" id="name-RequireAnyClientCert">	const <a href="../../src/crypto/tls/common.go.html#line-299">RequireAnyClientCert</a> <a href="#name-ClientAuthType">ClientAuthType</a> = 2</div>
+<div class="anchor" id="name-Server">	 func <a href="../../src/crypto/tls/tls.go.html#line-35">Server</a>(conn <a href="../net.html">net</a>.<a href="../net.html#name-Conn">Conn</a>, config *<a href="#name-Config">Config</a>) *<a href="#name-Conn">Conn</a>
+		Server returns a new TLS server side connection
+		using conn as the underlying transport.
+		The configuration config must be non-nil and must include
+		at least one certificate or else set GetCertificate.</div>
+<div class="anchor" id="name-TLS_AES_128_GCM_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-525">TLS_AES_128_GCM_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 4865
+		TLS 1.3 cipher suites.</div>
+<div class="anchor" id="name-TLS_AES_256_GCM_SHA384">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-526">TLS_AES_256_GCM_SHA384</a> <a href="../builtin.html#name-uint16">uint16</a> = 4866
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_CHACHA20_POLY1305_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-527">TLS_CHACHA20_POLY1305_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 4867
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-509">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 49161
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-515">TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 49187
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-518">TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 49195
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-510">TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 49162
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-520">TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384</a> <a href="../builtin.html#name-uint16">uint16</a> = 49196
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-536">TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305</a> <a href="../builtin.html#name-uint16">uint16</a> = 52393
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-522">TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 52393
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_ECDSA_WITH_RC4_128_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-508">TLS_ECDHE_ECDSA_WITH_RC4_128_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 49159
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-512">TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 49170
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-513">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 49171
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-516">TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 49191
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-517">TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 49199
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-514">TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 49172
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-519">TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384</a> <a href="../builtin.html#name-uint16">uint16</a> = 49200
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-535">TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305</a> <a href="../builtin.html#name-uint16">uint16</a> = 52392
+		Legacy names for the corresponding cipher suites with the correct _SHA256
+		suffix, retained for backward compatibility.</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-521">TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 52392
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_ECDHE_RSA_WITH_RC4_128_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-511">TLS_ECDHE_RSA_WITH_RC4_128_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 49169
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_FALLBACK_SCSV">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-531">TLS_FALLBACK_SCSV</a> <a href="../builtin.html#name-uint16">uint16</a> = 22016
+		TLS_FALLBACK_SCSV isn't a standard cipher suite but an indicator
+		that the client is doing version fallback. See RFC 7507.</div>
+<div class="anchor" id="name-TLS_RSA_WITH_3DES_EDE_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-502">TLS_RSA_WITH_3DES_EDE_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 10
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_RSA_WITH_AES_128_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-503">TLS_RSA_WITH_AES_128_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 47
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_RSA_WITH_AES_128_CBC_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-505">TLS_RSA_WITH_AES_128_CBC_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 60
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_RSA_WITH_AES_128_GCM_SHA256">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-506">TLS_RSA_WITH_AES_128_GCM_SHA256</a> <a href="../builtin.html#name-uint16">uint16</a> = 156
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_RSA_WITH_AES_256_CBC_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-504">TLS_RSA_WITH_AES_256_CBC_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 53
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_RSA_WITH_AES_256_GCM_SHA384">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-507">TLS_RSA_WITH_AES_256_GCM_SHA384</a> <a href="../builtin.html#name-uint16">uint16</a> = 157
+		A list of cipher suite IDs that are, or have been, implemented by this
+		package.
+
+		See https://www.iana.org/assignments/tls-parameters/tls-parameters.xml</div>
+<div class="anchor" id="name-TLS_RSA_WITH_RC4_128_SHA">	const <a href="../../src/crypto/tls/cipher_suites.go.html#line-501">TLS_RSA_WITH_RC4_128_SHA</a> <a href="../builtin.html#name-uint16">uint16</a> = 5
+		TLS 1.0 - 1.2 cipher suites.</div>
+<div class="anchor" id="name-VerifyClientCertIfGiven">	const <a href="../../src/crypto/tls/common.go.html#line-300">VerifyClientCertIfGiven</a> <a href="#name-ClientAuthType">ClientAuthType</a> = 3</div>
+<div class="anchor" id="name-VersionSSL30">	const <a href="../../src/crypto/tls/common.go.html#line-36">VersionSSL30</a> = 768
+		Deprecated: SSLv3 is cryptographically broken, and is no longer
+		supported by this package. See golang.org/issue/32716.</div>
+<div class="anchor" id="name-VersionTLS10">	const <a href="../../src/crypto/tls/common.go.html#line-29">VersionTLS10</a> = 769</div>
+<div class="anchor" id="name-VersionTLS11">	const <a href="../../src/crypto/tls/common.go.html#line-30">VersionTLS11</a> = 770</div>
+<div class="anchor" id="name-VersionTLS12">	const <a href="../../src/crypto/tls/common.go.html#line-31">VersionTLS12</a> = 771</div>
+<div class="anchor" id="name-VersionTLS13">	const <a href="../../src/crypto/tls/common.go.html#line-32">VersionTLS13</a> = 772</div>
+<div class="anchor" id="name-X25519">	const <a href="../../src/crypto/tls/common.go.html#line-121">X25519</a> <a href="#name-CurveID">CurveID</a> = 29</div>
+<div class="anchor" id="name-X509KeyPair">	 func <a href="../../src/crypto/tls/tls.go.html#line-276">X509KeyPair</a>(certPEMBlock, keyPEMBlock []<a href="../builtin.html#name-byte">byte</a>) (<a href="#name-Certificate">Certificate</a>, <a href="../builtin.html#name-error">error</a>)
+		X509KeyPair parses a public/private key pair from a pair of
+		PEM encoded data. On successful return, Certificate.Leaf will be nil because
+		the parsed form of the certificate is not retained.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

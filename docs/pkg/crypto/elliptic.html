@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/elliptic</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>elliptic</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/elliptic">crypto/elliptic</a><i> (on <a href="https://golang.org/pkg/crypto/elliptic/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/elliptic" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/elliptic.html">3 packages</a>, and imported by <a href="../../dep/crypto/elliptic.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/crypto/elliptic/elliptic.go.html#doc">d-&gt;</a> <a href="../../src/crypto/elliptic/elliptic.go.html">elliptic.go</a>
+	    <a href="../../src/crypto/elliptic/p224.go.html">p224.go</a>
+	    <a href="../../src/crypto/elliptic/p256_asm.go.html">p256_asm.go</a>
+	    <a href="../../src/crypto/elliptic/p256_asm_amd64.s.html">p256_asm_amd64.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Curve" data-popularity="1260">	 type <a href="../../src/crypto/elliptic/elliptic.go.html#line-27">Curve</a> <b<i>(interface)</i></b>
+		A Curve represents a short-form Weierstrass curve with a=-3.
+
+		Note that the point at infinity (0, 0) is not considered on the curve, and
+		although it can be returned by Add, Double, ScalarMult, or ScalarBaseMult, it
+		can't be marshaled or unmarshaled, and IsOnCurve will return false for it.
+
+		<input type='checkbox' class="stat" id="Curve-stat-methods"><label for="Curve-stat-methods">Exported Methods (6)</label><span id='Curve-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-33">Add</a>(x1, y1, x2, y2 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-35">Double</a>(x1, y1 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-31">IsOnCurve</a>(x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-29">Params</a>() *<a href="#name-CurveParams">CurveParams</a>
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-40">ScalarBaseMult</a>(k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			 (T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-37">ScalarMult</a>(x1, y1 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)</span>
+		<input type='checkbox' class="stat" id="Curve-stat-impledby"><label for="Curve-stat-impledby">Implemented By (3+)</label><span id='Curve-stat-impledby-content' class="stat-content">
+			*<a href="#name-CurveParams">CurveParams</a>
+			crypto/ecdsa.<a href="ecdsa.html#name-PrivateKey">PrivateKey</a>
+			crypto/ecdsa.<a href="ecdsa.html#name-PublicKey">PublicKey</a></span>
+		<input type='checkbox' class="stat" id="Curve-stat-results"><label for="Curve-stat-results">As Outputs Of (4+)</label><span id='Curve-stat-results-content' class="stat-content">
+			func <a href="#name-P224">P224</a>() <b>Curve</b>
+			func <a href="#name-P256">P256</a>() <b>Curve</b>
+			func <a href="#name-P384">P384</a>() <b>Curve</b>
+			func <a href="#name-P521">P521</a>() <b>Curve</b></span>
+		<input type='checkbox' class="stat" id="Curve-stat-params"><label for="Curve-stat-params">As Inputs Of (6+)</label><span id='Curve-stat-params-content' class="stat-content">
+			func <a href="#name-GenerateKey">GenerateKey</a>(curve <b>Curve</b>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (priv []<a href="../builtin.html#name-byte">byte</a>, x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-Marshal">Marshal</a>(curve <b>Curve</b>, x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) []<a href="../builtin.html#name-byte">byte</a>
+			func <a href="#name-MarshalCompressed">MarshalCompressed</a>(curve <b>Curve</b>, x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) []<a href="../builtin.html#name-byte">byte</a>
+			func <a href="#name-Unmarshal">Unmarshal</a>(curve <b>Curve</b>, data []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			func <a href="#name-UnmarshalCompressed">UnmarshalCompressed</a>(curve <b>Curve</b>, data []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			func crypto/ecdsa.<a href="ecdsa.html#name-GenerateKey">GenerateKey</a>(c <b>Curve</b>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (*<a href="ecdsa.html">ecdsa</a>.<a href="ecdsa.html#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-CurveParams" data-popularity="500">	 type <a href="../../src/crypto/elliptic/elliptic.go.html#line-45">CurveParams</a> <i>(struct)</i>
+		CurveParams contains the parameters of an elliptic curve and also provides
+		a generic, non-constant time implementation of Curve.
+
+		<input type='checkbox' class="stat" id="CurveParams-stat-fields"><label for="CurveParams-stat-fields">Exported Fields (7)</label><span id='CurveParams-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/elliptic/elliptic.go.html#line-48">B</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/elliptic/elliptic.go.html#line-50">BitSize</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/crypto/elliptic/elliptic.go.html#line-49">Gx</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/elliptic/elliptic.go.html#line-49">Gy</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/elliptic/elliptic.go.html#line-47">N</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/elliptic/elliptic.go.html#line-51">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/elliptic/elliptic.go.html#line-46">P</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="CurveParams-stat-methods"><label for="CurveParams-stat-methods">Exported Methods (6)</label><span id='CurveParams-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-110">Add</a>(x1, y1, x2, y2 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			(*T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-194">Double</a>(x1, y1 *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) (*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			(*T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-73">IsOnCurve</a>(x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-54">Params</a>() *<b>CurveParams</b>
+			(*T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-277">ScalarBaseMult</a>(k []<a href="../builtin.html#name-byte">byte</a>) (*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+			(*T) <a href="../../src/crypto/elliptic/elliptic.go.html#line-260">ScalarMult</a>(Bx, By *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, k []<a href="../builtin.html#name-byte">byte</a>) (*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)</span>
+		<input type='checkbox' class="stat" id="CurveParams-stat-impls"><label for="CurveParams-stat-impls">Implements (1+)</label><span id='CurveParams-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Curve">Curve</a></span>
+		<input type='checkbox' class="stat" id="CurveParams-stat-results"><label for="CurveParams-stat-results">As Outputs Of (2+)</label><span id='CurveParams-stat-results-content' class="stat-content">
+			func <a href="#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-29">Params</a>() *<b>CurveParams</b>
+			func (*<a href="#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-54">Params</a>() *<b>CurveParams</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-GenerateKey">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-285">GenerateKey</a>(curve <a href="#name-Curve">Curve</a>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (priv []<a href="../builtin.html#name-byte">byte</a>, x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>, err <a href="../builtin.html#name-error">error</a>)
+		GenerateKey returns a public/private key pair. The private key is
+		generated using the given reader, which must return random data.</div>
+<div class="anchor" id="name-Marshal">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-315">Marshal</a>(curve <a href="#name-Curve">Curve</a>, x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) []<a href="../builtin.html#name-byte">byte</a>
+		Marshal converts a point on the curve into the uncompressed form specified in
+		section 4.3.6 of ANSI X9.62.</div>
+<div class="anchor" id="name-MarshalCompressed">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-329">MarshalCompressed</a>(curve <a href="#name-Curve">Curve</a>, x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>) []<a href="../builtin.html#name-byte">byte</a>
+		MarshalCompressed converts a point on the curve into the compressed form
+		specified in section 4.3.6 of ANSI X9.62.</div>
+<div class="anchor" id="name-P224">	 func <a href="../../src/crypto/elliptic/p224.go.html#line-41">P224</a>() <a href="#name-Curve">Curve</a>
+		P224 returns a Curve which implements P-224 (see FIPS 186-3, section D.2.2).
+
+		The cryptographic operations are implemented using constant-time algorithms.</div>
+<div class="anchor" id="name-P256">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-432">P256</a>() <a href="#name-Curve">Curve</a>
+		P256 returns a Curve which implements NIST P-256 (FIPS 186-3, section D.2.3),
+		also known as secp256r1 or prime256v1. The CurveParams.Name of this Curve is
+		"P-256".
+
+		Multiple invocations of this function will return the same value, so it can
+		be used for equality checks and switch statements.
+
+		The cryptographic operations are implemented using constant-time algorithms.</div>
+<div class="anchor" id="name-P384">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-444">P384</a>() <a href="#name-Curve">Curve</a>
+		P384 returns a Curve which implements NIST P-384 (FIPS 186-3, section D.2.4),
+		also known as secp384r1. The CurveParams.Name of this Curve is "P-384".
+
+		Multiple invocations of this function will return the same value, so it can
+		be used for equality checks and switch statements.
+
+		The cryptographic operations do not use constant-time algorithms.</div>
+<div class="anchor" id="name-P521">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-456">P521</a>() <a href="#name-Curve">Curve</a>
+		P521 returns a Curve which implements NIST P-521 (FIPS 186-3, section D.2.5),
+		also known as secp521r1. The CurveParams.Name of this Curve is "P-521".
+
+		Multiple invocations of this function will return the same value, so it can
+		be used for equality checks and switch statements.
+
+		The cryptographic operations do not use constant-time algorithms.</div>
+<div class="anchor" id="name-Unmarshal">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-340">Unmarshal</a>(curve <a href="#name-Curve">Curve</a>, data []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+		Unmarshal converts a point, serialized by Marshal, into an x, y pair.
+		It is an error if the point is not in uncompressed form or is not on the curve.
+		On error, x = nil.</div>
+<div class="anchor" id="name-UnmarshalCompressed">	 func <a href="../../src/crypto/elliptic/elliptic.go.html#line-363">UnmarshalCompressed</a>(curve <a href="#name-Curve">Curve</a>, data []<a href="../builtin.html#name-byte">byte</a>) (x, y *<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a>)
+		UnmarshalCompressed converts a point, serialized by MarshalCompressed, into an x, y pair.
+		It is an error if the point is not in compressed form or is not on the curve.
+		On error, x = nil.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

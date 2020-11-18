@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: unicode</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>unicode</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-unicode">unicode</a><i> (on <a href="https://golang.org/pkg/unicode/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/unicode" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports 0 packages, and imported by <a href="../dep/unicode.html#imported-by">12 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/unicode/casetables.go.html">casetables.go</a>
+	    <a href="../src/unicode/digit.go.html">digit.go</a>
+	    <a href="../src/unicode/graphic.go.html">graphic.go</a>
+	<a href="../src/unicode/letter.go.html#doc">d-&gt;</a> <a href="../src/unicode/letter.go.html">letter.go</a>
+	    <a href="../src/unicode/tables.go.html">tables.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-CaseRange" data-popularity="0">	 type <a href="../src/unicode/letter.go.html#line-54">CaseRange</a> <i>(struct)</i>
+		CaseRange represents a range of Unicode code points for simple (one
+		code point to one code point) case conversion.
+		The range runs from Lo to Hi inclusive, with a fixed stride of 1. Deltas
+		are the number to add to the code point to reach the code point for a
+		different case for that character. They may be negative. If zero, it
+		means the character is in the corresponding case. There is a special
+		case representing sequences of alternating corresponding Upper and Lower
+		pairs. It appears with a fixed Delta of
+			{UpperLower, UpperLower, UpperLower}
+		The constant UpperLower has an otherwise impossible delta value.
+
+		<input type='checkbox' class="stat" id="CaseRange-stat-fields"><label for="CaseRange-stat-fields">Exported Fields (3)</label><span id='CaseRange-stat-fields-content' class="stat-content">
+			<a href="../src/unicode/letter.go.html#line-57">Delta</a> <i><a href="../src/unicode/letter.go.html#line-75">d</a></i>
+			<a href="../src/unicode/letter.go.html#line-56">Hi</a> <i><a href="builtin.html#name-uint32">uint32</a></i>
+			<a href="../src/unicode/letter.go.html#line-55">Lo</a> <i><a href="builtin.html#name-uint32">uint32</a></i></span></div>
+<div class="anchor" id="name-Range16" data-popularity="0">	 type <a href="../src/unicode/letter.go.html#line-29">Range16</a> <i>(struct)</i>
+		Range16 represents of a range of 16-bit Unicode code points. The range runs from Lo to Hi
+		inclusive and has the specified stride.
+
+		<input type='checkbox' class="stat" id="Range16-stat-fields"><label for="Range16-stat-fields">Exported Fields (3)</label><span id='Range16-stat-fields-content' class="stat-content">
+			<a href="../src/unicode/letter.go.html#line-31">Hi</a> <i><a href="builtin.html#name-uint16">uint16</a></i>
+			<a href="../src/unicode/letter.go.html#line-30">Lo</a> <i><a href="builtin.html#name-uint16">uint16</a></i>
+			<a href="../src/unicode/letter.go.html#line-32">Stride</a> <i><a href="builtin.html#name-uint16">uint16</a></i></span></div>
+<div class="anchor" id="name-Range32" data-popularity="0">	 type <a href="../src/unicode/letter.go.html#line-38">Range32</a> <i>(struct)</i>
+		Range32 represents of a range of Unicode code points and is used when one or
+		more of the values will not fit in 16 bits. The range runs from Lo to Hi
+		inclusive and has the specified stride. Lo and Hi must always be &gt;= 1&lt;&lt;16.
+
+		<input type='checkbox' class="stat" id="Range32-stat-fields"><label for="Range32-stat-fields">Exported Fields (3)</label><span id='Range32-stat-fields-content' class="stat-content">
+			<a href="../src/unicode/letter.go.html#line-40">Hi</a> <i><a href="builtin.html#name-uint32">uint32</a></i>
+			<a href="../src/unicode/letter.go.html#line-39">Lo</a> <i><a href="builtin.html#name-uint32">uint32</a></i>
+			<a href="../src/unicode/letter.go.html#line-41">Stride</a> <i><a href="builtin.html#name-uint32">uint32</a></i></span></div>
+<div class="anchor" id="name-RangeTable" data-popularity="120">	 type <a href="../src/unicode/letter.go.html#line-21">RangeTable</a> <i>(struct)</i>
+		RangeTable defines a set of Unicode code points by listing the ranges of
+		code points within the set. The ranges are listed in two slices
+		to save space: a slice of 16-bit ranges and a slice of 32-bit ranges.
+		The two slices must be in sorted order and non-overlapping.
+		Also, R32 should contain only values &gt;= 0x10000 (1&lt;&lt;16).
+
+		<input type='checkbox' class="stat" id="RangeTable-stat-fields"><label for="RangeTable-stat-fields">Exported Fields (3)</label><span id='RangeTable-stat-fields-content' class="stat-content">
+			<a href="../src/unicode/letter.go.html#line-24">LatinOffset</a> <i><a href="builtin.html#name-int">int</a></i>
+			<a href="../src/unicode/letter.go.html#line-22">R16</a> <i>[]<a href="#name-Range16">Range16</a></i>
+			<a href="../src/unicode/letter.go.html#line-23">R32</a> <i>[]<a href="#name-Range32">Range32</a></i></span>
+		<input type='checkbox' class="stat" id="RangeTable-stat-params"><label for="RangeTable-stat-params">As Inputs Of (3+)</label><span id='RangeTable-stat-params-content' class="stat-content">
+			func <a href="#name-In">In</a>(r <a href="builtin.html#name-rune">rune</a>, ranges ...*<b>RangeTable</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Is">Is</a>(rangeTab *<b>RangeTable</b>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-IsOneOf">IsOneOf</a>(ranges []*<b>RangeTable</b>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="RangeTable-stat-values"><label for="RangeTable-stat-values">As Types Of (234+)</label><span id='RangeTable-stat-values-content' class="stat-content">
+			  var <a href="#name-Adlam">Adlam</a> *RangeTable
+			  var <a href="#name-Ahom">Ahom</a> *RangeTable
+			  var <a href="#name-Anatolian_Hieroglyphs">Anatolian_Hieroglyphs</a> *RangeTable
+			  var <a href="#name-Arabic">Arabic</a> *RangeTable
+			  var <a href="#name-Armenian">Armenian</a> *RangeTable
+			  var <a href="#name-ASCII_Hex_Digit">ASCII_Hex_Digit</a> *RangeTable
+			  var <a href="#name-Avestan">Avestan</a> *RangeTable
+			  var <a href="#name-Balinese">Balinese</a> *RangeTable
+			  var <a href="#name-Bamum">Bamum</a> *RangeTable
+			  var <a href="#name-Bassa_Vah">Bassa_Vah</a> *RangeTable
+			  var <a href="#name-Batak">Batak</a> *RangeTable
+			  var <a href="#name-Bengali">Bengali</a> *RangeTable
+			  var <a href="#name-Bhaiksuki">Bhaiksuki</a> *RangeTable
+			  var <a href="#name-Bidi_Control">Bidi_Control</a> *RangeTable
+			  var <a href="#name-Bopomofo">Bopomofo</a> *RangeTable
+			  var <a href="#name-Brahmi">Brahmi</a> *RangeTable
+			  var <a href="#name-Braille">Braille</a> *RangeTable
+			  var <a href="#name-Buginese">Buginese</a> *RangeTable
+			  var <a href="#name-Buhid">Buhid</a> *RangeTable
+			  var <a href="#name-C">C</a> *RangeTable
+			  var <a href="#name-Canadian_Aboriginal">Canadian_Aboriginal</a> *RangeTable
+			  var <a href="#name-Carian">Carian</a> *RangeTable
+			  var <a href="#name-Caucasian_Albanian">Caucasian_Albanian</a> *RangeTable
+			  var <a href="#name-Cc">Cc</a> *RangeTable
+			  var <a href="#name-Cf">Cf</a> *RangeTable
+			  var <a href="#name-Chakma">Chakma</a> *RangeTable
+			  var <a href="#name-Cham">Cham</a> *RangeTable
+			  var <a href="#name-Cherokee">Cherokee</a> *RangeTable
+			  var <a href="#name-Co">Co</a> *RangeTable
+			  var <a href="#name-Common">Common</a> *RangeTable
+			  var <a href="#name-Coptic">Coptic</a> *RangeTable
+			  var <a href="#name-Cs">Cs</a> *RangeTable
+			  var <a href="#name-Cuneiform">Cuneiform</a> *RangeTable
+			  var <a href="#name-Cypriot">Cypriot</a> *RangeTable
+			  var <a href="#name-Cyrillic">Cyrillic</a> *RangeTable
+			  var <a href="#name-Dash">Dash</a> *RangeTable
+			  var <a href="#name-Deprecated">Deprecated</a> *RangeTable
+			  var <a href="#name-Deseret">Deseret</a> *RangeTable
+			  var <a href="#name-Devanagari">Devanagari</a> *RangeTable
+			  var <a href="#name-Diacritic">Diacritic</a> *RangeTable
+			  var <a href="#name-Digit">Digit</a> *RangeTable
+			  var <a href="#name-Dogra">Dogra</a> *RangeTable
+			  var <a href="#name-Duployan">Duployan</a> *RangeTable
+			  var <a href="#name-Egyptian_Hieroglyphs">Egyptian_Hieroglyphs</a> *RangeTable
+			  var <a href="#name-Elbasan">Elbasan</a> *RangeTable
+			  var <a href="#name-Elymaic">Elymaic</a> *RangeTable
+			  var <a href="#name-Ethiopic">Ethiopic</a> *RangeTable
+			  var <a href="#name-Extender">Extender</a> *RangeTable
+			  var <a href="#name-Georgian">Georgian</a> *RangeTable
+			  var <a href="#name-Glagolitic">Glagolitic</a> *RangeTable
+			  var <a href="#name-Gothic">Gothic</a> *RangeTable
+			  var <a href="#name-Grantha">Grantha</a> *RangeTable
+			  var <a href="#name-Greek">Greek</a> *RangeTable
+			  var <a href="#name-Gujarati">Gujarati</a> *RangeTable
+			  var <a href="#name-Gunjala_Gondi">Gunjala_Gondi</a> *RangeTable
+			  var <a href="#name-Gurmukhi">Gurmukhi</a> *RangeTable
+			  var <a href="#name-Han">Han</a> *RangeTable
+			  var <a href="#name-Hangul">Hangul</a> *RangeTable
+			  var <a href="#name-Hanifi_Rohingya">Hanifi_Rohingya</a> *RangeTable
+			  var <a href="#name-Hanunoo">Hanunoo</a> *RangeTable
+			  var <a href="#name-Hatran">Hatran</a> *RangeTable
+			  var <a href="#name-Hebrew">Hebrew</a> *RangeTable
+			  var <a href="#name-Hex_Digit">Hex_Digit</a> *RangeTable
+			  var <a href="#name-Hiragana">Hiragana</a> *RangeTable
+			  var <a href="#name-Hyphen">Hyphen</a> *RangeTable
+			  var <a href="#name-Ideographic">Ideographic</a> *RangeTable
+			  var <a href="#name-IDS_Binary_Operator">IDS_Binary_Operator</a> *RangeTable
+			  var <a href="#name-IDS_Trinary_Operator">IDS_Trinary_Operator</a> *RangeTable
+			  var <a href="#name-Imperial_Aramaic">Imperial_Aramaic</a> *RangeTable
+			  var <a href="#name-Inherited">Inherited</a> *RangeTable
+			  var <a href="#name-Inscriptional_Pahlavi">Inscriptional_Pahlavi</a> *RangeTable
+			  var <a href="#name-Inscriptional_Parthian">Inscriptional_Parthian</a> *RangeTable
+			  var <a href="#name-Javanese">Javanese</a> *RangeTable
+			  var <a href="#name-Join_Control">Join_Control</a> *RangeTable
+			  var <a href="#name-Kaithi">Kaithi</a> *RangeTable
+			  var <a href="#name-Kannada">Kannada</a> *RangeTable
+			  var <a href="#name-Katakana">Katakana</a> *RangeTable
+			  var <a href="#name-Kayah_Li">Kayah_Li</a> *RangeTable
+			  var <a href="#name-Kharoshthi">Kharoshthi</a> *RangeTable
+			  var <a href="#name-Khmer">Khmer</a> *RangeTable
+			  var <a href="#name-Khojki">Khojki</a> *RangeTable
+			  var <a href="#name-Khudawadi">Khudawadi</a> *RangeTable
+			  var <a href="#name-L">L</a> *RangeTable
+			  var <a href="#name-Lao">Lao</a> *RangeTable
+			  var <a href="#name-Latin">Latin</a> *RangeTable
+			  var <a href="#name-Lepcha">Lepcha</a> *RangeTable
+			  var <a href="#name-Letter">Letter</a> *RangeTable
+			  var <a href="#name-Limbu">Limbu</a> *RangeTable
+			  var <a href="#name-Linear_A">Linear_A</a> *RangeTable
+			  var <a href="#name-Linear_B">Linear_B</a> *RangeTable
+			  var <a href="#name-Lisu">Lisu</a> *RangeTable
+			  var <a href="#name-Ll">Ll</a> *RangeTable
+			  var <a href="#name-Lm">Lm</a> *RangeTable
+			  var <a href="#name-Lo">Lo</a> *RangeTable
+			  var <a href="#name-Logical_Order_Exception">Logical_Order_Exception</a> *RangeTable
+			  var <a href="#name-Lower">Lower</a> *RangeTable
+			  var <a href="#name-Lt">Lt</a> *RangeTable
+			  var <a href="#name-Lu">Lu</a> *RangeTable
+			  var <a href="#name-Lycian">Lycian</a> *RangeTable
+			  var <a href="#name-Lydian">Lydian</a> *RangeTable
+			  var <a href="#name-M">M</a> *RangeTable
+			  var <a href="#name-Mahajani">Mahajani</a> *RangeTable
+			  var <a href="#name-Makasar">Makasar</a> *RangeTable
+			  var <a href="#name-Malayalam">Malayalam</a> *RangeTable
+			  var <a href="#name-Mandaic">Mandaic</a> *RangeTable
+			  var <a href="#name-Manichaean">Manichaean</a> *RangeTable
+			  var <a href="#name-Marchen">Marchen</a> *RangeTable
+			  var <a href="#name-Mark">Mark</a> *RangeTable
+			  var <a href="#name-Masaram_Gondi">Masaram_Gondi</a> *RangeTable
+			  var <a href="#name-Mc">Mc</a> *RangeTable
+			  var <a href="#name-Me">Me</a> *RangeTable
+			  var <a href="#name-Medefaidrin">Medefaidrin</a> *RangeTable
+			  var <a href="#name-Meetei_Mayek">Meetei_Mayek</a> *RangeTable
+			  var <a href="#name-Mende_Kikakui">Mende_Kikakui</a> *RangeTable
+			  var <a href="#name-Meroitic_Cursive">Meroitic_Cursive</a> *RangeTable
+			  var <a href="#name-Meroitic_Hieroglyphs">Meroitic_Hieroglyphs</a> *RangeTable
+			  var <a href="#name-Miao">Miao</a> *RangeTable
+			  var <a href="#name-Mn">Mn</a> *RangeTable
+			  var <a href="#name-Modi">Modi</a> *RangeTable
+			  var <a href="#name-Mongolian">Mongolian</a> *RangeTable
+			  var <a href="#name-Mro">Mro</a> *RangeTable
+			  var <a href="#name-Multani">Multani</a> *RangeTable
+			  var <a href="#name-Myanmar">Myanmar</a> *RangeTable
+			  var <a href="#name-N">N</a> *RangeTable
+			  var <a href="#name-Nabataean">Nabataean</a> *RangeTable
+			  var <a href="#name-Nandinagari">Nandinagari</a> *RangeTable
+			  var <a href="#name-Nd">Nd</a> *RangeTable
+			  var <a href="#name-New_Tai_Lue">New_Tai_Lue</a> *RangeTable
+			  var <a href="#name-Newa">Newa</a> *RangeTable
+			  var <a href="#name-Nko">Nko</a> *RangeTable
+			  var <a href="#name-Nl">Nl</a> *RangeTable
+			  var <a href="#name-No">No</a> *RangeTable
+			  var <a href="#name-Noncharacter_Code_Point">Noncharacter_Code_Point</a> *RangeTable
+			  var <a href="#name-Number">Number</a> *RangeTable
+			  var <a href="#name-Nushu">Nushu</a> *RangeTable
+			  var <a href="#name-Nyiakeng_Puachue_Hmong">Nyiakeng_Puachue_Hmong</a> *RangeTable
+			  var <a href="#name-Ogham">Ogham</a> *RangeTable
+			  var <a href="#name-Ol_Chiki">Ol_Chiki</a> *RangeTable
+			  var <a href="#name-Old_Hungarian">Old_Hungarian</a> *RangeTable
+			  var <a href="#name-Old_Italic">Old_Italic</a> *RangeTable
+			  var <a href="#name-Old_North_Arabian">Old_North_Arabian</a> *RangeTable
+			  var <a href="#name-Old_Permic">Old_Permic</a> *RangeTable
+			  var <a href="#name-Old_Persian">Old_Persian</a> *RangeTable
+			  var <a href="#name-Old_Sogdian">Old_Sogdian</a> *RangeTable
+			  var <a href="#name-Old_South_Arabian">Old_South_Arabian</a> *RangeTable
+			  var <a href="#name-Old_Turkic">Old_Turkic</a> *RangeTable
+			  var <a href="#name-Oriya">Oriya</a> *RangeTable
+			  var <a href="#name-Osage">Osage</a> *RangeTable
+			  var <a href="#name-Osmanya">Osmanya</a> *RangeTable
+			  var <a href="#name-Other">Other</a> *RangeTable
+			  var <a href="#name-Other_Alphabetic">Other_Alphabetic</a> *RangeTable
+			  var <a href="#name-Other_Default_Ignorable_Code_Point">Other_Default_Ignorable_Code_Point</a> *RangeTable
+			  var <a href="#name-Other_Grapheme_Extend">Other_Grapheme_Extend</a> *RangeTable
+			  var <a href="#name-Other_ID_Continue">Other_ID_Continue</a> *RangeTable
+			  var <a href="#name-Other_ID_Start">Other_ID_Start</a> *RangeTable
+			  var <a href="#name-Other_Lowercase">Other_Lowercase</a> *RangeTable
+			  var <a href="#name-Other_Math">Other_Math</a> *RangeTable
+			  var <a href="#name-Other_Uppercase">Other_Uppercase</a> *RangeTable
+			  var <a href="#name-P">P</a> *RangeTable
+			  var <a href="#name-Pahawh_Hmong">Pahawh_Hmong</a> *RangeTable
+			  var <a href="#name-Palmyrene">Palmyrene</a> *RangeTable
+			  var <a href="#name-Pattern_Syntax">Pattern_Syntax</a> *RangeTable
+			  var <a href="#name-Pattern_White_Space">Pattern_White_Space</a> *RangeTable
+			  var <a href="#name-Pau_Cin_Hau">Pau_Cin_Hau</a> *RangeTable
+			  var <a href="#name-Pc">Pc</a> *RangeTable
+			  var <a href="#name-Pd">Pd</a> *RangeTable
+			  var <a href="#name-Pe">Pe</a> *RangeTable
+			  var <a href="#name-Pf">Pf</a> *RangeTable
+			  var <a href="#name-Phags_Pa">Phags_Pa</a> *RangeTable
+			  var <a href="#name-Phoenician">Phoenician</a> *RangeTable
+			  var <a href="#name-Pi">Pi</a> *RangeTable
+			  var <a href="#name-Po">Po</a> *RangeTable
+			  var <a href="#name-Prepended_Concatenation_Mark">Prepended_Concatenation_Mark</a> *RangeTable
+			  var <a href="#name-Ps">Ps</a> *RangeTable
+			  var <a href="#name-Psalter_Pahlavi">Psalter_Pahlavi</a> *RangeTable
+			  var <a href="#name-Punct">Punct</a> *RangeTable
+			  var <a href="#name-Quotation_Mark">Quotation_Mark</a> *RangeTable
+			  var <a href="#name-Radical">Radical</a> *RangeTable
+			  var <a href="#name-Regional_Indicator">Regional_Indicator</a> *RangeTable
+			  var <a href="#name-Rejang">Rejang</a> *RangeTable
+			  var <a href="#name-Runic">Runic</a> *RangeTable
+			  var <a href="#name-S">S</a> *RangeTable
+			  var <a href="#name-Samaritan">Samaritan</a> *RangeTable
+			  var <a href="#name-Saurashtra">Saurashtra</a> *RangeTable
+			  var <a href="#name-Sc">Sc</a> *RangeTable
+			  var <a href="#name-Sentence_Terminal">Sentence_Terminal</a> *RangeTable
+			  var <a href="#name-Sharada">Sharada</a> *RangeTable
+			  var <a href="#name-Shavian">Shavian</a> *RangeTable
+			  var <a href="#name-Siddham">Siddham</a> *RangeTable
+			  var <a href="#name-SignWriting">SignWriting</a> *RangeTable
+			  var <a href="#name-Sinhala">Sinhala</a> *RangeTable
+			  var <a href="#name-Sk">Sk</a> *RangeTable
+			  var <a href="#name-Sm">Sm</a> *RangeTable
+			  var <a href="#name-So">So</a> *RangeTable
+			  var <a href="#name-Soft_Dotted">Soft_Dotted</a> *RangeTable
+			  var <a href="#name-Sogdian">Sogdian</a> *RangeTable
+			  var <a href="#name-Sora_Sompeng">Sora_Sompeng</a> *RangeTable
+			  var <a href="#name-Soyombo">Soyombo</a> *RangeTable
+			  var <a href="#name-Space">Space</a> *RangeTable
+			  var <a href="#name-STerm">STerm</a> *RangeTable
+			  var <a href="#name-Sundanese">Sundanese</a> *RangeTable
+			  var <a href="#name-Syloti_Nagri">Syloti_Nagri</a> *RangeTable
+			  var <a href="#name-Symbol">Symbol</a> *RangeTable
+			  var <a href="#name-Syriac">Syriac</a> *RangeTable
+			  var <a href="#name-Tagalog">Tagalog</a> *RangeTable
+			  var <a href="#name-Tagbanwa">Tagbanwa</a> *RangeTable
+			  var <a href="#name-Tai_Le">Tai_Le</a> *RangeTable
+			  var <a href="#name-Tai_Tham">Tai_Tham</a> *RangeTable
+			  var <a href="#name-Tai_Viet">Tai_Viet</a> *RangeTable
+			  var <a href="#name-Takri">Takri</a> *RangeTable
+			  var <a href="#name-Tamil">Tamil</a> *RangeTable
+			  var <a href="#name-Tangut">Tangut</a> *RangeTable
+			  var <a href="#name-Telugu">Telugu</a> *RangeTable
+			  var <a href="#name-Terminal_Punctuation">Terminal_Punctuation</a> *RangeTable
+			  var <a href="#name-Thaana">Thaana</a> *RangeTable
+			  var <a href="#name-Thai">Thai</a> *RangeTable
+			  var <a href="#name-Tibetan">Tibetan</a> *RangeTable
+			  var <a href="#name-Tifinagh">Tifinagh</a> *RangeTable
+			  var <a href="#name-Tirhuta">Tirhuta</a> *RangeTable
+			  var <a href="#name-Title">Title</a> *RangeTable
+			  var <a href="#name-Ugaritic">Ugaritic</a> *RangeTable
+			  var <a href="#name-Unified_Ideograph">Unified_Ideograph</a> *RangeTable
+			  var <a href="#name-Upper">Upper</a> *RangeTable
+			  var <a href="#name-Vai">Vai</a> *RangeTable
+			  var <a href="#name-Variation_Selector">Variation_Selector</a> *RangeTable
+			  var <a href="#name-Wancho">Wancho</a> *RangeTable
+			  var <a href="#name-Warang_Citi">Warang_Citi</a> *RangeTable
+			  var <a href="#name-White_Space">White_Space</a> *RangeTable
+			  var <a href="#name-Yi">Yi</a> *RangeTable
+			  var <a href="#name-Z">Z</a> *RangeTable
+			  var <a href="#name-Zanabazar_Square">Zanabazar_Square</a> *RangeTable
+			  var <a href="#name-Zl">Zl</a> *RangeTable
+			  var <a href="#name-Zp">Zp</a> *RangeTable
+			  var <a href="#name-Zs">Zs</a> *RangeTable</span></div>
+<div class="anchor" id="name-SpecialCase" data-popularity="370">	 type <a href="../src/unicode/letter.go.html#line-62">SpecialCase</a> <i>([])</i>
+		SpecialCase represents language-specific case mappings such as Turkish.
+		Methods of SpecialCase customize (by overriding) the standard mappings.
+
+		<input type='checkbox' class="stat" id="SpecialCase-stat-methods"><label for="SpecialCase-stat-methods">Exported Methods (3)</label><span id='SpecialCase-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/unicode/letter.go.html#line-301">ToLower</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>
+			 (T) <a href="../src/unicode/letter.go.html#line-292">ToTitle</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>
+			 (T) <a href="../src/unicode/letter.go.html#line-283">ToUpper</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a></span>
+		<input type='checkbox' class="stat" id="SpecialCase-stat-params"><label for="SpecialCase-stat-params">As Inputs Of (6+)</label><span id='SpecialCase-stat-params-content' class="stat-content">
+			func bytes.<a href="bytes.html#name-ToLowerSpecial">ToLowerSpecial</a>(c <b>SpecialCase</b>, s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+			func bytes.<a href="bytes.html#name-ToTitleSpecial">ToTitleSpecial</a>(c <b>SpecialCase</b>, s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+			func bytes.<a href="bytes.html#name-ToUpperSpecial">ToUpperSpecial</a>(c <b>SpecialCase</b>, s []<a href="builtin.html#name-byte">byte</a>) []<a href="builtin.html#name-byte">byte</a>
+			func strings.<a href="strings.html#name-ToLowerSpecial">ToLowerSpecial</a>(c <b>SpecialCase</b>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			func strings.<a href="strings.html#name-ToTitleSpecial">ToTitleSpecial</a>(c <b>SpecialCase</b>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			func strings.<a href="strings.html#name-ToUpperSpecial">ToUpperSpecial</a>(c <b>SpecialCase</b>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SpecialCase-stat-values"><label for="SpecialCase-stat-values">As Types Of (2+)</label><span id='SpecialCase-stat-values-content' class="stat-content">
+			  var <a href="#name-AzeriCase">AzeriCase</a>
+			  var <a href="#name-TurkishCase">TurkishCase</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Adlam">	  var <a href="../src/unicode/tables.go.html#line-5471">Adlam</a> *<a href="#name-RangeTable">RangeTable</a> // Adlam is the set of Unicode characters in script Adlam.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Ahom">	  var <a href="../src/unicode/tables.go.html#line-5472">Ahom</a> *<a href="#name-RangeTable">RangeTable</a> // Ahom is the set of Unicode characters in script Ahom.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Anatolian_Hieroglyphs">	  var <a href="../src/unicode/tables.go.html#line-5473">Anatolian_Hieroglyphs</a> *<a href="#name-RangeTable">RangeTable</a> // Anatolian_Hieroglyphs is the set of Unicode characters in script Anatolian_Hieroglyphs.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Arabic">	  var <a href="../src/unicode/tables.go.html#line-5474">Arabic</a> *<a href="#name-RangeTable">RangeTable</a> // Arabic is the set of Unicode characters in script Arabic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Armenian">	  var <a href="../src/unicode/tables.go.html#line-5475">Armenian</a> *<a href="#name-RangeTable">RangeTable</a> // Armenian is the set of Unicode characters in script Armenian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-ASCII_Hex_Digit">	  var <a href="../src/unicode/tables.go.html#line-6749">ASCII_Hex_Digit</a> *<a href="#name-RangeTable">RangeTable</a> // ASCII_Hex_Digit is the set of Unicode characters with property ASCII_Hex_Digit.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Avestan">	  var <a href="../src/unicode/tables.go.html#line-5476">Avestan</a> *<a href="#name-RangeTable">RangeTable</a> // Avestan is the set of Unicode characters in script Avestan.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-AzeriCase">	  var <a href="../src/unicode/casetables.go.html#line-20">AzeriCase</a> <a href="#name-SpecialCase">SpecialCase</a></div>
+<div class="anchor" id="name-Balinese">	  var <a href="../src/unicode/tables.go.html#line-5477">Balinese</a> *<a href="#name-RangeTable">RangeTable</a> // Balinese is the set of Unicode characters in script Balinese.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Bamum">	  var <a href="../src/unicode/tables.go.html#line-5478">Bamum</a> *<a href="#name-RangeTable">RangeTable</a> // Bamum is the set of Unicode characters in script Bamum.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Bassa_Vah">	  var <a href="../src/unicode/tables.go.html#line-5479">Bassa_Vah</a> *<a href="#name-RangeTable">RangeTable</a> // Bassa_Vah is the set of Unicode characters in script Bassa_Vah.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Batak">	  var <a href="../src/unicode/tables.go.html#line-5480">Batak</a> *<a href="#name-RangeTable">RangeTable</a> // Batak is the set of Unicode characters in script Batak.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Bengali">	  var <a href="../src/unicode/tables.go.html#line-5481">Bengali</a> *<a href="#name-RangeTable">RangeTable</a> // Bengali is the set of Unicode characters in script Bengali.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Bhaiksuki">	  var <a href="../src/unicode/tables.go.html#line-5482">Bhaiksuki</a> *<a href="#name-RangeTable">RangeTable</a> // Bhaiksuki is the set of Unicode characters in script Bhaiksuki.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Bidi_Control">	  var <a href="../src/unicode/tables.go.html#line-6750">Bidi_Control</a> *<a href="#name-RangeTable">RangeTable</a> // Bidi_Control is the set of Unicode characters with property Bidi_Control.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Bopomofo">	  var <a href="../src/unicode/tables.go.html#line-5483">Bopomofo</a> *<a href="#name-RangeTable">RangeTable</a> // Bopomofo is the set of Unicode characters in script Bopomofo.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Brahmi">	  var <a href="../src/unicode/tables.go.html#line-5484">Brahmi</a> *<a href="#name-RangeTable">RangeTable</a> // Brahmi is the set of Unicode characters in script Brahmi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Braille">	  var <a href="../src/unicode/tables.go.html#line-5485">Braille</a> *<a href="#name-RangeTable">RangeTable</a> // Braille is the set of Unicode characters in script Braille.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Buginese">	  var <a href="../src/unicode/tables.go.html#line-5486">Buginese</a> *<a href="#name-RangeTable">RangeTable</a> // Buginese is the set of Unicode characters in script Buginese.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Buhid">	  var <a href="../src/unicode/tables.go.html#line-5487">Buhid</a> *<a href="#name-RangeTable">RangeTable</a> // Buhid is the set of Unicode characters in script Buhid.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-C">	  var <a href="../src/unicode/tables.go.html#line-3558">C</a> *<a href="#name-RangeTable">RangeTable</a>
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Canadian_Aboriginal">	  var <a href="../src/unicode/tables.go.html#line-5488">Canadian_Aboriginal</a> *<a href="#name-RangeTable">RangeTable</a> // Canadian_Aboriginal is the set of Unicode characters in script Canadian_Aboriginal.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Carian">	  var <a href="../src/unicode/tables.go.html#line-5489">Carian</a> *<a href="#name-RangeTable">RangeTable</a> // Carian is the set of Unicode characters in script Carian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-CaseRanges">	  var <a href="../src/unicode/tables.go.html#line-6788">CaseRanges</a> []<a href="#name-CaseRange">CaseRange</a>
+		CaseRanges is the table describing case mappings for all letters with
+		non-self mappings.</div>
+<div class="anchor" id="name-Categories">	  var <a href="../src/unicode/tables.go.html#line-9">Categories</a> map[<a href="builtin.html#name-string">string</a>]*<a href="#name-RangeTable">RangeTable</a>
+		Categories is the set of Unicode category tables.</div>
+<div class="anchor" id="name-Caucasian_Albanian">	  var <a href="../src/unicode/tables.go.html#line-5490">Caucasian_Albanian</a> *<a href="#name-RangeTable">RangeTable</a> // Caucasian_Albanian is the set of Unicode characters in script Caucasian_Albanian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cc">	  var <a href="../src/unicode/tables.go.html#line-3536">Cc</a> *<a href="#name-RangeTable">RangeTable</a> // Cc is the set of Unicode characters in category Cc (Other, control).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cf">	  var <a href="../src/unicode/tables.go.html#line-3537">Cf</a> *<a href="#name-RangeTable">RangeTable</a> // Cf is the set of Unicode characters in category Cf (Other, format).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Chakma">	  var <a href="../src/unicode/tables.go.html#line-5491">Chakma</a> *<a href="#name-RangeTable">RangeTable</a> // Chakma is the set of Unicode characters in script Chakma.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cham">	  var <a href="../src/unicode/tables.go.html#line-5492">Cham</a> *<a href="#name-RangeTable">RangeTable</a> // Cham is the set of Unicode characters in script Cham.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cherokee">	  var <a href="../src/unicode/tables.go.html#line-5493">Cherokee</a> *<a href="#name-RangeTable">RangeTable</a> // Cherokee is the set of Unicode characters in script Cherokee.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Co">	  var <a href="../src/unicode/tables.go.html#line-3538">Co</a> *<a href="#name-RangeTable">RangeTable</a> // Co is the set of Unicode characters in category Co (Other, private use).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Common">	  var <a href="../src/unicode/tables.go.html#line-5494">Common</a> *<a href="#name-RangeTable">RangeTable</a> // Common is the set of Unicode characters in script Common.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Coptic">	  var <a href="../src/unicode/tables.go.html#line-5495">Coptic</a> *<a href="#name-RangeTable">RangeTable</a> // Coptic is the set of Unicode characters in script Coptic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cs">	  var <a href="../src/unicode/tables.go.html#line-3539">Cs</a> *<a href="#name-RangeTable">RangeTable</a> // Cs is the set of Unicode characters in category Cs (Other, surrogate).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cuneiform">	  var <a href="../src/unicode/tables.go.html#line-5496">Cuneiform</a> *<a href="#name-RangeTable">RangeTable</a> // Cuneiform is the set of Unicode characters in script Cuneiform.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cypriot">	  var <a href="../src/unicode/tables.go.html#line-5497">Cypriot</a> *<a href="#name-RangeTable">RangeTable</a> // Cypriot is the set of Unicode characters in script Cypriot.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Cyrillic">	  var <a href="../src/unicode/tables.go.html#line-5498">Cyrillic</a> *<a href="#name-RangeTable">RangeTable</a> // Cyrillic is the set of Unicode characters in script Cyrillic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Dash">	  var <a href="../src/unicode/tables.go.html#line-6751">Dash</a> *<a href="#name-RangeTable">RangeTable</a> // Dash is the set of Unicode characters with property Dash.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Deprecated">	  var <a href="../src/unicode/tables.go.html#line-6752">Deprecated</a> *<a href="#name-RangeTable">RangeTable</a> // Deprecated is the set of Unicode characters with property Deprecated.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Deseret">	  var <a href="../src/unicode/tables.go.html#line-5499">Deseret</a> *<a href="#name-RangeTable">RangeTable</a> // Deseret is the set of Unicode characters in script Deseret.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Devanagari">	  var <a href="../src/unicode/tables.go.html#line-5500">Devanagari</a> *<a href="#name-RangeTable">RangeTable</a> // Devanagari is the set of Unicode characters in script Devanagari.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Diacritic">	  var <a href="../src/unicode/tables.go.html#line-6753">Diacritic</a> *<a href="#name-RangeTable">RangeTable</a> // Diacritic is the set of Unicode characters with property Diacritic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Digit">	  var <a href="../src/unicode/tables.go.html#line-3540">Digit</a> *<a href="#name-RangeTable">RangeTable</a> // Digit is the set of Unicode characters with the "decimal digit" property.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Dogra">	  var <a href="../src/unicode/tables.go.html#line-5501">Dogra</a> *<a href="#name-RangeTable">RangeTable</a> // Dogra is the set of Unicode characters in script Dogra.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Duployan">	  var <a href="../src/unicode/tables.go.html#line-5502">Duployan</a> *<a href="#name-RangeTable">RangeTable</a> // Duployan is the set of Unicode characters in script Duployan.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Egyptian_Hieroglyphs">	  var <a href="../src/unicode/tables.go.html#line-5503">Egyptian_Hieroglyphs</a> *<a href="#name-RangeTable">RangeTable</a> // Egyptian_Hieroglyphs is the set of Unicode characters in script Egyptian_Hieroglyphs.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Elbasan">	  var <a href="../src/unicode/tables.go.html#line-5504">Elbasan</a> *<a href="#name-RangeTable">RangeTable</a> // Elbasan is the set of Unicode characters in script Elbasan.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Elymaic">	  var <a href="../src/unicode/tables.go.html#line-5505">Elymaic</a> *<a href="#name-RangeTable">RangeTable</a> // Elymaic is the set of Unicode characters in script Elymaic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Ethiopic">	  var <a href="../src/unicode/tables.go.html#line-5506">Ethiopic</a> *<a href="#name-RangeTable">RangeTable</a> // Ethiopic is the set of Unicode characters in script Ethiopic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Extender">	  var <a href="../src/unicode/tables.go.html#line-6754">Extender</a> *<a href="#name-RangeTable">RangeTable</a> // Extender is the set of Unicode characters with property Extender.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-FoldCategory">	  var <a href="../src/unicode/tables.go.html#line-7593">FoldCategory</a> map[<a href="builtin.html#name-string">string</a>]*<a href="#name-RangeTable">RangeTable</a>
+		FoldCategory maps a category name to a table of
+		code points outside the category that are equivalent under
+		simple case folding to code points inside the category.
+		If there is no entry for a category name, there are no such points.</div>
+<div class="anchor" id="name-FoldScript">	  var <a href="../src/unicode/tables.go.html#line-7880">FoldScript</a> map[<a href="builtin.html#name-string">string</a>]*<a href="#name-RangeTable">RangeTable</a>
+		FoldScript maps a script name to a table of
+		code points outside the script that are equivalent under
+		simple case folding to code points inside the script.
+		If there is no entry for a script name, there are no such points.</div>
+<div class="anchor" id="name-Georgian">	  var <a href="../src/unicode/tables.go.html#line-5507">Georgian</a> *<a href="#name-RangeTable">RangeTable</a> // Georgian is the set of Unicode characters in script Georgian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Glagolitic">	  var <a href="../src/unicode/tables.go.html#line-5508">Glagolitic</a> *<a href="#name-RangeTable">RangeTable</a> // Glagolitic is the set of Unicode characters in script Glagolitic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Gothic">	  var <a href="../src/unicode/tables.go.html#line-5509">Gothic</a> *<a href="#name-RangeTable">RangeTable</a> // Gothic is the set of Unicode characters in script Gothic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Grantha">	  var <a href="../src/unicode/tables.go.html#line-5510">Grantha</a> *<a href="#name-RangeTable">RangeTable</a> // Grantha is the set of Unicode characters in script Grantha.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-GraphicRanges">	  var <a href="../src/unicode/graphic.go.html#line-23">GraphicRanges</a> []*<a href="#name-RangeTable">RangeTable</a>
+		GraphicRanges defines the set of graphic characters according to Unicode.</div>
+<div class="anchor" id="name-Greek">	  var <a href="../src/unicode/tables.go.html#line-5511">Greek</a> *<a href="#name-RangeTable">RangeTable</a> // Greek is the set of Unicode characters in script Greek.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Gujarati">	  var <a href="../src/unicode/tables.go.html#line-5512">Gujarati</a> *<a href="#name-RangeTable">RangeTable</a> // Gujarati is the set of Unicode characters in script Gujarati.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Gunjala_Gondi">	  var <a href="../src/unicode/tables.go.html#line-5513">Gunjala_Gondi</a> *<a href="#name-RangeTable">RangeTable</a> // Gunjala_Gondi is the set of Unicode characters in script Gunjala_Gondi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Gurmukhi">	  var <a href="../src/unicode/tables.go.html#line-5514">Gurmukhi</a> *<a href="#name-RangeTable">RangeTable</a> // Gurmukhi is the set of Unicode characters in script Gurmukhi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Han">	  var <a href="../src/unicode/tables.go.html#line-5515">Han</a> *<a href="#name-RangeTable">RangeTable</a> // Han is the set of Unicode characters in script Han.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hangul">	  var <a href="../src/unicode/tables.go.html#line-5516">Hangul</a> *<a href="#name-RangeTable">RangeTable</a> // Hangul is the set of Unicode characters in script Hangul.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hanifi_Rohingya">	  var <a href="../src/unicode/tables.go.html#line-5517">Hanifi_Rohingya</a> *<a href="#name-RangeTable">RangeTable</a> // Hanifi_Rohingya is the set of Unicode characters in script Hanifi_Rohingya.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hanunoo">	  var <a href="../src/unicode/tables.go.html#line-5518">Hanunoo</a> *<a href="#name-RangeTable">RangeTable</a> // Hanunoo is the set of Unicode characters in script Hanunoo.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hatran">	  var <a href="../src/unicode/tables.go.html#line-5519">Hatran</a> *<a href="#name-RangeTable">RangeTable</a> // Hatran is the set of Unicode characters in script Hatran.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hebrew">	  var <a href="../src/unicode/tables.go.html#line-5520">Hebrew</a> *<a href="#name-RangeTable">RangeTable</a> // Hebrew is the set of Unicode characters in script Hebrew.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hex_Digit">	  var <a href="../src/unicode/tables.go.html#line-6755">Hex_Digit</a> *<a href="#name-RangeTable">RangeTable</a> // Hex_Digit is the set of Unicode characters with property Hex_Digit.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hiragana">	  var <a href="../src/unicode/tables.go.html#line-5521">Hiragana</a> *<a href="#name-RangeTable">RangeTable</a> // Hiragana is the set of Unicode characters in script Hiragana.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Hyphen">	  var <a href="../src/unicode/tables.go.html#line-6756">Hyphen</a> *<a href="#name-RangeTable">RangeTable</a> // Hyphen is the set of Unicode characters with property Hyphen.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Ideographic">	  var <a href="../src/unicode/tables.go.html#line-6759">Ideographic</a> *<a href="#name-RangeTable">RangeTable</a> // Ideographic is the set of Unicode characters with property Ideographic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-IDS_Binary_Operator">	  var <a href="../src/unicode/tables.go.html#line-6757">IDS_Binary_Operator</a> *<a href="#name-RangeTable">RangeTable</a> // IDS_Binary_Operator is the set of Unicode characters with property IDS_Binary_Operator.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-IDS_Trinary_Operator">	  var <a href="../src/unicode/tables.go.html#line-6758">IDS_Trinary_Operator</a> *<a href="#name-RangeTable">RangeTable</a> // IDS_Trinary_Operator is the set of Unicode characters with property IDS_Trinary_Operator.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Imperial_Aramaic">	  var <a href="../src/unicode/tables.go.html#line-5522">Imperial_Aramaic</a> *<a href="#name-RangeTable">RangeTable</a> // Imperial_Aramaic is the set of Unicode characters in script Imperial_Aramaic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-In">	 func <a href="../src/unicode/graphic.go.html#line-69">In</a>(r <a href="builtin.html#name-rune">rune</a>, ranges ...*<a href="#name-RangeTable">RangeTable</a>) <a href="builtin.html#name-bool">bool</a>
+		In reports whether the rune is a member of one of the ranges.</div>
+<div class="anchor" id="name-Inherited">	  var <a href="../src/unicode/tables.go.html#line-5523">Inherited</a> *<a href="#name-RangeTable">RangeTable</a> // Inherited is the set of Unicode characters in script Inherited.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Inscriptional_Pahlavi">	  var <a href="../src/unicode/tables.go.html#line-5524">Inscriptional_Pahlavi</a> *<a href="#name-RangeTable">RangeTable</a> // Inscriptional_Pahlavi is the set of Unicode characters in script Inscriptional_Pahlavi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Inscriptional_Parthian">	  var <a href="../src/unicode/tables.go.html#line-5525">Inscriptional_Parthian</a> *<a href="#name-RangeTable">RangeTable</a> // Inscriptional_Parthian is the set of Unicode characters in script Inscriptional_Parthian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Is">	 func <a href="../src/unicode/letter.go.html#line-155">Is</a>(rangeTab *<a href="#name-RangeTable">RangeTable</a>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		Is reports whether the rune is in the specified table of ranges.</div>
+<div class="anchor" id="name-IsControl">	 func <a href="../src/unicode/graphic.go.html#line-81">IsControl</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsControl reports whether the rune is a control character.
+		The C (Other) Unicode category includes more code points
+		such as surrogates; use Is(C, r) to test for them.</div>
+<div class="anchor" id="name-IsDigit">	 func <a href="../src/unicode/digit.go.html#line-8">IsDigit</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsDigit reports whether the rune is a decimal digit.</div>
+<div class="anchor" id="name-IsGraphic">	 func <a href="../src/unicode/graphic.go.html#line-36">IsGraphic</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsGraphic reports whether the rune is defined as a Graphic by Unicode.
+		Such characters include letters, marks, numbers, punctuation, symbols, and
+		spaces, from categories L, M, N, P, S, Zs.</div>
+<div class="anchor" id="name-IsLetter">	 func <a href="../src/unicode/graphic.go.html#line-90">IsLetter</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsLetter reports whether the rune is a letter (category L).</div>
+<div class="anchor" id="name-IsLower">	 func <a href="../src/unicode/letter.go.html#line-189">IsLower</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsLower reports whether the rune is a lower case letter.</div>
+<div class="anchor" id="name-IsMark">	 func <a href="../src/unicode/graphic.go.html#line-98">IsMark</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsMark reports whether the rune is a mark character (category M).</div>
+<div class="anchor" id="name-IsNumber">	 func <a href="../src/unicode/graphic.go.html#line-104">IsNumber</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsNumber reports whether the rune is a number (category N).</div>
+<div class="anchor" id="name-IsOneOf">	 func <a href="../src/unicode/graphic.go.html#line-59">IsOneOf</a>(ranges []*<a href="#name-RangeTable">RangeTable</a>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsOneOf reports whether the rune is a member of one of the ranges.
+		The function "In" provides a nicer signature and should be used in preference to IsOneOf.</div>
+<div class="anchor" id="name-IsPrint">	 func <a href="../src/unicode/graphic.go.html#line-50">IsPrint</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsPrint reports whether the rune is defined as printable by Go. Such
+		characters include letters, marks, numbers, punctuation, symbols, and the
+		ASCII space character, from categories L, M, N, P, S and the ASCII space
+		character. This categorization is the same as IsGraphic except that the
+		only spacing character is ASCII space, U+0020.</div>
+<div class="anchor" id="name-IsPunct">	 func <a href="../src/unicode/graphic.go.html#line-113">IsPunct</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsPunct reports whether the rune is a Unicode punctuation character
+		(category P).</div>
+<div class="anchor" id="name-IsSpace">	 func <a href="../src/unicode/graphic.go.html#line-126">IsSpace</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsSpace reports whether the rune is a space character as defined
+		by Unicode's White Space property; in the Latin-1 space
+		this is
+			'\t', '\n', '\v', '\f', '\r', ' ', U+0085 (NEL), U+00A0 (NBSP).
+		Other definitions of spacing characters are set by category
+		Z and property Pattern_White_Space.</div>
+<div class="anchor" id="name-IsSymbol">	 func <a href="../src/unicode/graphic.go.html#line-139">IsSymbol</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsSymbol reports whether the rune is a symbolic character.</div>
+<div class="anchor" id="name-IsTitle">	 func <a href="../src/unicode/letter.go.html#line-198">IsTitle</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsTitle reports whether the rune is a title case letter.</div>
+<div class="anchor" id="name-IsUpper">	 func <a href="../src/unicode/letter.go.html#line-180">IsUpper</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-bool">bool</a>
+		IsUpper reports whether the rune is an upper case letter.</div>
+<div class="anchor" id="name-Javanese">	  var <a href="../src/unicode/tables.go.html#line-5526">Javanese</a> *<a href="#name-RangeTable">RangeTable</a> // Javanese is the set of Unicode characters in script Javanese.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Join_Control">	  var <a href="../src/unicode/tables.go.html#line-6760">Join_Control</a> *<a href="#name-RangeTable">RangeTable</a> // Join_Control is the set of Unicode characters with property Join_Control.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Kaithi">	  var <a href="../src/unicode/tables.go.html#line-5527">Kaithi</a> *<a href="#name-RangeTable">RangeTable</a> // Kaithi is the set of Unicode characters in script Kaithi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Kannada">	  var <a href="../src/unicode/tables.go.html#line-5528">Kannada</a> *<a href="#name-RangeTable">RangeTable</a> // Kannada is the set of Unicode characters in script Kannada.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Katakana">	  var <a href="../src/unicode/tables.go.html#line-5529">Katakana</a> *<a href="#name-RangeTable">RangeTable</a> // Katakana is the set of Unicode characters in script Katakana.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Kayah_Li">	  var <a href="../src/unicode/tables.go.html#line-5530">Kayah_Li</a> *<a href="#name-RangeTable">RangeTable</a> // Kayah_Li is the set of Unicode characters in script Kayah_Li.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Kharoshthi">	  var <a href="../src/unicode/tables.go.html#line-5531">Kharoshthi</a> *<a href="#name-RangeTable">RangeTable</a> // Kharoshthi is the set of Unicode characters in script Kharoshthi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Khmer">	  var <a href="../src/unicode/tables.go.html#line-5532">Khmer</a> *<a href="#name-RangeTable">RangeTable</a> // Khmer is the set of Unicode characters in script Khmer.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Khojki">	  var <a href="../src/unicode/tables.go.html#line-5533">Khojki</a> *<a href="#name-RangeTable">RangeTable</a> // Khojki is the set of Unicode characters in script Khojki.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Khudawadi">	  var <a href="../src/unicode/tables.go.html#line-5534">Khudawadi</a> *<a href="#name-RangeTable">RangeTable</a> // Khudawadi is the set of Unicode characters in script Khudawadi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-L">	  var <a href="../src/unicode/tables.go.html#line-3543">L</a> *<a href="#name-RangeTable">RangeTable</a>
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lao">	  var <a href="../src/unicode/tables.go.html#line-5535">Lao</a> *<a href="#name-RangeTable">RangeTable</a> // Lao is the set of Unicode characters in script Lao.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Latin">	  var <a href="../src/unicode/tables.go.html#line-5536">Latin</a> *<a href="#name-RangeTable">RangeTable</a> // Latin is the set of Unicode characters in script Latin.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lepcha">	  var <a href="../src/unicode/tables.go.html#line-5537">Lepcha</a> *<a href="#name-RangeTable">RangeTable</a> // Lepcha is the set of Unicode characters in script Lepcha.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Letter">	  var <a href="../src/unicode/tables.go.html#line-3542">Letter</a> *<a href="#name-RangeTable">RangeTable</a> // Letter/L is the set of Unicode letters, category L.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Limbu">	  var <a href="../src/unicode/tables.go.html#line-5538">Limbu</a> *<a href="#name-RangeTable">RangeTable</a> // Limbu is the set of Unicode characters in script Limbu.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Linear_A">	  var <a href="../src/unicode/tables.go.html#line-5539">Linear_A</a> *<a href="#name-RangeTable">RangeTable</a> // Linear_A is the set of Unicode characters in script Linear_A.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Linear_B">	  var <a href="../src/unicode/tables.go.html#line-5540">Linear_B</a> *<a href="#name-RangeTable">RangeTable</a> // Linear_B is the set of Unicode characters in script Linear_B.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lisu">	  var <a href="../src/unicode/tables.go.html#line-5541">Lisu</a> *<a href="#name-RangeTable">RangeTable</a> // Lisu is the set of Unicode characters in script Lisu.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Ll">	  var <a href="../src/unicode/tables.go.html#line-3547">Ll</a> *<a href="#name-RangeTable">RangeTable</a> // Ll is the set of Unicode characters in category Ll (Letter, lowercase).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lm">	  var <a href="../src/unicode/tables.go.html#line-3544">Lm</a> *<a href="#name-RangeTable">RangeTable</a> // Lm is the set of Unicode characters in category Lm (Letter, modifier).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lo">	  var <a href="../src/unicode/tables.go.html#line-3545">Lo</a> *<a href="#name-RangeTable">RangeTable</a> // Lo is the set of Unicode characters in category Lo (Letter, other).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Logical_Order_Exception">	  var <a href="../src/unicode/tables.go.html#line-6761">Logical_Order_Exception</a> *<a href="#name-RangeTable">RangeTable</a> // Logical_Order_Exception is the set of Unicode characters with property Logical_Order_Exception.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lower">	  var <a href="../src/unicode/tables.go.html#line-3546">Lower</a> *<a href="#name-RangeTable">RangeTable</a> // Lower is the set of Unicode lower case letters.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-LowerCase">	const <a href="../src/unicode/letter.go.html#line-70">LowerCase</a> = 1
+		Indices into the Delta arrays inside CaseRanges for case mapping.</div>
+<div class="anchor" id="name-Lt">	  var <a href="../src/unicode/tables.go.html#line-3577">Lt</a> *<a href="#name-RangeTable">RangeTable</a> // Lt is the set of Unicode characters in category Lt (Letter, titlecase).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lu">	  var <a href="../src/unicode/tables.go.html#line-3579">Lu</a> *<a href="#name-RangeTable">RangeTable</a> // Lu is the set of Unicode characters in category Lu (Letter, uppercase).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lycian">	  var <a href="../src/unicode/tables.go.html#line-5542">Lycian</a> *<a href="#name-RangeTable">RangeTable</a> // Lycian is the set of Unicode characters in script Lycian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Lydian">	  var <a href="../src/unicode/tables.go.html#line-5543">Lydian</a> *<a href="#name-RangeTable">RangeTable</a> // Lydian is the set of Unicode characters in script Lydian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-M">	  var <a href="../src/unicode/tables.go.html#line-3549">M</a> *<a href="#name-RangeTable">RangeTable</a>
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Mahajani">	  var <a href="../src/unicode/tables.go.html#line-5544">Mahajani</a> *<a href="#name-RangeTable">RangeTable</a> // Mahajani is the set of Unicode characters in script Mahajani.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Makasar">	  var <a href="../src/unicode/tables.go.html#line-5545">Makasar</a> *<a href="#name-RangeTable">RangeTable</a> // Makasar is the set of Unicode characters in script Makasar.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Malayalam">	  var <a href="../src/unicode/tables.go.html#line-5546">Malayalam</a> *<a href="#name-RangeTable">RangeTable</a> // Malayalam is the set of Unicode characters in script Malayalam.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Mandaic">	  var <a href="../src/unicode/tables.go.html#line-5547">Mandaic</a> *<a href="#name-RangeTable">RangeTable</a> // Mandaic is the set of Unicode characters in script Mandaic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Manichaean">	  var <a href="../src/unicode/tables.go.html#line-5548">Manichaean</a> *<a href="#name-RangeTable">RangeTable</a> // Manichaean is the set of Unicode characters in script Manichaean.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Marchen">	  var <a href="../src/unicode/tables.go.html#line-5549">Marchen</a> *<a href="#name-RangeTable">RangeTable</a> // Marchen is the set of Unicode characters in script Marchen.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Mark">	  var <a href="../src/unicode/tables.go.html#line-3548">Mark</a> *<a href="#name-RangeTable">RangeTable</a> // Mark/M is the set of Unicode mark characters, category M.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Masaram_Gondi">	  var <a href="../src/unicode/tables.go.html#line-5550">Masaram_Gondi</a> *<a href="#name-RangeTable">RangeTable</a> // Masaram_Gondi is the set of Unicode characters in script Masaram_Gondi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-MaxASCII">	const <a href="../src/unicode/letter.go.html#line-12">MaxASCII</a> = 127 // maximum ASCII value.</div>
+<div class="anchor" id="name-MaxCase">	const <a href="../src/unicode/letter.go.html#line-72">MaxCase</a> = 3
+		Indices into the Delta arrays inside CaseRanges for case mapping.</div>
+<div class="anchor" id="name-MaxLatin1">	const <a href="../src/unicode/letter.go.html#line-13">MaxLatin1</a> = 255 // maximum Latin-1 value.</div>
+<div class="anchor" id="name-MaxRune">	const <a href="../src/unicode/letter.go.html#line-10">MaxRune</a> = 1114111 // Maximum valid Unicode code point.</div>
+<div class="anchor" id="name-Mc">	  var <a href="../src/unicode/tables.go.html#line-3550">Mc</a> *<a href="#name-RangeTable">RangeTable</a> // Mc is the set of Unicode characters in category Mc (Mark, spacing combining).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Me">	  var <a href="../src/unicode/tables.go.html#line-3551">Me</a> *<a href="#name-RangeTable">RangeTable</a> // Me is the set of Unicode characters in category Me (Mark, enclosing).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Medefaidrin">	  var <a href="../src/unicode/tables.go.html#line-5551">Medefaidrin</a> *<a href="#name-RangeTable">RangeTable</a> // Medefaidrin is the set of Unicode characters in script Medefaidrin.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Meetei_Mayek">	  var <a href="../src/unicode/tables.go.html#line-5552">Meetei_Mayek</a> *<a href="#name-RangeTable">RangeTable</a> // Meetei_Mayek is the set of Unicode characters in script Meetei_Mayek.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Mende_Kikakui">	  var <a href="../src/unicode/tables.go.html#line-5553">Mende_Kikakui</a> *<a href="#name-RangeTable">RangeTable</a> // Mende_Kikakui is the set of Unicode characters in script Mende_Kikakui.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Meroitic_Cursive">	  var <a href="../src/unicode/tables.go.html#line-5554">Meroitic_Cursive</a> *<a href="#name-RangeTable">RangeTable</a> // Meroitic_Cursive is the set of Unicode characters in script Meroitic_Cursive.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Meroitic_Hieroglyphs">	  var <a href="../src/unicode/tables.go.html#line-5555">Meroitic_Hieroglyphs</a> *<a href="#name-RangeTable">RangeTable</a> // Meroitic_Hieroglyphs is the set of Unicode characters in script Meroitic_Hieroglyphs.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Miao">	  var <a href="../src/unicode/tables.go.html#line-5556">Miao</a> *<a href="#name-RangeTable">RangeTable</a> // Miao is the set of Unicode characters in script Miao.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Mn">	  var <a href="../src/unicode/tables.go.html#line-3552">Mn</a> *<a href="#name-RangeTable">RangeTable</a> // Mn is the set of Unicode characters in category Mn (Mark, nonspacing).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Modi">	  var <a href="../src/unicode/tables.go.html#line-5557">Modi</a> *<a href="#name-RangeTable">RangeTable</a> // Modi is the set of Unicode characters in script Modi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Mongolian">	  var <a href="../src/unicode/tables.go.html#line-5558">Mongolian</a> *<a href="#name-RangeTable">RangeTable</a> // Mongolian is the set of Unicode characters in script Mongolian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Mro">	  var <a href="../src/unicode/tables.go.html#line-5559">Mro</a> *<a href="#name-RangeTable">RangeTable</a> // Mro is the set of Unicode characters in script Mro.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Multani">	  var <a href="../src/unicode/tables.go.html#line-5560">Multani</a> *<a href="#name-RangeTable">RangeTable</a> // Multani is the set of Unicode characters in script Multani.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Myanmar">	  var <a href="../src/unicode/tables.go.html#line-5561">Myanmar</a> *<a href="#name-RangeTable">RangeTable</a> // Myanmar is the set of Unicode characters in script Myanmar.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-N">	  var <a href="../src/unicode/tables.go.html#line-3556">N</a> *<a href="#name-RangeTable">RangeTable</a>
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Nabataean">	  var <a href="../src/unicode/tables.go.html#line-5562">Nabataean</a> *<a href="#name-RangeTable">RangeTable</a> // Nabataean is the set of Unicode characters in script Nabataean.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Nandinagari">	  var <a href="../src/unicode/tables.go.html#line-5563">Nandinagari</a> *<a href="#name-RangeTable">RangeTable</a> // Nandinagari is the set of Unicode characters in script Nandinagari.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Nd">	  var <a href="../src/unicode/tables.go.html#line-3541">Nd</a> *<a href="#name-RangeTable">RangeTable</a> // Nd is the set of Unicode characters in category Nd (Number, decimal digit).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-New_Tai_Lue">	  var <a href="../src/unicode/tables.go.html#line-5564">New_Tai_Lue</a> *<a href="#name-RangeTable">RangeTable</a> // New_Tai_Lue is the set of Unicode characters in script New_Tai_Lue.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Newa">	  var <a href="../src/unicode/tables.go.html#line-5565">Newa</a> *<a href="#name-RangeTable">RangeTable</a> // Newa is the set of Unicode characters in script Newa.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Nko">	  var <a href="../src/unicode/tables.go.html#line-5566">Nko</a> *<a href="#name-RangeTable">RangeTable</a> // Nko is the set of Unicode characters in script Nko.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Nl">	  var <a href="../src/unicode/tables.go.html#line-3553">Nl</a> *<a href="#name-RangeTable">RangeTable</a> // Nl is the set of Unicode characters in category Nl (Number, letter).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-No">	  var <a href="../src/unicode/tables.go.html#line-3554">No</a> *<a href="#name-RangeTable">RangeTable</a> // No is the set of Unicode characters in category No (Number, other).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Noncharacter_Code_Point">	  var <a href="../src/unicode/tables.go.html#line-6762">Noncharacter_Code_Point</a> *<a href="#name-RangeTable">RangeTable</a> // Noncharacter_Code_Point is the set of Unicode characters with property Noncharacter_Code_Point.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Number">	  var <a href="../src/unicode/tables.go.html#line-3555">Number</a> *<a href="#name-RangeTable">RangeTable</a> // Number/N is the set of Unicode number characters, category N.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Nushu">	  var <a href="../src/unicode/tables.go.html#line-5567">Nushu</a> *<a href="#name-RangeTable">RangeTable</a> // Nushu is the set of Unicode characters in script Nushu.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Nyiakeng_Puachue_Hmong">	  var <a href="../src/unicode/tables.go.html#line-5568">Nyiakeng_Puachue_Hmong</a> *<a href="#name-RangeTable">RangeTable</a> // Nyiakeng_Puachue_Hmong is the set of Unicode characters in script Nyiakeng_Puachue_Hmong.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Ogham">	  var <a href="../src/unicode/tables.go.html#line-5569">Ogham</a> *<a href="#name-RangeTable">RangeTable</a> // Ogham is the set of Unicode characters in script Ogham.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Ol_Chiki">	  var <a href="../src/unicode/tables.go.html#line-5570">Ol_Chiki</a> *<a href="#name-RangeTable">RangeTable</a> // Ol_Chiki is the set of Unicode characters in script Ol_Chiki.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_Hungarian">	  var <a href="../src/unicode/tables.go.html#line-5571">Old_Hungarian</a> *<a href="#name-RangeTable">RangeTable</a> // Old_Hungarian is the set of Unicode characters in script Old_Hungarian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_Italic">	  var <a href="../src/unicode/tables.go.html#line-5572">Old_Italic</a> *<a href="#name-RangeTable">RangeTable</a> // Old_Italic is the set of Unicode characters in script Old_Italic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_North_Arabian">	  var <a href="../src/unicode/tables.go.html#line-5573">Old_North_Arabian</a> *<a href="#name-RangeTable">RangeTable</a> // Old_North_Arabian is the set of Unicode characters in script Old_North_Arabian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_Permic">	  var <a href="../src/unicode/tables.go.html#line-5574">Old_Permic</a> *<a href="#name-RangeTable">RangeTable</a> // Old_Permic is the set of Unicode characters in script Old_Permic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_Persian">	  var <a href="../src/unicode/tables.go.html#line-5575">Old_Persian</a> *<a href="#name-RangeTable">RangeTable</a> // Old_Persian is the set of Unicode characters in script Old_Persian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_Sogdian">	  var <a href="../src/unicode/tables.go.html#line-5576">Old_Sogdian</a> *<a href="#name-RangeTable">RangeTable</a> // Old_Sogdian is the set of Unicode characters in script Old_Sogdian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_South_Arabian">	  var <a href="../src/unicode/tables.go.html#line-5577">Old_South_Arabian</a> *<a href="#name-RangeTable">RangeTable</a> // Old_South_Arabian is the set of Unicode characters in script Old_South_Arabian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Old_Turkic">	  var <a href="../src/unicode/tables.go.html#line-5578">Old_Turkic</a> *<a href="#name-RangeTable">RangeTable</a> // Old_Turkic is the set of Unicode characters in script Old_Turkic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Oriya">	  var <a href="../src/unicode/tables.go.html#line-5579">Oriya</a> *<a href="#name-RangeTable">RangeTable</a> // Oriya is the set of Unicode characters in script Oriya.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Osage">	  var <a href="../src/unicode/tables.go.html#line-5580">Osage</a> *<a href="#name-RangeTable">RangeTable</a> // Osage is the set of Unicode characters in script Osage.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Osmanya">	  var <a href="../src/unicode/tables.go.html#line-5581">Osmanya</a> *<a href="#name-RangeTable">RangeTable</a> // Osmanya is the set of Unicode characters in script Osmanya.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other">	  var <a href="../src/unicode/tables.go.html#line-3557">Other</a> *<a href="#name-RangeTable">RangeTable</a> // Other/C is the set of Unicode control and special characters, category C.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_Alphabetic">	  var <a href="../src/unicode/tables.go.html#line-6763">Other_Alphabetic</a> *<a href="#name-RangeTable">RangeTable</a> // Other_Alphabetic is the set of Unicode characters with property Other_Alphabetic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_Default_Ignorable_Code_Point">	  var <a href="../src/unicode/tables.go.html#line-6764">Other_Default_Ignorable_Code_Point</a> *<a href="#name-RangeTable">RangeTable</a> // Other_Default_Ignorable_Code_Point is the set of Unicode characters with property Other_Default_Ignorable_Code_Point.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_Grapheme_Extend">	  var <a href="../src/unicode/tables.go.html#line-6765">Other_Grapheme_Extend</a> *<a href="#name-RangeTable">RangeTable</a> // Other_Grapheme_Extend is the set of Unicode characters with property Other_Grapheme_Extend.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_ID_Continue">	  var <a href="../src/unicode/tables.go.html#line-6766">Other_ID_Continue</a> *<a href="#name-RangeTable">RangeTable</a> // Other_ID_Continue is the set of Unicode characters with property Other_ID_Continue.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_ID_Start">	  var <a href="../src/unicode/tables.go.html#line-6767">Other_ID_Start</a> *<a href="#name-RangeTable">RangeTable</a> // Other_ID_Start is the set of Unicode characters with property Other_ID_Start.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_Lowercase">	  var <a href="../src/unicode/tables.go.html#line-6768">Other_Lowercase</a> *<a href="#name-RangeTable">RangeTable</a> // Other_Lowercase is the set of Unicode characters with property Other_Lowercase.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_Math">	  var <a href="../src/unicode/tables.go.html#line-6769">Other_Math</a> *<a href="#name-RangeTable">RangeTable</a> // Other_Math is the set of Unicode characters with property Other_Math.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Other_Uppercase">	  var <a href="../src/unicode/tables.go.html#line-6770">Other_Uppercase</a> *<a href="#name-RangeTable">RangeTable</a> // Other_Uppercase is the set of Unicode characters with property Other_Uppercase.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-P">	  var <a href="../src/unicode/tables.go.html#line-3567">P</a> *<a href="#name-RangeTable">RangeTable</a>
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pahawh_Hmong">	  var <a href="../src/unicode/tables.go.html#line-5582">Pahawh_Hmong</a> *<a href="#name-RangeTable">RangeTable</a> // Pahawh_Hmong is the set of Unicode characters in script Pahawh_Hmong.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Palmyrene">	  var <a href="../src/unicode/tables.go.html#line-5583">Palmyrene</a> *<a href="#name-RangeTable">RangeTable</a> // Palmyrene is the set of Unicode characters in script Palmyrene.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pattern_Syntax">	  var <a href="../src/unicode/tables.go.html#line-6771">Pattern_Syntax</a> *<a href="#name-RangeTable">RangeTable</a> // Pattern_Syntax is the set of Unicode characters with property Pattern_Syntax.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pattern_White_Space">	  var <a href="../src/unicode/tables.go.html#line-6772">Pattern_White_Space</a> *<a href="#name-RangeTable">RangeTable</a> // Pattern_White_Space is the set of Unicode characters with property Pattern_White_Space.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pau_Cin_Hau">	  var <a href="../src/unicode/tables.go.html#line-5584">Pau_Cin_Hau</a> *<a href="#name-RangeTable">RangeTable</a> // Pau_Cin_Hau is the set of Unicode characters in script Pau_Cin_Hau.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pc">	  var <a href="../src/unicode/tables.go.html#line-3559">Pc</a> *<a href="#name-RangeTable">RangeTable</a> // Pc is the set of Unicode characters in category Pc (Punctuation, connector).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pd">	  var <a href="../src/unicode/tables.go.html#line-3560">Pd</a> *<a href="#name-RangeTable">RangeTable</a> // Pd is the set of Unicode characters in category Pd (Punctuation, dash).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pe">	  var <a href="../src/unicode/tables.go.html#line-3561">Pe</a> *<a href="#name-RangeTable">RangeTable</a> // Pe is the set of Unicode characters in category Pe (Punctuation, close).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pf">	  var <a href="../src/unicode/tables.go.html#line-3562">Pf</a> *<a href="#name-RangeTable">RangeTable</a> // Pf is the set of Unicode characters in category Pf (Punctuation, final quote).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Phags_Pa">	  var <a href="../src/unicode/tables.go.html#line-5585">Phags_Pa</a> *<a href="#name-RangeTable">RangeTable</a> // Phags_Pa is the set of Unicode characters in script Phags_Pa.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Phoenician">	  var <a href="../src/unicode/tables.go.html#line-5586">Phoenician</a> *<a href="#name-RangeTable">RangeTable</a> // Phoenician is the set of Unicode characters in script Phoenician.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Pi">	  var <a href="../src/unicode/tables.go.html#line-3563">Pi</a> *<a href="#name-RangeTable">RangeTable</a> // Pi is the set of Unicode characters in category Pi (Punctuation, initial quote).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Po">	  var <a href="../src/unicode/tables.go.html#line-3564">Po</a> *<a href="#name-RangeTable">RangeTable</a> // Po is the set of Unicode characters in category Po (Punctuation, other).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Prepended_Concatenation_Mark">	  var <a href="../src/unicode/tables.go.html#line-6773">Prepended_Concatenation_Mark</a> *<a href="#name-RangeTable">RangeTable</a> // Prepended_Concatenation_Mark is the set of Unicode characters with property Prepended_Concatenation_Mark.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-PrintRanges">	  var <a href="../src/unicode/graphic.go.html#line-29">PrintRanges</a> []*<a href="#name-RangeTable">RangeTable</a>
+		PrintRanges defines the set of printable characters according to Go.
+		ASCII space, U+0020, is handled separately.</div>
+<div class="anchor" id="name-Properties">	  var <a href="../src/unicode/tables.go.html#line-5626">Properties</a> map[<a href="builtin.html#name-string">string</a>]*<a href="#name-RangeTable">RangeTable</a>
+		Properties is the set of Unicode property tables.</div>
+<div class="anchor" id="name-Ps">	  var <a href="../src/unicode/tables.go.html#line-3565">Ps</a> *<a href="#name-RangeTable">RangeTable</a> // Ps is the set of Unicode characters in category Ps (Punctuation, open).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Psalter_Pahlavi">	  var <a href="../src/unicode/tables.go.html#line-5587">Psalter_Pahlavi</a> *<a href="#name-RangeTable">RangeTable</a> // Psalter_Pahlavi is the set of Unicode characters in script Psalter_Pahlavi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Punct">	  var <a href="../src/unicode/tables.go.html#line-3566">Punct</a> *<a href="#name-RangeTable">RangeTable</a> // Punct/P is the set of Unicode punctuation characters, category P.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Quotation_Mark">	  var <a href="../src/unicode/tables.go.html#line-6774">Quotation_Mark</a> *<a href="#name-RangeTable">RangeTable</a> // Quotation_Mark is the set of Unicode characters with property Quotation_Mark.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Radical">	  var <a href="../src/unicode/tables.go.html#line-6775">Radical</a> *<a href="#name-RangeTable">RangeTable</a> // Radical is the set of Unicode characters with property Radical.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Regional_Indicator">	  var <a href="../src/unicode/tables.go.html#line-6776">Regional_Indicator</a> *<a href="#name-RangeTable">RangeTable</a> // Regional_Indicator is the set of Unicode characters with property Regional_Indicator.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Rejang">	  var <a href="../src/unicode/tables.go.html#line-5588">Rejang</a> *<a href="#name-RangeTable">RangeTable</a> // Rejang is the set of Unicode characters in script Rejang.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-ReplacementChar">	const <a href="../src/unicode/letter.go.html#line-11">ReplacementChar</a> = 65533 // Represents invalid code points.</div>
+<div class="anchor" id="name-Runic">	  var <a href="../src/unicode/tables.go.html#line-5589">Runic</a> *<a href="#name-RangeTable">RangeTable</a> // Runic is the set of Unicode characters in script Runic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-S">	  var <a href="../src/unicode/tables.go.html#line-3575">S</a> *<a href="#name-RangeTable">RangeTable</a>
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Samaritan">	  var <a href="../src/unicode/tables.go.html#line-5590">Samaritan</a> *<a href="#name-RangeTable">RangeTable</a> // Samaritan is the set of Unicode characters in script Samaritan.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Saurashtra">	  var <a href="../src/unicode/tables.go.html#line-5591">Saurashtra</a> *<a href="#name-RangeTable">RangeTable</a> // Saurashtra is the set of Unicode characters in script Saurashtra.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Sc">	  var <a href="../src/unicode/tables.go.html#line-3568">Sc</a> *<a href="#name-RangeTable">RangeTable</a> // Sc is the set of Unicode characters in category Sc (Symbol, currency).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Scripts">	  var <a href="../src/unicode/tables.go.html#line-3586">Scripts</a> map[<a href="builtin.html#name-string">string</a>]*<a href="#name-RangeTable">RangeTable</a>
+		Scripts is the set of Unicode script tables.</div>
+<div class="anchor" id="name-Sentence_Terminal">	  var <a href="../src/unicode/tables.go.html#line-6778">Sentence_Terminal</a> *<a href="#name-RangeTable">RangeTable</a> // Sentence_Terminal is the set of Unicode characters with property Sentence_Terminal.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Sharada">	  var <a href="../src/unicode/tables.go.html#line-5592">Sharada</a> *<a href="#name-RangeTable">RangeTable</a> // Sharada is the set of Unicode characters in script Sharada.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Shavian">	  var <a href="../src/unicode/tables.go.html#line-5593">Shavian</a> *<a href="#name-RangeTable">RangeTable</a> // Shavian is the set of Unicode characters in script Shavian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Siddham">	  var <a href="../src/unicode/tables.go.html#line-5594">Siddham</a> *<a href="#name-RangeTable">RangeTable</a> // Siddham is the set of Unicode characters in script Siddham.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-SignWriting">	  var <a href="../src/unicode/tables.go.html#line-5595">SignWriting</a> *<a href="#name-RangeTable">RangeTable</a> // SignWriting is the set of Unicode characters in script SignWriting.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-SimpleFold">	 func <a href="../src/unicode/letter.go.html#line-336">SimpleFold</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>
+		SimpleFold iterates over Unicode code points equivalent under
+		the Unicode-defined simple case folding. Among the code points
+		equivalent to rune (including rune itself), SimpleFold returns the
+		smallest rune &gt; r if one exists, or else the smallest rune &gt;= 0.
+		If r is not a valid Unicode code point, SimpleFold(r) returns r.
+
+		For example:
+			SimpleFold('A') = 'a'
+			SimpleFold('a') = 'A'
+
+			SimpleFold('K') = 'k'
+			SimpleFold('k') = '\u212A' (Kelvin symbol, K)
+			SimpleFold('\u212A') = 'K'
+
+			SimpleFold('1') = '1'
+
+			SimpleFold(-2) = -2</div>
+<div class="anchor" id="name-Sinhala">	  var <a href="../src/unicode/tables.go.html#line-5596">Sinhala</a> *<a href="#name-RangeTable">RangeTable</a> // Sinhala is the set of Unicode characters in script Sinhala.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Sk">	  var <a href="../src/unicode/tables.go.html#line-3569">Sk</a> *<a href="#name-RangeTable">RangeTable</a> // Sk is the set of Unicode characters in category Sk (Symbol, modifier).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Sm">	  var <a href="../src/unicode/tables.go.html#line-3570">Sm</a> *<a href="#name-RangeTable">RangeTable</a> // Sm is the set of Unicode characters in category Sm (Symbol, math).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-So">	  var <a href="../src/unicode/tables.go.html#line-3571">So</a> *<a href="#name-RangeTable">RangeTable</a> // So is the set of Unicode characters in category So (Symbol, other).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Soft_Dotted">	  var <a href="../src/unicode/tables.go.html#line-6779">Soft_Dotted</a> *<a href="#name-RangeTable">RangeTable</a> // Soft_Dotted is the set of Unicode characters with property Soft_Dotted.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Sogdian">	  var <a href="../src/unicode/tables.go.html#line-5597">Sogdian</a> *<a href="#name-RangeTable">RangeTable</a> // Sogdian is the set of Unicode characters in script Sogdian.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Sora_Sompeng">	  var <a href="../src/unicode/tables.go.html#line-5598">Sora_Sompeng</a> *<a href="#name-RangeTable">RangeTable</a> // Sora_Sompeng is the set of Unicode characters in script Sora_Sompeng.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Soyombo">	  var <a href="../src/unicode/tables.go.html#line-5599">Soyombo</a> *<a href="#name-RangeTable">RangeTable</a> // Soyombo is the set of Unicode characters in script Soyombo.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Space">	  var <a href="../src/unicode/tables.go.html#line-3572">Space</a> *<a href="#name-RangeTable">RangeTable</a> // Space/Z is the set of Unicode space characters, category Z.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-STerm">	  var <a href="../src/unicode/tables.go.html#line-6777">STerm</a> *<a href="#name-RangeTable">RangeTable</a> // STerm is an alias for Sentence_Terminal.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Sundanese">	  var <a href="../src/unicode/tables.go.html#line-5600">Sundanese</a> *<a href="#name-RangeTable">RangeTable</a> // Sundanese is the set of Unicode characters in script Sundanese.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Syloti_Nagri">	  var <a href="../src/unicode/tables.go.html#line-5601">Syloti_Nagri</a> *<a href="#name-RangeTable">RangeTable</a> // Syloti_Nagri is the set of Unicode characters in script Syloti_Nagri.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Symbol">	  var <a href="../src/unicode/tables.go.html#line-3574">Symbol</a> *<a href="#name-RangeTable">RangeTable</a> // Symbol/S is the set of Unicode symbol characters, category S.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Syriac">	  var <a href="../src/unicode/tables.go.html#line-5602">Syriac</a> *<a href="#name-RangeTable">RangeTable</a> // Syriac is the set of Unicode characters in script Syriac.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tagalog">	  var <a href="../src/unicode/tables.go.html#line-5603">Tagalog</a> *<a href="#name-RangeTable">RangeTable</a> // Tagalog is the set of Unicode characters in script Tagalog.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tagbanwa">	  var <a href="../src/unicode/tables.go.html#line-5604">Tagbanwa</a> *<a href="#name-RangeTable">RangeTable</a> // Tagbanwa is the set of Unicode characters in script Tagbanwa.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tai_Le">	  var <a href="../src/unicode/tables.go.html#line-5605">Tai_Le</a> *<a href="#name-RangeTable">RangeTable</a> // Tai_Le is the set of Unicode characters in script Tai_Le.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tai_Tham">	  var <a href="../src/unicode/tables.go.html#line-5606">Tai_Tham</a> *<a href="#name-RangeTable">RangeTable</a> // Tai_Tham is the set of Unicode characters in script Tai_Tham.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tai_Viet">	  var <a href="../src/unicode/tables.go.html#line-5607">Tai_Viet</a> *<a href="#name-RangeTable">RangeTable</a> // Tai_Viet is the set of Unicode characters in script Tai_Viet.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Takri">	  var <a href="../src/unicode/tables.go.html#line-5608">Takri</a> *<a href="#name-RangeTable">RangeTable</a> // Takri is the set of Unicode characters in script Takri.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tamil">	  var <a href="../src/unicode/tables.go.html#line-5609">Tamil</a> *<a href="#name-RangeTable">RangeTable</a> // Tamil is the set of Unicode characters in script Tamil.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tangut">	  var <a href="../src/unicode/tables.go.html#line-5610">Tangut</a> *<a href="#name-RangeTable">RangeTable</a> // Tangut is the set of Unicode characters in script Tangut.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Telugu">	  var <a href="../src/unicode/tables.go.html#line-5611">Telugu</a> *<a href="#name-RangeTable">RangeTable</a> // Telugu is the set of Unicode characters in script Telugu.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Terminal_Punctuation">	  var <a href="../src/unicode/tables.go.html#line-6780">Terminal_Punctuation</a> *<a href="#name-RangeTable">RangeTable</a> // Terminal_Punctuation is the set of Unicode characters with property Terminal_Punctuation.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Thaana">	  var <a href="../src/unicode/tables.go.html#line-5612">Thaana</a> *<a href="#name-RangeTable">RangeTable</a> // Thaana is the set of Unicode characters in script Thaana.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Thai">	  var <a href="../src/unicode/tables.go.html#line-5613">Thai</a> *<a href="#name-RangeTable">RangeTable</a> // Thai is the set of Unicode characters in script Thai.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tibetan">	  var <a href="../src/unicode/tables.go.html#line-5614">Tibetan</a> *<a href="#name-RangeTable">RangeTable</a> // Tibetan is the set of Unicode characters in script Tibetan.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tifinagh">	  var <a href="../src/unicode/tables.go.html#line-5615">Tifinagh</a> *<a href="#name-RangeTable">RangeTable</a> // Tifinagh is the set of Unicode characters in script Tifinagh.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Tirhuta">	  var <a href="../src/unicode/tables.go.html#line-5616">Tirhuta</a> *<a href="#name-RangeTable">RangeTable</a> // Tirhuta is the set of Unicode characters in script Tirhuta.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Title">	  var <a href="../src/unicode/tables.go.html#line-3576">Title</a> *<a href="#name-RangeTable">RangeTable</a> // Title is the set of Unicode title case letters.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-TitleCase">	const <a href="../src/unicode/letter.go.html#line-71">TitleCase</a> = 2
+		Indices into the Delta arrays inside CaseRanges for case mapping.</div>
+<div class="anchor" id="name-To">	 func <a href="../src/unicode/letter.go.html#line-244">To</a>(_case <a href="builtin.html#name-int">int</a>, r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>
+		To maps the rune to the specified case: UpperCase, LowerCase, or TitleCase.</div>
+<div class="anchor" id="name-ToLower">	 func <a href="../src/unicode/letter.go.html#line-261">ToLower</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>
+		ToLower maps the rune to lower case.</div>
+<div class="anchor" id="name-ToTitle">	 func <a href="../src/unicode/letter.go.html#line-272">ToTitle</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>
+		ToTitle maps the rune to title case.</div>
+<div class="anchor" id="name-ToUpper">	 func <a href="../src/unicode/letter.go.html#line-250">ToUpper</a>(r <a href="builtin.html#name-rune">rune</a>) <a href="builtin.html#name-rune">rune</a>
+		ToUpper maps the rune to upper case.</div>
+<div class="anchor" id="name-TurkishCase">	  var <a href="../src/unicode/casetables.go.html#line-12">TurkishCase</a> <a href="#name-SpecialCase">SpecialCase</a></div>
+<div class="anchor" id="name-Ugaritic">	  var <a href="../src/unicode/tables.go.html#line-5617">Ugaritic</a> *<a href="#name-RangeTable">RangeTable</a> // Ugaritic is the set of Unicode characters in script Ugaritic.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Unified_Ideograph">	  var <a href="../src/unicode/tables.go.html#line-6781">Unified_Ideograph</a> *<a href="#name-RangeTable">RangeTable</a> // Unified_Ideograph is the set of Unicode characters with property Unified_Ideograph.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Upper">	  var <a href="../src/unicode/tables.go.html#line-3578">Upper</a> *<a href="#name-RangeTable">RangeTable</a> // Upper is the set of Unicode upper case letters.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-UpperCase">	const <a href="../src/unicode/letter.go.html#line-69">UpperCase</a> = 0
+		Indices into the Delta arrays inside CaseRanges for case mapping.</div>
+<div class="anchor" id="name-UpperLower">	const <a href="../src/unicode/letter.go.html#line-81">UpperLower</a> = 1114112 // (Cannot be a valid delta.)
+		If the Delta field of a CaseRange is UpperLower, it means
+		this CaseRange represents a sequence of the form (say)
+		Upper Lower Upper Lower.</div>
+<div class="anchor" id="name-Vai">	  var <a href="../src/unicode/tables.go.html#line-5618">Vai</a> *<a href="#name-RangeTable">RangeTable</a> // Vai is the set of Unicode characters in script Vai.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Variation_Selector">	  var <a href="../src/unicode/tables.go.html#line-6782">Variation_Selector</a> *<a href="#name-RangeTable">RangeTable</a> // Variation_Selector is the set of Unicode characters with property Variation_Selector.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Version">	const <a href="../src/unicode/tables.go.html#line-6">Version</a> = "12.0.0"
+		Version is the Unicode edition from which the tables are derived.</div>
+<div class="anchor" id="name-Wancho">	  var <a href="../src/unicode/tables.go.html#line-5619">Wancho</a> *<a href="#name-RangeTable">RangeTable</a> // Wancho is the set of Unicode characters in script Wancho.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Warang_Citi">	  var <a href="../src/unicode/tables.go.html#line-5620">Warang_Citi</a> *<a href="#name-RangeTable">RangeTable</a> // Warang_Citi is the set of Unicode characters in script Warang_Citi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-White_Space">	  var <a href="../src/unicode/tables.go.html#line-6783">White_Space</a> *<a href="#name-RangeTable">RangeTable</a> // White_Space is the set of Unicode characters with property White_Space.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Yi">	  var <a href="../src/unicode/tables.go.html#line-5621">Yi</a> *<a href="#name-RangeTable">RangeTable</a> // Yi is the set of Unicode characters in script Yi.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Z">	  var <a href="../src/unicode/tables.go.html#line-3573">Z</a> *<a href="#name-RangeTable">RangeTable</a>
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Zanabazar_Square">	  var <a href="../src/unicode/tables.go.html#line-5622">Zanabazar_Square</a> *<a href="#name-RangeTable">RangeTable</a> // Zanabazar_Square is the set of Unicode characters in script Zanabazar_Square.
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Zl">	  var <a href="../src/unicode/tables.go.html#line-3580">Zl</a> *<a href="#name-RangeTable">RangeTable</a> // Zl is the set of Unicode characters in category Zl (Separator, line).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Zp">	  var <a href="../src/unicode/tables.go.html#line-3581">Zp</a> *<a href="#name-RangeTable">RangeTable</a> // Zp is the set of Unicode characters in category Zp (Separator, paragraph).
+		These variables have type *RangeTable.</div>
+<div class="anchor" id="name-Zs">	  var <a href="../src/unicode/tables.go.html#line-3582">Zs</a> *<a href="#name-RangeTable">RangeTable</a> // Zs is the set of Unicode characters in category Zs (Separator, space).
+		These variables have type *RangeTable.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: sort</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>sort</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-sort">sort</a><i> (on <a href="https://golang.org/pkg/sort/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/sort" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/sort.html">one package</a>, and imported by <a href="../dep/sort.html#imported-by">24 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/sort/search.go.html">search.go</a>
+	    <a href="../src/sort/slice.go.html">slice.go</a>
+	    <a href="../src/sort/slice_go113.go.html">slice_go113.go</a>
+	<a href="../src/sort/sort.go.html#doc">d-&gt;</a> <a href="../src/sort/sort.go.html">sort.go</a>
+	    <a href="../src/sort/zfuncversion.go.html">zfuncversion.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Float64Slice" data-popularity="300">	 type <a href="../src/sort/sort.go.html#line-280">Float64Slice</a> <i>([])</i>
+		Float64Slice attaches the methods of Interface to []float64, sorting in increasing order
+		(not-a-number values are treated as less than other values).
+
+		<input type='checkbox' class="stat" id="Float64Slice-stat-methods"><label for="Float64Slice-stat-methods">Exported Methods (5)</label><span id='Float64Slice-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/sort/sort.go.html#line-282">Len</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/sort/sort.go.html#line-283">Less</a>(i, j <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/sort/search.go.html#line-109">Search</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/sort/sort.go.html#line-292">Sort</a>()
+			 (T) <a href="../src/sort/sort.go.html#line-284">Swap</a>(i, j <a href="builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="Float64Slice-stat-impls"><label for="Float64Slice-stat-impls">Implements (1+)</label><span id='Float64Slice-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Interface" data-popularity="1115">	 type <a href="../src/sort/sort.go.html#line-14">Interface</a> <b<i>(interface)</i></b>
+		A type, typically a collection, that satisfies sort.Interface can be
+		sorted by the routines in this package. The methods require that the
+		elements of the collection be enumerated by an integer index.
+
+		<input type='checkbox' class="stat" id="Interface-stat-methods"><label for="Interface-stat-methods">Exported Methods (3)</label><span id='Interface-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/sort/sort.go.html#line-16">Len</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/sort/sort.go.html#line-19">Less</a>(i, j <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/sort/sort.go.html#line-21">Swap</a>(i, j <a href="builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="Interface-stat-impledby"><label for="Interface-stat-impledby">Implemented By (5+)</label><span id='Interface-stat-impledby-content' class="stat-content">
+			<a href="#name-Float64Slice">Float64Slice</a>
+			<a href="#name-IntSlice">IntSlice</a>
+			<a href="#name-StringSlice">StringSlice</a>
+			go/scanner.<a href="go/scanner.html#name-ErrorList">ErrorList</a>
+			internal/fmtsort.(*<a href="internal/fmtsort.html#name-SortedMap">SortedMap</a>)</span>
+		<input type='checkbox' class="stat" id="Interface-stat-results"><label for="Interface-stat-results">As Outputs Of (1+)</label><span id='Interface-stat-results-content' class="stat-content">
+			func <a href="#name-Reverse">Reverse</a>(data <b>Interface</b>) <b>Interface</b></span>
+		<input type='checkbox' class="stat" id="Interface-stat-params"><label for="Interface-stat-params">As Inputs Of (4+)</label><span id='Interface-stat-params-content' class="stat-content">
+			func <a href="#name-IsSorted">IsSorted</a>(data <b>Interface</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Reverse">Reverse</a>(data <b>Interface</b>) <b>Interface</b>
+			func <a href="#name-Sort">Sort</a>(data <b>Interface</b>)
+			func <a href="#name-Stable">Stable</a>(data <b>Interface</b>)</span></div>
+<div class="anchor" id="name-IntSlice" data-popularity="300">	 type <a href="../src/sort/sort.go.html#line-269">IntSlice</a> <i>([])</i>
+		IntSlice attaches the methods of Interface to []int, sorting in increasing order.
+
+		<input type='checkbox' class="stat" id="IntSlice-stat-methods"><label for="IntSlice-stat-methods">Exported Methods (5)</label><span id='IntSlice-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/sort/sort.go.html#line-271">Len</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/sort/sort.go.html#line-272">Less</a>(i, j <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/sort/search.go.html#line-106">Search</a>(x <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/sort/sort.go.html#line-276">Sort</a>()
+			 (T) <a href="../src/sort/sort.go.html#line-273">Swap</a>(i, j <a href="builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="IntSlice-stat-impls"><label for="IntSlice-stat-impls">Implements (1+)</label><span id='IntSlice-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-StringSlice" data-popularity="300">	 type <a href="../src/sort/sort.go.html#line-295">StringSlice</a> <i>([])</i>
+		StringSlice attaches the methods of Interface to []string, sorting in increasing order.
+
+		<input type='checkbox' class="stat" id="StringSlice-stat-methods"><label for="StringSlice-stat-methods">Exported Methods (5)</label><span id='StringSlice-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/sort/sort.go.html#line-297">Len</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/sort/sort.go.html#line-298">Less</a>(i, j <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/sort/search.go.html#line-112">Search</a>(x <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/sort/sort.go.html#line-302">Sort</a>()
+			 (T) <a href="../src/sort/sort.go.html#line-299">Swap</a>(i, j <a href="builtin.html#name-int">int</a>)</span>
+		<input type='checkbox' class="stat" id="StringSlice-stat-impls"><label for="StringSlice-stat-impls">Implements (1+)</label><span id='StringSlice-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Float64s">	 func <a href="../src/sort/sort.go.html#line-311">Float64s</a>(a []<a href="builtin.html#name-float64">float64</a>)
+		Float64s sorts a slice of float64s in increasing order
+		(not-a-number values are treated as less than other values).</div>
+<div class="anchor" id="name-Float64sAreSorted">	 func <a href="../src/sort/sort.go.html#line-321">Float64sAreSorted</a>(a []<a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-bool">bool</a>
+		Float64sAreSorted tests whether a slice of float64s is sorted in increasing order
+		(not-a-number values are treated as less than other values).</div>
+<div class="anchor" id="name-Ints">	 func <a href="../src/sort/sort.go.html#line-307">Ints</a>(a []<a href="builtin.html#name-int">int</a>)
+		Ints sorts a slice of ints in increasing order.</div>
+<div class="anchor" id="name-IntsAreSorted">	 func <a href="../src/sort/sort.go.html#line-317">IntsAreSorted</a>(a []<a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>
+		IntsAreSorted tests whether a slice of ints is sorted in increasing order.</div>
+<div class="anchor" id="name-IsSorted">	 func <a href="../src/sort/sort.go.html#line-256">IsSorted</a>(data <a href="#name-Interface">Interface</a>) <a href="builtin.html#name-bool">bool</a>
+		IsSorted reports whether data is sorted.</div>
+<div class="anchor" id="name-Reverse">	 func <a href="../src/sort/sort.go.html#line-251">Reverse</a>(data <a href="#name-Interface">Interface</a>) <a href="#name-Interface">Interface</a>
+		Reverse returns the reverse order for data.</div>
+<div class="anchor" id="name-Search">	 func <a href="../src/sort/search.go.html#line-59">Search</a>(n <a href="builtin.html#name-int">int</a>, f func(<a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-int">int</a>
+		Search uses binary search to find and return the smallest index i
+		in [0, n) at which f(i) is true, assuming that on the range [0, n),
+		f(i) == true implies f(i+1) == true. That is, Search requires that
+		f is false for some (possibly empty) prefix of the input range [0, n)
+		and then true for the (possibly empty) remainder; Search returns
+		the first true index. If there is no such index, Search returns n.
+		(Note that the "not found" return value is not -1 as in, for instance,
+		strings.Index.)
+		Search calls f(i) only for i in the range [0, n).
+
+		A common use of Search is to find the index i for a value x in
+		a sorted, indexable data structure such as an array or slice.
+		In this case, the argument f, typically a closure, captures the value
+		to be searched for, and how the data structure is indexed and
+		ordered.
+
+		For instance, given a slice data sorted in ascending order,
+		the call Search(len(data), func(i int) bool { return data[i] &gt;= 23 })
+		returns the smallest index i such that data[i] &gt;= 23. If the caller
+		wants to find whether 23 is in the slice, it must test data[i] == 23
+		separately.
+
+		Searching data sorted in descending order would use the &lt;=
+		operator instead of the &gt;= operator.
+
+		To complete the example above, the following code tries to find the value
+		x in an integer slice data sorted in ascending order:
+
+			x := 23
+			i := sort.Search(len(data), func(i int) bool { return data[i] &gt;= x })
+			if i &lt; len(data) &amp;&amp; data[i] == x {
+				// x is present at data[i]
+			} else {
+				// x is not present in data,
+				// but i is the index where it would be inserted.
+			}
+
+		As a more whimsical example, this program guesses your number:
+
+			func GuessingGame() {
+				var s string
+				fmt.Printf("Pick an integer from 0 to 100.\n")
+				answer := sort.Search(100, func(i int) bool {
+					fmt.Printf("Is your number &lt;= %d? ", i)
+					fmt.Scanf("%s", &amp;s)
+					return s != "" &amp;&amp; s[0] == 'y'
+				})
+				fmt.Printf("Your number is %d.\n", answer)
+			}</div>
+<div class="anchor" id="name-SearchFloat64s">	 func <a href="../src/sort/search.go.html#line-92">SearchFloat64s</a>(a []<a href="builtin.html#name-float64">float64</a>, x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-int">int</a>
+		SearchFloat64s searches for x in a sorted slice of float64s and returns the index
+		as specified by Search. The return value is the index to insert x if x is not
+		present (it could be len(a)).
+		The slice must be sorted in ascending order.</div>
+<div class="anchor" id="name-SearchInts">	 func <a href="../src/sort/search.go.html#line-83">SearchInts</a>(a []<a href="builtin.html#name-int">int</a>, x <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-int">int</a>
+		SearchInts searches for x in a sorted slice of ints and returns the index
+		as specified by Search. The return value is the index to insert x if x is
+		not present (it could be len(a)).
+		The slice must be sorted in ascending order.</div>
+<div class="anchor" id="name-SearchStrings">	 func <a href="../src/sort/search.go.html#line-101">SearchStrings</a>(a []<a href="builtin.html#name-string">string</a>, x <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-int">int</a>
+		SearchStrings searches for x in a sorted slice of strings and returns the index
+		as specified by Search. The return value is the index to insert x if x is not
+		present (it could be len(a)).
+		The slice must be sorted in ascending order.</div>
+<div class="anchor" id="name-Slice">	 func <a href="../src/sort/slice.go.html#line-13">Slice</a>(slice interface{}, less func(i, j <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>)
+		Slice sorts the provided slice given the provided less function.
+
+		The sort is not guaranteed to be stable. For a stable sort, use
+		SliceStable.
+
+		The function panics if the provided interface is not a slice.</div>
+<div class="anchor" id="name-SliceIsSorted">	 func <a href="../src/sort/slice.go.html#line-33">SliceIsSorted</a>(slice interface{}, less func(i, j <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>) <a href="builtin.html#name-bool">bool</a>
+		SliceIsSorted tests whether a slice is sorted.
+
+		The function panics if the provided interface is not a slice.</div>
+<div class="anchor" id="name-SliceStable">	 func <a href="../src/sort/slice.go.html#line-24">SliceStable</a>(slice interface{}, less func(i, j <a href="builtin.html#name-int">int</a>) <a href="builtin.html#name-bool">bool</a>)
+		SliceStable sorts the provided slice given the provided less
+		function while keeping the original order of equal elements.
+
+		The function panics if the provided interface is not a slice.</div>
+<div class="anchor" id="name-Sort">	 func <a href="../src/sort/sort.go.html#line-216">Sort</a>(data <a href="#name-Interface">Interface</a>)
+		Sort sorts data.
+		It makes one call to data.Len to determine n, and O(n*log(n)) calls to
+		data.Less and data.Swap. The sort is not guaranteed to be stable.</div>
+<div class="anchor" id="name-Stable">	 func <a href="../src/sort/sort.go.html#line-356">Stable</a>(data <a href="#name-Interface">Interface</a>)
+		Stable sorts data while keeping the original order of equal elements.
+
+		It makes one call to data.Len to determine n, O(n*log(n)) calls to
+		data.Less and O(n*log(n)*log(n)) calls to data.Swap.</div>
+<div class="anchor" id="name-Strings">	 func <a href="../src/sort/sort.go.html#line-314">Strings</a>(a []<a href="builtin.html#name-string">string</a>)
+		Strings sorts a slice of strings in increasing order.</div>
+<div class="anchor" id="name-StringsAreSorted">	 func <a href="../src/sort/sort.go.html#line-324">StringsAreSorted</a>(a []<a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>
+		StringsAreSorted tests whether a slice of strings is sorted in increasing order.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: interface.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	interface.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package net</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"errors"</code></span>
+<span class="codeline" id="line-9"><code>	"sync"</code></span>
+<span class="codeline" id="line-10"><code>	"time"</code></span>
+<span class="codeline" id="line-11"><code>)</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>// BUG(mikio): On JS, methods and functions related to</code></span>
+<span class="codeline" id="line-14"><code>// Interface are not implemented.</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>// BUG(mikio): On AIX, DragonFly BSD, NetBSD, OpenBSD, Plan 9 and</code></span>
+<span class="codeline" id="line-17"><code>// Solaris, the MulticastAddrs method of Interface is not implemented.</code></span>
+<span class="codeline" id="line-18"><code></code></span>
+<span class="codeline" id="line-19"><code>var (</code></span>
+<span class="codeline" id="line-20"><code>	errInvalidInterface         = errors.New("invalid network interface")</code></span>
+<span class="codeline" id="line-21"><code>	errInvalidInterfaceIndex    = errors.New("invalid network interface index")</code></span>
+<span class="codeline" id="line-22"><code>	errInvalidInterfaceName     = errors.New("invalid network interface name")</code></span>
+<span class="codeline" id="line-23"><code>	errNoSuchInterface          = errors.New("no such network interface")</code></span>
+<span class="codeline" id="line-24"><code>	errNoSuchMulticastInterface = errors.New("no such multicast network interface")</code></span>
+<span class="codeline" id="line-25"><code>)</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>// Interface represents a mapping between network interface name</code></span>
+<span class="codeline" id="line-28"><code>// and index. It also represents network interface facility</code></span>
+<span class="codeline" id="line-29"><code>// information.</code></span>
+<span class="codeline" id="line-30"><code>type Interface struct {</code></span>
+<span class="codeline" id="line-31"><code>	Index        int          // positive integer that starts at one, zero is never used</code></span>
+<span class="codeline" id="line-32"><code>	MTU          int          // maximum transmission unit</code></span>
+<span class="codeline" id="line-33"><code>	Name         string       // e.g., "en0", "lo0", "eth0.100"</code></span>
+<span class="codeline" id="line-34"><code>	HardwareAddr HardwareAddr // IEEE MAC-48, EUI-48 and EUI-64 form</code></span>
+<span class="codeline" id="line-35"><code>	Flags        Flags        // e.g., FlagUp, FlagLoopback, FlagMulticast</code></span>
+<span class="codeline" id="line-36"><code>}</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>type Flags uint</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>const (</code></span>
+<span class="codeline" id="line-41"><code>	FlagUp           Flags = 1 &lt;&lt; iota // interface is up</code></span>
+<span class="codeline" id="line-42"><code>	FlagBroadcast                      // interface supports broadcast access capability</code></span>
+<span class="codeline" id="line-43"><code>	FlagLoopback                       // interface is a loopback interface</code></span>
+<span class="codeline" id="line-44"><code>	FlagPointToPoint                   // interface belongs to a point-to-point link</code></span>
+<span class="codeline" id="line-45"><code>	FlagMulticast                      // interface supports multicast access capability</code></span>
+<span class="codeline" id="line-46"><code>)</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>var flagNames = []string{</code></span>
+<span class="codeline" id="line-49"><code>	"up",</code></span>
+<span class="codeline" id="line-50"><code>	"broadcast",</code></span>
+<span class="codeline" id="line-51"><code>	"loopback",</code></span>
+<span class="codeline" id="line-52"><code>	"pointtopoint",</code></span>
+<span class="codeline" id="line-53"><code>	"multicast",</code></span>
+<span class="codeline" id="line-54"><code>}</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>func (f Flags) String() string {</code></span>
+<span class="codeline" id="line-57"><code>	s := ""</code></span>
+<span class="codeline" id="line-58"><code>	for i, name := range flagNames {</code></span>
+<span class="codeline" id="line-59"><code>		if f&amp;(1&lt;&lt;uint(i)) != 0 {</code></span>
+<span class="codeline" id="line-60"><code>			if s != "" {</code></span>
+<span class="codeline" id="line-61"><code>				s += "|"</code></span>
+<span class="codeline" id="line-62"><code>			}</code></span>
+<span class="codeline" id="line-63"><code>			s += name</code></span>
+<span class="codeline" id="line-64"><code>		}</code></span>
+<span class="codeline" id="line-65"><code>	}</code></span>
+<span class="codeline" id="line-66"><code>	if s == "" {</code></span>
+<span class="codeline" id="line-67"><code>		s = "0"</code></span>
+<span class="codeline" id="line-68"><code>	}</code></span>
+<span class="codeline" id="line-69"><code>	return s</code></span>
+<span class="codeline" id="line-70"><code>}</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>// Addrs returns a list of unicast interface addresses for a specific</code></span>
+<span class="codeline" id="line-73"><code>// interface.</code></span>
+<span class="codeline" id="line-74"><code>func (ifi *Interface) Addrs() ([]Addr, error) {</code></span>
+<span class="codeline" id="line-75"><code>	if ifi == nil {</code></span>
+<span class="codeline" id="line-76"><code>		return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: errInvalidInterface}</code></span>
+<span class="codeline" id="line-77"><code>	}</code></span>
+<span class="codeline" id="line-78"><code>	ifat, err := interfaceAddrTable(ifi)</code></span>
+<span class="codeline" id="line-79"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-80"><code>		err = &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}</code></span>
+<span class="codeline" id="line-81"><code>	}</code></span>
+<span class="codeline" id="line-82"><code>	return ifat, err</code></span>
+<span class="codeline" id="line-83"><code>}</code></span>
+<span class="codeline" id="line-84"><code></code></span>
+<span class="codeline" id="line-85"><code>// MulticastAddrs returns a list of multicast, joined group addresses</code></span>
+<span class="codeline" id="line-86"><code>// for a specific interface.</code></span>
+<span class="codeline" id="line-87"><code>func (ifi *Interface) MulticastAddrs() ([]Addr, error) {</code></span>
+<span class="codeline" id="line-88"><code>	if ifi == nil {</code></span>
+<span class="codeline" id="line-89"><code>		return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: errInvalidInterface}</code></span>
+<span class="codeline" id="line-90"><code>	}</code></span>
+<span class="codeline" id="line-91"><code>	ifat, err := interfaceMulticastAddrTable(ifi)</code></span>
+<span class="codeline" id="line-92"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-93"><code>		err = &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}</code></span>
+<span class="codeline" id="line-94"><code>	}</code></span>
+<span class="codeline" id="line-95"><code>	return ifat, err</code></span>
+<span class="codeline" id="line-96"><code>}</code></span>
+<span class="codeline" id="line-97"><code></code></span>
+<span class="codeline" id="line-98"><code>// Interfaces returns a list of the system's network interfaces.</code></span>
+<span class="codeline" id="line-99"><code>func Interfaces() ([]Interface, error) {</code></span>
+<span class="codeline" id="line-100"><code>	ift, err := interfaceTable(0)</code></span>
+<span class="codeline" id="line-101"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-102"><code>		return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}</code></span>
+<span class="codeline" id="line-103"><code>	}</code></span>
+<span class="codeline" id="line-104"><code>	if len(ift) != 0 {</code></span>
+<span class="codeline" id="line-105"><code>		zoneCache.update(ift, false)</code></span>
+<span class="codeline" id="line-106"><code>	}</code></span>
+<span class="codeline" id="line-107"><code>	return ift, nil</code></span>
+<span class="codeline" id="line-108"><code>}</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>// InterfaceAddrs returns a list of the system's unicast interface</code></span>
+<span class="codeline" id="line-111"><code>// addresses.</code></span>
+<span class="codeline" id="line-112"><code>//</code></span>
+<span class="codeline" id="line-113"><code>// The returned list does not identify the associated interface; use</code></span>
+<span class="codeline" id="line-114"><code>// Interfaces and Interface.Addrs for more detail.</code></span>
+<span class="codeline" id="line-115"><code>func InterfaceAddrs() ([]Addr, error) {</code></span>
+<span class="codeline" id="line-116"><code>	ifat, err := interfaceAddrTable(nil)</code></span>
+<span class="codeline" id="line-117"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-118"><code>		err = &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}</code></span>
+<span class="codeline" id="line-119"><code>	}</code></span>
+<span class="codeline" id="line-120"><code>	return ifat, err</code></span>
+<span class="codeline" id="line-121"><code>}</code></span>
+<span class="codeline" id="line-122"><code></code></span>
+<span class="codeline" id="line-123"><code>// InterfaceByIndex returns the interface specified by index.</code></span>
+<span class="codeline" id="line-124"><code>//</code></span>
+<span class="codeline" id="line-125"><code>// On Solaris, it returns one of the logical network interfaces</code></span>
+<span class="codeline" id="line-126"><code>// sharing the logical data link; for more precision use</code></span>
+<span class="codeline" id="line-127"><code>// InterfaceByName.</code></span>
+<span class="codeline" id="line-128"><code>func InterfaceByIndex(index int) (*Interface, error) {</code></span>
+<span class="codeline" id="line-129"><code>	if index &lt;= 0 {</code></span>
+<span class="codeline" id="line-130"><code>		return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: errInvalidInterfaceIndex}</code></span>
+<span class="codeline" id="line-131"><code>	}</code></span>
+<span class="codeline" id="line-132"><code>	ift, err := interfaceTable(index)</code></span>
+<span class="codeline" id="line-133"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-134"><code>		return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}</code></span>
+<span class="codeline" id="line-135"><code>	}</code></span>
+<span class="codeline" id="line-136"><code>	ifi, err := interfaceByIndex(ift, index)</code></span>
+<span class="codeline" id="line-137"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-138"><code>		err = &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}</code></span>
+<span class="codeline" id="line-139"><code>	}</code></span>
+<span class="codeline" id="line-140"><code>	return ifi, err</code></span>
+<span class="codeline" id="line-141"><code>}</code></span>
+<span class="codeline" id="line-142"><code></code></span>
+<span class="codeline" id="line-143"><code>func interfaceByIndex(ift []Interface, index int) (*Interface, error) {</code></span>
+<span class="codeline" id="line-144"><code>	for _, ifi := range ift {</code></span>
+<span class="codeline" id="line-145"><code>		if index == ifi.Index {</code></span>
+<span class="codeline" id="line-146"><code>			return &amp;ifi, nil</code></span>
+<span class="codeline" id="line-147"><code>		}</code></span>
+<span class="codeline" id="line-148"><code>	}</code></span>
+<span class="codeline" id="line-149"><code>	return nil, errNoSuchInterface</code></span>
+<span class="codeline" id="line-150"><code>}</code></span>
+<span class="codeline" id="line-151"><code></code></span>
+<span class="codeline" id="line-152"><code>// InterfaceByName returns the interface specified by name.</code></span>
+<span class="codeline" id="line-153"><code>func InterfaceByName(name string) (*Interface, error) {</code></span>
+<span class="codeline" id="line-154"><code>	if name == "" {</code></span>
+<span class="codeline" id="line-155"><code>		return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: errInvalidInterfaceName}</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code>	ift, err := interfaceTable(0)</code></span>
+<span class="codeline" id="line-158"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-159"><code>		return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: err}</code></span>
+<span class="codeline" id="line-160"><code>	}</code></span>
+<span class="codeline" id="line-161"><code>	if len(ift) != 0 {</code></span>
+<span class="codeline" id="line-162"><code>		zoneCache.update(ift, false)</code></span>
+<span class="codeline" id="line-163"><code>	}</code></span>
+<span class="codeline" id="line-164"><code>	for _, ifi := range ift {</code></span>
+<span class="codeline" id="line-165"><code>		if name == ifi.Name {</code></span>
+<span class="codeline" id="line-166"><code>			return &amp;ifi, nil</code></span>
+<span class="codeline" id="line-167"><code>		}</code></span>
+<span class="codeline" id="line-168"><code>	}</code></span>
+<span class="codeline" id="line-169"><code>	return nil, &amp;OpError{Op: "route", Net: "ip+net", Source: nil, Addr: nil, Err: errNoSuchInterface}</code></span>
+<span class="codeline" id="line-170"><code>}</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>// An ipv6ZoneCache represents a cache holding partial network</code></span>
+<span class="codeline" id="line-173"><code>// interface information. It is used for reducing the cost of IPv6</code></span>
+<span class="codeline" id="line-174"><code>// addressing scope zone resolution.</code></span>
+<span class="codeline" id="line-175"><code>//</code></span>
+<span class="codeline" id="line-176"><code>// Multiple names sharing the index are managed by first-come</code></span>
+<span class="codeline" id="line-177"><code>// first-served basis for consistency.</code></span>
+<span class="codeline" id="line-178"><code>type ipv6ZoneCache struct {</code></span>
+<span class="codeline" id="line-179"><code>	sync.RWMutex                // guard the following</code></span>
+<span class="codeline" id="line-180"><code>	lastFetched  time.Time      // last time routing information was fetched</code></span>
+<span class="codeline" id="line-181"><code>	toIndex      map[string]int // interface name to its index</code></span>
+<span class="codeline" id="line-182"><code>	toName       map[int]string // interface index to its name</code></span>
+<span class="codeline" id="line-183"><code>}</code></span>
+<span class="codeline" id="line-184"><code></code></span>
+<span class="codeline" id="line-185"><code>var zoneCache = ipv6ZoneCache{</code></span>
+<span class="codeline" id="line-186"><code>	toIndex: make(map[string]int),</code></span>
+<span class="codeline" id="line-187"><code>	toName:  make(map[int]string),</code></span>
+<span class="codeline" id="line-188"><code>}</code></span>
+<span class="codeline" id="line-189"><code></code></span>
+<span class="codeline" id="line-190"><code>// update refreshes the network interface information if the cache was last</code></span>
+<span class="codeline" id="line-191"><code>// updated more than 1 minute ago, or if force is set. It reports whether the</code></span>
+<span class="codeline" id="line-192"><code>// cache was updated.</code></span>
+<span class="codeline" id="line-193"><code>func (zc *ipv6ZoneCache) update(ift []Interface, force bool) (updated bool) {</code></span>
+<span class="codeline" id="line-194"><code>	zc.Lock()</code></span>
+<span class="codeline" id="line-195"><code>	defer zc.Unlock()</code></span>
+<span class="codeline" id="line-196"><code>	now := time.Now()</code></span>
+<span class="codeline" id="line-197"><code>	if !force &amp;&amp; zc.lastFetched.After(now.Add(-60*time.Second)) {</code></span>
+<span class="codeline" id="line-198"><code>		return false</code></span>
+<span class="codeline" id="line-199"><code>	}</code></span>
+<span class="codeline" id="line-200"><code>	zc.lastFetched = now</code></span>
+<span class="codeline" id="line-201"><code>	if len(ift) == 0 {</code></span>
+<span class="codeline" id="line-202"><code>		var err error</code></span>
+<span class="codeline" id="line-203"><code>		if ift, err = interfaceTable(0); err != nil {</code></span>
+<span class="codeline" id="line-204"><code>			return false</code></span>
+<span class="codeline" id="line-205"><code>		}</code></span>
+<span class="codeline" id="line-206"><code>	}</code></span>
+<span class="codeline" id="line-207"><code>	zc.toIndex = make(map[string]int, len(ift))</code></span>
+<span class="codeline" id="line-208"><code>	zc.toName = make(map[int]string, len(ift))</code></span>
+<span class="codeline" id="line-209"><code>	for _, ifi := range ift {</code></span>
+<span class="codeline" id="line-210"><code>		zc.toIndex[ifi.Name] = ifi.Index</code></span>
+<span class="codeline" id="line-211"><code>		if _, ok := zc.toName[ifi.Index]; !ok {</code></span>
+<span class="codeline" id="line-212"><code>			zc.toName[ifi.Index] = ifi.Name</code></span>
+<span class="codeline" id="line-213"><code>		}</code></span>
+<span class="codeline" id="line-214"><code>	}</code></span>
+<span class="codeline" id="line-215"><code>	return true</code></span>
+<span class="codeline" id="line-216"><code>}</code></span>
+<span class="codeline" id="line-217"><code></code></span>
+<span class="codeline" id="line-218"><code>func (zc *ipv6ZoneCache) name(index int) string {</code></span>
+<span class="codeline" id="line-219"><code>	if index == 0 {</code></span>
+<span class="codeline" id="line-220"><code>		return ""</code></span>
+<span class="codeline" id="line-221"><code>	}</code></span>
+<span class="codeline" id="line-222"><code>	updated := zoneCache.update(nil, false)</code></span>
+<span class="codeline" id="line-223"><code>	zoneCache.RLock()</code></span>
+<span class="codeline" id="line-224"><code>	name, ok := zoneCache.toName[index]</code></span>
+<span class="codeline" id="line-225"><code>	zoneCache.RUnlock()</code></span>
+<span class="codeline" id="line-226"><code>	if !ok &amp;&amp; !updated {</code></span>
+<span class="codeline" id="line-227"><code>		zoneCache.update(nil, true)</code></span>
+<span class="codeline" id="line-228"><code>		zoneCache.RLock()</code></span>
+<span class="codeline" id="line-229"><code>		name, ok = zoneCache.toName[index]</code></span>
+<span class="codeline" id="line-230"><code>		zoneCache.RUnlock()</code></span>
+<span class="codeline" id="line-231"><code>	}</code></span>
+<span class="codeline" id="line-232"><code>	if !ok { // last resort</code></span>
+<span class="codeline" id="line-233"><code>		name = uitoa(uint(index))</code></span>
+<span class="codeline" id="line-234"><code>	}</code></span>
+<span class="codeline" id="line-235"><code>	return name</code></span>
+<span class="codeline" id="line-236"><code>}</code></span>
+<span class="codeline" id="line-237"><code></code></span>
+<span class="codeline" id="line-238"><code>func (zc *ipv6ZoneCache) index(name string) int {</code></span>
+<span class="codeline" id="line-239"><code>	if name == "" {</code></span>
+<span class="codeline" id="line-240"><code>		return 0</code></span>
+<span class="codeline" id="line-241"><code>	}</code></span>
+<span class="codeline" id="line-242"><code>	updated := zoneCache.update(nil, false)</code></span>
+<span class="codeline" id="line-243"><code>	zoneCache.RLock()</code></span>
+<span class="codeline" id="line-244"><code>	index, ok := zoneCache.toIndex[name]</code></span>
+<span class="codeline" id="line-245"><code>	zoneCache.RUnlock()</code></span>
+<span class="codeline" id="line-246"><code>	if !ok &amp;&amp; !updated {</code></span>
+<span class="codeline" id="line-247"><code>		zoneCache.update(nil, true)</code></span>
+<span class="codeline" id="line-248"><code>		zoneCache.RLock()</code></span>
+<span class="codeline" id="line-249"><code>		index, ok = zoneCache.toIndex[name]</code></span>
+<span class="codeline" id="line-250"><code>		zoneCache.RUnlock()</code></span>
+<span class="codeline" id="line-251"><code>	}</code></span>
+<span class="codeline" id="line-252"><code>	if !ok { // last resort</code></span>
+<span class="codeline" id="line-253"><code>		index, _, _ = dtoi(name)</code></span>
+<span class="codeline" id="line-254"><code>	}</code></span>
+<span class="codeline" id="line-255"><code>	return index</code></span>
+<span class="codeline" id="line-256"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

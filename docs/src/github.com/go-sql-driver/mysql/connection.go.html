@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: connection.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	connection.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2012 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"context"</code></span>
+<span class="codeline" id="line-13"><code>	"database/sql"</code></span>
+<span class="codeline" id="line-14"><code>	"database/sql/driver"</code></span>
+<span class="codeline" id="line-15"><code>	"io"</code></span>
+<span class="codeline" id="line-16"><code>	"net"</code></span>
+<span class="codeline" id="line-17"><code>	"strconv"</code></span>
+<span class="codeline" id="line-18"><code>	"strings"</code></span>
+<span class="codeline" id="line-19"><code>	"time"</code></span>
+<span class="codeline" id="line-20"><code>)</code></span>
+<span class="codeline" id="line-21"><code></code></span>
+<span class="codeline" id="line-22"><code>type mysqlConn struct {</code></span>
+<span class="codeline" id="line-23"><code>	buf              buffer</code></span>
+<span class="codeline" id="line-24"><code>	netConn          net.Conn</code></span>
+<span class="codeline" id="line-25"><code>	rawConn          net.Conn // underlying connection when netConn is TLS connection.</code></span>
+<span class="codeline" id="line-26"><code>	affectedRows     uint64</code></span>
+<span class="codeline" id="line-27"><code>	insertId         uint64</code></span>
+<span class="codeline" id="line-28"><code>	cfg              *Config</code></span>
+<span class="codeline" id="line-29"><code>	maxAllowedPacket int</code></span>
+<span class="codeline" id="line-30"><code>	maxWriteSize     int</code></span>
+<span class="codeline" id="line-31"><code>	writeTimeout     time.Duration</code></span>
+<span class="codeline" id="line-32"><code>	flags            clientFlag</code></span>
+<span class="codeline" id="line-33"><code>	status           statusFlag</code></span>
+<span class="codeline" id="line-34"><code>	sequence         uint8</code></span>
+<span class="codeline" id="line-35"><code>	parseTime        bool</code></span>
+<span class="codeline" id="line-36"><code>	reset            bool // set when the Go SQL package calls ResetSession</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>	// for context support (Go 1.8+)</code></span>
+<span class="codeline" id="line-39"><code>	watching bool</code></span>
+<span class="codeline" id="line-40"><code>	watcher  chan&lt;- context.Context</code></span>
+<span class="codeline" id="line-41"><code>	closech  chan struct{}</code></span>
+<span class="codeline" id="line-42"><code>	finished chan&lt;- struct{}</code></span>
+<span class="codeline" id="line-43"><code>	canceled atomicError // set non-nil if conn is canceled</code></span>
+<span class="codeline" id="line-44"><code>	closed   atomicBool  // set when conn is closed, before closech is closed</code></span>
+<span class="codeline" id="line-45"><code>}</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>// Handles parameters set in DSN after the connection is established</code></span>
+<span class="codeline" id="line-48"><code>func (mc *mysqlConn) handleParams() (err error) {</code></span>
+<span class="codeline" id="line-49"><code>	for param, val := range mc.cfg.Params {</code></span>
+<span class="codeline" id="line-50"><code>		switch param {</code></span>
+<span class="codeline" id="line-51"><code>		// Charset</code></span>
+<span class="codeline" id="line-52"><code>		case "charset":</code></span>
+<span class="codeline" id="line-53"><code>			charsets := strings.Split(val, ",")</code></span>
+<span class="codeline" id="line-54"><code>			for i := range charsets {</code></span>
+<span class="codeline" id="line-55"><code>				// ignore errors here - a charset may not exist</code></span>
+<span class="codeline" id="line-56"><code>				err = mc.exec("SET NAMES " + charsets[i])</code></span>
+<span class="codeline" id="line-57"><code>				if err == nil {</code></span>
+<span class="codeline" id="line-58"><code>					break</code></span>
+<span class="codeline" id="line-59"><code>				}</code></span>
+<span class="codeline" id="line-60"><code>			}</code></span>
+<span class="codeline" id="line-61"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-62"><code>				return</code></span>
+<span class="codeline" id="line-63"><code>			}</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>		// System Vars</code></span>
+<span class="codeline" id="line-66"><code>		default:</code></span>
+<span class="codeline" id="line-67"><code>			err = mc.exec("SET " + param + "=" + val + "")</code></span>
+<span class="codeline" id="line-68"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-69"><code>				return</code></span>
+<span class="codeline" id="line-70"><code>			}</code></span>
+<span class="codeline" id="line-71"><code>		}</code></span>
+<span class="codeline" id="line-72"><code>	}</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>	return</code></span>
+<span class="codeline" id="line-75"><code>}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>func (mc *mysqlConn) markBadConn(err error) error {</code></span>
+<span class="codeline" id="line-78"><code>	if mc == nil {</code></span>
+<span class="codeline" id="line-79"><code>		return err</code></span>
+<span class="codeline" id="line-80"><code>	}</code></span>
+<span class="codeline" id="line-81"><code>	if err != errBadConnNoWrite {</code></span>
+<span class="codeline" id="line-82"><code>		return err</code></span>
+<span class="codeline" id="line-83"><code>	}</code></span>
+<span class="codeline" id="line-84"><code>	return driver.ErrBadConn</code></span>
+<span class="codeline" id="line-85"><code>}</code></span>
+<span class="codeline" id="line-86"><code></code></span>
+<span class="codeline" id="line-87"><code>func (mc *mysqlConn) Begin() (driver.Tx, error) {</code></span>
+<span class="codeline" id="line-88"><code>	return mc.begin(false)</code></span>
+<span class="codeline" id="line-89"><code>}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>func (mc *mysqlConn) begin(readOnly bool) (driver.Tx, error) {</code></span>
+<span class="codeline" id="line-92"><code>	if mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-93"><code>		errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-94"><code>		return nil, driver.ErrBadConn</code></span>
+<span class="codeline" id="line-95"><code>	}</code></span>
+<span class="codeline" id="line-96"><code>	var q string</code></span>
+<span class="codeline" id="line-97"><code>	if readOnly {</code></span>
+<span class="codeline" id="line-98"><code>		q = "START TRANSACTION READ ONLY"</code></span>
+<span class="codeline" id="line-99"><code>	} else {</code></span>
+<span class="codeline" id="line-100"><code>		q = "START TRANSACTION"</code></span>
+<span class="codeline" id="line-101"><code>	}</code></span>
+<span class="codeline" id="line-102"><code>	err := mc.exec(q)</code></span>
+<span class="codeline" id="line-103"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-104"><code>		return &amp;mysqlTx{mc}, err</code></span>
+<span class="codeline" id="line-105"><code>	}</code></span>
+<span class="codeline" id="line-106"><code>	return nil, mc.markBadConn(err)</code></span>
+<span class="codeline" id="line-107"><code>}</code></span>
+<span class="codeline" id="line-108"><code></code></span>
+<span class="codeline" id="line-109"><code>func (mc *mysqlConn) Close() (err error) {</code></span>
+<span class="codeline" id="line-110"><code>	// Makes Close idempotent</code></span>
+<span class="codeline" id="line-111"><code>	if !mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-112"><code>		err = mc.writeCommandPacket(comQuit)</code></span>
+<span class="codeline" id="line-113"><code>	}</code></span>
+<span class="codeline" id="line-114"><code></code></span>
+<span class="codeline" id="line-115"><code>	mc.cleanup()</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>	return</code></span>
+<span class="codeline" id="line-118"><code>}</code></span>
+<span class="codeline" id="line-119"><code></code></span>
+<span class="codeline" id="line-120"><code>// Closes the network connection and unsets internal variables. Do not call this</code></span>
+<span class="codeline" id="line-121"><code>// function after successfully authentication, call Close instead. This function</code></span>
+<span class="codeline" id="line-122"><code>// is called before auth or on auth failure because MySQL will have already</code></span>
+<span class="codeline" id="line-123"><code>// closed the network connection.</code></span>
+<span class="codeline" id="line-124"><code>func (mc *mysqlConn) cleanup() {</code></span>
+<span class="codeline" id="line-125"><code>	if !mc.closed.TrySet(true) {</code></span>
+<span class="codeline" id="line-126"><code>		return</code></span>
+<span class="codeline" id="line-127"><code>	}</code></span>
+<span class="codeline" id="line-128"><code></code></span>
+<span class="codeline" id="line-129"><code>	// Makes cleanup idempotent</code></span>
+<span class="codeline" id="line-130"><code>	close(mc.closech)</code></span>
+<span class="codeline" id="line-131"><code>	if mc.netConn == nil {</code></span>
+<span class="codeline" id="line-132"><code>		return</code></span>
+<span class="codeline" id="line-133"><code>	}</code></span>
+<span class="codeline" id="line-134"><code>	if err := mc.netConn.Close(); err != nil {</code></span>
+<span class="codeline" id="line-135"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-136"><code>	}</code></span>
+<span class="codeline" id="line-137"><code>}</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>func (mc *mysqlConn) error() error {</code></span>
+<span class="codeline" id="line-140"><code>	if mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-141"><code>		if err := mc.canceled.Value(); err != nil {</code></span>
+<span class="codeline" id="line-142"><code>			return err</code></span>
+<span class="codeline" id="line-143"><code>		}</code></span>
+<span class="codeline" id="line-144"><code>		return ErrInvalidConn</code></span>
+<span class="codeline" id="line-145"><code>	}</code></span>
+<span class="codeline" id="line-146"><code>	return nil</code></span>
+<span class="codeline" id="line-147"><code>}</code></span>
+<span class="codeline" id="line-148"><code></code></span>
+<span class="codeline" id="line-149"><code>func (mc *mysqlConn) Prepare(query string) (driver.Stmt, error) {</code></span>
+<span class="codeline" id="line-150"><code>	if mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-151"><code>		errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-152"><code>		return nil, driver.ErrBadConn</code></span>
+<span class="codeline" id="line-153"><code>	}</code></span>
+<span class="codeline" id="line-154"><code>	// Send command</code></span>
+<span class="codeline" id="line-155"><code>	err := mc.writeCommandPacketStr(comStmtPrepare, query)</code></span>
+<span class="codeline" id="line-156"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-157"><code>		// STMT_PREPARE is safe to retry.  So we can return ErrBadConn here.</code></span>
+<span class="codeline" id="line-158"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-159"><code>		return nil, driver.ErrBadConn</code></span>
+<span class="codeline" id="line-160"><code>	}</code></span>
+<span class="codeline" id="line-161"><code></code></span>
+<span class="codeline" id="line-162"><code>	stmt := &amp;mysqlStmt{</code></span>
+<span class="codeline" id="line-163"><code>		mc: mc,</code></span>
+<span class="codeline" id="line-164"><code>	}</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>	// Read Result</code></span>
+<span class="codeline" id="line-167"><code>	columnCount, err := stmt.readPrepareResultPacket()</code></span>
+<span class="codeline" id="line-168"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-169"><code>		if stmt.paramCount &gt; 0 {</code></span>
+<span class="codeline" id="line-170"><code>			if err = mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-171"><code>				return nil, err</code></span>
+<span class="codeline" id="line-172"><code>			}</code></span>
+<span class="codeline" id="line-173"><code>		}</code></span>
+<span class="codeline" id="line-174"><code></code></span>
+<span class="codeline" id="line-175"><code>		if columnCount &gt; 0 {</code></span>
+<span class="codeline" id="line-176"><code>			err = mc.readUntilEOF()</code></span>
+<span class="codeline" id="line-177"><code>		}</code></span>
+<span class="codeline" id="line-178"><code>	}</code></span>
+<span class="codeline" id="line-179"><code></code></span>
+<span class="codeline" id="line-180"><code>	return stmt, err</code></span>
+<span class="codeline" id="line-181"><code>}</code></span>
+<span class="codeline" id="line-182"><code></code></span>
+<span class="codeline" id="line-183"><code>func (mc *mysqlConn) interpolateParams(query string, args []driver.Value) (string, error) {</code></span>
+<span class="codeline" id="line-184"><code>	// Number of ? should be same to len(args)</code></span>
+<span class="codeline" id="line-185"><code>	if strings.Count(query, "?") != len(args) {</code></span>
+<span class="codeline" id="line-186"><code>		return "", driver.ErrSkip</code></span>
+<span class="codeline" id="line-187"><code>	}</code></span>
+<span class="codeline" id="line-188"><code></code></span>
+<span class="codeline" id="line-189"><code>	buf, err := mc.buf.takeCompleteBuffer()</code></span>
+<span class="codeline" id="line-190"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-191"><code>		// can not take the buffer. Something must be wrong with the connection</code></span>
+<span class="codeline" id="line-192"><code>		errLog.Print(err)</code></span>
+<span class="codeline" id="line-193"><code>		return "", ErrInvalidConn</code></span>
+<span class="codeline" id="line-194"><code>	}</code></span>
+<span class="codeline" id="line-195"><code>	buf = buf[:0]</code></span>
+<span class="codeline" id="line-196"><code>	argPos := 0</code></span>
+<span class="codeline" id="line-197"><code></code></span>
+<span class="codeline" id="line-198"><code>	for i := 0; i &lt; len(query); i++ {</code></span>
+<span class="codeline" id="line-199"><code>		q := strings.IndexByte(query[i:], '?')</code></span>
+<span class="codeline" id="line-200"><code>		if q == -1 {</code></span>
+<span class="codeline" id="line-201"><code>			buf = append(buf, query[i:]...)</code></span>
+<span class="codeline" id="line-202"><code>			break</code></span>
+<span class="codeline" id="line-203"><code>		}</code></span>
+<span class="codeline" id="line-204"><code>		buf = append(buf, query[i:i+q]...)</code></span>
+<span class="codeline" id="line-205"><code>		i += q</code></span>
+<span class="codeline" id="line-206"><code></code></span>
+<span class="codeline" id="line-207"><code>		arg := args[argPos]</code></span>
+<span class="codeline" id="line-208"><code>		argPos++</code></span>
+<span class="codeline" id="line-209"><code></code></span>
+<span class="codeline" id="line-210"><code>		if arg == nil {</code></span>
+<span class="codeline" id="line-211"><code>			buf = append(buf, "NULL"...)</code></span>
+<span class="codeline" id="line-212"><code>			continue</code></span>
+<span class="codeline" id="line-213"><code>		}</code></span>
+<span class="codeline" id="line-214"><code></code></span>
+<span class="codeline" id="line-215"><code>		switch v := arg.(type) {</code></span>
+<span class="codeline" id="line-216"><code>		case int64:</code></span>
+<span class="codeline" id="line-217"><code>			buf = strconv.AppendInt(buf, v, 10)</code></span>
+<span class="codeline" id="line-218"><code>		case uint64:</code></span>
+<span class="codeline" id="line-219"><code>			// Handle uint64 explicitly because our custom ConvertValue emits unsigned values</code></span>
+<span class="codeline" id="line-220"><code>			buf = strconv.AppendUint(buf, v, 10)</code></span>
+<span class="codeline" id="line-221"><code>		case float64:</code></span>
+<span class="codeline" id="line-222"><code>			buf = strconv.AppendFloat(buf, v, 'g', -1, 64)</code></span>
+<span class="codeline" id="line-223"><code>		case bool:</code></span>
+<span class="codeline" id="line-224"><code>			if v {</code></span>
+<span class="codeline" id="line-225"><code>				buf = append(buf, '1')</code></span>
+<span class="codeline" id="line-226"><code>			} else {</code></span>
+<span class="codeline" id="line-227"><code>				buf = append(buf, '0')</code></span>
+<span class="codeline" id="line-228"><code>			}</code></span>
+<span class="codeline" id="line-229"><code>		case time.Time:</code></span>
+<span class="codeline" id="line-230"><code>			if v.IsZero() {</code></span>
+<span class="codeline" id="line-231"><code>				buf = append(buf, "'0000-00-00'"...)</code></span>
+<span class="codeline" id="line-232"><code>			} else {</code></span>
+<span class="codeline" id="line-233"><code>				v := v.In(mc.cfg.Loc)</code></span>
+<span class="codeline" id="line-234"><code>				v = v.Add(time.Nanosecond * 500) // To round under microsecond</code></span>
+<span class="codeline" id="line-235"><code>				year := v.Year()</code></span>
+<span class="codeline" id="line-236"><code>				year100 := year / 100</code></span>
+<span class="codeline" id="line-237"><code>				year1 := year % 100</code></span>
+<span class="codeline" id="line-238"><code>				month := v.Month()</code></span>
+<span class="codeline" id="line-239"><code>				day := v.Day()</code></span>
+<span class="codeline" id="line-240"><code>				hour := v.Hour()</code></span>
+<span class="codeline" id="line-241"><code>				minute := v.Minute()</code></span>
+<span class="codeline" id="line-242"><code>				second := v.Second()</code></span>
+<span class="codeline" id="line-243"><code>				micro := v.Nanosecond() / 1000</code></span>
+<span class="codeline" id="line-244"><code></code></span>
+<span class="codeline" id="line-245"><code>				buf = append(buf, []byte{</code></span>
+<span class="codeline" id="line-246"><code>					'\'',</code></span>
+<span class="codeline" id="line-247"><code>					digits10[year100], digits01[year100],</code></span>
+<span class="codeline" id="line-248"><code>					digits10[year1], digits01[year1],</code></span>
+<span class="codeline" id="line-249"><code>					'-',</code></span>
+<span class="codeline" id="line-250"><code>					digits10[month], digits01[month],</code></span>
+<span class="codeline" id="line-251"><code>					'-',</code></span>
+<span class="codeline" id="line-252"><code>					digits10[day], digits01[day],</code></span>
+<span class="codeline" id="line-253"><code>					' ',</code></span>
+<span class="codeline" id="line-254"><code>					digits10[hour], digits01[hour],</code></span>
+<span class="codeline" id="line-255"><code>					':',</code></span>
+<span class="codeline" id="line-256"><code>					digits10[minute], digits01[minute],</code></span>
+<span class="codeline" id="line-257"><code>					':',</code></span>
+<span class="codeline" id="line-258"><code>					digits10[second], digits01[second],</code></span>
+<span class="codeline" id="line-259"><code>				}...)</code></span>
+<span class="codeline" id="line-260"><code></code></span>
+<span class="codeline" id="line-261"><code>				if micro != 0 {</code></span>
+<span class="codeline" id="line-262"><code>					micro10000 := micro / 10000</code></span>
+<span class="codeline" id="line-263"><code>					micro100 := micro / 100 % 100</code></span>
+<span class="codeline" id="line-264"><code>					micro1 := micro % 100</code></span>
+<span class="codeline" id="line-265"><code>					buf = append(buf, []byte{</code></span>
+<span class="codeline" id="line-266"><code>						'.',</code></span>
+<span class="codeline" id="line-267"><code>						digits10[micro10000], digits01[micro10000],</code></span>
+<span class="codeline" id="line-268"><code>						digits10[micro100], digits01[micro100],</code></span>
+<span class="codeline" id="line-269"><code>						digits10[micro1], digits01[micro1],</code></span>
+<span class="codeline" id="line-270"><code>					}...)</code></span>
+<span class="codeline" id="line-271"><code>				}</code></span>
+<span class="codeline" id="line-272"><code>				buf = append(buf, '\'')</code></span>
+<span class="codeline" id="line-273"><code>			}</code></span>
+<span class="codeline" id="line-274"><code>		case []byte:</code></span>
+<span class="codeline" id="line-275"><code>			if v == nil {</code></span>
+<span class="codeline" id="line-276"><code>				buf = append(buf, "NULL"...)</code></span>
+<span class="codeline" id="line-277"><code>			} else {</code></span>
+<span class="codeline" id="line-278"><code>				buf = append(buf, "_binary'"...)</code></span>
+<span class="codeline" id="line-279"><code>				if mc.status&amp;statusNoBackslashEscapes == 0 {</code></span>
+<span class="codeline" id="line-280"><code>					buf = escapeBytesBackslash(buf, v)</code></span>
+<span class="codeline" id="line-281"><code>				} else {</code></span>
+<span class="codeline" id="line-282"><code>					buf = escapeBytesQuotes(buf, v)</code></span>
+<span class="codeline" id="line-283"><code>				}</code></span>
+<span class="codeline" id="line-284"><code>				buf = append(buf, '\'')</code></span>
+<span class="codeline" id="line-285"><code>			}</code></span>
+<span class="codeline" id="line-286"><code>		case string:</code></span>
+<span class="codeline" id="line-287"><code>			buf = append(buf, '\'')</code></span>
+<span class="codeline" id="line-288"><code>			if mc.status&amp;statusNoBackslashEscapes == 0 {</code></span>
+<span class="codeline" id="line-289"><code>				buf = escapeStringBackslash(buf, v)</code></span>
+<span class="codeline" id="line-290"><code>			} else {</code></span>
+<span class="codeline" id="line-291"><code>				buf = escapeStringQuotes(buf, v)</code></span>
+<span class="codeline" id="line-292"><code>			}</code></span>
+<span class="codeline" id="line-293"><code>			buf = append(buf, '\'')</code></span>
+<span class="codeline" id="line-294"><code>		default:</code></span>
+<span class="codeline" id="line-295"><code>			return "", driver.ErrSkip</code></span>
+<span class="codeline" id="line-296"><code>		}</code></span>
+<span class="codeline" id="line-297"><code></code></span>
+<span class="codeline" id="line-298"><code>		if len(buf)+4 &gt; mc.maxAllowedPacket {</code></span>
+<span class="codeline" id="line-299"><code>			return "", driver.ErrSkip</code></span>
+<span class="codeline" id="line-300"><code>		}</code></span>
+<span class="codeline" id="line-301"><code>	}</code></span>
+<span class="codeline" id="line-302"><code>	if argPos != len(args) {</code></span>
+<span class="codeline" id="line-303"><code>		return "", driver.ErrSkip</code></span>
+<span class="codeline" id="line-304"><code>	}</code></span>
+<span class="codeline" id="line-305"><code>	return string(buf), nil</code></span>
+<span class="codeline" id="line-306"><code>}</code></span>
+<span class="codeline" id="line-307"><code></code></span>
+<span class="codeline" id="line-308"><code>func (mc *mysqlConn) Exec(query string, args []driver.Value) (driver.Result, error) {</code></span>
+<span class="codeline" id="line-309"><code>	if mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-310"><code>		errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-311"><code>		return nil, driver.ErrBadConn</code></span>
+<span class="codeline" id="line-312"><code>	}</code></span>
+<span class="codeline" id="line-313"><code>	if len(args) != 0 {</code></span>
+<span class="codeline" id="line-314"><code>		if !mc.cfg.InterpolateParams {</code></span>
+<span class="codeline" id="line-315"><code>			return nil, driver.ErrSkip</code></span>
+<span class="codeline" id="line-316"><code>		}</code></span>
+<span class="codeline" id="line-317"><code>		// try to interpolate the parameters to save extra roundtrips for preparing and closing a statement</code></span>
+<span class="codeline" id="line-318"><code>		prepared, err := mc.interpolateParams(query, args)</code></span>
+<span class="codeline" id="line-319"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-320"><code>			return nil, err</code></span>
+<span class="codeline" id="line-321"><code>		}</code></span>
+<span class="codeline" id="line-322"><code>		query = prepared</code></span>
+<span class="codeline" id="line-323"><code>	}</code></span>
+<span class="codeline" id="line-324"><code>	mc.affectedRows = 0</code></span>
+<span class="codeline" id="line-325"><code>	mc.insertId = 0</code></span>
+<span class="codeline" id="line-326"><code></code></span>
+<span class="codeline" id="line-327"><code>	err := mc.exec(query)</code></span>
+<span class="codeline" id="line-328"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-329"><code>		return &amp;mysqlResult{</code></span>
+<span class="codeline" id="line-330"><code>			affectedRows: int64(mc.affectedRows),</code></span>
+<span class="codeline" id="line-331"><code>			insertId:     int64(mc.insertId),</code></span>
+<span class="codeline" id="line-332"><code>		}, err</code></span>
+<span class="codeline" id="line-333"><code>	}</code></span>
+<span class="codeline" id="line-334"><code>	return nil, mc.markBadConn(err)</code></span>
+<span class="codeline" id="line-335"><code>}</code></span>
+<span class="codeline" id="line-336"><code></code></span>
+<span class="codeline" id="line-337"><code>// Internal function to execute commands</code></span>
+<span class="codeline" id="line-338"><code>func (mc *mysqlConn) exec(query string) error {</code></span>
+<span class="codeline" id="line-339"><code>	// Send command</code></span>
+<span class="codeline" id="line-340"><code>	if err := mc.writeCommandPacketStr(comQuery, query); err != nil {</code></span>
+<span class="codeline" id="line-341"><code>		return mc.markBadConn(err)</code></span>
+<span class="codeline" id="line-342"><code>	}</code></span>
+<span class="codeline" id="line-343"><code></code></span>
+<span class="codeline" id="line-344"><code>	// Read Result</code></span>
+<span class="codeline" id="line-345"><code>	resLen, err := mc.readResultSetHeaderPacket()</code></span>
+<span class="codeline" id="line-346"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-347"><code>		return err</code></span>
+<span class="codeline" id="line-348"><code>	}</code></span>
+<span class="codeline" id="line-349"><code></code></span>
+<span class="codeline" id="line-350"><code>	if resLen &gt; 0 {</code></span>
+<span class="codeline" id="line-351"><code>		// columns</code></span>
+<span class="codeline" id="line-352"><code>		if err := mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-353"><code>			return err</code></span>
+<span class="codeline" id="line-354"><code>		}</code></span>
+<span class="codeline" id="line-355"><code></code></span>
+<span class="codeline" id="line-356"><code>		// rows</code></span>
+<span class="codeline" id="line-357"><code>		if err := mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-358"><code>			return err</code></span>
+<span class="codeline" id="line-359"><code>		}</code></span>
+<span class="codeline" id="line-360"><code>	}</code></span>
+<span class="codeline" id="line-361"><code></code></span>
+<span class="codeline" id="line-362"><code>	return mc.discardResults()</code></span>
+<span class="codeline" id="line-363"><code>}</code></span>
+<span class="codeline" id="line-364"><code></code></span>
+<span class="codeline" id="line-365"><code>func (mc *mysqlConn) Query(query string, args []driver.Value) (driver.Rows, error) {</code></span>
+<span class="codeline" id="line-366"><code>	return mc.query(query, args)</code></span>
+<span class="codeline" id="line-367"><code>}</code></span>
+<span class="codeline" id="line-368"><code></code></span>
+<span class="codeline" id="line-369"><code>func (mc *mysqlConn) query(query string, args []driver.Value) (*textRows, error) {</code></span>
+<span class="codeline" id="line-370"><code>	if mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-371"><code>		errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-372"><code>		return nil, driver.ErrBadConn</code></span>
+<span class="codeline" id="line-373"><code>	}</code></span>
+<span class="codeline" id="line-374"><code>	if len(args) != 0 {</code></span>
+<span class="codeline" id="line-375"><code>		if !mc.cfg.InterpolateParams {</code></span>
+<span class="codeline" id="line-376"><code>			return nil, driver.ErrSkip</code></span>
+<span class="codeline" id="line-377"><code>		}</code></span>
+<span class="codeline" id="line-378"><code>		// try client-side prepare to reduce roundtrip</code></span>
+<span class="codeline" id="line-379"><code>		prepared, err := mc.interpolateParams(query, args)</code></span>
+<span class="codeline" id="line-380"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-381"><code>			return nil, err</code></span>
+<span class="codeline" id="line-382"><code>		}</code></span>
+<span class="codeline" id="line-383"><code>		query = prepared</code></span>
+<span class="codeline" id="line-384"><code>	}</code></span>
+<span class="codeline" id="line-385"><code>	// Send command</code></span>
+<span class="codeline" id="line-386"><code>	err := mc.writeCommandPacketStr(comQuery, query)</code></span>
+<span class="codeline" id="line-387"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-388"><code>		// Read Result</code></span>
+<span class="codeline" id="line-389"><code>		var resLen int</code></span>
+<span class="codeline" id="line-390"><code>		resLen, err = mc.readResultSetHeaderPacket()</code></span>
+<span class="codeline" id="line-391"><code>		if err == nil {</code></span>
+<span class="codeline" id="line-392"><code>			rows := new(textRows)</code></span>
+<span class="codeline" id="line-393"><code>			rows.mc = mc</code></span>
+<span class="codeline" id="line-394"><code></code></span>
+<span class="codeline" id="line-395"><code>			if resLen == 0 {</code></span>
+<span class="codeline" id="line-396"><code>				rows.rs.done = true</code></span>
+<span class="codeline" id="line-397"><code></code></span>
+<span class="codeline" id="line-398"><code>				switch err := rows.NextResultSet(); err {</code></span>
+<span class="codeline" id="line-399"><code>				case nil, io.EOF:</code></span>
+<span class="codeline" id="line-400"><code>					return rows, nil</code></span>
+<span class="codeline" id="line-401"><code>				default:</code></span>
+<span class="codeline" id="line-402"><code>					return nil, err</code></span>
+<span class="codeline" id="line-403"><code>				}</code></span>
+<span class="codeline" id="line-404"><code>			}</code></span>
+<span class="codeline" id="line-405"><code></code></span>
+<span class="codeline" id="line-406"><code>			// Columns</code></span>
+<span class="codeline" id="line-407"><code>			rows.rs.columns, err = mc.readColumns(resLen)</code></span>
+<span class="codeline" id="line-408"><code>			return rows, err</code></span>
+<span class="codeline" id="line-409"><code>		}</code></span>
+<span class="codeline" id="line-410"><code>	}</code></span>
+<span class="codeline" id="line-411"><code>	return nil, mc.markBadConn(err)</code></span>
+<span class="codeline" id="line-412"><code>}</code></span>
+<span class="codeline" id="line-413"><code></code></span>
+<span class="codeline" id="line-414"><code>// Gets the value of the given MySQL System Variable</code></span>
+<span class="codeline" id="line-415"><code>// The returned byte slice is only valid until the next read</code></span>
+<span class="codeline" id="line-416"><code>func (mc *mysqlConn) getSystemVar(name string) ([]byte, error) {</code></span>
+<span class="codeline" id="line-417"><code>	// Send command</code></span>
+<span class="codeline" id="line-418"><code>	if err := mc.writeCommandPacketStr(comQuery, "SELECT @@"+name); err != nil {</code></span>
+<span class="codeline" id="line-419"><code>		return nil, err</code></span>
+<span class="codeline" id="line-420"><code>	}</code></span>
+<span class="codeline" id="line-421"><code></code></span>
+<span class="codeline" id="line-422"><code>	// Read Result</code></span>
+<span class="codeline" id="line-423"><code>	resLen, err := mc.readResultSetHeaderPacket()</code></span>
+<span class="codeline" id="line-424"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-425"><code>		rows := new(textRows)</code></span>
+<span class="codeline" id="line-426"><code>		rows.mc = mc</code></span>
+<span class="codeline" id="line-427"><code>		rows.rs.columns = []mysqlField{{fieldType: fieldTypeVarChar}}</code></span>
+<span class="codeline" id="line-428"><code></code></span>
+<span class="codeline" id="line-429"><code>		if resLen &gt; 0 {</code></span>
+<span class="codeline" id="line-430"><code>			// Columns</code></span>
+<span class="codeline" id="line-431"><code>			if err := mc.readUntilEOF(); err != nil {</code></span>
+<span class="codeline" id="line-432"><code>				return nil, err</code></span>
+<span class="codeline" id="line-433"><code>			}</code></span>
+<span class="codeline" id="line-434"><code>		}</code></span>
+<span class="codeline" id="line-435"><code></code></span>
+<span class="codeline" id="line-436"><code>		dest := make([]driver.Value, resLen)</code></span>
+<span class="codeline" id="line-437"><code>		if err = rows.readRow(dest); err == nil {</code></span>
+<span class="codeline" id="line-438"><code>			return dest[0].([]byte), mc.readUntilEOF()</code></span>
+<span class="codeline" id="line-439"><code>		}</code></span>
+<span class="codeline" id="line-440"><code>	}</code></span>
+<span class="codeline" id="line-441"><code>	return nil, err</code></span>
+<span class="codeline" id="line-442"><code>}</code></span>
+<span class="codeline" id="line-443"><code></code></span>
+<span class="codeline" id="line-444"><code>// finish is called when the query has canceled.</code></span>
+<span class="codeline" id="line-445"><code>func (mc *mysqlConn) cancel(err error) {</code></span>
+<span class="codeline" id="line-446"><code>	mc.canceled.Set(err)</code></span>
+<span class="codeline" id="line-447"><code>	mc.cleanup()</code></span>
+<span class="codeline" id="line-448"><code>}</code></span>
+<span class="codeline" id="line-449"><code></code></span>
+<span class="codeline" id="line-450"><code>// finish is called when the query has succeeded.</code></span>
+<span class="codeline" id="line-451"><code>func (mc *mysqlConn) finish() {</code></span>
+<span class="codeline" id="line-452"><code>	if !mc.watching || mc.finished == nil {</code></span>
+<span class="codeline" id="line-453"><code>		return</code></span>
+<span class="codeline" id="line-454"><code>	}</code></span>
+<span class="codeline" id="line-455"><code>	select {</code></span>
+<span class="codeline" id="line-456"><code>	case mc.finished &lt;- struct{}{}:</code></span>
+<span class="codeline" id="line-457"><code>		mc.watching = false</code></span>
+<span class="codeline" id="line-458"><code>	case &lt;-mc.closech:</code></span>
+<span class="codeline" id="line-459"><code>	}</code></span>
+<span class="codeline" id="line-460"><code>}</code></span>
+<span class="codeline" id="line-461"><code></code></span>
+<span class="codeline" id="line-462"><code>// Ping implements driver.Pinger interface</code></span>
+<span class="codeline" id="line-463"><code>func (mc *mysqlConn) Ping(ctx context.Context) (err error) {</code></span>
+<span class="codeline" id="line-464"><code>	if mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-465"><code>		errLog.Print(ErrInvalidConn)</code></span>
+<span class="codeline" id="line-466"><code>		return driver.ErrBadConn</code></span>
+<span class="codeline" id="line-467"><code>	}</code></span>
+<span class="codeline" id="line-468"><code></code></span>
+<span class="codeline" id="line-469"><code>	if err = mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-470"><code>		return</code></span>
+<span class="codeline" id="line-471"><code>	}</code></span>
+<span class="codeline" id="line-472"><code>	defer mc.finish()</code></span>
+<span class="codeline" id="line-473"><code></code></span>
+<span class="codeline" id="line-474"><code>	if err = mc.writeCommandPacket(comPing); err != nil {</code></span>
+<span class="codeline" id="line-475"><code>		return mc.markBadConn(err)</code></span>
+<span class="codeline" id="line-476"><code>	}</code></span>
+<span class="codeline" id="line-477"><code></code></span>
+<span class="codeline" id="line-478"><code>	return mc.readResultOK()</code></span>
+<span class="codeline" id="line-479"><code>}</code></span>
+<span class="codeline" id="line-480"><code></code></span>
+<span class="codeline" id="line-481"><code>// BeginTx implements driver.ConnBeginTx interface</code></span>
+<span class="codeline" id="line-482"><code>func (mc *mysqlConn) BeginTx(ctx context.Context, opts driver.TxOptions) (driver.Tx, error) {</code></span>
+<span class="codeline" id="line-483"><code>	if err := mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-484"><code>		return nil, err</code></span>
+<span class="codeline" id="line-485"><code>	}</code></span>
+<span class="codeline" id="line-486"><code>	defer mc.finish()</code></span>
+<span class="codeline" id="line-487"><code></code></span>
+<span class="codeline" id="line-488"><code>	if sql.IsolationLevel(opts.Isolation) != sql.LevelDefault {</code></span>
+<span class="codeline" id="line-489"><code>		level, err := mapIsolationLevel(opts.Isolation)</code></span>
+<span class="codeline" id="line-490"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-491"><code>			return nil, err</code></span>
+<span class="codeline" id="line-492"><code>		}</code></span>
+<span class="codeline" id="line-493"><code>		err = mc.exec("SET TRANSACTION ISOLATION LEVEL " + level)</code></span>
+<span class="codeline" id="line-494"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-495"><code>			return nil, err</code></span>
+<span class="codeline" id="line-496"><code>		}</code></span>
+<span class="codeline" id="line-497"><code>	}</code></span>
+<span class="codeline" id="line-498"><code></code></span>
+<span class="codeline" id="line-499"><code>	return mc.begin(opts.ReadOnly)</code></span>
+<span class="codeline" id="line-500"><code>}</code></span>
+<span class="codeline" id="line-501"><code></code></span>
+<span class="codeline" id="line-502"><code>func (mc *mysqlConn) QueryContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Rows, error) {</code></span>
+<span class="codeline" id="line-503"><code>	dargs, err := namedValueToValue(args)</code></span>
+<span class="codeline" id="line-504"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-505"><code>		return nil, err</code></span>
+<span class="codeline" id="line-506"><code>	}</code></span>
+<span class="codeline" id="line-507"><code></code></span>
+<span class="codeline" id="line-508"><code>	if err := mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-509"><code>		return nil, err</code></span>
+<span class="codeline" id="line-510"><code>	}</code></span>
+<span class="codeline" id="line-511"><code></code></span>
+<span class="codeline" id="line-512"><code>	rows, err := mc.query(query, dargs)</code></span>
+<span class="codeline" id="line-513"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-514"><code>		mc.finish()</code></span>
+<span class="codeline" id="line-515"><code>		return nil, err</code></span>
+<span class="codeline" id="line-516"><code>	}</code></span>
+<span class="codeline" id="line-517"><code>	rows.finish = mc.finish</code></span>
+<span class="codeline" id="line-518"><code>	return rows, err</code></span>
+<span class="codeline" id="line-519"><code>}</code></span>
+<span class="codeline" id="line-520"><code></code></span>
+<span class="codeline" id="line-521"><code>func (mc *mysqlConn) ExecContext(ctx context.Context, query string, args []driver.NamedValue) (driver.Result, error) {</code></span>
+<span class="codeline" id="line-522"><code>	dargs, err := namedValueToValue(args)</code></span>
+<span class="codeline" id="line-523"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-524"><code>		return nil, err</code></span>
+<span class="codeline" id="line-525"><code>	}</code></span>
+<span class="codeline" id="line-526"><code></code></span>
+<span class="codeline" id="line-527"><code>	if err := mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-528"><code>		return nil, err</code></span>
+<span class="codeline" id="line-529"><code>	}</code></span>
+<span class="codeline" id="line-530"><code>	defer mc.finish()</code></span>
+<span class="codeline" id="line-531"><code></code></span>
+<span class="codeline" id="line-532"><code>	return mc.Exec(query, dargs)</code></span>
+<span class="codeline" id="line-533"><code>}</code></span>
+<span class="codeline" id="line-534"><code></code></span>
+<span class="codeline" id="line-535"><code>func (mc *mysqlConn) PrepareContext(ctx context.Context, query string) (driver.Stmt, error) {</code></span>
+<span class="codeline" id="line-536"><code>	if err := mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-537"><code>		return nil, err</code></span>
+<span class="codeline" id="line-538"><code>	}</code></span>
+<span class="codeline" id="line-539"><code></code></span>
+<span class="codeline" id="line-540"><code>	stmt, err := mc.Prepare(query)</code></span>
+<span class="codeline" id="line-541"><code>	mc.finish()</code></span>
+<span class="codeline" id="line-542"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-543"><code>		return nil, err</code></span>
+<span class="codeline" id="line-544"><code>	}</code></span>
+<span class="codeline" id="line-545"><code></code></span>
+<span class="codeline" id="line-546"><code>	select {</code></span>
+<span class="codeline" id="line-547"><code>	default:</code></span>
+<span class="codeline" id="line-548"><code>	case &lt;-ctx.Done():</code></span>
+<span class="codeline" id="line-549"><code>		stmt.Close()</code></span>
+<span class="codeline" id="line-550"><code>		return nil, ctx.Err()</code></span>
+<span class="codeline" id="line-551"><code>	}</code></span>
+<span class="codeline" id="line-552"><code>	return stmt, nil</code></span>
+<span class="codeline" id="line-553"><code>}</code></span>
+<span class="codeline" id="line-554"><code></code></span>
+<span class="codeline" id="line-555"><code>func (stmt *mysqlStmt) QueryContext(ctx context.Context, args []driver.NamedValue) (driver.Rows, error) {</code></span>
+<span class="codeline" id="line-556"><code>	dargs, err := namedValueToValue(args)</code></span>
+<span class="codeline" id="line-557"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-558"><code>		return nil, err</code></span>
+<span class="codeline" id="line-559"><code>	}</code></span>
+<span class="codeline" id="line-560"><code></code></span>
+<span class="codeline" id="line-561"><code>	if err := stmt.mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-562"><code>		return nil, err</code></span>
+<span class="codeline" id="line-563"><code>	}</code></span>
+<span class="codeline" id="line-564"><code></code></span>
+<span class="codeline" id="line-565"><code>	rows, err := stmt.query(dargs)</code></span>
+<span class="codeline" id="line-566"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-567"><code>		stmt.mc.finish()</code></span>
+<span class="codeline" id="line-568"><code>		return nil, err</code></span>
+<span class="codeline" id="line-569"><code>	}</code></span>
+<span class="codeline" id="line-570"><code>	rows.finish = stmt.mc.finish</code></span>
+<span class="codeline" id="line-571"><code>	return rows, err</code></span>
+<span class="codeline" id="line-572"><code>}</code></span>
+<span class="codeline" id="line-573"><code></code></span>
+<span class="codeline" id="line-574"><code>func (stmt *mysqlStmt) ExecContext(ctx context.Context, args []driver.NamedValue) (driver.Result, error) {</code></span>
+<span class="codeline" id="line-575"><code>	dargs, err := namedValueToValue(args)</code></span>
+<span class="codeline" id="line-576"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-577"><code>		return nil, err</code></span>
+<span class="codeline" id="line-578"><code>	}</code></span>
+<span class="codeline" id="line-579"><code></code></span>
+<span class="codeline" id="line-580"><code>	if err := stmt.mc.watchCancel(ctx); err != nil {</code></span>
+<span class="codeline" id="line-581"><code>		return nil, err</code></span>
+<span class="codeline" id="line-582"><code>	}</code></span>
+<span class="codeline" id="line-583"><code>	defer stmt.mc.finish()</code></span>
+<span class="codeline" id="line-584"><code></code></span>
+<span class="codeline" id="line-585"><code>	return stmt.Exec(dargs)</code></span>
+<span class="codeline" id="line-586"><code>}</code></span>
+<span class="codeline" id="line-587"><code></code></span>
+<span class="codeline" id="line-588"><code>func (mc *mysqlConn) watchCancel(ctx context.Context) error {</code></span>
+<span class="codeline" id="line-589"><code>	if mc.watching {</code></span>
+<span class="codeline" id="line-590"><code>		// Reach here if canceled,</code></span>
+<span class="codeline" id="line-591"><code>		// so the connection is already invalid</code></span>
+<span class="codeline" id="line-592"><code>		mc.cleanup()</code></span>
+<span class="codeline" id="line-593"><code>		return nil</code></span>
+<span class="codeline" id="line-594"><code>	}</code></span>
+<span class="codeline" id="line-595"><code>	// When ctx is already cancelled, don't watch it.</code></span>
+<span class="codeline" id="line-596"><code>	if err := ctx.Err(); err != nil {</code></span>
+<span class="codeline" id="line-597"><code>		return err</code></span>
+<span class="codeline" id="line-598"><code>	}</code></span>
+<span class="codeline" id="line-599"><code>	// When ctx is not cancellable, don't watch it.</code></span>
+<span class="codeline" id="line-600"><code>	if ctx.Done() == nil {</code></span>
+<span class="codeline" id="line-601"><code>		return nil</code></span>
+<span class="codeline" id="line-602"><code>	}</code></span>
+<span class="codeline" id="line-603"><code>	// When watcher is not alive, can't watch it.</code></span>
+<span class="codeline" id="line-604"><code>	if mc.watcher == nil {</code></span>
+<span class="codeline" id="line-605"><code>		return nil</code></span>
+<span class="codeline" id="line-606"><code>	}</code></span>
+<span class="codeline" id="line-607"><code></code></span>
+<span class="codeline" id="line-608"><code>	mc.watching = true</code></span>
+<span class="codeline" id="line-609"><code>	mc.watcher &lt;- ctx</code></span>
+<span class="codeline" id="line-610"><code>	return nil</code></span>
+<span class="codeline" id="line-611"><code>}</code></span>
+<span class="codeline" id="line-612"><code></code></span>
+<span class="codeline" id="line-613"><code>func (mc *mysqlConn) startWatcher() {</code></span>
+<span class="codeline" id="line-614"><code>	watcher := make(chan context.Context, 1)</code></span>
+<span class="codeline" id="line-615"><code>	mc.watcher = watcher</code></span>
+<span class="codeline" id="line-616"><code>	finished := make(chan struct{})</code></span>
+<span class="codeline" id="line-617"><code>	mc.finished = finished</code></span>
+<span class="codeline" id="line-618"><code>	go func() {</code></span>
+<span class="codeline" id="line-619"><code>		for {</code></span>
+<span class="codeline" id="line-620"><code>			var ctx context.Context</code></span>
+<span class="codeline" id="line-621"><code>			select {</code></span>
+<span class="codeline" id="line-622"><code>			case ctx = &lt;-watcher:</code></span>
+<span class="codeline" id="line-623"><code>			case &lt;-mc.closech:</code></span>
+<span class="codeline" id="line-624"><code>				return</code></span>
+<span class="codeline" id="line-625"><code>			}</code></span>
+<span class="codeline" id="line-626"><code></code></span>
+<span class="codeline" id="line-627"><code>			select {</code></span>
+<span class="codeline" id="line-628"><code>			case &lt;-ctx.Done():</code></span>
+<span class="codeline" id="line-629"><code>				mc.cancel(ctx.Err())</code></span>
+<span class="codeline" id="line-630"><code>			case &lt;-finished:</code></span>
+<span class="codeline" id="line-631"><code>			case &lt;-mc.closech:</code></span>
+<span class="codeline" id="line-632"><code>				return</code></span>
+<span class="codeline" id="line-633"><code>			}</code></span>
+<span class="codeline" id="line-634"><code>		}</code></span>
+<span class="codeline" id="line-635"><code>	}()</code></span>
+<span class="codeline" id="line-636"><code>}</code></span>
+<span class="codeline" id="line-637"><code></code></span>
+<span class="codeline" id="line-638"><code>func (mc *mysqlConn) CheckNamedValue(nv *driver.NamedValue) (err error) {</code></span>
+<span class="codeline" id="line-639"><code>	nv.Value, err = converter{}.ConvertValue(nv.Value)</code></span>
+<span class="codeline" id="line-640"><code>	return</code></span>
+<span class="codeline" id="line-641"><code>}</code></span>
+<span class="codeline" id="line-642"><code></code></span>
+<span class="codeline" id="line-643"><code>// ResetSession implements driver.SessionResetter.</code></span>
+<span class="codeline" id="line-644"><code>// (From Go 1.10)</code></span>
+<span class="codeline" id="line-645"><code>func (mc *mysqlConn) ResetSession(ctx context.Context) error {</code></span>
+<span class="codeline" id="line-646"><code>	if mc.closed.IsSet() {</code></span>
+<span class="codeline" id="line-647"><code>		return driver.ErrBadConn</code></span>
+<span class="codeline" id="line-648"><code>	}</code></span>
+<span class="codeline" id="line-649"><code>	mc.reset = true</code></span>
+<span class="codeline" id="line-650"><code>	return nil</code></span>
+<span class="codeline" id="line-651"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: ip.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	ip.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// IP address manipulations</code></span>
+<span class="codeline" id="line-6"><code>//</code></span>
+<span class="codeline" id="line-7"><code>// IPv4 addresses are 4 bytes; IPv6 addresses are 16 bytes.</code></span>
+<span class="codeline" id="line-8"><code>// An IPv4 address can be converted to an IPv6 address by</code></span>
+<span class="codeline" id="line-9"><code>// adding a canonical prefix (10 zeros, 2 0xFFs).</code></span>
+<span class="codeline" id="line-10"><code>// This library accepts either size of byte slice but always</code></span>
+<span class="codeline" id="line-11"><code>// returns 16-byte addresses.</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>package net</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>import "internal/bytealg"</code></span>
+<span class="codeline" id="line-16"><code></code></span>
+<span class="codeline" id="line-17"><code>// IP address lengths (bytes).</code></span>
+<span class="codeline" id="line-18"><code>const (</code></span>
+<span class="codeline" id="line-19"><code>	IPv4len = 4</code></span>
+<span class="codeline" id="line-20"><code>	IPv6len = 16</code></span>
+<span class="codeline" id="line-21"><code>)</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>// An IP is a single IP address, a slice of bytes.</code></span>
+<span class="codeline" id="line-24"><code>// Functions in this package accept either 4-byte (IPv4)</code></span>
+<span class="codeline" id="line-25"><code>// or 16-byte (IPv6) slices as input.</code></span>
+<span class="codeline" id="line-26"><code>//</code></span>
+<span class="codeline" id="line-27"><code>// Note that in this documentation, referring to an</code></span>
+<span class="codeline" id="line-28"><code>// IP address as an IPv4 address or an IPv6 address</code></span>
+<span class="codeline" id="line-29"><code>// is a semantic property of the address, not just the</code></span>
+<span class="codeline" id="line-30"><code>// length of the byte slice: a 16-byte slice can still</code></span>
+<span class="codeline" id="line-31"><code>// be an IPv4 address.</code></span>
+<span class="codeline" id="line-32"><code>type IP []byte</code></span>
+<span class="codeline" id="line-33"><code></code></span>
+<span class="codeline" id="line-34"><code>// An IPMask is a bitmask that can be used to manipulate</code></span>
+<span class="codeline" id="line-35"><code>// IP addresses for IP addressing and routing.</code></span>
+<span class="codeline" id="line-36"><code>//</code></span>
+<span class="codeline" id="line-37"><code>// See type IPNet and func ParseCIDR for details.</code></span>
+<span class="codeline" id="line-38"><code>type IPMask []byte</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>// An IPNet represents an IP network.</code></span>
+<span class="codeline" id="line-41"><code>type IPNet struct {</code></span>
+<span class="codeline" id="line-42"><code>	IP   IP     // network number</code></span>
+<span class="codeline" id="line-43"><code>	Mask IPMask // network mask</code></span>
+<span class="codeline" id="line-44"><code>}</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>// IPv4 returns the IP address (in 16-byte form) of the</code></span>
+<span class="codeline" id="line-47"><code>// IPv4 address a.b.c.d.</code></span>
+<span class="codeline" id="line-48"><code>func IPv4(a, b, c, d byte) IP {</code></span>
+<span class="codeline" id="line-49"><code>	p := make(IP, IPv6len)</code></span>
+<span class="codeline" id="line-50"><code>	copy(p, v4InV6Prefix)</code></span>
+<span class="codeline" id="line-51"><code>	p[12] = a</code></span>
+<span class="codeline" id="line-52"><code>	p[13] = b</code></span>
+<span class="codeline" id="line-53"><code>	p[14] = c</code></span>
+<span class="codeline" id="line-54"><code>	p[15] = d</code></span>
+<span class="codeline" id="line-55"><code>	return p</code></span>
+<span class="codeline" id="line-56"><code>}</code></span>
+<span class="codeline" id="line-57"><code></code></span>
+<span class="codeline" id="line-58"><code>var v4InV6Prefix = []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff}</code></span>
+<span class="codeline" id="line-59"><code></code></span>
+<span class="codeline" id="line-60"><code>// IPv4Mask returns the IP mask (in 4-byte form) of the</code></span>
+<span class="codeline" id="line-61"><code>// IPv4 mask a.b.c.d.</code></span>
+<span class="codeline" id="line-62"><code>func IPv4Mask(a, b, c, d byte) IPMask {</code></span>
+<span class="codeline" id="line-63"><code>	p := make(IPMask, IPv4len)</code></span>
+<span class="codeline" id="line-64"><code>	p[0] = a</code></span>
+<span class="codeline" id="line-65"><code>	p[1] = b</code></span>
+<span class="codeline" id="line-66"><code>	p[2] = c</code></span>
+<span class="codeline" id="line-67"><code>	p[3] = d</code></span>
+<span class="codeline" id="line-68"><code>	return p</code></span>
+<span class="codeline" id="line-69"><code>}</code></span>
+<span class="codeline" id="line-70"><code></code></span>
+<span class="codeline" id="line-71"><code>// CIDRMask returns an IPMask consisting of 'ones' 1 bits</code></span>
+<span class="codeline" id="line-72"><code>// followed by 0s up to a total length of 'bits' bits.</code></span>
+<span class="codeline" id="line-73"><code>// For a mask of this form, CIDRMask is the inverse of IPMask.Size.</code></span>
+<span class="codeline" id="line-74"><code>func CIDRMask(ones, bits int) IPMask {</code></span>
+<span class="codeline" id="line-75"><code>	if bits != 8*IPv4len &amp;&amp; bits != 8*IPv6len {</code></span>
+<span class="codeline" id="line-76"><code>		return nil</code></span>
+<span class="codeline" id="line-77"><code>	}</code></span>
+<span class="codeline" id="line-78"><code>	if ones &lt; 0 || ones &gt; bits {</code></span>
+<span class="codeline" id="line-79"><code>		return nil</code></span>
+<span class="codeline" id="line-80"><code>	}</code></span>
+<span class="codeline" id="line-81"><code>	l := bits / 8</code></span>
+<span class="codeline" id="line-82"><code>	m := make(IPMask, l)</code></span>
+<span class="codeline" id="line-83"><code>	n := uint(ones)</code></span>
+<span class="codeline" id="line-84"><code>	for i := 0; i &lt; l; i++ {</code></span>
+<span class="codeline" id="line-85"><code>		if n &gt;= 8 {</code></span>
+<span class="codeline" id="line-86"><code>			m[i] = 0xff</code></span>
+<span class="codeline" id="line-87"><code>			n -= 8</code></span>
+<span class="codeline" id="line-88"><code>			continue</code></span>
+<span class="codeline" id="line-89"><code>		}</code></span>
+<span class="codeline" id="line-90"><code>		m[i] = ^byte(0xff &gt;&gt; n)</code></span>
+<span class="codeline" id="line-91"><code>		n = 0</code></span>
+<span class="codeline" id="line-92"><code>	}</code></span>
+<span class="codeline" id="line-93"><code>	return m</code></span>
+<span class="codeline" id="line-94"><code>}</code></span>
+<span class="codeline" id="line-95"><code></code></span>
+<span class="codeline" id="line-96"><code>// Well-known IPv4 addresses</code></span>
+<span class="codeline" id="line-97"><code>var (</code></span>
+<span class="codeline" id="line-98"><code>	IPv4bcast     = IPv4(255, 255, 255, 255) // limited broadcast</code></span>
+<span class="codeline" id="line-99"><code>	IPv4allsys    = IPv4(224, 0, 0, 1)       // all systems</code></span>
+<span class="codeline" id="line-100"><code>	IPv4allrouter = IPv4(224, 0, 0, 2)       // all routers</code></span>
+<span class="codeline" id="line-101"><code>	IPv4zero      = IPv4(0, 0, 0, 0)         // all zeros</code></span>
+<span class="codeline" id="line-102"><code>)</code></span>
+<span class="codeline" id="line-103"><code></code></span>
+<span class="codeline" id="line-104"><code>// Well-known IPv6 addresses</code></span>
+<span class="codeline" id="line-105"><code>var (</code></span>
+<span class="codeline" id="line-106"><code>	IPv6zero                   = IP{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</code></span>
+<span class="codeline" id="line-107"><code>	IPv6unspecified            = IP{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}</code></span>
+<span class="codeline" id="line-108"><code>	IPv6loopback               = IP{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}</code></span>
+<span class="codeline" id="line-109"><code>	IPv6interfacelocalallnodes = IP{0xff, 0x01, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01}</code></span>
+<span class="codeline" id="line-110"><code>	IPv6linklocalallnodes      = IP{0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x01}</code></span>
+<span class="codeline" id="line-111"><code>	IPv6linklocalallrouters    = IP{0xff, 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x02}</code></span>
+<span class="codeline" id="line-112"><code>)</code></span>
+<span class="codeline" id="line-113"><code></code></span>
+<span class="codeline" id="line-114"><code>// IsUnspecified reports whether ip is an unspecified address, either</code></span>
+<span class="codeline" id="line-115"><code>// the IPv4 address "0.0.0.0" or the IPv6 address "::".</code></span>
+<span class="codeline" id="line-116"><code>func (ip IP) IsUnspecified() bool {</code></span>
+<span class="codeline" id="line-117"><code>	return ip.Equal(IPv4zero) || ip.Equal(IPv6unspecified)</code></span>
+<span class="codeline" id="line-118"><code>}</code></span>
+<span class="codeline" id="line-119"><code></code></span>
+<span class="codeline" id="line-120"><code>// IsLoopback reports whether ip is a loopback address.</code></span>
+<span class="codeline" id="line-121"><code>func (ip IP) IsLoopback() bool {</code></span>
+<span class="codeline" id="line-122"><code>	if ip4 := ip.To4(); ip4 != nil {</code></span>
+<span class="codeline" id="line-123"><code>		return ip4[0] == 127</code></span>
+<span class="codeline" id="line-124"><code>	}</code></span>
+<span class="codeline" id="line-125"><code>	return ip.Equal(IPv6loopback)</code></span>
+<span class="codeline" id="line-126"><code>}</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>// IsMulticast reports whether ip is a multicast address.</code></span>
+<span class="codeline" id="line-129"><code>func (ip IP) IsMulticast() bool {</code></span>
+<span class="codeline" id="line-130"><code>	if ip4 := ip.To4(); ip4 != nil {</code></span>
+<span class="codeline" id="line-131"><code>		return ip4[0]&amp;0xf0 == 0xe0</code></span>
+<span class="codeline" id="line-132"><code>	}</code></span>
+<span class="codeline" id="line-133"><code>	return len(ip) == IPv6len &amp;&amp; ip[0] == 0xff</code></span>
+<span class="codeline" id="line-134"><code>}</code></span>
+<span class="codeline" id="line-135"><code></code></span>
+<span class="codeline" id="line-136"><code>// IsInterfaceLocalMulticast reports whether ip is</code></span>
+<span class="codeline" id="line-137"><code>// an interface-local multicast address.</code></span>
+<span class="codeline" id="line-138"><code>func (ip IP) IsInterfaceLocalMulticast() bool {</code></span>
+<span class="codeline" id="line-139"><code>	return len(ip) == IPv6len &amp;&amp; ip[0] == 0xff &amp;&amp; ip[1]&amp;0x0f == 0x01</code></span>
+<span class="codeline" id="line-140"><code>}</code></span>
+<span class="codeline" id="line-141"><code></code></span>
+<span class="codeline" id="line-142"><code>// IsLinkLocalMulticast reports whether ip is a link-local</code></span>
+<span class="codeline" id="line-143"><code>// multicast address.</code></span>
+<span class="codeline" id="line-144"><code>func (ip IP) IsLinkLocalMulticast() bool {</code></span>
+<span class="codeline" id="line-145"><code>	if ip4 := ip.To4(); ip4 != nil {</code></span>
+<span class="codeline" id="line-146"><code>		return ip4[0] == 224 &amp;&amp; ip4[1] == 0 &amp;&amp; ip4[2] == 0</code></span>
+<span class="codeline" id="line-147"><code>	}</code></span>
+<span class="codeline" id="line-148"><code>	return len(ip) == IPv6len &amp;&amp; ip[0] == 0xff &amp;&amp; ip[1]&amp;0x0f == 0x02</code></span>
+<span class="codeline" id="line-149"><code>}</code></span>
+<span class="codeline" id="line-150"><code></code></span>
+<span class="codeline" id="line-151"><code>// IsLinkLocalUnicast reports whether ip is a link-local</code></span>
+<span class="codeline" id="line-152"><code>// unicast address.</code></span>
+<span class="codeline" id="line-153"><code>func (ip IP) IsLinkLocalUnicast() bool {</code></span>
+<span class="codeline" id="line-154"><code>	if ip4 := ip.To4(); ip4 != nil {</code></span>
+<span class="codeline" id="line-155"><code>		return ip4[0] == 169 &amp;&amp; ip4[1] == 254</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code>	return len(ip) == IPv6len &amp;&amp; ip[0] == 0xfe &amp;&amp; ip[1]&amp;0xc0 == 0x80</code></span>
+<span class="codeline" id="line-158"><code>}</code></span>
+<span class="codeline" id="line-159"><code></code></span>
+<span class="codeline" id="line-160"><code>// IsGlobalUnicast reports whether ip is a global unicast</code></span>
+<span class="codeline" id="line-161"><code>// address.</code></span>
+<span class="codeline" id="line-162"><code>//</code></span>
+<span class="codeline" id="line-163"><code>// The identification of global unicast addresses uses address type</code></span>
+<span class="codeline" id="line-164"><code>// identification as defined in RFC 1122, RFC 4632 and RFC 4291 with</code></span>
+<span class="codeline" id="line-165"><code>// the exception of IPv4 directed broadcast addresses.</code></span>
+<span class="codeline" id="line-166"><code>// It returns true even if ip is in IPv4 private address space or</code></span>
+<span class="codeline" id="line-167"><code>// local IPv6 unicast address space.</code></span>
+<span class="codeline" id="line-168"><code>func (ip IP) IsGlobalUnicast() bool {</code></span>
+<span class="codeline" id="line-169"><code>	return (len(ip) == IPv4len || len(ip) == IPv6len) &amp;&amp;</code></span>
+<span class="codeline" id="line-170"><code>		!ip.Equal(IPv4bcast) &amp;&amp;</code></span>
+<span class="codeline" id="line-171"><code>		!ip.IsUnspecified() &amp;&amp;</code></span>
+<span class="codeline" id="line-172"><code>		!ip.IsLoopback() &amp;&amp;</code></span>
+<span class="codeline" id="line-173"><code>		!ip.IsMulticast() &amp;&amp;</code></span>
+<span class="codeline" id="line-174"><code>		!ip.IsLinkLocalUnicast()</code></span>
+<span class="codeline" id="line-175"><code>}</code></span>
+<span class="codeline" id="line-176"><code></code></span>
+<span class="codeline" id="line-177"><code>// Is p all zeros?</code></span>
+<span class="codeline" id="line-178"><code>func isZeros(p IP) bool {</code></span>
+<span class="codeline" id="line-179"><code>	for i := 0; i &lt; len(p); i++ {</code></span>
+<span class="codeline" id="line-180"><code>		if p[i] != 0 {</code></span>
+<span class="codeline" id="line-181"><code>			return false</code></span>
+<span class="codeline" id="line-182"><code>		}</code></span>
+<span class="codeline" id="line-183"><code>	}</code></span>
+<span class="codeline" id="line-184"><code>	return true</code></span>
+<span class="codeline" id="line-185"><code>}</code></span>
+<span class="codeline" id="line-186"><code></code></span>
+<span class="codeline" id="line-187"><code>// To4 converts the IPv4 address ip to a 4-byte representation.</code></span>
+<span class="codeline" id="line-188"><code>// If ip is not an IPv4 address, To4 returns nil.</code></span>
+<span class="codeline" id="line-189"><code>func (ip IP) To4() IP {</code></span>
+<span class="codeline" id="line-190"><code>	if len(ip) == IPv4len {</code></span>
+<span class="codeline" id="line-191"><code>		return ip</code></span>
+<span class="codeline" id="line-192"><code>	}</code></span>
+<span class="codeline" id="line-193"><code>	if len(ip) == IPv6len &amp;&amp;</code></span>
+<span class="codeline" id="line-194"><code>		isZeros(ip[0:10]) &amp;&amp;</code></span>
+<span class="codeline" id="line-195"><code>		ip[10] == 0xff &amp;&amp;</code></span>
+<span class="codeline" id="line-196"><code>		ip[11] == 0xff {</code></span>
+<span class="codeline" id="line-197"><code>		return ip[12:16]</code></span>
+<span class="codeline" id="line-198"><code>	}</code></span>
+<span class="codeline" id="line-199"><code>	return nil</code></span>
+<span class="codeline" id="line-200"><code>}</code></span>
+<span class="codeline" id="line-201"><code></code></span>
+<span class="codeline" id="line-202"><code>// To16 converts the IP address ip to a 16-byte representation.</code></span>
+<span class="codeline" id="line-203"><code>// If ip is not an IP address (it is the wrong length), To16 returns nil.</code></span>
+<span class="codeline" id="line-204"><code>func (ip IP) To16() IP {</code></span>
+<span class="codeline" id="line-205"><code>	if len(ip) == IPv4len {</code></span>
+<span class="codeline" id="line-206"><code>		return IPv4(ip[0], ip[1], ip[2], ip[3])</code></span>
+<span class="codeline" id="line-207"><code>	}</code></span>
+<span class="codeline" id="line-208"><code>	if len(ip) == IPv6len {</code></span>
+<span class="codeline" id="line-209"><code>		return ip</code></span>
+<span class="codeline" id="line-210"><code>	}</code></span>
+<span class="codeline" id="line-211"><code>	return nil</code></span>
+<span class="codeline" id="line-212"><code>}</code></span>
+<span class="codeline" id="line-213"><code></code></span>
+<span class="codeline" id="line-214"><code>// Default route masks for IPv4.</code></span>
+<span class="codeline" id="line-215"><code>var (</code></span>
+<span class="codeline" id="line-216"><code>	classAMask = IPv4Mask(0xff, 0, 0, 0)</code></span>
+<span class="codeline" id="line-217"><code>	classBMask = IPv4Mask(0xff, 0xff, 0, 0)</code></span>
+<span class="codeline" id="line-218"><code>	classCMask = IPv4Mask(0xff, 0xff, 0xff, 0)</code></span>
+<span class="codeline" id="line-219"><code>)</code></span>
+<span class="codeline" id="line-220"><code></code></span>
+<span class="codeline" id="line-221"><code>// DefaultMask returns the default IP mask for the IP address ip.</code></span>
+<span class="codeline" id="line-222"><code>// Only IPv4 addresses have default masks; DefaultMask returns</code></span>
+<span class="codeline" id="line-223"><code>// nil if ip is not a valid IPv4 address.</code></span>
+<span class="codeline" id="line-224"><code>func (ip IP) DefaultMask() IPMask {</code></span>
+<span class="codeline" id="line-225"><code>	if ip = ip.To4(); ip == nil {</code></span>
+<span class="codeline" id="line-226"><code>		return nil</code></span>
+<span class="codeline" id="line-227"><code>	}</code></span>
+<span class="codeline" id="line-228"><code>	switch {</code></span>
+<span class="codeline" id="line-229"><code>	case ip[0] &lt; 0x80:</code></span>
+<span class="codeline" id="line-230"><code>		return classAMask</code></span>
+<span class="codeline" id="line-231"><code>	case ip[0] &lt; 0xC0:</code></span>
+<span class="codeline" id="line-232"><code>		return classBMask</code></span>
+<span class="codeline" id="line-233"><code>	default:</code></span>
+<span class="codeline" id="line-234"><code>		return classCMask</code></span>
+<span class="codeline" id="line-235"><code>	}</code></span>
+<span class="codeline" id="line-236"><code>}</code></span>
+<span class="codeline" id="line-237"><code></code></span>
+<span class="codeline" id="line-238"><code>func allFF(b []byte) bool {</code></span>
+<span class="codeline" id="line-239"><code>	for _, c := range b {</code></span>
+<span class="codeline" id="line-240"><code>		if c != 0xff {</code></span>
+<span class="codeline" id="line-241"><code>			return false</code></span>
+<span class="codeline" id="line-242"><code>		}</code></span>
+<span class="codeline" id="line-243"><code>	}</code></span>
+<span class="codeline" id="line-244"><code>	return true</code></span>
+<span class="codeline" id="line-245"><code>}</code></span>
+<span class="codeline" id="line-246"><code></code></span>
+<span class="codeline" id="line-247"><code>// Mask returns the result of masking the IP address ip with mask.</code></span>
+<span class="codeline" id="line-248"><code>func (ip IP) Mask(mask IPMask) IP {</code></span>
+<span class="codeline" id="line-249"><code>	if len(mask) == IPv6len &amp;&amp; len(ip) == IPv4len &amp;&amp; allFF(mask[:12]) {</code></span>
+<span class="codeline" id="line-250"><code>		mask = mask[12:]</code></span>
+<span class="codeline" id="line-251"><code>	}</code></span>
+<span class="codeline" id="line-252"><code>	if len(mask) == IPv4len &amp;&amp; len(ip) == IPv6len &amp;&amp; bytealg.Equal(ip[:12], v4InV6Prefix) {</code></span>
+<span class="codeline" id="line-253"><code>		ip = ip[12:]</code></span>
+<span class="codeline" id="line-254"><code>	}</code></span>
+<span class="codeline" id="line-255"><code>	n := len(ip)</code></span>
+<span class="codeline" id="line-256"><code>	if n != len(mask) {</code></span>
+<span class="codeline" id="line-257"><code>		return nil</code></span>
+<span class="codeline" id="line-258"><code>	}</code></span>
+<span class="codeline" id="line-259"><code>	out := make(IP, n)</code></span>
+<span class="codeline" id="line-260"><code>	for i := 0; i &lt; n; i++ {</code></span>
+<span class="codeline" id="line-261"><code>		out[i] = ip[i] &amp; mask[i]</code></span>
+<span class="codeline" id="line-262"><code>	}</code></span>
+<span class="codeline" id="line-263"><code>	return out</code></span>
+<span class="codeline" id="line-264"><code>}</code></span>
+<span class="codeline" id="line-265"><code></code></span>
+<span class="codeline" id="line-266"><code>// ubtoa encodes the string form of the integer v to dst[start:] and</code></span>
+<span class="codeline" id="line-267"><code>// returns the number of bytes written to dst. The caller must ensure</code></span>
+<span class="codeline" id="line-268"><code>// that dst has sufficient length.</code></span>
+<span class="codeline" id="line-269"><code>func ubtoa(dst []byte, start int, v byte) int {</code></span>
+<span class="codeline" id="line-270"><code>	if v &lt; 10 {</code></span>
+<span class="codeline" id="line-271"><code>		dst[start] = v + '0'</code></span>
+<span class="codeline" id="line-272"><code>		return 1</code></span>
+<span class="codeline" id="line-273"><code>	} else if v &lt; 100 {</code></span>
+<span class="codeline" id="line-274"><code>		dst[start+1] = v%10 + '0'</code></span>
+<span class="codeline" id="line-275"><code>		dst[start] = v/10 + '0'</code></span>
+<span class="codeline" id="line-276"><code>		return 2</code></span>
+<span class="codeline" id="line-277"><code>	}</code></span>
+<span class="codeline" id="line-278"><code></code></span>
+<span class="codeline" id="line-279"><code>	dst[start+2] = v%10 + '0'</code></span>
+<span class="codeline" id="line-280"><code>	dst[start+1] = (v/10)%10 + '0'</code></span>
+<span class="codeline" id="line-281"><code>	dst[start] = v/100 + '0'</code></span>
+<span class="codeline" id="line-282"><code>	return 3</code></span>
+<span class="codeline" id="line-283"><code>}</code></span>
+<span class="codeline" id="line-284"><code></code></span>
+<span class="codeline" id="line-285"><code>// String returns the string form of the IP address ip.</code></span>
+<span class="codeline" id="line-286"><code>// It returns one of 4 forms:</code></span>
+<span class="codeline" id="line-287"><code>//   - "&lt;nil&gt;", if ip has length 0</code></span>
+<span class="codeline" id="line-288"><code>//   - dotted decimal ("192.0.2.1"), if ip is an IPv4 or IP4-mapped IPv6 address</code></span>
+<span class="codeline" id="line-289"><code>//   - IPv6 ("2001:db8::1"), if ip is a valid IPv6 address</code></span>
+<span class="codeline" id="line-290"><code>//   - the hexadecimal form of ip, without punctuation, if no other cases apply</code></span>
+<span class="codeline" id="line-291"><code>func (ip IP) String() string {</code></span>
+<span class="codeline" id="line-292"><code>	p := ip</code></span>
+<span class="codeline" id="line-293"><code></code></span>
+<span class="codeline" id="line-294"><code>	if len(ip) == 0 {</code></span>
+<span class="codeline" id="line-295"><code>		return "&lt;nil&gt;"</code></span>
+<span class="codeline" id="line-296"><code>	}</code></span>
+<span class="codeline" id="line-297"><code></code></span>
+<span class="codeline" id="line-298"><code>	// If IPv4, use dotted notation.</code></span>
+<span class="codeline" id="line-299"><code>	if p4 := p.To4(); len(p4) == IPv4len {</code></span>
+<span class="codeline" id="line-300"><code>		const maxIPv4StringLen = len("255.255.255.255")</code></span>
+<span class="codeline" id="line-301"><code>		b := make([]byte, maxIPv4StringLen)</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>		n := ubtoa(b, 0, p4[0])</code></span>
+<span class="codeline" id="line-304"><code>		b[n] = '.'</code></span>
+<span class="codeline" id="line-305"><code>		n++</code></span>
+<span class="codeline" id="line-306"><code></code></span>
+<span class="codeline" id="line-307"><code>		n += ubtoa(b, n, p4[1])</code></span>
+<span class="codeline" id="line-308"><code>		b[n] = '.'</code></span>
+<span class="codeline" id="line-309"><code>		n++</code></span>
+<span class="codeline" id="line-310"><code></code></span>
+<span class="codeline" id="line-311"><code>		n += ubtoa(b, n, p4[2])</code></span>
+<span class="codeline" id="line-312"><code>		b[n] = '.'</code></span>
+<span class="codeline" id="line-313"><code>		n++</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>		n += ubtoa(b, n, p4[3])</code></span>
+<span class="codeline" id="line-316"><code>		return string(b[:n])</code></span>
+<span class="codeline" id="line-317"><code>	}</code></span>
+<span class="codeline" id="line-318"><code>	if len(p) != IPv6len {</code></span>
+<span class="codeline" id="line-319"><code>		return "?" + hexString(ip)</code></span>
+<span class="codeline" id="line-320"><code>	}</code></span>
+<span class="codeline" id="line-321"><code></code></span>
+<span class="codeline" id="line-322"><code>	// Find longest run of zeros.</code></span>
+<span class="codeline" id="line-323"><code>	e0 := -1</code></span>
+<span class="codeline" id="line-324"><code>	e1 := -1</code></span>
+<span class="codeline" id="line-325"><code>	for i := 0; i &lt; IPv6len; i += 2 {</code></span>
+<span class="codeline" id="line-326"><code>		j := i</code></span>
+<span class="codeline" id="line-327"><code>		for j &lt; IPv6len &amp;&amp; p[j] == 0 &amp;&amp; p[j+1] == 0 {</code></span>
+<span class="codeline" id="line-328"><code>			j += 2</code></span>
+<span class="codeline" id="line-329"><code>		}</code></span>
+<span class="codeline" id="line-330"><code>		if j &gt; i &amp;&amp; j-i &gt; e1-e0 {</code></span>
+<span class="codeline" id="line-331"><code>			e0 = i</code></span>
+<span class="codeline" id="line-332"><code>			e1 = j</code></span>
+<span class="codeline" id="line-333"><code>			i = j</code></span>
+<span class="codeline" id="line-334"><code>		}</code></span>
+<span class="codeline" id="line-335"><code>	}</code></span>
+<span class="codeline" id="line-336"><code>	// The symbol "::" MUST NOT be used to shorten just one 16 bit 0 field.</code></span>
+<span class="codeline" id="line-337"><code>	if e1-e0 &lt;= 2 {</code></span>
+<span class="codeline" id="line-338"><code>		e0 = -1</code></span>
+<span class="codeline" id="line-339"><code>		e1 = -1</code></span>
+<span class="codeline" id="line-340"><code>	}</code></span>
+<span class="codeline" id="line-341"><code></code></span>
+<span class="codeline" id="line-342"><code>	const maxLen = len("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff")</code></span>
+<span class="codeline" id="line-343"><code>	b := make([]byte, 0, maxLen)</code></span>
+<span class="codeline" id="line-344"><code></code></span>
+<span class="codeline" id="line-345"><code>	// Print with possible :: in place of run of zeros</code></span>
+<span class="codeline" id="line-346"><code>	for i := 0; i &lt; IPv6len; i += 2 {</code></span>
+<span class="codeline" id="line-347"><code>		if i == e0 {</code></span>
+<span class="codeline" id="line-348"><code>			b = append(b, ':', ':')</code></span>
+<span class="codeline" id="line-349"><code>			i = e1</code></span>
+<span class="codeline" id="line-350"><code>			if i &gt;= IPv6len {</code></span>
+<span class="codeline" id="line-351"><code>				break</code></span>
+<span class="codeline" id="line-352"><code>			}</code></span>
+<span class="codeline" id="line-353"><code>		} else if i &gt; 0 {</code></span>
+<span class="codeline" id="line-354"><code>			b = append(b, ':')</code></span>
+<span class="codeline" id="line-355"><code>		}</code></span>
+<span class="codeline" id="line-356"><code>		b = appendHex(b, (uint32(p[i])&lt;&lt;8)|uint32(p[i+1]))</code></span>
+<span class="codeline" id="line-357"><code>	}</code></span>
+<span class="codeline" id="line-358"><code>	return string(b)</code></span>
+<span class="codeline" id="line-359"><code>}</code></span>
+<span class="codeline" id="line-360"><code></code></span>
+<span class="codeline" id="line-361"><code>func hexString(b []byte) string {</code></span>
+<span class="codeline" id="line-362"><code>	s := make([]byte, len(b)*2)</code></span>
+<span class="codeline" id="line-363"><code>	for i, tn := range b {</code></span>
+<span class="codeline" id="line-364"><code>		s[i*2], s[i*2+1] = hexDigit[tn&gt;&gt;4], hexDigit[tn&amp;0xf]</code></span>
+<span class="codeline" id="line-365"><code>	}</code></span>
+<span class="codeline" id="line-366"><code>	return string(s)</code></span>
+<span class="codeline" id="line-367"><code>}</code></span>
+<span class="codeline" id="line-368"><code></code></span>
+<span class="codeline" id="line-369"><code>// ipEmptyString is like ip.String except that it returns</code></span>
+<span class="codeline" id="line-370"><code>// an empty string when ip is unset.</code></span>
+<span class="codeline" id="line-371"><code>func ipEmptyString(ip IP) string {</code></span>
+<span class="codeline" id="line-372"><code>	if len(ip) == 0 {</code></span>
+<span class="codeline" id="line-373"><code>		return ""</code></span>
+<span class="codeline" id="line-374"><code>	}</code></span>
+<span class="codeline" id="line-375"><code>	return ip.String()</code></span>
+<span class="codeline" id="line-376"><code>}</code></span>
+<span class="codeline" id="line-377"><code></code></span>
+<span class="codeline" id="line-378"><code>// MarshalText implements the encoding.TextMarshaler interface.</code></span>
+<span class="codeline" id="line-379"><code>// The encoding is the same as returned by String, with one exception:</code></span>
+<span class="codeline" id="line-380"><code>// When len(ip) is zero, it returns an empty slice.</code></span>
+<span class="codeline" id="line-381"><code>func (ip IP) MarshalText() ([]byte, error) {</code></span>
+<span class="codeline" id="line-382"><code>	if len(ip) == 0 {</code></span>
+<span class="codeline" id="line-383"><code>		return []byte(""), nil</code></span>
+<span class="codeline" id="line-384"><code>	}</code></span>
+<span class="codeline" id="line-385"><code>	if len(ip) != IPv4len &amp;&amp; len(ip) != IPv6len {</code></span>
+<span class="codeline" id="line-386"><code>		return nil, &amp;AddrError{Err: "invalid IP address", Addr: hexString(ip)}</code></span>
+<span class="codeline" id="line-387"><code>	}</code></span>
+<span class="codeline" id="line-388"><code>	return []byte(ip.String()), nil</code></span>
+<span class="codeline" id="line-389"><code>}</code></span>
+<span class="codeline" id="line-390"><code></code></span>
+<span class="codeline" id="line-391"><code>// UnmarshalText implements the encoding.TextUnmarshaler interface.</code></span>
+<span class="codeline" id="line-392"><code>// The IP address is expected in a form accepted by ParseIP.</code></span>
+<span class="codeline" id="line-393"><code>func (ip *IP) UnmarshalText(text []byte) error {</code></span>
+<span class="codeline" id="line-394"><code>	if len(text) == 0 {</code></span>
+<span class="codeline" id="line-395"><code>		*ip = nil</code></span>
+<span class="codeline" id="line-396"><code>		return nil</code></span>
+<span class="codeline" id="line-397"><code>	}</code></span>
+<span class="codeline" id="line-398"><code>	s := string(text)</code></span>
+<span class="codeline" id="line-399"><code>	x := ParseIP(s)</code></span>
+<span class="codeline" id="line-400"><code>	if x == nil {</code></span>
+<span class="codeline" id="line-401"><code>		return &amp;ParseError{Type: "IP address", Text: s}</code></span>
+<span class="codeline" id="line-402"><code>	}</code></span>
+<span class="codeline" id="line-403"><code>	*ip = x</code></span>
+<span class="codeline" id="line-404"><code>	return nil</code></span>
+<span class="codeline" id="line-405"><code>}</code></span>
+<span class="codeline" id="line-406"><code></code></span>
+<span class="codeline" id="line-407"><code>// Equal reports whether ip and x are the same IP address.</code></span>
+<span class="codeline" id="line-408"><code>// An IPv4 address and that same address in IPv6 form are</code></span>
+<span class="codeline" id="line-409"><code>// considered to be equal.</code></span>
+<span class="codeline" id="line-410"><code>func (ip IP) Equal(x IP) bool {</code></span>
+<span class="codeline" id="line-411"><code>	if len(ip) == len(x) {</code></span>
+<span class="codeline" id="line-412"><code>		return bytealg.Equal(ip, x)</code></span>
+<span class="codeline" id="line-413"><code>	}</code></span>
+<span class="codeline" id="line-414"><code>	if len(ip) == IPv4len &amp;&amp; len(x) == IPv6len {</code></span>
+<span class="codeline" id="line-415"><code>		return bytealg.Equal(x[0:12], v4InV6Prefix) &amp;&amp; bytealg.Equal(ip, x[12:])</code></span>
+<span class="codeline" id="line-416"><code>	}</code></span>
+<span class="codeline" id="line-417"><code>	if len(ip) == IPv6len &amp;&amp; len(x) == IPv4len {</code></span>
+<span class="codeline" id="line-418"><code>		return bytealg.Equal(ip[0:12], v4InV6Prefix) &amp;&amp; bytealg.Equal(ip[12:], x)</code></span>
+<span class="codeline" id="line-419"><code>	}</code></span>
+<span class="codeline" id="line-420"><code>	return false</code></span>
+<span class="codeline" id="line-421"><code>}</code></span>
+<span class="codeline" id="line-422"><code></code></span>
+<span class="codeline" id="line-423"><code>func (ip IP) matchAddrFamily(x IP) bool {</code></span>
+<span class="codeline" id="line-424"><code>	return ip.To4() != nil &amp;&amp; x.To4() != nil || ip.To16() != nil &amp;&amp; ip.To4() == nil &amp;&amp; x.To16() != nil &amp;&amp; x.To4() == nil</code></span>
+<span class="codeline" id="line-425"><code>}</code></span>
+<span class="codeline" id="line-426"><code></code></span>
+<span class="codeline" id="line-427"><code>// If mask is a sequence of 1 bits followed by 0 bits,</code></span>
+<span class="codeline" id="line-428"><code>// return the number of 1 bits.</code></span>
+<span class="codeline" id="line-429"><code>func simpleMaskLength(mask IPMask) int {</code></span>
+<span class="codeline" id="line-430"><code>	var n int</code></span>
+<span class="codeline" id="line-431"><code>	for i, v := range mask {</code></span>
+<span class="codeline" id="line-432"><code>		if v == 0xff {</code></span>
+<span class="codeline" id="line-433"><code>			n += 8</code></span>
+<span class="codeline" id="line-434"><code>			continue</code></span>
+<span class="codeline" id="line-435"><code>		}</code></span>
+<span class="codeline" id="line-436"><code>		// found non-ff byte</code></span>
+<span class="codeline" id="line-437"><code>		// count 1 bits</code></span>
+<span class="codeline" id="line-438"><code>		for v&amp;0x80 != 0 {</code></span>
+<span class="codeline" id="line-439"><code>			n++</code></span>
+<span class="codeline" id="line-440"><code>			v &lt;&lt;= 1</code></span>
+<span class="codeline" id="line-441"><code>		}</code></span>
+<span class="codeline" id="line-442"><code>		// rest must be 0 bits</code></span>
+<span class="codeline" id="line-443"><code>		if v != 0 {</code></span>
+<span class="codeline" id="line-444"><code>			return -1</code></span>
+<span class="codeline" id="line-445"><code>		}</code></span>
+<span class="codeline" id="line-446"><code>		for i++; i &lt; len(mask); i++ {</code></span>
+<span class="codeline" id="line-447"><code>			if mask[i] != 0 {</code></span>
+<span class="codeline" id="line-448"><code>				return -1</code></span>
+<span class="codeline" id="line-449"><code>			}</code></span>
+<span class="codeline" id="line-450"><code>		}</code></span>
+<span class="codeline" id="line-451"><code>		break</code></span>
+<span class="codeline" id="line-452"><code>	}</code></span>
+<span class="codeline" id="line-453"><code>	return n</code></span>
+<span class="codeline" id="line-454"><code>}</code></span>
+<span class="codeline" id="line-455"><code></code></span>
+<span class="codeline" id="line-456"><code>// Size returns the number of leading ones and total bits in the mask.</code></span>
+<span class="codeline" id="line-457"><code>// If the mask is not in the canonical form--ones followed by zeros--then</code></span>
+<span class="codeline" id="line-458"><code>// Size returns 0, 0.</code></span>
+<span class="codeline" id="line-459"><code>func (m IPMask) Size() (ones, bits int) {</code></span>
+<span class="codeline" id="line-460"><code>	ones, bits = simpleMaskLength(m), len(m)*8</code></span>
+<span class="codeline" id="line-461"><code>	if ones == -1 {</code></span>
+<span class="codeline" id="line-462"><code>		return 0, 0</code></span>
+<span class="codeline" id="line-463"><code>	}</code></span>
+<span class="codeline" id="line-464"><code>	return</code></span>
+<span class="codeline" id="line-465"><code>}</code></span>
+<span class="codeline" id="line-466"><code></code></span>
+<span class="codeline" id="line-467"><code>// String returns the hexadecimal form of m, with no punctuation.</code></span>
+<span class="codeline" id="line-468"><code>func (m IPMask) String() string {</code></span>
+<span class="codeline" id="line-469"><code>	if len(m) == 0 {</code></span>
+<span class="codeline" id="line-470"><code>		return "&lt;nil&gt;"</code></span>
+<span class="codeline" id="line-471"><code>	}</code></span>
+<span class="codeline" id="line-472"><code>	return hexString(m)</code></span>
+<span class="codeline" id="line-473"><code>}</code></span>
+<span class="codeline" id="line-474"><code></code></span>
+<span class="codeline" id="line-475"><code>func networkNumberAndMask(n *IPNet) (ip IP, m IPMask) {</code></span>
+<span class="codeline" id="line-476"><code>	if ip = n.IP.To4(); ip == nil {</code></span>
+<span class="codeline" id="line-477"><code>		ip = n.IP</code></span>
+<span class="codeline" id="line-478"><code>		if len(ip) != IPv6len {</code></span>
+<span class="codeline" id="line-479"><code>			return nil, nil</code></span>
+<span class="codeline" id="line-480"><code>		}</code></span>
+<span class="codeline" id="line-481"><code>	}</code></span>
+<span class="codeline" id="line-482"><code>	m = n.Mask</code></span>
+<span class="codeline" id="line-483"><code>	switch len(m) {</code></span>
+<span class="codeline" id="line-484"><code>	case IPv4len:</code></span>
+<span class="codeline" id="line-485"><code>		if len(ip) != IPv4len {</code></span>
+<span class="codeline" id="line-486"><code>			return nil, nil</code></span>
+<span class="codeline" id="line-487"><code>		}</code></span>
+<span class="codeline" id="line-488"><code>	case IPv6len:</code></span>
+<span class="codeline" id="line-489"><code>		if len(ip) == IPv4len {</code></span>
+<span class="codeline" id="line-490"><code>			m = m[12:]</code></span>
+<span class="codeline" id="line-491"><code>		}</code></span>
+<span class="codeline" id="line-492"><code>	default:</code></span>
+<span class="codeline" id="line-493"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-494"><code>	}</code></span>
+<span class="codeline" id="line-495"><code>	return</code></span>
+<span class="codeline" id="line-496"><code>}</code></span>
+<span class="codeline" id="line-497"><code></code></span>
+<span class="codeline" id="line-498"><code>// Contains reports whether the network includes ip.</code></span>
+<span class="codeline" id="line-499"><code>func (n *IPNet) Contains(ip IP) bool {</code></span>
+<span class="codeline" id="line-500"><code>	nn, m := networkNumberAndMask(n)</code></span>
+<span class="codeline" id="line-501"><code>	if x := ip.To4(); x != nil {</code></span>
+<span class="codeline" id="line-502"><code>		ip = x</code></span>
+<span class="codeline" id="line-503"><code>	}</code></span>
+<span class="codeline" id="line-504"><code>	l := len(ip)</code></span>
+<span class="codeline" id="line-505"><code>	if l != len(nn) {</code></span>
+<span class="codeline" id="line-506"><code>		return false</code></span>
+<span class="codeline" id="line-507"><code>	}</code></span>
+<span class="codeline" id="line-508"><code>	for i := 0; i &lt; l; i++ {</code></span>
+<span class="codeline" id="line-509"><code>		if nn[i]&amp;m[i] != ip[i]&amp;m[i] {</code></span>
+<span class="codeline" id="line-510"><code>			return false</code></span>
+<span class="codeline" id="line-511"><code>		}</code></span>
+<span class="codeline" id="line-512"><code>	}</code></span>
+<span class="codeline" id="line-513"><code>	return true</code></span>
+<span class="codeline" id="line-514"><code>}</code></span>
+<span class="codeline" id="line-515"><code></code></span>
+<span class="codeline" id="line-516"><code>// Network returns the address's network name, "ip+net".</code></span>
+<span class="codeline" id="line-517"><code>func (n *IPNet) Network() string { return "ip+net" }</code></span>
+<span class="codeline" id="line-518"><code></code></span>
+<span class="codeline" id="line-519"><code>// String returns the CIDR notation of n like "192.0.2.0/24"</code></span>
+<span class="codeline" id="line-520"><code>// or "2001:db8::/48" as defined in RFC 4632 and RFC 4291.</code></span>
+<span class="codeline" id="line-521"><code>// If the mask is not in the canonical form, it returns the</code></span>
+<span class="codeline" id="line-522"><code>// string which consists of an IP address, followed by a slash</code></span>
+<span class="codeline" id="line-523"><code>// character and a mask expressed as hexadecimal form with no</code></span>
+<span class="codeline" id="line-524"><code>// punctuation like "198.51.100.0/c000ff00".</code></span>
+<span class="codeline" id="line-525"><code>func (n *IPNet) String() string {</code></span>
+<span class="codeline" id="line-526"><code>	nn, m := networkNumberAndMask(n)</code></span>
+<span class="codeline" id="line-527"><code>	if nn == nil || m == nil {</code></span>
+<span class="codeline" id="line-528"><code>		return "&lt;nil&gt;"</code></span>
+<span class="codeline" id="line-529"><code>	}</code></span>
+<span class="codeline" id="line-530"><code>	l := simpleMaskLength(m)</code></span>
+<span class="codeline" id="line-531"><code>	if l == -1 {</code></span>
+<span class="codeline" id="line-532"><code>		return nn.String() + "/" + m.String()</code></span>
+<span class="codeline" id="line-533"><code>	}</code></span>
+<span class="codeline" id="line-534"><code>	return nn.String() + "/" + uitoa(uint(l))</code></span>
+<span class="codeline" id="line-535"><code>}</code></span>
+<span class="codeline" id="line-536"><code></code></span>
+<span class="codeline" id="line-537"><code>// Parse IPv4 address (d.d.d.d).</code></span>
+<span class="codeline" id="line-538"><code>func parseIPv4(s string) IP {</code></span>
+<span class="codeline" id="line-539"><code>	var p [IPv4len]byte</code></span>
+<span class="codeline" id="line-540"><code>	for i := 0; i &lt; IPv4len; i++ {</code></span>
+<span class="codeline" id="line-541"><code>		if len(s) == 0 {</code></span>
+<span class="codeline" id="line-542"><code>			// Missing octets.</code></span>
+<span class="codeline" id="line-543"><code>			return nil</code></span>
+<span class="codeline" id="line-544"><code>		}</code></span>
+<span class="codeline" id="line-545"><code>		if i &gt; 0 {</code></span>
+<span class="codeline" id="line-546"><code>			if s[0] != '.' {</code></span>
+<span class="codeline" id="line-547"><code>				return nil</code></span>
+<span class="codeline" id="line-548"><code>			}</code></span>
+<span class="codeline" id="line-549"><code>			s = s[1:]</code></span>
+<span class="codeline" id="line-550"><code>		}</code></span>
+<span class="codeline" id="line-551"><code>		n, c, ok := dtoi(s)</code></span>
+<span class="codeline" id="line-552"><code>		if !ok || n &gt; 0xFF {</code></span>
+<span class="codeline" id="line-553"><code>			return nil</code></span>
+<span class="codeline" id="line-554"><code>		}</code></span>
+<span class="codeline" id="line-555"><code>		s = s[c:]</code></span>
+<span class="codeline" id="line-556"><code>		p[i] = byte(n)</code></span>
+<span class="codeline" id="line-557"><code>	}</code></span>
+<span class="codeline" id="line-558"><code>	if len(s) != 0 {</code></span>
+<span class="codeline" id="line-559"><code>		return nil</code></span>
+<span class="codeline" id="line-560"><code>	}</code></span>
+<span class="codeline" id="line-561"><code>	return IPv4(p[0], p[1], p[2], p[3])</code></span>
+<span class="codeline" id="line-562"><code>}</code></span>
+<span class="codeline" id="line-563"><code></code></span>
+<span class="codeline" id="line-564"><code>// parseIPv6Zone parses s as a literal IPv6 address and its associated zone</code></span>
+<span class="codeline" id="line-565"><code>// identifier which is described in RFC 4007.</code></span>
+<span class="codeline" id="line-566"><code>func parseIPv6Zone(s string) (IP, string) {</code></span>
+<span class="codeline" id="line-567"><code>	s, zone := splitHostZone(s)</code></span>
+<span class="codeline" id="line-568"><code>	return parseIPv6(s), zone</code></span>
+<span class="codeline" id="line-569"><code>}</code></span>
+<span class="codeline" id="line-570"><code></code></span>
+<span class="codeline" id="line-571"><code>// parseIPv6 parses s as a literal IPv6 address described in RFC 4291</code></span>
+<span class="codeline" id="line-572"><code>// and RFC 5952.</code></span>
+<span class="codeline" id="line-573"><code>func parseIPv6(s string) (ip IP) {</code></span>
+<span class="codeline" id="line-574"><code>	ip = make(IP, IPv6len)</code></span>
+<span class="codeline" id="line-575"><code>	ellipsis := -1 // position of ellipsis in ip</code></span>
+<span class="codeline" id="line-576"><code></code></span>
+<span class="codeline" id="line-577"><code>	// Might have leading ellipsis</code></span>
+<span class="codeline" id="line-578"><code>	if len(s) &gt;= 2 &amp;&amp; s[0] == ':' &amp;&amp; s[1] == ':' {</code></span>
+<span class="codeline" id="line-579"><code>		ellipsis = 0</code></span>
+<span class="codeline" id="line-580"><code>		s = s[2:]</code></span>
+<span class="codeline" id="line-581"><code>		// Might be only ellipsis</code></span>
+<span class="codeline" id="line-582"><code>		if len(s) == 0 {</code></span>
+<span class="codeline" id="line-583"><code>			return ip</code></span>
+<span class="codeline" id="line-584"><code>		}</code></span>
+<span class="codeline" id="line-585"><code>	}</code></span>
+<span class="codeline" id="line-586"><code></code></span>
+<span class="codeline" id="line-587"><code>	// Loop, parsing hex numbers followed by colon.</code></span>
+<span class="codeline" id="line-588"><code>	i := 0</code></span>
+<span class="codeline" id="line-589"><code>	for i &lt; IPv6len {</code></span>
+<span class="codeline" id="line-590"><code>		// Hex number.</code></span>
+<span class="codeline" id="line-591"><code>		n, c, ok := xtoi(s)</code></span>
+<span class="codeline" id="line-592"><code>		if !ok || n &gt; 0xFFFF {</code></span>
+<span class="codeline" id="line-593"><code>			return nil</code></span>
+<span class="codeline" id="line-594"><code>		}</code></span>
+<span class="codeline" id="line-595"><code></code></span>
+<span class="codeline" id="line-596"><code>		// If followed by dot, might be in trailing IPv4.</code></span>
+<span class="codeline" id="line-597"><code>		if c &lt; len(s) &amp;&amp; s[c] == '.' {</code></span>
+<span class="codeline" id="line-598"><code>			if ellipsis &lt; 0 &amp;&amp; i != IPv6len-IPv4len {</code></span>
+<span class="codeline" id="line-599"><code>				// Not the right place.</code></span>
+<span class="codeline" id="line-600"><code>				return nil</code></span>
+<span class="codeline" id="line-601"><code>			}</code></span>
+<span class="codeline" id="line-602"><code>			if i+IPv4len &gt; IPv6len {</code></span>
+<span class="codeline" id="line-603"><code>				// Not enough room.</code></span>
+<span class="codeline" id="line-604"><code>				return nil</code></span>
+<span class="codeline" id="line-605"><code>			}</code></span>
+<span class="codeline" id="line-606"><code>			ip4 := parseIPv4(s)</code></span>
+<span class="codeline" id="line-607"><code>			if ip4 == nil {</code></span>
+<span class="codeline" id="line-608"><code>				return nil</code></span>
+<span class="codeline" id="line-609"><code>			}</code></span>
+<span class="codeline" id="line-610"><code>			ip[i] = ip4[12]</code></span>
+<span class="codeline" id="line-611"><code>			ip[i+1] = ip4[13]</code></span>
+<span class="codeline" id="line-612"><code>			ip[i+2] = ip4[14]</code></span>
+<span class="codeline" id="line-613"><code>			ip[i+3] = ip4[15]</code></span>
+<span class="codeline" id="line-614"><code>			s = ""</code></span>
+<span class="codeline" id="line-615"><code>			i += IPv4len</code></span>
+<span class="codeline" id="line-616"><code>			break</code></span>
+<span class="codeline" id="line-617"><code>		}</code></span>
+<span class="codeline" id="line-618"><code></code></span>
+<span class="codeline" id="line-619"><code>		// Save this 16-bit chunk.</code></span>
+<span class="codeline" id="line-620"><code>		ip[i] = byte(n &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-621"><code>		ip[i+1] = byte(n)</code></span>
+<span class="codeline" id="line-622"><code>		i += 2</code></span>
+<span class="codeline" id="line-623"><code></code></span>
+<span class="codeline" id="line-624"><code>		// Stop at end of string.</code></span>
+<span class="codeline" id="line-625"><code>		s = s[c:]</code></span>
+<span class="codeline" id="line-626"><code>		if len(s) == 0 {</code></span>
+<span class="codeline" id="line-627"><code>			break</code></span>
+<span class="codeline" id="line-628"><code>		}</code></span>
+<span class="codeline" id="line-629"><code></code></span>
+<span class="codeline" id="line-630"><code>		// Otherwise must be followed by colon and more.</code></span>
+<span class="codeline" id="line-631"><code>		if s[0] != ':' || len(s) == 1 {</code></span>
+<span class="codeline" id="line-632"><code>			return nil</code></span>
+<span class="codeline" id="line-633"><code>		}</code></span>
+<span class="codeline" id="line-634"><code>		s = s[1:]</code></span>
+<span class="codeline" id="line-635"><code></code></span>
+<span class="codeline" id="line-636"><code>		// Look for ellipsis.</code></span>
+<span class="codeline" id="line-637"><code>		if s[0] == ':' {</code></span>
+<span class="codeline" id="line-638"><code>			if ellipsis &gt;= 0 { // already have one</code></span>
+<span class="codeline" id="line-639"><code>				return nil</code></span>
+<span class="codeline" id="line-640"><code>			}</code></span>
+<span class="codeline" id="line-641"><code>			ellipsis = i</code></span>
+<span class="codeline" id="line-642"><code>			s = s[1:]</code></span>
+<span class="codeline" id="line-643"><code>			if len(s) == 0 { // can be at end</code></span>
+<span class="codeline" id="line-644"><code>				break</code></span>
+<span class="codeline" id="line-645"><code>			}</code></span>
+<span class="codeline" id="line-646"><code>		}</code></span>
+<span class="codeline" id="line-647"><code>	}</code></span>
+<span class="codeline" id="line-648"><code></code></span>
+<span class="codeline" id="line-649"><code>	// Must have used entire string.</code></span>
+<span class="codeline" id="line-650"><code>	if len(s) != 0 {</code></span>
+<span class="codeline" id="line-651"><code>		return nil</code></span>
+<span class="codeline" id="line-652"><code>	}</code></span>
+<span class="codeline" id="line-653"><code></code></span>
+<span class="codeline" id="line-654"><code>	// If didn't parse enough, expand ellipsis.</code></span>
+<span class="codeline" id="line-655"><code>	if i &lt; IPv6len {</code></span>
+<span class="codeline" id="line-656"><code>		if ellipsis &lt; 0 {</code></span>
+<span class="codeline" id="line-657"><code>			return nil</code></span>
+<span class="codeline" id="line-658"><code>		}</code></span>
+<span class="codeline" id="line-659"><code>		n := IPv6len - i</code></span>
+<span class="codeline" id="line-660"><code>		for j := i - 1; j &gt;= ellipsis; j-- {</code></span>
+<span class="codeline" id="line-661"><code>			ip[j+n] = ip[j]</code></span>
+<span class="codeline" id="line-662"><code>		}</code></span>
+<span class="codeline" id="line-663"><code>		for j := ellipsis + n - 1; j &gt;= ellipsis; j-- {</code></span>
+<span class="codeline" id="line-664"><code>			ip[j] = 0</code></span>
+<span class="codeline" id="line-665"><code>		}</code></span>
+<span class="codeline" id="line-666"><code>	} else if ellipsis &gt;= 0 {</code></span>
+<span class="codeline" id="line-667"><code>		// Ellipsis must represent at least one 0 group.</code></span>
+<span class="codeline" id="line-668"><code>		return nil</code></span>
+<span class="codeline" id="line-669"><code>	}</code></span>
+<span class="codeline" id="line-670"><code>	return ip</code></span>
+<span class="codeline" id="line-671"><code>}</code></span>
+<span class="codeline" id="line-672"><code></code></span>
+<span class="codeline" id="line-673"><code>// ParseIP parses s as an IP address, returning the result.</code></span>
+<span class="codeline" id="line-674"><code>// The string s can be in IPv4 dotted decimal ("192.0.2.1"), IPv6</code></span>
+<span class="codeline" id="line-675"><code>// ("2001:db8::68"), or IPv4-mapped IPv6 ("::ffff:192.0.2.1") form.</code></span>
+<span class="codeline" id="line-676"><code>// If s is not a valid textual representation of an IP address,</code></span>
+<span class="codeline" id="line-677"><code>// ParseIP returns nil.</code></span>
+<span class="codeline" id="line-678"><code>func ParseIP(s string) IP {</code></span>
+<span class="codeline" id="line-679"><code>	for i := 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-680"><code>		switch s[i] {</code></span>
+<span class="codeline" id="line-681"><code>		case '.':</code></span>
+<span class="codeline" id="line-682"><code>			return parseIPv4(s)</code></span>
+<span class="codeline" id="line-683"><code>		case ':':</code></span>
+<span class="codeline" id="line-684"><code>			return parseIPv6(s)</code></span>
+<span class="codeline" id="line-685"><code>		}</code></span>
+<span class="codeline" id="line-686"><code>	}</code></span>
+<span class="codeline" id="line-687"><code>	return nil</code></span>
+<span class="codeline" id="line-688"><code>}</code></span>
+<span class="codeline" id="line-689"><code></code></span>
+<span class="codeline" id="line-690"><code>// parseIPZone parses s as an IP address, return it and its associated zone</code></span>
+<span class="codeline" id="line-691"><code>// identifier (IPv6 only).</code></span>
+<span class="codeline" id="line-692"><code>func parseIPZone(s string) (IP, string) {</code></span>
+<span class="codeline" id="line-693"><code>	for i := 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-694"><code>		switch s[i] {</code></span>
+<span class="codeline" id="line-695"><code>		case '.':</code></span>
+<span class="codeline" id="line-696"><code>			return parseIPv4(s), ""</code></span>
+<span class="codeline" id="line-697"><code>		case ':':</code></span>
+<span class="codeline" id="line-698"><code>			return parseIPv6Zone(s)</code></span>
+<span class="codeline" id="line-699"><code>		}</code></span>
+<span class="codeline" id="line-700"><code>	}</code></span>
+<span class="codeline" id="line-701"><code>	return nil, ""</code></span>
+<span class="codeline" id="line-702"><code>}</code></span>
+<span class="codeline" id="line-703"><code></code></span>
+<span class="codeline" id="line-704"><code>// ParseCIDR parses s as a CIDR notation IP address and prefix length,</code></span>
+<span class="codeline" id="line-705"><code>// like "192.0.2.0/24" or "2001:db8::/32", as defined in</code></span>
+<span class="codeline" id="line-706"><code>// RFC 4632 and RFC 4291.</code></span>
+<span class="codeline" id="line-707"><code>//</code></span>
+<span class="codeline" id="line-708"><code>// It returns the IP address and the network implied by the IP and</code></span>
+<span class="codeline" id="line-709"><code>// prefix length.</code></span>
+<span class="codeline" id="line-710"><code>// For example, ParseCIDR("192.0.2.1/24") returns the IP address</code></span>
+<span class="codeline" id="line-711"><code>// 192.0.2.1 and the network 192.0.2.0/24.</code></span>
+<span class="codeline" id="line-712"><code>func ParseCIDR(s string) (IP, *IPNet, error) {</code></span>
+<span class="codeline" id="line-713"><code>	i := bytealg.IndexByteString(s, '/')</code></span>
+<span class="codeline" id="line-714"><code>	if i &lt; 0 {</code></span>
+<span class="codeline" id="line-715"><code>		return nil, nil, &amp;ParseError{Type: "CIDR address", Text: s}</code></span>
+<span class="codeline" id="line-716"><code>	}</code></span>
+<span class="codeline" id="line-717"><code>	addr, mask := s[:i], s[i+1:]</code></span>
+<span class="codeline" id="line-718"><code>	iplen := IPv4len</code></span>
+<span class="codeline" id="line-719"><code>	ip := parseIPv4(addr)</code></span>
+<span class="codeline" id="line-720"><code>	if ip == nil {</code></span>
+<span class="codeline" id="line-721"><code>		iplen = IPv6len</code></span>
+<span class="codeline" id="line-722"><code>		ip = parseIPv6(addr)</code></span>
+<span class="codeline" id="line-723"><code>	}</code></span>
+<span class="codeline" id="line-724"><code>	n, i, ok := dtoi(mask)</code></span>
+<span class="codeline" id="line-725"><code>	if ip == nil || !ok || i != len(mask) || n &lt; 0 || n &gt; 8*iplen {</code></span>
+<span class="codeline" id="line-726"><code>		return nil, nil, &amp;ParseError{Type: "CIDR address", Text: s}</code></span>
+<span class="codeline" id="line-727"><code>	}</code></span>
+<span class="codeline" id="line-728"><code>	m := CIDRMask(n, 8*iplen)</code></span>
+<span class="codeline" id="line-729"><code>	return ip, &amp;IPNet{IP: ip.Mask(m), Mask: m}, nil</code></span>
+<span class="codeline" id="line-730"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

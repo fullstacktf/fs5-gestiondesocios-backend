@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: update.go in package gorm.io/gorm/callbacks</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	update.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/gorm.io/gorm/callbacks.html">gorm.io/gorm/callbacks</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>package callbacks</code></span>
+<span class="codeline" id="line-2"><code></code></span>
+<span class="codeline" id="line-3"><code>import (</code></span>
+<span class="codeline" id="line-4"><code>	"reflect"</code></span>
+<span class="codeline" id="line-5"><code>	"sort"</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>	"gorm.io/gorm"</code></span>
+<span class="codeline" id="line-8"><code>	"gorm.io/gorm/clause"</code></span>
+<span class="codeline" id="line-9"><code>	"gorm.io/gorm/schema"</code></span>
+<span class="codeline" id="line-10"><code>)</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>func SetupUpdateReflectValue(db *gorm.DB) {</code></span>
+<span class="codeline" id="line-13"><code>	if db.Error == nil &amp;&amp; db.Statement.Schema != nil {</code></span>
+<span class="codeline" id="line-14"><code>		if !db.Statement.ReflectValue.CanAddr() || db.Statement.Model != db.Statement.Dest {</code></span>
+<span class="codeline" id="line-15"><code>			db.Statement.ReflectValue = reflect.ValueOf(db.Statement.Model)</code></span>
+<span class="codeline" id="line-16"><code>			for db.Statement.ReflectValue.Kind() == reflect.Ptr {</code></span>
+<span class="codeline" id="line-17"><code>				db.Statement.ReflectValue = db.Statement.ReflectValue.Elem()</code></span>
+<span class="codeline" id="line-18"><code>			}</code></span>
+<span class="codeline" id="line-19"><code></code></span>
+<span class="codeline" id="line-20"><code>			if dest, ok := db.Statement.Dest.(map[string]interface{}); ok {</code></span>
+<span class="codeline" id="line-21"><code>				for _, rel := range db.Statement.Schema.Relationships.BelongsTo {</code></span>
+<span class="codeline" id="line-22"><code>					if _, ok := dest[rel.Name]; ok {</code></span>
+<span class="codeline" id="line-23"><code>						rel.Field.Set(db.Statement.ReflectValue, dest[rel.Name])</code></span>
+<span class="codeline" id="line-24"><code>					}</code></span>
+<span class="codeline" id="line-25"><code>				}</code></span>
+<span class="codeline" id="line-26"><code>			}</code></span>
+<span class="codeline" id="line-27"><code>		}</code></span>
+<span class="codeline" id="line-28"><code>	}</code></span>
+<span class="codeline" id="line-29"><code>}</code></span>
+<span class="codeline" id="line-30"><code></code></span>
+<span class="codeline" id="line-31"><code>func BeforeUpdate(db *gorm.DB) {</code></span>
+<span class="codeline" id="line-32"><code>	if db.Error == nil &amp;&amp; db.Statement.Schema != nil &amp;&amp; !db.Statement.UpdatingColumn &amp;&amp; (db.Statement.Schema.BeforeSave || db.Statement.Schema.BeforeUpdate) {</code></span>
+<span class="codeline" id="line-33"><code>		callMethod(db, func(value interface{}, tx *gorm.DB) (called bool) {</code></span>
+<span class="codeline" id="line-34"><code>			if db.Statement.Schema.BeforeSave {</code></span>
+<span class="codeline" id="line-35"><code>				if i, ok := value.(BeforeSaveInterface); ok {</code></span>
+<span class="codeline" id="line-36"><code>					called = true</code></span>
+<span class="codeline" id="line-37"><code>					db.AddError(i.BeforeSave(tx))</code></span>
+<span class="codeline" id="line-38"><code>				}</code></span>
+<span class="codeline" id="line-39"><code>			}</code></span>
+<span class="codeline" id="line-40"><code></code></span>
+<span class="codeline" id="line-41"><code>			if db.Statement.Schema.BeforeUpdate {</code></span>
+<span class="codeline" id="line-42"><code>				if i, ok := value.(BeforeUpdateInterface); ok {</code></span>
+<span class="codeline" id="line-43"><code>					called = true</code></span>
+<span class="codeline" id="line-44"><code>					db.AddError(i.BeforeUpdate(tx))</code></span>
+<span class="codeline" id="line-45"><code>				}</code></span>
+<span class="codeline" id="line-46"><code>			}</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>			return called</code></span>
+<span class="codeline" id="line-49"><code>		})</code></span>
+<span class="codeline" id="line-50"><code>	}</code></span>
+<span class="codeline" id="line-51"><code>}</code></span>
+<span class="codeline" id="line-52"><code></code></span>
+<span class="codeline" id="line-53"><code>func Update(db *gorm.DB) {</code></span>
+<span class="codeline" id="line-54"><code>	if db.Error == nil {</code></span>
+<span class="codeline" id="line-55"><code>		if db.Statement.Schema != nil &amp;&amp; !db.Statement.Unscoped {</code></span>
+<span class="codeline" id="line-56"><code>			for _, c := range db.Statement.Schema.UpdateClauses {</code></span>
+<span class="codeline" id="line-57"><code>				db.Statement.AddClause(c)</code></span>
+<span class="codeline" id="line-58"><code>			}</code></span>
+<span class="codeline" id="line-59"><code>		}</code></span>
+<span class="codeline" id="line-60"><code></code></span>
+<span class="codeline" id="line-61"><code>		if db.Statement.SQL.String() == "" {</code></span>
+<span class="codeline" id="line-62"><code>			db.Statement.SQL.Grow(180)</code></span>
+<span class="codeline" id="line-63"><code>			db.Statement.AddClauseIfNotExists(clause.Update{})</code></span>
+<span class="codeline" id="line-64"><code>			if set := ConvertToAssignments(db.Statement); len(set) != 0 {</code></span>
+<span class="codeline" id="line-65"><code>				db.Statement.AddClause(set)</code></span>
+<span class="codeline" id="line-66"><code>			} else {</code></span>
+<span class="codeline" id="line-67"><code>				return</code></span>
+<span class="codeline" id="line-68"><code>			}</code></span>
+<span class="codeline" id="line-69"><code>			db.Statement.Build("UPDATE", "SET", "WHERE")</code></span>
+<span class="codeline" id="line-70"><code>		}</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>		if _, ok := db.Statement.Clauses["WHERE"]; !db.AllowGlobalUpdate &amp;&amp; !ok {</code></span>
+<span class="codeline" id="line-73"><code>			db.AddError(gorm.ErrMissingWhereClause)</code></span>
+<span class="codeline" id="line-74"><code>			return</code></span>
+<span class="codeline" id="line-75"><code>		}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>		if !db.DryRun &amp;&amp; db.Error == nil {</code></span>
+<span class="codeline" id="line-78"><code>			result, err := db.Statement.ConnPool.ExecContext(db.Statement.Context, db.Statement.SQL.String(), db.Statement.Vars...)</code></span>
+<span class="codeline" id="line-79"><code></code></span>
+<span class="codeline" id="line-80"><code>			if err == nil {</code></span>
+<span class="codeline" id="line-81"><code>				db.RowsAffected, _ = result.RowsAffected()</code></span>
+<span class="codeline" id="line-82"><code>			} else {</code></span>
+<span class="codeline" id="line-83"><code>				db.AddError(err)</code></span>
+<span class="codeline" id="line-84"><code>			}</code></span>
+<span class="codeline" id="line-85"><code>		}</code></span>
+<span class="codeline" id="line-86"><code>	}</code></span>
+<span class="codeline" id="line-87"><code>}</code></span>
+<span class="codeline" id="line-88"><code></code></span>
+<span class="codeline" id="line-89"><code>func AfterUpdate(db *gorm.DB) {</code></span>
+<span class="codeline" id="line-90"><code>	if db.Error == nil &amp;&amp; db.Statement.Schema != nil &amp;&amp; !db.Statement.UpdatingColumn &amp;&amp; (db.Statement.Schema.AfterSave || db.Statement.Schema.AfterUpdate) {</code></span>
+<span class="codeline" id="line-91"><code>		callMethod(db, func(value interface{}, tx *gorm.DB) (called bool) {</code></span>
+<span class="codeline" id="line-92"><code>			if db.Statement.Schema.AfterSave {</code></span>
+<span class="codeline" id="line-93"><code>				if i, ok := value.(AfterSaveInterface); ok {</code></span>
+<span class="codeline" id="line-94"><code>					called = true</code></span>
+<span class="codeline" id="line-95"><code>					db.AddError(i.AfterSave(tx))</code></span>
+<span class="codeline" id="line-96"><code>				}</code></span>
+<span class="codeline" id="line-97"><code>			}</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>			if db.Statement.Schema.AfterUpdate {</code></span>
+<span class="codeline" id="line-100"><code>				if i, ok := value.(AfterUpdateInterface); ok {</code></span>
+<span class="codeline" id="line-101"><code>					called = true</code></span>
+<span class="codeline" id="line-102"><code>					db.AddError(i.AfterUpdate(tx))</code></span>
+<span class="codeline" id="line-103"><code>				}</code></span>
+<span class="codeline" id="line-104"><code>			}</code></span>
+<span class="codeline" id="line-105"><code>			return called</code></span>
+<span class="codeline" id="line-106"><code>		})</code></span>
+<span class="codeline" id="line-107"><code>	}</code></span>
+<span class="codeline" id="line-108"><code>}</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>// ConvertToAssignments convert to update assignments</code></span>
+<span class="codeline" id="line-111"><code>func ConvertToAssignments(stmt *gorm.Statement) (set clause.Set) {</code></span>
+<span class="codeline" id="line-112"><code>	var (</code></span>
+<span class="codeline" id="line-113"><code>		selectColumns, restricted = stmt.SelectAndOmitColumns(false, true)</code></span>
+<span class="codeline" id="line-114"><code>		assignValue               func(field *schema.Field, value interface{})</code></span>
+<span class="codeline" id="line-115"><code>	)</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>	switch stmt.ReflectValue.Kind() {</code></span>
+<span class="codeline" id="line-118"><code>	case reflect.Slice, reflect.Array:</code></span>
+<span class="codeline" id="line-119"><code>		assignValue = func(field *schema.Field, value interface{}) {</code></span>
+<span class="codeline" id="line-120"><code>			for i := 0; i &lt; stmt.ReflectValue.Len(); i++ {</code></span>
+<span class="codeline" id="line-121"><code>				field.Set(stmt.ReflectValue.Index(i), value)</code></span>
+<span class="codeline" id="line-122"><code>			}</code></span>
+<span class="codeline" id="line-123"><code>		}</code></span>
+<span class="codeline" id="line-124"><code>	case reflect.Struct:</code></span>
+<span class="codeline" id="line-125"><code>		assignValue = func(field *schema.Field, value interface{}) {</code></span>
+<span class="codeline" id="line-126"><code>			if stmt.ReflectValue.CanAddr() {</code></span>
+<span class="codeline" id="line-127"><code>				field.Set(stmt.ReflectValue, value)</code></span>
+<span class="codeline" id="line-128"><code>			}</code></span>
+<span class="codeline" id="line-129"><code>		}</code></span>
+<span class="codeline" id="line-130"><code>	default:</code></span>
+<span class="codeline" id="line-131"><code>		assignValue = func(field *schema.Field, value interface{}) {</code></span>
+<span class="codeline" id="line-132"><code>		}</code></span>
+<span class="codeline" id="line-133"><code>	}</code></span>
+<span class="codeline" id="line-134"><code></code></span>
+<span class="codeline" id="line-135"><code>	updatingValue := reflect.ValueOf(stmt.Dest)</code></span>
+<span class="codeline" id="line-136"><code>	for updatingValue.Kind() == reflect.Ptr {</code></span>
+<span class="codeline" id="line-137"><code>		updatingValue = updatingValue.Elem()</code></span>
+<span class="codeline" id="line-138"><code>	}</code></span>
+<span class="codeline" id="line-139"><code></code></span>
+<span class="codeline" id="line-140"><code>	if !updatingValue.CanAddr() || stmt.Dest != stmt.Model {</code></span>
+<span class="codeline" id="line-141"><code>		switch stmt.ReflectValue.Kind() {</code></span>
+<span class="codeline" id="line-142"><code>		case reflect.Slice, reflect.Array:</code></span>
+<span class="codeline" id="line-143"><code>			var primaryKeyExprs []clause.Expression</code></span>
+<span class="codeline" id="line-144"><code>			for i := 0; i &lt; stmt.ReflectValue.Len(); i++ {</code></span>
+<span class="codeline" id="line-145"><code>				var exprs = make([]clause.Expression, len(stmt.Schema.PrimaryFields))</code></span>
+<span class="codeline" id="line-146"><code>				var notZero bool</code></span>
+<span class="codeline" id="line-147"><code>				for idx, field := range stmt.Schema.PrimaryFields {</code></span>
+<span class="codeline" id="line-148"><code>					value, isZero := field.ValueOf(stmt.ReflectValue.Index(i))</code></span>
+<span class="codeline" id="line-149"><code>					exprs[idx] = clause.Eq{Column: field.DBName, Value: value}</code></span>
+<span class="codeline" id="line-150"><code>					notZero = notZero || !isZero</code></span>
+<span class="codeline" id="line-151"><code>				}</code></span>
+<span class="codeline" id="line-152"><code>				if notZero {</code></span>
+<span class="codeline" id="line-153"><code>					primaryKeyExprs = append(primaryKeyExprs, clause.And(exprs...))</code></span>
+<span class="codeline" id="line-154"><code>				}</code></span>
+<span class="codeline" id="line-155"><code>			}</code></span>
+<span class="codeline" id="line-156"><code>			stmt.AddClause(clause.Where{Exprs: []clause.Expression{clause.Or(primaryKeyExprs...)}})</code></span>
+<span class="codeline" id="line-157"><code>		case reflect.Struct:</code></span>
+<span class="codeline" id="line-158"><code>			for _, field := range stmt.Schema.PrimaryFields {</code></span>
+<span class="codeline" id="line-159"><code>				if value, isZero := field.ValueOf(stmt.ReflectValue); !isZero {</code></span>
+<span class="codeline" id="line-160"><code>					stmt.AddClause(clause.Where{Exprs: []clause.Expression{clause.Eq{Column: field.DBName, Value: value}}})</code></span>
+<span class="codeline" id="line-161"><code>				}</code></span>
+<span class="codeline" id="line-162"><code>			}</code></span>
+<span class="codeline" id="line-163"><code>		}</code></span>
+<span class="codeline" id="line-164"><code>	}</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>	switch value := updatingValue.Interface().(type) {</code></span>
+<span class="codeline" id="line-167"><code>	case map[string]interface{}:</code></span>
+<span class="codeline" id="line-168"><code>		set = make([]clause.Assignment, 0, len(value))</code></span>
+<span class="codeline" id="line-169"><code></code></span>
+<span class="codeline" id="line-170"><code>		keys := make([]string, 0, len(value))</code></span>
+<span class="codeline" id="line-171"><code>		for k := range value {</code></span>
+<span class="codeline" id="line-172"><code>			keys = append(keys, k)</code></span>
+<span class="codeline" id="line-173"><code>		}</code></span>
+<span class="codeline" id="line-174"><code>		sort.Strings(keys)</code></span>
+<span class="codeline" id="line-175"><code></code></span>
+<span class="codeline" id="line-176"><code>		for _, k := range keys {</code></span>
+<span class="codeline" id="line-177"><code>			kv := value[k]</code></span>
+<span class="codeline" id="line-178"><code>			if _, ok := kv.(*gorm.DB); ok {</code></span>
+<span class="codeline" id="line-179"><code>				kv = []interface{}{kv}</code></span>
+<span class="codeline" id="line-180"><code>			}</code></span>
+<span class="codeline" id="line-181"><code></code></span>
+<span class="codeline" id="line-182"><code>			if stmt.Schema != nil {</code></span>
+<span class="codeline" id="line-183"><code>				if field := stmt.Schema.LookUpField(k); field != nil {</code></span>
+<span class="codeline" id="line-184"><code>					if field.DBName != "" {</code></span>
+<span class="codeline" id="line-185"><code>						if v, ok := selectColumns[field.DBName]; (ok &amp;&amp; v) || (!ok &amp;&amp; !restricted) {</code></span>
+<span class="codeline" id="line-186"><code>							set = append(set, clause.Assignment{Column: clause.Column{Name: field.DBName}, Value: kv})</code></span>
+<span class="codeline" id="line-187"><code>							assignValue(field, value[k])</code></span>
+<span class="codeline" id="line-188"><code>						}</code></span>
+<span class="codeline" id="line-189"><code>					} else if v, ok := selectColumns[field.Name]; (ok &amp;&amp; v) || (!ok &amp;&amp; !restricted) {</code></span>
+<span class="codeline" id="line-190"><code>						assignValue(field, value[k])</code></span>
+<span class="codeline" id="line-191"><code>					}</code></span>
+<span class="codeline" id="line-192"><code>					continue</code></span>
+<span class="codeline" id="line-193"><code>				}</code></span>
+<span class="codeline" id="line-194"><code>			}</code></span>
+<span class="codeline" id="line-195"><code></code></span>
+<span class="codeline" id="line-196"><code>			if v, ok := selectColumns[k]; (ok &amp;&amp; v) || (!ok &amp;&amp; !restricted) {</code></span>
+<span class="codeline" id="line-197"><code>				set = append(set, clause.Assignment{Column: clause.Column{Name: k}, Value: kv})</code></span>
+<span class="codeline" id="line-198"><code>			}</code></span>
+<span class="codeline" id="line-199"><code>		}</code></span>
+<span class="codeline" id="line-200"><code></code></span>
+<span class="codeline" id="line-201"><code>		if !stmt.UpdatingColumn &amp;&amp; stmt.Schema != nil {</code></span>
+<span class="codeline" id="line-202"><code>			for _, dbName := range stmt.Schema.DBNames {</code></span>
+<span class="codeline" id="line-203"><code>				field := stmt.Schema.LookUpField(dbName)</code></span>
+<span class="codeline" id="line-204"><code>				if field.AutoUpdateTime &gt; 0 &amp;&amp; value[field.Name] == nil &amp;&amp; value[field.DBName] == nil {</code></span>
+<span class="codeline" id="line-205"><code>					if v, ok := selectColumns[field.DBName]; (ok &amp;&amp; v) || (!ok &amp;&amp; !restricted) {</code></span>
+<span class="codeline" id="line-206"><code>						now := stmt.DB.NowFunc()</code></span>
+<span class="codeline" id="line-207"><code>						assignValue(field, now)</code></span>
+<span class="codeline" id="line-208"><code></code></span>
+<span class="codeline" id="line-209"><code>						if field.AutoUpdateTime == schema.UnixNanosecond {</code></span>
+<span class="codeline" id="line-210"><code>							set = append(set, clause.Assignment{Column: clause.Column{Name: field.DBName}, Value: now.UnixNano()})</code></span>
+<span class="codeline" id="line-211"><code>						} else if field.AutoUpdateTime == schema.UnixMillisecond {</code></span>
+<span class="codeline" id="line-212"><code>							set = append(set, clause.Assignment{Column: clause.Column{Name: field.DBName}, Value: now.UnixNano() / 1e6})</code></span>
+<span class="codeline" id="line-213"><code>						} else if field.GORMDataType == schema.Time {</code></span>
+<span class="codeline" id="line-214"><code>							set = append(set, clause.Assignment{Column: clause.Column{Name: field.DBName}, Value: now})</code></span>
+<span class="codeline" id="line-215"><code>						} else {</code></span>
+<span class="codeline" id="line-216"><code>							set = append(set, clause.Assignment{Column: clause.Column{Name: field.DBName}, Value: now.Unix()})</code></span>
+<span class="codeline" id="line-217"><code>						}</code></span>
+<span class="codeline" id="line-218"><code>					}</code></span>
+<span class="codeline" id="line-219"><code>				}</code></span>
+<span class="codeline" id="line-220"><code>			}</code></span>
+<span class="codeline" id="line-221"><code>		}</code></span>
+<span class="codeline" id="line-222"><code>	default:</code></span>
+<span class="codeline" id="line-223"><code>		switch updatingValue.Kind() {</code></span>
+<span class="codeline" id="line-224"><code>		case reflect.Struct:</code></span>
+<span class="codeline" id="line-225"><code>			set = make([]clause.Assignment, 0, len(stmt.Schema.FieldsByDBName))</code></span>
+<span class="codeline" id="line-226"><code>			for _, dbName := range stmt.Schema.DBNames {</code></span>
+<span class="codeline" id="line-227"><code>				field := stmt.Schema.LookUpField(dbName)</code></span>
+<span class="codeline" id="line-228"><code>				if !field.PrimaryKey || (!updatingValue.CanAddr() || stmt.Dest != stmt.Model) {</code></span>
+<span class="codeline" id="line-229"><code>					if v, ok := selectColumns[field.DBName]; (ok &amp;&amp; v) || (!ok &amp;&amp; !restricted) {</code></span>
+<span class="codeline" id="line-230"><code>						value, isZero := field.ValueOf(updatingValue)</code></span>
+<span class="codeline" id="line-231"><code>						if !stmt.UpdatingColumn {</code></span>
+<span class="codeline" id="line-232"><code>							if field.AutoUpdateTime &gt; 0 {</code></span>
+<span class="codeline" id="line-233"><code>								if field.AutoUpdateTime == schema.UnixNanosecond {</code></span>
+<span class="codeline" id="line-234"><code>									value = stmt.DB.NowFunc().UnixNano()</code></span>
+<span class="codeline" id="line-235"><code>								} else if field.AutoUpdateTime == schema.UnixMillisecond {</code></span>
+<span class="codeline" id="line-236"><code>									value = stmt.DB.NowFunc().UnixNano() / 1e6</code></span>
+<span class="codeline" id="line-237"><code>								} else if field.GORMDataType == schema.Time {</code></span>
+<span class="codeline" id="line-238"><code>									value = stmt.DB.NowFunc()</code></span>
+<span class="codeline" id="line-239"><code>								} else {</code></span>
+<span class="codeline" id="line-240"><code>									value = stmt.DB.NowFunc().Unix()</code></span>
+<span class="codeline" id="line-241"><code>								}</code></span>
+<span class="codeline" id="line-242"><code>								isZero = false</code></span>
+<span class="codeline" id="line-243"><code>							}</code></span>
+<span class="codeline" id="line-244"><code>						}</code></span>
+<span class="codeline" id="line-245"><code></code></span>
+<span class="codeline" id="line-246"><code>						if ok || !isZero {</code></span>
+<span class="codeline" id="line-247"><code>							set = append(set, clause.Assignment{Column: clause.Column{Name: field.DBName}, Value: value})</code></span>
+<span class="codeline" id="line-248"><code>							assignValue(field, value)</code></span>
+<span class="codeline" id="line-249"><code>						}</code></span>
+<span class="codeline" id="line-250"><code>					}</code></span>
+<span class="codeline" id="line-251"><code>				} else {</code></span>
+<span class="codeline" id="line-252"><code>					if value, isZero := field.ValueOf(updatingValue); !isZero {</code></span>
+<span class="codeline" id="line-253"><code>						stmt.AddClause(clause.Where{Exprs: []clause.Expression{clause.Eq{Column: field.DBName, Value: value}}})</code></span>
+<span class="codeline" id="line-254"><code>					}</code></span>
+<span class="codeline" id="line-255"><code>				}</code></span>
+<span class="codeline" id="line-256"><code>			}</code></span>
+<span class="codeline" id="line-257"><code>		default:</code></span>
+<span class="codeline" id="line-258"><code>			stmt.AddError(gorm.ErrInvalidData)</code></span>
+<span class="codeline" id="line-259"><code>		}</code></span>
+<span class="codeline" id="line-260"><code>	}</code></span>
+<span class="codeline" id="line-261"><code></code></span>
+<span class="codeline" id="line-262"><code>	return</code></span>
+<span class="codeline" id="line-263"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

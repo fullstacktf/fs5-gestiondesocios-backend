@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: regexp/syntax</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>syntax</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-regexp/syntax">regexp/syntax</a><i> (on <a href="https://golang.org/pkg/regexp/syntax/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/regexp/syntax" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/regexp/syntax.html">5 packages</a>, and imported by <a href="../../dep/regexp/syntax.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/regexp/syntax/compile.go.html">compile.go</a>
+	<a href="../../src/regexp/syntax/doc.go.html#doc">d-&gt;</a> <a href="../../src/regexp/syntax/doc.go.html">doc.go</a>
+	    <a href="../../src/regexp/syntax/op_string.go.html">op_string.go</a>
+	    <a href="../../src/regexp/syntax/parse.go.html">parse.go</a>
+	    <a href="../../src/regexp/syntax/perl_groups.go.html">perl_groups.go</a>
+	    <a href="../../src/regexp/syntax/prog.go.html">prog.go</a>
+	    <a href="../../src/regexp/syntax/regexp.go.html">regexp.go</a>
+	    <a href="../../src/regexp/syntax/simplify.go.html">simplify.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-EmptyOp" data-popularity="165">	 type <a href="../../src/regexp/syntax/prog.go.html#line-62">EmptyOp</a> <a href="../builtin.html#name-uint8">uint8</a>
+		An EmptyOp specifies a kind or mixture of zero-width assertions.
+
+		<input type='checkbox' class="stat" id="EmptyOp-stat-results"><label for="EmptyOp-stat-results">As Outputs Of (2+)</label><span id='EmptyOp-stat-results-content' class="stat-content">
+			func <a href="#name-EmptyOpContext">EmptyOpContext</a>(r1, r2 <a href="../builtin.html#name-rune">rune</a>) <b>EmptyOp</b>
+			func (*<a href="#name-Prog">Prog</a>).<a href="../../src/regexp/syntax/prog.go.html#line-166">StartCond</a>() <b>EmptyOp</b></span>
+		<input type='checkbox' class="stat" id="EmptyOp-stat-values"><label for="EmptyOp-stat-values">As Types Of (6+)</label><span id='EmptyOp-stat-values-content' class="stat-content">
+			const <a href="#name-EmptyBeginLine">EmptyBeginLine</a>
+			const <a href="#name-EmptyBeginText">EmptyBeginText</a>
+			const <a href="#name-EmptyEndLine">EmptyEndLine</a>
+			const <a href="#name-EmptyEndText">EmptyEndText</a>
+			const <a href="#name-EmptyNoWordBoundary">EmptyNoWordBoundary</a>
+			const <a href="#name-EmptyWordBoundary">EmptyWordBoundary</a></span></div>
+<div class="anchor" id="name-Error" data-popularity="100">	 type <a href="../../src/regexp/syntax/parse.go.html#line-16">Error</a> <i>(struct)</i>
+		An Error describes a failure to parse a regular expression
+		and gives the offending expression.
+
+		<input type='checkbox' class="stat" id="Error-stat-fields"><label for="Error-stat-fields">Exported Fields (2)</label><span id='Error-stat-fields-content' class="stat-content">
+			<a href="../../src/regexp/syntax/parse.go.html#line-17">Code</a> <i><a href="#name-ErrorCode">ErrorCode</a></i>
+			<a href="../../src/regexp/syntax/parse.go.html#line-18">Expr</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Error-stat-methods"><label for="Error-stat-methods">One Exported Method</label><span id='Error-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/regexp/syntax/parse.go.html#line-21">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Error-stat-impls"><label for="Error-stat-impls">Implements (1+)</label><span id='Error-stat-impls-content' class="stat-content">
+			*T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-ErrorCode" data-popularity="115">	 type <a href="../../src/regexp/syntax/parse.go.html#line-26">ErrorCode</a> <a href="../builtin.html#name-string">string</a>
+		An ErrorCode describes a failure to parse a regular expression.
+
+		<input type='checkbox' class="stat" id="ErrorCode-stat-methods"><label for="ErrorCode-stat-methods">One Exported Method</label><span id='ErrorCode-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/regexp/syntax/parse.go.html#line-48">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ErrorCode-stat-impls"><label for="ErrorCode-stat-impls">Implements (1+)</label><span id='ErrorCode-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="ErrorCode-stat-values"><label for="ErrorCode-stat-values">As Types Of (14+)</label><span id='ErrorCode-stat-values-content' class="stat-content">
+			const <a href="#name-ErrInternalError">ErrInternalError</a>
+			const <a href="#name-ErrInvalidCharClass">ErrInvalidCharClass</a>
+			const <a href="#name-ErrInvalidCharRange">ErrInvalidCharRange</a>
+			const <a href="#name-ErrInvalidEscape">ErrInvalidEscape</a>
+			const <a href="#name-ErrInvalidNamedCapture">ErrInvalidNamedCapture</a>
+			const <a href="#name-ErrInvalidPerlOp">ErrInvalidPerlOp</a>
+			const <a href="#name-ErrInvalidRepeatOp">ErrInvalidRepeatOp</a>
+			const <a href="#name-ErrInvalidRepeatSize">ErrInvalidRepeatSize</a>
+			const <a href="#name-ErrInvalidUTF8">ErrInvalidUTF8</a>
+			const <a href="#name-ErrMissingBracket">ErrMissingBracket</a>
+			const <a href="#name-ErrMissingParen">ErrMissingParen</a>
+			const <a href="#name-ErrMissingRepeatArgument">ErrMissingRepeatArgument</a>
+			const <a href="#name-ErrTrailingBackslash">ErrTrailingBackslash</a>
+			const <a href="#name-ErrUnexpectedParen">ErrUnexpectedParen</a></span></div>
+<div class="anchor" id="name-Flags" data-popularity="50">	 type <a href="../../src/regexp/syntax/parse.go.html#line-53">Flags</a> <a href="../builtin.html#name-uint16">uint16</a>
+		Flags control the behavior of the parser and record information about regexp context.
+
+		<input type='checkbox' class="stat" id="Flags-stat-params"><label for="Flags-stat-params">As Inputs Of (1+)</label><span id='Flags-stat-params-content' class="stat-content">
+			func <a href="#name-Parse">Parse</a>(s <a href="../builtin.html#name-string">string</a>, flags <b>Flags</b>) (*<a href="#name-Regexp">Regexp</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Flags-stat-values"><label for="Flags-stat-values">As Types Of (13+)</label><span id='Flags-stat-values-content' class="stat-content">
+			const <a href="#name-ClassNL">ClassNL</a>
+			const <a href="#name-DotNL">DotNL</a>
+			const <a href="#name-FoldCase">FoldCase</a>
+			const <a href="#name-Literal">Literal</a>
+			const <a href="#name-MatchNL">MatchNL</a>
+			const <a href="#name-NonGreedy">NonGreedy</a>
+			const <a href="#name-OneLine">OneLine</a>
+			const <a href="#name-Perl">Perl</a>
+			const <a href="#name-PerlX">PerlX</a>
+			const <a href="#name-POSIX">POSIX</a>
+			const <a href="#name-Simple">Simple</a>
+			const <a href="#name-UnicodeGroups">UnicodeGroups</a>
+			const <a href="#name-WasDollar">WasDollar</a></span></div>
+<div class="anchor" id="name-Inst" data-popularity="250">	 type <a href="../../src/regexp/syntax/prog.go.html#line-112">Inst</a> <i>(struct)</i>
+		An Inst is a single instruction in a regular expression program.
+
+		<input type='checkbox' class="stat" id="Inst-stat-fields"><label for="Inst-stat-fields">Exported Fields (4)</label><span id='Inst-stat-fields-content' class="stat-content">
+			<a href="../../src/regexp/syntax/prog.go.html#line-115">Arg</a> <i><a href="../builtin.html#name-uint32">uint32</a></i>
+			<a href="../../src/regexp/syntax/prog.go.html#line-113">Op</a> <i><a href="#name-InstOp">InstOp</a></i>
+			<a href="../../src/regexp/syntax/prog.go.html#line-114">Out</a> <i><a href="../builtin.html#name-uint32">uint32</a></i>
+			<a href="../../src/regexp/syntax/prog.go.html#line-116">Rune</a> <i>[]<a href="../builtin.html#name-rune">rune</a></i></span>
+		<input type='checkbox' class="stat" id="Inst-stat-methods"><label for="Inst-stat-methods">Exported Methods (4)</label><span id='Inst-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/regexp/syntax/prog.go.html#line-263">MatchEmptyWidth</a>(before <a href="../builtin.html#name-rune">rune</a>, after <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/regexp/syntax/prog.go.html#line-192">MatchRune</a>(r <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/regexp/syntax/prog.go.html#line-201">MatchRunePos</a>(r <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/regexp/syntax/prog.go.html#line-281">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Inst-stat-impls"><label for="Inst-stat-impls">Implements (1+)</label><span id='Inst-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span></div>
+<div class="anchor" id="name-InstOp" data-popularity="115">	 type <a href="../../src/regexp/syntax/prog.go.html#line-24">InstOp</a> <a href="../builtin.html#name-uint8">uint8</a>
+		An InstOp is an instruction opcode.
+
+		<input type='checkbox' class="stat" id="InstOp-stat-methods"><label for="InstOp-stat-methods">One Exported Method</label><span id='InstOp-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/regexp/syntax/prog.go.html#line-54">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="InstOp-stat-impls"><label for="InstOp-stat-impls">Implements (1+)</label><span id='InstOp-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="InstOp-stat-values"><label for="InstOp-stat-values">As Types Of (11+)</label><span id='InstOp-stat-values-content' class="stat-content">
+			const <a href="#name-InstAlt">InstAlt</a>
+			const <a href="#name-InstAltMatch">InstAltMatch</a>
+			const <a href="#name-InstCapture">InstCapture</a>
+			const <a href="#name-InstEmptyWidth">InstEmptyWidth</a>
+			const <a href="#name-InstFail">InstFail</a>
+			const <a href="#name-InstMatch">InstMatch</a>
+			const <a href="#name-InstNop">InstNop</a>
+			const <a href="#name-InstRune">InstRune</a>
+			const <a href="#name-InstRune1">InstRune1</a>
+			const <a href="#name-InstRuneAny">InstRuneAny</a>
+			const <a href="#name-InstRuneAnyNotNL">InstRuneAnyNotNL</a></span></div>
+<div class="anchor" id="name-Op" data-popularity="115">	 type <a href="../../src/regexp/syntax/regexp.go.html#line-32">Op</a> <a href="../builtin.html#name-uint8">uint8</a>
+		An Op is a single regular expression operator.
+
+		<input type='checkbox' class="stat" id="Op-stat-methods"><label for="Op-stat-methods">One Exported Method</label><span id='Op-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/regexp/syntax/op_string.go.html#line-16">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Op-stat-impls"><label for="Op-stat-impls">Implements (1+)</label><span id='Op-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Op-stat-values"><label for="Op-stat-values">As Types Of (19+)</label><span id='Op-stat-values-content' class="stat-content">
+			const <a href="#name-OpAlternate">OpAlternate</a>
+			const <a href="#name-OpAnyChar">OpAnyChar</a>
+			const <a href="#name-OpAnyCharNotNL">OpAnyCharNotNL</a>
+			const <a href="#name-OpBeginLine">OpBeginLine</a>
+			const <a href="#name-OpBeginText">OpBeginText</a>
+			const <a href="#name-OpCapture">OpCapture</a>
+			const <a href="#name-OpCharClass">OpCharClass</a>
+			const <a href="#name-OpConcat">OpConcat</a>
+			const <a href="#name-OpEmptyMatch">OpEmptyMatch</a>
+			const <a href="#name-OpEndLine">OpEndLine</a>
+			const <a href="#name-OpEndText">OpEndText</a>
+			const <a href="#name-OpLiteral">OpLiteral</a>
+			const <a href="#name-OpNoMatch">OpNoMatch</a>
+			const <a href="#name-OpNoWordBoundary">OpNoWordBoundary</a>
+			const <a href="#name-OpPlus">OpPlus</a>
+			const <a href="#name-OpQuest">OpQuest</a>
+			const <a href="#name-OpRepeat">OpRepeat</a>
+			const <a href="#name-OpStar">OpStar</a>
+			const <a href="#name-OpWordBoundary">OpWordBoundary</a></span></div>
+<div class="anchor" id="name-Prog" data-popularity="275">	 type <a href="../../src/regexp/syntax/prog.go.html#line-17">Prog</a> <i>(struct)</i>
+		A Prog is a compiled regular expression program.
+
+		<input type='checkbox' class="stat" id="Prog-stat-fields"><label for="Prog-stat-fields">Exported Fields (3)</label><span id='Prog-stat-fields-content' class="stat-content">
+			<a href="../../src/regexp/syntax/prog.go.html#line-18">Inst</a> <i>[]<a href="#name-Inst">Inst</a></i>
+			<a href="../../src/regexp/syntax/prog.go.html#line-20">NumCap</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/regexp/syntax/prog.go.html#line-19">Start</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="Prog-stat-methods"><label for="Prog-stat-methods">Exported Methods (3)</label><span id='Prog-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/regexp/syntax/prog.go.html#line-147">Prefix</a>() (prefix <a href="../builtin.html#name-string">string</a>, complete <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/regexp/syntax/prog.go.html#line-166">StartCond</a>() <a href="#name-EmptyOp">EmptyOp</a>
+			(*T) <a href="../../src/regexp/syntax/prog.go.html#line-119">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Prog-stat-impls"><label for="Prog-stat-impls">Implements (1+)</label><span id='Prog-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Prog-stat-results"><label for="Prog-stat-results">As Outputs Of (1+)</label><span id='Prog-stat-results-content' class="stat-content">
+			func <a href="#name-Compile">Compile</a>(re *<a href="#name-Regexp">Regexp</a>) (*<b>Prog</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Regexp" data-popularity="520">	 type <a href="../../src/regexp/syntax/regexp.go.html#line-17">Regexp</a> <i>(struct)</i>
+		A Regexp is a node in a regular expression syntax tree.
+
+		<input type='checkbox' class="stat" id="Regexp-stat-fields"><label for="Regexp-stat-fields">Exported Fields (10)</label><span id='Regexp-stat-fields-content' class="stat-content">
+			<a href="../../src/regexp/syntax/regexp.go.html#line-25">Cap</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-19">Flags</a> <i><a href="#name-Flags">Flags</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-24">Max</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-24">Min</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-26">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-18">Op</a> <i><a href="#name-Op">Op</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-22">Rune</a> <i>[]<a href="../builtin.html#name-rune">rune</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-23">Rune0</a> <i>[2]<a href="../builtin.html#name-rune">rune</a></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-20">Sub</a> <i>[]*<b>Regexp</b></i>
+			<a href="../../src/regexp/syntax/regexp.go.html#line-21">Sub0</a> <i>[1]*<b>Regexp</b></i></span>
+		<input type='checkbox' class="stat" id="Regexp-stat-methods"><label for="Regexp-stat-methods">Exported Methods (5)</label><span id='Regexp-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/regexp/syntax/regexp.go.html#line-307">CapNames</a>() []<a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/regexp/syntax/regexp.go.html#line-63">Equal</a>(y *<b>Regexp</b>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/regexp/syntax/regexp.go.html#line-293">MaxCap</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/regexp/syntax/simplify.go.html#line-14">Simplify</a>() *<b>Regexp</b>
+			(*T) <a href="../../src/regexp/syntax/regexp.go.html#line-246">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Regexp-stat-impls"><label for="Regexp-stat-impls">Implements (1+)</label><span id='Regexp-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Regexp-stat-results"><label for="Regexp-stat-results">As Outputs Of (2+)</label><span id='Regexp-stat-results-content' class="stat-content">
+			func <a href="#name-Parse">Parse</a>(s <a href="../builtin.html#name-string">string</a>, flags <a href="#name-Flags">Flags</a>) (*<b>Regexp</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Regexp">Regexp</a>).<a href="../../src/regexp/syntax/simplify.go.html#line-14">Simplify</a>() *<b>Regexp</b></span>
+		<input type='checkbox' class="stat" id="Regexp-stat-params"><label for="Regexp-stat-params">As Inputs Of (2+)</label><span id='Regexp-stat-params-content' class="stat-content">
+			func <a href="#name-Compile">Compile</a>(re *<b>Regexp</b>) (*<a href="#name-Prog">Prog</a>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Regexp">Regexp</a>).<a href="../../src/regexp/syntax/regexp.go.html#line-63">Equal</a>(y *<b>Regexp</b>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ClassNL">	const <a href="../../src/regexp/syntax/parse.go.html#line-58">ClassNL</a> <a href="#name-Flags">Flags</a> = 4 // allow character classes like [^a-z] and [[:space:]] to match newline</div>
+<div class="anchor" id="name-Compile">	 func <a href="../../src/regexp/syntax/compile.go.html#line-70">Compile</a>(re *<a href="#name-Regexp">Regexp</a>) (*<a href="#name-Prog">Prog</a>, <a href="../builtin.html#name-error">error</a>)
+		Compile compiles the regexp into a program to be executed.
+		The regexp should have been simplified already (returned from re.Simplify).</div>
+<div class="anchor" id="name-DotNL">	const <a href="../../src/regexp/syntax/parse.go.html#line-59">DotNL</a> <a href="#name-Flags">Flags</a> = 8 // allow . to match newline</div>
+<div class="anchor" id="name-EmptyBeginLine">	const <a href="../../src/regexp/syntax/prog.go.html#line-65">EmptyBeginLine</a> <a href="#name-EmptyOp">EmptyOp</a> = 1</div>
+<div class="anchor" id="name-EmptyBeginText">	const <a href="../../src/regexp/syntax/prog.go.html#line-67">EmptyBeginText</a> <a href="#name-EmptyOp">EmptyOp</a> = 4</div>
+<div class="anchor" id="name-EmptyEndLine">	const <a href="../../src/regexp/syntax/prog.go.html#line-66">EmptyEndLine</a> <a href="#name-EmptyOp">EmptyOp</a> = 2</div>
+<div class="anchor" id="name-EmptyEndText">	const <a href="../../src/regexp/syntax/prog.go.html#line-68">EmptyEndText</a> <a href="#name-EmptyOp">EmptyOp</a> = 8</div>
+<div class="anchor" id="name-EmptyNoWordBoundary">	const <a href="../../src/regexp/syntax/prog.go.html#line-70">EmptyNoWordBoundary</a> <a href="#name-EmptyOp">EmptyOp</a> = 32</div>
+<div class="anchor" id="name-EmptyOpContext">	 func <a href="../../src/regexp/syntax/prog.go.html#line-79">EmptyOpContext</a>(r1, r2 <a href="../builtin.html#name-rune">rune</a>) <a href="#name-EmptyOp">EmptyOp</a>
+		EmptyOpContext returns the zero-width assertions
+		satisfied at the position between the runes r1 and r2.
+		Passing r1 == -1 indicates that the position is
+		at the beginning of the text.
+		Passing r2 == -1 indicates that the position is
+		at the end of the text.</div>
+<div class="anchor" id="name-EmptyWordBoundary">	const <a href="../../src/regexp/syntax/prog.go.html#line-69">EmptyWordBoundary</a> <a href="#name-EmptyOp">EmptyOp</a> = 16</div>
+<div class="anchor" id="name-ErrInternalError">	const <a href="../../src/regexp/syntax/parse.go.html#line-30">ErrInternalError</a> <a href="#name-ErrorCode">ErrorCode</a> = "regexp/syntax: internal error"
+		Unexpected error</div>
+<div class="anchor" id="name-ErrInvalidCharClass">	const <a href="../../src/regexp/syntax/parse.go.html#line-33">ErrInvalidCharClass</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid character class"
+		Parse errors</div>
+<div class="anchor" id="name-ErrInvalidCharRange">	const <a href="../../src/regexp/syntax/parse.go.html#line-34">ErrInvalidCharRange</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid character class range"</div>
+<div class="anchor" id="name-ErrInvalidEscape">	const <a href="../../src/regexp/syntax/parse.go.html#line-35">ErrInvalidEscape</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid escape sequence"</div>
+<div class="anchor" id="name-ErrInvalidNamedCapture">	const <a href="../../src/regexp/syntax/parse.go.html#line-36">ErrInvalidNamedCapture</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid named capture"</div>
+<div class="anchor" id="name-ErrInvalidPerlOp">	const <a href="../../src/regexp/syntax/parse.go.html#line-37">ErrInvalidPerlOp</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid or unsupported Perl syntax"</div>
+<div class="anchor" id="name-ErrInvalidRepeatOp">	const <a href="../../src/regexp/syntax/parse.go.html#line-38">ErrInvalidRepeatOp</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid nested repetition operator"</div>
+<div class="anchor" id="name-ErrInvalidRepeatSize">	const <a href="../../src/regexp/syntax/parse.go.html#line-39">ErrInvalidRepeatSize</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid repeat count"</div>
+<div class="anchor" id="name-ErrInvalidUTF8">	const <a href="../../src/regexp/syntax/parse.go.html#line-40">ErrInvalidUTF8</a> <a href="#name-ErrorCode">ErrorCode</a> = "invalid UTF-8"</div>
+<div class="anchor" id="name-ErrMissingBracket">	const <a href="../../src/regexp/syntax/parse.go.html#line-41">ErrMissingBracket</a> <a href="#name-ErrorCode">ErrorCode</a> = "missing closing ]"</div>
+<div class="anchor" id="name-ErrMissingParen">	const <a href="../../src/regexp/syntax/parse.go.html#line-42">ErrMissingParen</a> <a href="#name-ErrorCode">ErrorCode</a> = "missing closing )"</div>
+<div class="anchor" id="name-ErrMissingRepeatArgument">	const <a href="../../src/regexp/syntax/parse.go.html#line-43">ErrMissingRepeatArgument</a> <a href="#name-ErrorCode">ErrorCode</a> = "missing argument to repetition operator"</div>
+<div class="anchor" id="name-ErrTrailingBackslash">	const <a href="../../src/regexp/syntax/parse.go.html#line-44">ErrTrailingBackslash</a> <a href="#name-ErrorCode">ErrorCode</a> = "trailing backslash at end of expression"</div>
+<div class="anchor" id="name-ErrUnexpectedParen">	const <a href="../../src/regexp/syntax/parse.go.html#line-45">ErrUnexpectedParen</a> <a href="#name-ErrorCode">ErrorCode</a> = "unexpected )"</div>
+<div class="anchor" id="name-FoldCase">	const <a href="../../src/regexp/syntax/parse.go.html#line-56">FoldCase</a> <a href="#name-Flags">Flags</a> = 1 // case-insensitive match</div>
+<div class="anchor" id="name-InstAlt">	const <a href="../../src/regexp/syntax/prog.go.html#line-27">InstAlt</a> <a href="#name-InstOp">InstOp</a> = 0</div>
+<div class="anchor" id="name-InstAltMatch">	const <a href="../../src/regexp/syntax/prog.go.html#line-28">InstAltMatch</a> <a href="#name-InstOp">InstOp</a> = 1</div>
+<div class="anchor" id="name-InstCapture">	const <a href="../../src/regexp/syntax/prog.go.html#line-29">InstCapture</a> <a href="#name-InstOp">InstOp</a> = 2</div>
+<div class="anchor" id="name-InstEmptyWidth">	const <a href="../../src/regexp/syntax/prog.go.html#line-30">InstEmptyWidth</a> <a href="#name-InstOp">InstOp</a> = 3</div>
+<div class="anchor" id="name-InstFail">	const <a href="../../src/regexp/syntax/prog.go.html#line-32">InstFail</a> <a href="#name-InstOp">InstOp</a> = 5</div>
+<div class="anchor" id="name-InstMatch">	const <a href="../../src/regexp/syntax/prog.go.html#line-31">InstMatch</a> <a href="#name-InstOp">InstOp</a> = 4</div>
+<div class="anchor" id="name-InstNop">	const <a href="../../src/regexp/syntax/prog.go.html#line-33">InstNop</a> <a href="#name-InstOp">InstOp</a> = 6</div>
+<div class="anchor" id="name-InstRune">	const <a href="../../src/regexp/syntax/prog.go.html#line-34">InstRune</a> <a href="#name-InstOp">InstOp</a> = 7</div>
+<div class="anchor" id="name-InstRune1">	const <a href="../../src/regexp/syntax/prog.go.html#line-35">InstRune1</a> <a href="#name-InstOp">InstOp</a> = 8</div>
+<div class="anchor" id="name-InstRuneAny">	const <a href="../../src/regexp/syntax/prog.go.html#line-36">InstRuneAny</a> <a href="#name-InstOp">InstOp</a> = 9</div>
+<div class="anchor" id="name-InstRuneAnyNotNL">	const <a href="../../src/regexp/syntax/prog.go.html#line-37">InstRuneAnyNotNL</a> <a href="#name-InstOp">InstOp</a> = 10</div>
+<div class="anchor" id="name-IsWordChar">	 func <a href="../../src/regexp/syntax/prog.go.html#line-107">IsWordChar</a>(r <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-bool">bool</a>
+		IsWordChar reports whether r is consider a ``word character''
+		during the evaluation of the \b and \B zero-width assertions.
+		These assertions are ASCII-only: the word characters are [A-Za-z0-9_].</div>
+<div class="anchor" id="name-Literal">	const <a href="../../src/regexp/syntax/parse.go.html#line-57">Literal</a> <a href="#name-Flags">Flags</a> = 2 // treat pattern as literal string</div>
+<div class="anchor" id="name-MatchNL">	const <a href="../../src/regexp/syntax/parse.go.html#line-67">MatchNL</a> <a href="#name-Flags">Flags</a> = 12</div>
+<div class="anchor" id="name-NonGreedy">	const <a href="../../src/regexp/syntax/parse.go.html#line-61">NonGreedy</a> <a href="#name-Flags">Flags</a> = 32 // make repetition operators default to non-greedy</div>
+<div class="anchor" id="name-OneLine">	const <a href="../../src/regexp/syntax/parse.go.html#line-60">OneLine</a> <a href="#name-Flags">Flags</a> = 16 // treat ^ and $ as only matching at beginning and end of text</div>
+<div class="anchor" id="name-OpAlternate">	const <a href="../../src/regexp/syntax/regexp.go.html#line-57">OpAlternate</a> <a href="#name-Op">Op</a> = 19 // matches alternation of Subs</div>
+<div class="anchor" id="name-OpAnyChar">	const <a href="../../src/regexp/syntax/regexp.go.html#line-44">OpAnyChar</a> <a href="#name-Op">Op</a> = 6 // matches any character</div>
+<div class="anchor" id="name-OpAnyCharNotNL">	const <a href="../../src/regexp/syntax/regexp.go.html#line-43">OpAnyCharNotNL</a> <a href="#name-Op">Op</a> = 5 // matches any character except newline</div>
+<div class="anchor" id="name-OpBeginLine">	const <a href="../../src/regexp/syntax/regexp.go.html#line-45">OpBeginLine</a> <a href="#name-Op">Op</a> = 7 // matches empty string at beginning of line</div>
+<div class="anchor" id="name-OpBeginText">	const <a href="../../src/regexp/syntax/regexp.go.html#line-47">OpBeginText</a> <a href="#name-Op">Op</a> = 9 // matches empty string at beginning of text</div>
+<div class="anchor" id="name-OpCapture">	const <a href="../../src/regexp/syntax/regexp.go.html#line-51">OpCapture</a> <a href="#name-Op">Op</a> = 13 // capturing subexpression with index Cap, optional name Name</div>
+<div class="anchor" id="name-OpCharClass">	const <a href="../../src/regexp/syntax/regexp.go.html#line-42">OpCharClass</a> <a href="#name-Op">Op</a> = 4 // matches Runes interpreted as range pair list</div>
+<div class="anchor" id="name-OpConcat">	const <a href="../../src/regexp/syntax/regexp.go.html#line-56">OpConcat</a> <a href="#name-Op">Op</a> = 18 // matches concatenation of Subs</div>
+<div class="anchor" id="name-OpEmptyMatch">	const <a href="../../src/regexp/syntax/regexp.go.html#line-40">OpEmptyMatch</a> <a href="#name-Op">Op</a> = 2 // matches empty string</div>
+<div class="anchor" id="name-OpEndLine">	const <a href="../../src/regexp/syntax/regexp.go.html#line-46">OpEndLine</a> <a href="#name-Op">Op</a> = 8 // matches empty string at end of line</div>
+<div class="anchor" id="name-OpEndText">	const <a href="../../src/regexp/syntax/regexp.go.html#line-48">OpEndText</a> <a href="#name-Op">Op</a> = 10 // matches empty string at end of text</div>
+<div class="anchor" id="name-OpLiteral">	const <a href="../../src/regexp/syntax/regexp.go.html#line-41">OpLiteral</a> <a href="#name-Op">Op</a> = 3 // matches Runes sequence</div>
+<div class="anchor" id="name-OpNoMatch">	const <a href="../../src/regexp/syntax/regexp.go.html#line-39">OpNoMatch</a> <a href="#name-Op">Op</a> = 1 // matches no strings</div>
+<div class="anchor" id="name-OpNoWordBoundary">	const <a href="../../src/regexp/syntax/regexp.go.html#line-50">OpNoWordBoundary</a> <a href="#name-Op">Op</a> = 12 // matches word non-boundary `\B`</div>
+<div class="anchor" id="name-OpPlus">	const <a href="../../src/regexp/syntax/regexp.go.html#line-53">OpPlus</a> <a href="#name-Op">Op</a> = 15 // matches Sub[0] one or more times</div>
+<div class="anchor" id="name-OpQuest">	const <a href="../../src/regexp/syntax/regexp.go.html#line-54">OpQuest</a> <a href="#name-Op">Op</a> = 16 // matches Sub[0] zero or one times</div>
+<div class="anchor" id="name-OpRepeat">	const <a href="../../src/regexp/syntax/regexp.go.html#line-55">OpRepeat</a> <a href="#name-Op">Op</a> = 17 // matches Sub[0] at least Min times, at most Max (Max == -1 is no limit)</div>
+<div class="anchor" id="name-OpStar">	const <a href="../../src/regexp/syntax/regexp.go.html#line-52">OpStar</a> <a href="#name-Op">Op</a> = 14 // matches Sub[0] zero or more times</div>
+<div class="anchor" id="name-OpWordBoundary">	const <a href="../../src/regexp/syntax/regexp.go.html#line-49">OpWordBoundary</a> <a href="#name-Op">Op</a> = 11 // matches word boundary `\b`</div>
+<div class="anchor" id="name-Parse">	 func <a href="../../src/regexp/syntax/parse.go.html#line-695">Parse</a>(s <a href="../builtin.html#name-string">string</a>, flags <a href="#name-Flags">Flags</a>) (*<a href="#name-Regexp">Regexp</a>, <a href="../builtin.html#name-error">error</a>)
+		Parse parses a regular expression string s, controlled by the specified
+		Flags, and returns a regular expression parse tree. The syntax is
+		described in the top-level comment.</div>
+<div class="anchor" id="name-Perl">	const <a href="../../src/regexp/syntax/parse.go.html#line-69">Perl</a> <a href="#name-Flags">Flags</a> = 212 // as close to Perl as possible</div>
+<div class="anchor" id="name-PerlX">	const <a href="../../src/regexp/syntax/parse.go.html#line-62">PerlX</a> <a href="#name-Flags">Flags</a> = 64 // allow Perl extensions</div>
+<div class="anchor" id="name-POSIX">	const <a href="../../src/regexp/syntax/parse.go.html#line-70">POSIX</a> <a href="#name-Flags">Flags</a> = 0 // POSIX syntax</div>
+<div class="anchor" id="name-Simple">	const <a href="../../src/regexp/syntax/parse.go.html#line-65">Simple</a> <a href="#name-Flags">Flags</a> = 512 // regexp contains no counted repetition</div>
+<div class="anchor" id="name-UnicodeGroups">	const <a href="../../src/regexp/syntax/parse.go.html#line-63">UnicodeGroups</a> <a href="#name-Flags">Flags</a> = 128 // allow \p{Han}, \P{Han} for Unicode group and negation</div>
+<div class="anchor" id="name-WasDollar">	const <a href="../../src/regexp/syntax/parse.go.html#line-64">WasDollar</a> <a href="#name-Flags">Flags</a> = 256 // regexp OpEndText was $, not \z</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

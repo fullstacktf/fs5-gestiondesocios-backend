@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: mpallocbits.go in package runtime</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	mpallocbits.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/runtime.html">runtime</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2019 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package runtime</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"runtime/internal/sys"</code></span>
+<span class="codeline" id="line-9"><code>)</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>// pageBits is a bitmap representing one bit per page in a palloc chunk.</code></span>
+<span class="codeline" id="line-12"><code>type pageBits [pallocChunkPages / 64]uint64</code></span>
+<span class="codeline" id="line-13"><code></code></span>
+<span class="codeline" id="line-14"><code>// get returns the value of the i'th bit in the bitmap.</code></span>
+<span class="codeline" id="line-15"><code>func (b *pageBits) get(i uint) uint {</code></span>
+<span class="codeline" id="line-16"><code>	return uint((b[i/64] &gt;&gt; (i % 64)) &amp; 1)</code></span>
+<span class="codeline" id="line-17"><code>}</code></span>
+<span class="codeline" id="line-18"><code></code></span>
+<span class="codeline" id="line-19"><code>// block64 returns the 64-bit aligned block of bits containing the i'th bit.</code></span>
+<span class="codeline" id="line-20"><code>func (b *pageBits) block64(i uint) uint64 {</code></span>
+<span class="codeline" id="line-21"><code>	return b[i/64]</code></span>
+<span class="codeline" id="line-22"><code>}</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>// set sets bit i of pageBits.</code></span>
+<span class="codeline" id="line-25"><code>func (b *pageBits) set(i uint) {</code></span>
+<span class="codeline" id="line-26"><code>	b[i/64] |= 1 &lt;&lt; (i % 64)</code></span>
+<span class="codeline" id="line-27"><code>}</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>// setRange sets bits in the range [i, i+n).</code></span>
+<span class="codeline" id="line-30"><code>func (b *pageBits) setRange(i, n uint) {</code></span>
+<span class="codeline" id="line-31"><code>	_ = b[i/64]</code></span>
+<span class="codeline" id="line-32"><code>	if n == 1 {</code></span>
+<span class="codeline" id="line-33"><code>		// Fast path for the n == 1 case.</code></span>
+<span class="codeline" id="line-34"><code>		b.set(i)</code></span>
+<span class="codeline" id="line-35"><code>		return</code></span>
+<span class="codeline" id="line-36"><code>	}</code></span>
+<span class="codeline" id="line-37"><code>	// Set bits [i, j].</code></span>
+<span class="codeline" id="line-38"><code>	j := i + n - 1</code></span>
+<span class="codeline" id="line-39"><code>	if i/64 == j/64 {</code></span>
+<span class="codeline" id="line-40"><code>		b[i/64] |= ((uint64(1) &lt;&lt; n) - 1) &lt;&lt; (i % 64)</code></span>
+<span class="codeline" id="line-41"><code>		return</code></span>
+<span class="codeline" id="line-42"><code>	}</code></span>
+<span class="codeline" id="line-43"><code>	_ = b[j/64]</code></span>
+<span class="codeline" id="line-44"><code>	// Set leading bits.</code></span>
+<span class="codeline" id="line-45"><code>	b[i/64] |= ^uint64(0) &lt;&lt; (i % 64)</code></span>
+<span class="codeline" id="line-46"><code>	for k := i/64 + 1; k &lt; j/64; k++ {</code></span>
+<span class="codeline" id="line-47"><code>		b[k] = ^uint64(0)</code></span>
+<span class="codeline" id="line-48"><code>	}</code></span>
+<span class="codeline" id="line-49"><code>	// Set trailing bits.</code></span>
+<span class="codeline" id="line-50"><code>	b[j/64] |= (uint64(1) &lt;&lt; (j%64 + 1)) - 1</code></span>
+<span class="codeline" id="line-51"><code>}</code></span>
+<span class="codeline" id="line-52"><code></code></span>
+<span class="codeline" id="line-53"><code>// setAll sets all the bits of b.</code></span>
+<span class="codeline" id="line-54"><code>func (b *pageBits) setAll() {</code></span>
+<span class="codeline" id="line-55"><code>	for i := range b {</code></span>
+<span class="codeline" id="line-56"><code>		b[i] = ^uint64(0)</code></span>
+<span class="codeline" id="line-57"><code>	}</code></span>
+<span class="codeline" id="line-58"><code>}</code></span>
+<span class="codeline" id="line-59"><code></code></span>
+<span class="codeline" id="line-60"><code>// clear clears bit i of pageBits.</code></span>
+<span class="codeline" id="line-61"><code>func (b *pageBits) clear(i uint) {</code></span>
+<span class="codeline" id="line-62"><code>	b[i/64] &amp;^= 1 &lt;&lt; (i % 64)</code></span>
+<span class="codeline" id="line-63"><code>}</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>// clearRange clears bits in the range [i, i+n).</code></span>
+<span class="codeline" id="line-66"><code>func (b *pageBits) clearRange(i, n uint) {</code></span>
+<span class="codeline" id="line-67"><code>	_ = b[i/64]</code></span>
+<span class="codeline" id="line-68"><code>	if n == 1 {</code></span>
+<span class="codeline" id="line-69"><code>		// Fast path for the n == 1 case.</code></span>
+<span class="codeline" id="line-70"><code>		b.clear(i)</code></span>
+<span class="codeline" id="line-71"><code>		return</code></span>
+<span class="codeline" id="line-72"><code>	}</code></span>
+<span class="codeline" id="line-73"><code>	// Clear bits [i, j].</code></span>
+<span class="codeline" id="line-74"><code>	j := i + n - 1</code></span>
+<span class="codeline" id="line-75"><code>	if i/64 == j/64 {</code></span>
+<span class="codeline" id="line-76"><code>		b[i/64] &amp;^= ((uint64(1) &lt;&lt; n) - 1) &lt;&lt; (i % 64)</code></span>
+<span class="codeline" id="line-77"><code>		return</code></span>
+<span class="codeline" id="line-78"><code>	}</code></span>
+<span class="codeline" id="line-79"><code>	_ = b[j/64]</code></span>
+<span class="codeline" id="line-80"><code>	// Clear leading bits.</code></span>
+<span class="codeline" id="line-81"><code>	b[i/64] &amp;^= ^uint64(0) &lt;&lt; (i % 64)</code></span>
+<span class="codeline" id="line-82"><code>	for k := i/64 + 1; k &lt; j/64; k++ {</code></span>
+<span class="codeline" id="line-83"><code>		b[k] = 0</code></span>
+<span class="codeline" id="line-84"><code>	}</code></span>
+<span class="codeline" id="line-85"><code>	// Clear trailing bits.</code></span>
+<span class="codeline" id="line-86"><code>	b[j/64] &amp;^= (uint64(1) &lt;&lt; (j%64 + 1)) - 1</code></span>
+<span class="codeline" id="line-87"><code>}</code></span>
+<span class="codeline" id="line-88"><code></code></span>
+<span class="codeline" id="line-89"><code>// clearAll frees all the bits of b.</code></span>
+<span class="codeline" id="line-90"><code>func (b *pageBits) clearAll() {</code></span>
+<span class="codeline" id="line-91"><code>	for i := range b {</code></span>
+<span class="codeline" id="line-92"><code>		b[i] = 0</code></span>
+<span class="codeline" id="line-93"><code>	}</code></span>
+<span class="codeline" id="line-94"><code>}</code></span>
+<span class="codeline" id="line-95"><code></code></span>
+<span class="codeline" id="line-96"><code>// popcntRange counts the number of set bits in the</code></span>
+<span class="codeline" id="line-97"><code>// range [i, i+n).</code></span>
+<span class="codeline" id="line-98"><code>func (b *pageBits) popcntRange(i, n uint) (s uint) {</code></span>
+<span class="codeline" id="line-99"><code>	if n == 1 {</code></span>
+<span class="codeline" id="line-100"><code>		return uint((b[i/64] &gt;&gt; (i % 64)) &amp; 1)</code></span>
+<span class="codeline" id="line-101"><code>	}</code></span>
+<span class="codeline" id="line-102"><code>	_ = b[i/64]</code></span>
+<span class="codeline" id="line-103"><code>	j := i + n - 1</code></span>
+<span class="codeline" id="line-104"><code>	if i/64 == j/64 {</code></span>
+<span class="codeline" id="line-105"><code>		return uint(sys.OnesCount64((b[i/64] &gt;&gt; (i % 64)) &amp; ((1 &lt;&lt; n) - 1)))</code></span>
+<span class="codeline" id="line-106"><code>	}</code></span>
+<span class="codeline" id="line-107"><code>	_ = b[j/64]</code></span>
+<span class="codeline" id="line-108"><code>	s += uint(sys.OnesCount64(b[i/64] &gt;&gt; (i % 64)))</code></span>
+<span class="codeline" id="line-109"><code>	for k := i/64 + 1; k &lt; j/64; k++ {</code></span>
+<span class="codeline" id="line-110"><code>		s += uint(sys.OnesCount64(b[k]))</code></span>
+<span class="codeline" id="line-111"><code>	}</code></span>
+<span class="codeline" id="line-112"><code>	s += uint(sys.OnesCount64(b[j/64] &amp; ((1 &lt;&lt; (j%64 + 1)) - 1)))</code></span>
+<span class="codeline" id="line-113"><code>	return</code></span>
+<span class="codeline" id="line-114"><code>}</code></span>
+<span class="codeline" id="line-115"><code></code></span>
+<span class="codeline" id="line-116"><code>// pallocBits is a bitmap that tracks page allocations for at most one</code></span>
+<span class="codeline" id="line-117"><code>// palloc chunk.</code></span>
+<span class="codeline" id="line-118"><code>//</code></span>
+<span class="codeline" id="line-119"><code>// The precise representation is an implementation detail, but for the</code></span>
+<span class="codeline" id="line-120"><code>// sake of documentation, 0s are free pages and 1s are allocated pages.</code></span>
+<span class="codeline" id="line-121"><code>type pallocBits pageBits</code></span>
+<span class="codeline" id="line-122"><code></code></span>
+<span class="codeline" id="line-123"><code>// consec8tab is a table containing the number of consecutive</code></span>
+<span class="codeline" id="line-124"><code>// zero bits for any uint8 value.</code></span>
+<span class="codeline" id="line-125"><code>//</code></span>
+<span class="codeline" id="line-126"><code>// The table is generated by calling consec8(i) for each</code></span>
+<span class="codeline" id="line-127"><code>// possible uint8 value, which is defined as:</code></span>
+<span class="codeline" id="line-128"><code>//</code></span>
+<span class="codeline" id="line-129"><code>// // consec8 counts the maximum number of consecutive 0 bits</code></span>
+<span class="codeline" id="line-130"><code>// // in a uint8.</code></span>
+<span class="codeline" id="line-131"><code>// func consec8(n uint8) int {</code></span>
+<span class="codeline" id="line-132"><code>// 	n = ^n</code></span>
+<span class="codeline" id="line-133"><code>// 	i := 0</code></span>
+<span class="codeline" id="line-134"><code>// 	for n != 0 {</code></span>
+<span class="codeline" id="line-135"><code>// 		n &amp;= (n &lt;&lt; 1)</code></span>
+<span class="codeline" id="line-136"><code>// 		i++</code></span>
+<span class="codeline" id="line-137"><code>// 	}</code></span>
+<span class="codeline" id="line-138"><code>// 	return i</code></span>
+<span class="codeline" id="line-139"><code>// }</code></span>
+<span class="codeline" id="line-140"><code>var consec8tab = [256]uint{</code></span>
+<span class="codeline" id="line-141"><code>	8, 7, 6, 6, 5, 5, 5, 5, 4, 4, 4, 4, 4, 4, 4, 4,</code></span>
+<span class="codeline" id="line-142"><code>	4, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,</code></span>
+<span class="codeline" id="line-143"><code>	5, 4, 3, 3, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2,</code></span>
+<span class="codeline" id="line-144"><code>	4, 3, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2,</code></span>
+<span class="codeline" id="line-145"><code>	6, 5, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2,</code></span>
+<span class="codeline" id="line-146"><code>	4, 3, 2, 2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 1, 1,</code></span>
+<span class="codeline" id="line-147"><code>	5, 4, 3, 3, 2, 2, 2, 2, 3, 2, 1, 1, 2, 1, 1, 1,</code></span>
+<span class="codeline" id="line-148"><code>	4, 3, 2, 2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 1, 1,</code></span>
+<span class="codeline" id="line-149"><code>	7, 6, 5, 5, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 3, 3,</code></span>
+<span class="codeline" id="line-150"><code>	4, 3, 2, 2, 2, 2, 2, 2, 3, 2, 2, 2, 2, 2, 2, 2,</code></span>
+<span class="codeline" id="line-151"><code>	5, 4, 3, 3, 2, 2, 2, 2, 3, 2, 1, 1, 2, 1, 1, 1,</code></span>
+<span class="codeline" id="line-152"><code>	4, 3, 2, 2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 1, 1,</code></span>
+<span class="codeline" id="line-153"><code>	6, 5, 4, 4, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 2,</code></span>
+<span class="codeline" id="line-154"><code>	4, 3, 2, 2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 1, 1,</code></span>
+<span class="codeline" id="line-155"><code>	5, 4, 3, 3, 2, 2, 2, 2, 3, 2, 1, 1, 2, 1, 1, 1,</code></span>
+<span class="codeline" id="line-156"><code>	4, 3, 2, 2, 2, 1, 1, 1, 3, 2, 1, 1, 2, 1, 1, 0,</code></span>
+<span class="codeline" id="line-157"><code>}</code></span>
+<span class="codeline" id="line-158"><code></code></span>
+<span class="codeline" id="line-159"><code>// summarize returns a packed summary of the bitmap in pallocBits.</code></span>
+<span class="codeline" id="line-160"><code>func (b *pallocBits) summarize() pallocSum {</code></span>
+<span class="codeline" id="line-161"><code>	// TODO(mknyszek): There may be something more clever to be done</code></span>
+<span class="codeline" id="line-162"><code>	// here to make the summarize operation more efficient. For example,</code></span>
+<span class="codeline" id="line-163"><code>	// we can compute start and end with 64-bit wide operations easily,</code></span>
+<span class="codeline" id="line-164"><code>	// but max is a bit more complex. Perhaps there exists some way to</code></span>
+<span class="codeline" id="line-165"><code>	// leverage the 64-bit start and end to our advantage?</code></span>
+<span class="codeline" id="line-166"><code>	var start, max, end uint</code></span>
+<span class="codeline" id="line-167"><code>	for i := 0; i &lt; len(b); i++ {</code></span>
+<span class="codeline" id="line-168"><code>		a := b[i]</code></span>
+<span class="codeline" id="line-169"><code>		for j := 0; j &lt; 64; j += 8 {</code></span>
+<span class="codeline" id="line-170"><code>			k := uint8(a &gt;&gt; j)</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>			// Compute start.</code></span>
+<span class="codeline" id="line-173"><code>			si := uint(sys.TrailingZeros8(k))</code></span>
+<span class="codeline" id="line-174"><code>			if start == uint(i*64+j) {</code></span>
+<span class="codeline" id="line-175"><code>				start += si</code></span>
+<span class="codeline" id="line-176"><code>			}</code></span>
+<span class="codeline" id="line-177"><code></code></span>
+<span class="codeline" id="line-178"><code>			// Compute max.</code></span>
+<span class="codeline" id="line-179"><code>			if end+si &gt; max {</code></span>
+<span class="codeline" id="line-180"><code>				max = end + si</code></span>
+<span class="codeline" id="line-181"><code>			}</code></span>
+<span class="codeline" id="line-182"><code>			if mi := consec8tab[k]; mi &gt; max {</code></span>
+<span class="codeline" id="line-183"><code>				max = mi</code></span>
+<span class="codeline" id="line-184"><code>			}</code></span>
+<span class="codeline" id="line-185"><code></code></span>
+<span class="codeline" id="line-186"><code>			// Compute end.</code></span>
+<span class="codeline" id="line-187"><code>			if k == 0 {</code></span>
+<span class="codeline" id="line-188"><code>				end += 8</code></span>
+<span class="codeline" id="line-189"><code>			} else {</code></span>
+<span class="codeline" id="line-190"><code>				end = uint(sys.LeadingZeros8(k))</code></span>
+<span class="codeline" id="line-191"><code>			}</code></span>
+<span class="codeline" id="line-192"><code>		}</code></span>
+<span class="codeline" id="line-193"><code>	}</code></span>
+<span class="codeline" id="line-194"><code>	return packPallocSum(start, max, end)</code></span>
+<span class="codeline" id="line-195"><code>}</code></span>
+<span class="codeline" id="line-196"><code></code></span>
+<span class="codeline" id="line-197"><code>// find searches for npages contiguous free pages in pallocBits and returns</code></span>
+<span class="codeline" id="line-198"><code>// the index where that run starts, as well as the index of the first free page</code></span>
+<span class="codeline" id="line-199"><code>// it found in the search. searchIdx represents the first known free page and</code></span>
+<span class="codeline" id="line-200"><code>// where to begin the search from.</code></span>
+<span class="codeline" id="line-201"><code>//</code></span>
+<span class="codeline" id="line-202"><code>// If find fails to find any free space, it returns an index of ^uint(0) and</code></span>
+<span class="codeline" id="line-203"><code>// the new searchIdx should be ignored.</code></span>
+<span class="codeline" id="line-204"><code>//</code></span>
+<span class="codeline" id="line-205"><code>// Note that if npages == 1, the two returned values will always be identical.</code></span>
+<span class="codeline" id="line-206"><code>func (b *pallocBits) find(npages uintptr, searchIdx uint) (uint, uint) {</code></span>
+<span class="codeline" id="line-207"><code>	if npages == 1 {</code></span>
+<span class="codeline" id="line-208"><code>		addr := b.find1(searchIdx)</code></span>
+<span class="codeline" id="line-209"><code>		return addr, addr</code></span>
+<span class="codeline" id="line-210"><code>	} else if npages &lt;= 64 {</code></span>
+<span class="codeline" id="line-211"><code>		return b.findSmallN(npages, searchIdx)</code></span>
+<span class="codeline" id="line-212"><code>	}</code></span>
+<span class="codeline" id="line-213"><code>	return b.findLargeN(npages, searchIdx)</code></span>
+<span class="codeline" id="line-214"><code>}</code></span>
+<span class="codeline" id="line-215"><code></code></span>
+<span class="codeline" id="line-216"><code>// find1 is a helper for find which searches for a single free page</code></span>
+<span class="codeline" id="line-217"><code>// in the pallocBits and returns the index.</code></span>
+<span class="codeline" id="line-218"><code>//</code></span>
+<span class="codeline" id="line-219"><code>// See find for an explanation of the searchIdx parameter.</code></span>
+<span class="codeline" id="line-220"><code>func (b *pallocBits) find1(searchIdx uint) uint {</code></span>
+<span class="codeline" id="line-221"><code>	for i := searchIdx / 64; i &lt; uint(len(b)); i++ {</code></span>
+<span class="codeline" id="line-222"><code>		x := b[i]</code></span>
+<span class="codeline" id="line-223"><code>		if x == ^uint64(0) {</code></span>
+<span class="codeline" id="line-224"><code>			continue</code></span>
+<span class="codeline" id="line-225"><code>		}</code></span>
+<span class="codeline" id="line-226"><code>		return i*64 + uint(sys.TrailingZeros64(^x))</code></span>
+<span class="codeline" id="line-227"><code>	}</code></span>
+<span class="codeline" id="line-228"><code>	return ^uint(0)</code></span>
+<span class="codeline" id="line-229"><code>}</code></span>
+<span class="codeline" id="line-230"><code></code></span>
+<span class="codeline" id="line-231"><code>// findSmallN is a helper for find which searches for npages contiguous free pages</code></span>
+<span class="codeline" id="line-232"><code>// in this pallocBits and returns the index where that run of contiguous pages</code></span>
+<span class="codeline" id="line-233"><code>// starts as well as the index of the first free page it finds in its search.</code></span>
+<span class="codeline" id="line-234"><code>//</code></span>
+<span class="codeline" id="line-235"><code>// See find for an explanation of the searchIdx parameter.</code></span>
+<span class="codeline" id="line-236"><code>//</code></span>
+<span class="codeline" id="line-237"><code>// Returns a ^uint(0) index on failure and the new searchIdx should be ignored.</code></span>
+<span class="codeline" id="line-238"><code>//</code></span>
+<span class="codeline" id="line-239"><code>// findSmallN assumes npages &lt;= 64, where any such contiguous run of pages</code></span>
+<span class="codeline" id="line-240"><code>// crosses at most one aligned 64-bit boundary in the bits.</code></span>
+<span class="codeline" id="line-241"><code>func (b *pallocBits) findSmallN(npages uintptr, searchIdx uint) (uint, uint) {</code></span>
+<span class="codeline" id="line-242"><code>	end, newSearchIdx := uint(0), ^uint(0)</code></span>
+<span class="codeline" id="line-243"><code>	for i := searchIdx / 64; i &lt; uint(len(b)); i++ {</code></span>
+<span class="codeline" id="line-244"><code>		bi := b[i]</code></span>
+<span class="codeline" id="line-245"><code>		if bi == ^uint64(0) {</code></span>
+<span class="codeline" id="line-246"><code>			end = 0</code></span>
+<span class="codeline" id="line-247"><code>			continue</code></span>
+<span class="codeline" id="line-248"><code>		}</code></span>
+<span class="codeline" id="line-249"><code>		// First see if we can pack our allocation in the trailing</code></span>
+<span class="codeline" id="line-250"><code>		// zeros plus the end of the last 64 bits.</code></span>
+<span class="codeline" id="line-251"><code>		start := uint(sys.TrailingZeros64(bi))</code></span>
+<span class="codeline" id="line-252"><code>		if newSearchIdx == ^uint(0) {</code></span>
+<span class="codeline" id="line-253"><code>			// The new searchIdx is going to be at these 64 bits after any</code></span>
+<span class="codeline" id="line-254"><code>			// 1s we file, so count trailing 1s.</code></span>
+<span class="codeline" id="line-255"><code>			newSearchIdx = i*64 + uint(sys.TrailingZeros64(^bi))</code></span>
+<span class="codeline" id="line-256"><code>		}</code></span>
+<span class="codeline" id="line-257"><code>		if end+start &gt;= uint(npages) {</code></span>
+<span class="codeline" id="line-258"><code>			return i*64 - end, newSearchIdx</code></span>
+<span class="codeline" id="line-259"><code>		}</code></span>
+<span class="codeline" id="line-260"><code>		// Next, check the interior of the 64-bit chunk.</code></span>
+<span class="codeline" id="line-261"><code>		j := findBitRange64(^bi, uint(npages))</code></span>
+<span class="codeline" id="line-262"><code>		if j &lt; 64 {</code></span>
+<span class="codeline" id="line-263"><code>			return i*64 + j, newSearchIdx</code></span>
+<span class="codeline" id="line-264"><code>		}</code></span>
+<span class="codeline" id="line-265"><code>		end = uint(sys.LeadingZeros64(bi))</code></span>
+<span class="codeline" id="line-266"><code>	}</code></span>
+<span class="codeline" id="line-267"><code>	return ^uint(0), newSearchIdx</code></span>
+<span class="codeline" id="line-268"><code>}</code></span>
+<span class="codeline" id="line-269"><code></code></span>
+<span class="codeline" id="line-270"><code>// findLargeN is a helper for find which searches for npages contiguous free pages</code></span>
+<span class="codeline" id="line-271"><code>// in this pallocBits and returns the index where that run starts, as well as the</code></span>
+<span class="codeline" id="line-272"><code>// index of the first free page it found it its search.</code></span>
+<span class="codeline" id="line-273"><code>//</code></span>
+<span class="codeline" id="line-274"><code>// See alloc for an explanation of the searchIdx parameter.</code></span>
+<span class="codeline" id="line-275"><code>//</code></span>
+<span class="codeline" id="line-276"><code>// Returns a ^uint(0) index on failure and the new searchIdx should be ignored.</code></span>
+<span class="codeline" id="line-277"><code>//</code></span>
+<span class="codeline" id="line-278"><code>// findLargeN assumes npages &gt; 64, where any such run of free pages</code></span>
+<span class="codeline" id="line-279"><code>// crosses at least one aligned 64-bit boundary in the bits.</code></span>
+<span class="codeline" id="line-280"><code>func (b *pallocBits) findLargeN(npages uintptr, searchIdx uint) (uint, uint) {</code></span>
+<span class="codeline" id="line-281"><code>	start, size, newSearchIdx := ^uint(0), uint(0), ^uint(0)</code></span>
+<span class="codeline" id="line-282"><code>	for i := searchIdx / 64; i &lt; uint(len(b)); i++ {</code></span>
+<span class="codeline" id="line-283"><code>		x := b[i]</code></span>
+<span class="codeline" id="line-284"><code>		if x == ^uint64(0) {</code></span>
+<span class="codeline" id="line-285"><code>			size = 0</code></span>
+<span class="codeline" id="line-286"><code>			continue</code></span>
+<span class="codeline" id="line-287"><code>		}</code></span>
+<span class="codeline" id="line-288"><code>		if newSearchIdx == ^uint(0) {</code></span>
+<span class="codeline" id="line-289"><code>			// The new searchIdx is going to be at these 64 bits after any</code></span>
+<span class="codeline" id="line-290"><code>			// 1s we file, so count trailing 1s.</code></span>
+<span class="codeline" id="line-291"><code>			newSearchIdx = i*64 + uint(sys.TrailingZeros64(^x))</code></span>
+<span class="codeline" id="line-292"><code>		}</code></span>
+<span class="codeline" id="line-293"><code>		if size == 0 {</code></span>
+<span class="codeline" id="line-294"><code>			size = uint(sys.LeadingZeros64(x))</code></span>
+<span class="codeline" id="line-295"><code>			start = i*64 + 64 - size</code></span>
+<span class="codeline" id="line-296"><code>			continue</code></span>
+<span class="codeline" id="line-297"><code>		}</code></span>
+<span class="codeline" id="line-298"><code>		s := uint(sys.TrailingZeros64(x))</code></span>
+<span class="codeline" id="line-299"><code>		if s+size &gt;= uint(npages) {</code></span>
+<span class="codeline" id="line-300"><code>			size += s</code></span>
+<span class="codeline" id="line-301"><code>			return start, newSearchIdx</code></span>
+<span class="codeline" id="line-302"><code>		}</code></span>
+<span class="codeline" id="line-303"><code>		if s &lt; 64 {</code></span>
+<span class="codeline" id="line-304"><code>			size = uint(sys.LeadingZeros64(x))</code></span>
+<span class="codeline" id="line-305"><code>			start = i*64 + 64 - size</code></span>
+<span class="codeline" id="line-306"><code>			continue</code></span>
+<span class="codeline" id="line-307"><code>		}</code></span>
+<span class="codeline" id="line-308"><code>		size += 64</code></span>
+<span class="codeline" id="line-309"><code>	}</code></span>
+<span class="codeline" id="line-310"><code>	if size &lt; uint(npages) {</code></span>
+<span class="codeline" id="line-311"><code>		return ^uint(0), newSearchIdx</code></span>
+<span class="codeline" id="line-312"><code>	}</code></span>
+<span class="codeline" id="line-313"><code>	return start, newSearchIdx</code></span>
+<span class="codeline" id="line-314"><code>}</code></span>
+<span class="codeline" id="line-315"><code></code></span>
+<span class="codeline" id="line-316"><code>// allocRange allocates the range [i, i+n).</code></span>
+<span class="codeline" id="line-317"><code>func (b *pallocBits) allocRange(i, n uint) {</code></span>
+<span class="codeline" id="line-318"><code>	(*pageBits)(b).setRange(i, n)</code></span>
+<span class="codeline" id="line-319"><code>}</code></span>
+<span class="codeline" id="line-320"><code></code></span>
+<span class="codeline" id="line-321"><code>// allocAll allocates all the bits of b.</code></span>
+<span class="codeline" id="line-322"><code>func (b *pallocBits) allocAll() {</code></span>
+<span class="codeline" id="line-323"><code>	(*pageBits)(b).setAll()</code></span>
+<span class="codeline" id="line-324"><code>}</code></span>
+<span class="codeline" id="line-325"><code></code></span>
+<span class="codeline" id="line-326"><code>// free1 frees a single page in the pallocBits at i.</code></span>
+<span class="codeline" id="line-327"><code>func (b *pallocBits) free1(i uint) {</code></span>
+<span class="codeline" id="line-328"><code>	(*pageBits)(b).clear(i)</code></span>
+<span class="codeline" id="line-329"><code>}</code></span>
+<span class="codeline" id="line-330"><code></code></span>
+<span class="codeline" id="line-331"><code>// free frees the range [i, i+n) of pages in the pallocBits.</code></span>
+<span class="codeline" id="line-332"><code>func (b *pallocBits) free(i, n uint) {</code></span>
+<span class="codeline" id="line-333"><code>	(*pageBits)(b).clearRange(i, n)</code></span>
+<span class="codeline" id="line-334"><code>}</code></span>
+<span class="codeline" id="line-335"><code></code></span>
+<span class="codeline" id="line-336"><code>// freeAll frees all the bits of b.</code></span>
+<span class="codeline" id="line-337"><code>func (b *pallocBits) freeAll() {</code></span>
+<span class="codeline" id="line-338"><code>	(*pageBits)(b).clearAll()</code></span>
+<span class="codeline" id="line-339"><code>}</code></span>
+<span class="codeline" id="line-340"><code></code></span>
+<span class="codeline" id="line-341"><code>// pages64 returns a 64-bit bitmap representing a block of 64 pages aligned</code></span>
+<span class="codeline" id="line-342"><code>// to 64 pages. The returned block of pages is the one containing the i'th</code></span>
+<span class="codeline" id="line-343"><code>// page in this pallocBits. Each bit represents whether the page is in-use.</code></span>
+<span class="codeline" id="line-344"><code>func (b *pallocBits) pages64(i uint) uint64 {</code></span>
+<span class="codeline" id="line-345"><code>	return (*pageBits)(b).block64(i)</code></span>
+<span class="codeline" id="line-346"><code>}</code></span>
+<span class="codeline" id="line-347"><code></code></span>
+<span class="codeline" id="line-348"><code>// findBitRange64 returns the bit index of the first set of</code></span>
+<span class="codeline" id="line-349"><code>// n consecutive 1 bits. If no consecutive set of 1 bits of</code></span>
+<span class="codeline" id="line-350"><code>// size n may be found in c, then it returns an integer &gt;= 64.</code></span>
+<span class="codeline" id="line-351"><code>func findBitRange64(c uint64, n uint) uint {</code></span>
+<span class="codeline" id="line-352"><code>	i := uint(0)</code></span>
+<span class="codeline" id="line-353"><code>	cont := uint(sys.TrailingZeros64(^c))</code></span>
+<span class="codeline" id="line-354"><code>	for cont &lt; n &amp;&amp; i &lt; 64 {</code></span>
+<span class="codeline" id="line-355"><code>		i += cont</code></span>
+<span class="codeline" id="line-356"><code>		i += uint(sys.TrailingZeros64(c &gt;&gt; i))</code></span>
+<span class="codeline" id="line-357"><code>		cont = uint(sys.TrailingZeros64(^(c &gt;&gt; i)))</code></span>
+<span class="codeline" id="line-358"><code>	}</code></span>
+<span class="codeline" id="line-359"><code>	return i</code></span>
+<span class="codeline" id="line-360"><code>}</code></span>
+<span class="codeline" id="line-361"><code></code></span>
+<span class="codeline" id="line-362"><code>// pallocData encapsulates pallocBits and a bitmap for</code></span>
+<span class="codeline" id="line-363"><code>// whether or not a given page is scavenged in a single</code></span>
+<span class="codeline" id="line-364"><code>// structure. It's effectively a pallocBits with</code></span>
+<span class="codeline" id="line-365"><code>// additional functionality.</code></span>
+<span class="codeline" id="line-366"><code>//</code></span>
+<span class="codeline" id="line-367"><code>// Update the comment on (*pageAlloc).chunks should this</code></span>
+<span class="codeline" id="line-368"><code>// structure change.</code></span>
+<span class="codeline" id="line-369"><code>type pallocData struct {</code></span>
+<span class="codeline" id="line-370"><code>	pallocBits</code></span>
+<span class="codeline" id="line-371"><code>	scavenged pageBits</code></span>
+<span class="codeline" id="line-372"><code>}</code></span>
+<span class="codeline" id="line-373"><code></code></span>
+<span class="codeline" id="line-374"><code>// allocRange sets bits [i, i+n) in the bitmap to 1 and</code></span>
+<span class="codeline" id="line-375"><code>// updates the scavenged bits appropriately.</code></span>
+<span class="codeline" id="line-376"><code>func (m *pallocData) allocRange(i, n uint) {</code></span>
+<span class="codeline" id="line-377"><code>	// Clear the scavenged bits when we alloc the range.</code></span>
+<span class="codeline" id="line-378"><code>	m.pallocBits.allocRange(i, n)</code></span>
+<span class="codeline" id="line-379"><code>	m.scavenged.clearRange(i, n)</code></span>
+<span class="codeline" id="line-380"><code>}</code></span>
+<span class="codeline" id="line-381"><code></code></span>
+<span class="codeline" id="line-382"><code>// allocAll sets every bit in the bitmap to 1 and updates</code></span>
+<span class="codeline" id="line-383"><code>// the scavenged bits appropriately.</code></span>
+<span class="codeline" id="line-384"><code>func (m *pallocData) allocAll() {</code></span>
+<span class="codeline" id="line-385"><code>	// Clear the scavenged bits when we alloc the range.</code></span>
+<span class="codeline" id="line-386"><code>	m.pallocBits.allocAll()</code></span>
+<span class="codeline" id="line-387"><code>	m.scavenged.clearAll()</code></span>
+<span class="codeline" id="line-388"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

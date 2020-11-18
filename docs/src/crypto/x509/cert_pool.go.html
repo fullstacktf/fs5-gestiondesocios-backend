@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: cert_pool.go in package crypto/x509</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	cert_pool.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/x509.html">crypto/x509</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package x509</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"encoding/pem"</code></span>
+<span class="codeline" id="line-9"><code>	"errors"</code></span>
+<span class="codeline" id="line-10"><code>	"runtime"</code></span>
+<span class="codeline" id="line-11"><code>)</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>// CertPool is a set of certificates.</code></span>
+<span class="codeline" id="line-14"><code>type CertPool struct {</code></span>
+<span class="codeline" id="line-15"><code>	bySubjectKeyId map[string][]int</code></span>
+<span class="codeline" id="line-16"><code>	byName         map[string][]int</code></span>
+<span class="codeline" id="line-17"><code>	certs          []*Certificate</code></span>
+<span class="codeline" id="line-18"><code>}</code></span>
+<span class="codeline" id="line-19"><code></code></span>
+<span class="codeline" id="line-20"><code>// NewCertPool returns a new, empty CertPool.</code></span>
+<span class="codeline" id="line-21"><code>func NewCertPool() *CertPool {</code></span>
+<span class="codeline" id="line-22"><code>	return &amp;CertPool{</code></span>
+<span class="codeline" id="line-23"><code>		bySubjectKeyId: make(map[string][]int),</code></span>
+<span class="codeline" id="line-24"><code>		byName:         make(map[string][]int),</code></span>
+<span class="codeline" id="line-25"><code>	}</code></span>
+<span class="codeline" id="line-26"><code>}</code></span>
+<span class="codeline" id="line-27"><code></code></span>
+<span class="codeline" id="line-28"><code>func (s *CertPool) copy() *CertPool {</code></span>
+<span class="codeline" id="line-29"><code>	p := &amp;CertPool{</code></span>
+<span class="codeline" id="line-30"><code>		bySubjectKeyId: make(map[string][]int, len(s.bySubjectKeyId)),</code></span>
+<span class="codeline" id="line-31"><code>		byName:         make(map[string][]int, len(s.byName)),</code></span>
+<span class="codeline" id="line-32"><code>		certs:          make([]*Certificate, len(s.certs)),</code></span>
+<span class="codeline" id="line-33"><code>	}</code></span>
+<span class="codeline" id="line-34"><code>	for k, v := range s.bySubjectKeyId {</code></span>
+<span class="codeline" id="line-35"><code>		indexes := make([]int, len(v))</code></span>
+<span class="codeline" id="line-36"><code>		copy(indexes, v)</code></span>
+<span class="codeline" id="line-37"><code>		p.bySubjectKeyId[k] = indexes</code></span>
+<span class="codeline" id="line-38"><code>	}</code></span>
+<span class="codeline" id="line-39"><code>	for k, v := range s.byName {</code></span>
+<span class="codeline" id="line-40"><code>		indexes := make([]int, len(v))</code></span>
+<span class="codeline" id="line-41"><code>		copy(indexes, v)</code></span>
+<span class="codeline" id="line-42"><code>		p.byName[k] = indexes</code></span>
+<span class="codeline" id="line-43"><code>	}</code></span>
+<span class="codeline" id="line-44"><code>	copy(p.certs, s.certs)</code></span>
+<span class="codeline" id="line-45"><code>	return p</code></span>
+<span class="codeline" id="line-46"><code>}</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>// SystemCertPool returns a copy of the system cert pool.</code></span>
+<span class="codeline" id="line-49"><code>//</code></span>
+<span class="codeline" id="line-50"><code>// On Unix systems other than macOS the environment variables SSL_CERT_FILE and</code></span>
+<span class="codeline" id="line-51"><code>// SSL_CERT_DIR can be used to override the system default locations for the SSL</code></span>
+<span class="codeline" id="line-52"><code>// certificate file and SSL certificate files directory, respectively. The</code></span>
+<span class="codeline" id="line-53"><code>// latter can be a colon-separated list.</code></span>
+<span class="codeline" id="line-54"><code>//</code></span>
+<span class="codeline" id="line-55"><code>// Any mutations to the returned pool are not written to disk and do not affect</code></span>
+<span class="codeline" id="line-56"><code>// any other pool returned by SystemCertPool.</code></span>
+<span class="codeline" id="line-57"><code>//</code></span>
+<span class="codeline" id="line-58"><code>// New changes in the system cert pool might not be reflected in subsequent calls.</code></span>
+<span class="codeline" id="line-59"><code>func SystemCertPool() (*CertPool, error) {</code></span>
+<span class="codeline" id="line-60"><code>	if runtime.GOOS == "windows" {</code></span>
+<span class="codeline" id="line-61"><code>		// Issue 16736, 18609:</code></span>
+<span class="codeline" id="line-62"><code>		return nil, errors.New("crypto/x509: system root pool is not available on Windows")</code></span>
+<span class="codeline" id="line-63"><code>	}</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>	if sysRoots := systemRootsPool(); sysRoots != nil {</code></span>
+<span class="codeline" id="line-66"><code>		return sysRoots.copy(), nil</code></span>
+<span class="codeline" id="line-67"><code>	}</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>	return loadSystemRoots()</code></span>
+<span class="codeline" id="line-70"><code>}</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>// findPotentialParents returns the indexes of certificates in s which might</code></span>
+<span class="codeline" id="line-73"><code>// have signed cert. The caller must not modify the returned slice.</code></span>
+<span class="codeline" id="line-74"><code>func (s *CertPool) findPotentialParents(cert *Certificate) []int {</code></span>
+<span class="codeline" id="line-75"><code>	if s == nil {</code></span>
+<span class="codeline" id="line-76"><code>		return nil</code></span>
+<span class="codeline" id="line-77"><code>	}</code></span>
+<span class="codeline" id="line-78"><code></code></span>
+<span class="codeline" id="line-79"><code>	var candidates []int</code></span>
+<span class="codeline" id="line-80"><code>	if len(cert.AuthorityKeyId) &gt; 0 {</code></span>
+<span class="codeline" id="line-81"><code>		candidates = s.bySubjectKeyId[string(cert.AuthorityKeyId)]</code></span>
+<span class="codeline" id="line-82"><code>	}</code></span>
+<span class="codeline" id="line-83"><code>	if len(candidates) == 0 {</code></span>
+<span class="codeline" id="line-84"><code>		candidates = s.byName[string(cert.RawIssuer)]</code></span>
+<span class="codeline" id="line-85"><code>	}</code></span>
+<span class="codeline" id="line-86"><code>	return candidates</code></span>
+<span class="codeline" id="line-87"><code>}</code></span>
+<span class="codeline" id="line-88"><code></code></span>
+<span class="codeline" id="line-89"><code>func (s *CertPool) contains(cert *Certificate) bool {</code></span>
+<span class="codeline" id="line-90"><code>	if s == nil {</code></span>
+<span class="codeline" id="line-91"><code>		return false</code></span>
+<span class="codeline" id="line-92"><code>	}</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>	candidates := s.byName[string(cert.RawSubject)]</code></span>
+<span class="codeline" id="line-95"><code>	for _, c := range candidates {</code></span>
+<span class="codeline" id="line-96"><code>		if s.certs[c].Equal(cert) {</code></span>
+<span class="codeline" id="line-97"><code>			return true</code></span>
+<span class="codeline" id="line-98"><code>		}</code></span>
+<span class="codeline" id="line-99"><code>	}</code></span>
+<span class="codeline" id="line-100"><code></code></span>
+<span class="codeline" id="line-101"><code>	return false</code></span>
+<span class="codeline" id="line-102"><code>}</code></span>
+<span class="codeline" id="line-103"><code></code></span>
+<span class="codeline" id="line-104"><code>// AddCert adds a certificate to a pool.</code></span>
+<span class="codeline" id="line-105"><code>func (s *CertPool) AddCert(cert *Certificate) {</code></span>
+<span class="codeline" id="line-106"><code>	if cert == nil {</code></span>
+<span class="codeline" id="line-107"><code>		panic("adding nil Certificate to CertPool")</code></span>
+<span class="codeline" id="line-108"><code>	}</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>	// Check that the certificate isn't being added twice.</code></span>
+<span class="codeline" id="line-111"><code>	if s.contains(cert) {</code></span>
+<span class="codeline" id="line-112"><code>		return</code></span>
+<span class="codeline" id="line-113"><code>	}</code></span>
+<span class="codeline" id="line-114"><code></code></span>
+<span class="codeline" id="line-115"><code>	n := len(s.certs)</code></span>
+<span class="codeline" id="line-116"><code>	s.certs = append(s.certs, cert)</code></span>
+<span class="codeline" id="line-117"><code></code></span>
+<span class="codeline" id="line-118"><code>	if len(cert.SubjectKeyId) &gt; 0 {</code></span>
+<span class="codeline" id="line-119"><code>		keyId := string(cert.SubjectKeyId)</code></span>
+<span class="codeline" id="line-120"><code>		s.bySubjectKeyId[keyId] = append(s.bySubjectKeyId[keyId], n)</code></span>
+<span class="codeline" id="line-121"><code>	}</code></span>
+<span class="codeline" id="line-122"><code>	name := string(cert.RawSubject)</code></span>
+<span class="codeline" id="line-123"><code>	s.byName[name] = append(s.byName[name], n)</code></span>
+<span class="codeline" id="line-124"><code>}</code></span>
+<span class="codeline" id="line-125"><code></code></span>
+<span class="codeline" id="line-126"><code>// AppendCertsFromPEM attempts to parse a series of PEM encoded certificates.</code></span>
+<span class="codeline" id="line-127"><code>// It appends any certificates found to s and reports whether any certificates</code></span>
+<span class="codeline" id="line-128"><code>// were successfully parsed.</code></span>
+<span class="codeline" id="line-129"><code>//</code></span>
+<span class="codeline" id="line-130"><code>// On many Linux systems, /etc/ssl/cert.pem will contain the system wide set</code></span>
+<span class="codeline" id="line-131"><code>// of root CAs in a format suitable for this function.</code></span>
+<span class="codeline" id="line-132"><code>func (s *CertPool) AppendCertsFromPEM(pemCerts []byte) (ok bool) {</code></span>
+<span class="codeline" id="line-133"><code>	for len(pemCerts) &gt; 0 {</code></span>
+<span class="codeline" id="line-134"><code>		var block *pem.Block</code></span>
+<span class="codeline" id="line-135"><code>		block, pemCerts = pem.Decode(pemCerts)</code></span>
+<span class="codeline" id="line-136"><code>		if block == nil {</code></span>
+<span class="codeline" id="line-137"><code>			break</code></span>
+<span class="codeline" id="line-138"><code>		}</code></span>
+<span class="codeline" id="line-139"><code>		if block.Type != "CERTIFICATE" || len(block.Headers) != 0 {</code></span>
+<span class="codeline" id="line-140"><code>			continue</code></span>
+<span class="codeline" id="line-141"><code>		}</code></span>
+<span class="codeline" id="line-142"><code></code></span>
+<span class="codeline" id="line-143"><code>		cert, err := ParseCertificate(block.Bytes)</code></span>
+<span class="codeline" id="line-144"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-145"><code>			continue</code></span>
+<span class="codeline" id="line-146"><code>		}</code></span>
+<span class="codeline" id="line-147"><code></code></span>
+<span class="codeline" id="line-148"><code>		s.AddCert(cert)</code></span>
+<span class="codeline" id="line-149"><code>		ok = true</code></span>
+<span class="codeline" id="line-150"><code>	}</code></span>
+<span class="codeline" id="line-151"><code></code></span>
+<span class="codeline" id="line-152"><code>	return</code></span>
+<span class="codeline" id="line-153"><code>}</code></span>
+<span class="codeline" id="line-154"><code></code></span>
+<span class="codeline" id="line-155"><code>// Subjects returns a list of the DER-encoded subjects of</code></span>
+<span class="codeline" id="line-156"><code>// all of the certificates in the pool.</code></span>
+<span class="codeline" id="line-157"><code>func (s *CertPool) Subjects() [][]byte {</code></span>
+<span class="codeline" id="line-158"><code>	res := make([][]byte, len(s.certs))</code></span>
+<span class="codeline" id="line-159"><code>	for i, c := range s.certs {</code></span>
+<span class="codeline" id="line-160"><code>		res[i] = c.RawSubject</code></span>
+<span class="codeline" id="line-161"><code>	}</code></span>
+<span class="codeline" id="line-162"><code>	return res</code></span>
+<span class="codeline" id="line-163"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

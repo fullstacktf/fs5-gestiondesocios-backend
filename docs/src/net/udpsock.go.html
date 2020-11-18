@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: udpsock.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	udpsock.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package net</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"context"</code></span>
+<span class="codeline" id="line-9"><code>	"syscall"</code></span>
+<span class="codeline" id="line-10"><code>)</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>// BUG(mikio): On Plan 9, the ReadMsgUDP and</code></span>
+<span class="codeline" id="line-13"><code>// WriteMsgUDP methods of UDPConn are not implemented.</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>// BUG(mikio): On Windows, the File method of UDPConn is not</code></span>
+<span class="codeline" id="line-16"><code>// implemented.</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>// BUG(mikio): On JS, methods and functions related to UDPConn are not</code></span>
+<span class="codeline" id="line-19"><code>// implemented.</code></span>
+<span class="codeline" id="line-20"><code></code></span>
+<span class="codeline" id="line-21"><code>// UDPAddr represents the address of a UDP end point.</code></span>
+<span class="codeline" id="line-22"><code>type UDPAddr struct {</code></span>
+<span class="codeline" id="line-23"><code>	IP   IP</code></span>
+<span class="codeline" id="line-24"><code>	Port int</code></span>
+<span class="codeline" id="line-25"><code>	Zone string // IPv6 scoped addressing zone</code></span>
+<span class="codeline" id="line-26"><code>}</code></span>
+<span class="codeline" id="line-27"><code></code></span>
+<span class="codeline" id="line-28"><code>// Network returns the address's network name, "udp".</code></span>
+<span class="codeline" id="line-29"><code>func (a *UDPAddr) Network() string { return "udp" }</code></span>
+<span class="codeline" id="line-30"><code></code></span>
+<span class="codeline" id="line-31"><code>func (a *UDPAddr) String() string {</code></span>
+<span class="codeline" id="line-32"><code>	if a == nil {</code></span>
+<span class="codeline" id="line-33"><code>		return "&lt;nil&gt;"</code></span>
+<span class="codeline" id="line-34"><code>	}</code></span>
+<span class="codeline" id="line-35"><code>	ip := ipEmptyString(a.IP)</code></span>
+<span class="codeline" id="line-36"><code>	if a.Zone != "" {</code></span>
+<span class="codeline" id="line-37"><code>		return JoinHostPort(ip+"%"+a.Zone, itoa(a.Port))</code></span>
+<span class="codeline" id="line-38"><code>	}</code></span>
+<span class="codeline" id="line-39"><code>	return JoinHostPort(ip, itoa(a.Port))</code></span>
+<span class="codeline" id="line-40"><code>}</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>func (a *UDPAddr) isWildcard() bool {</code></span>
+<span class="codeline" id="line-43"><code>	if a == nil || a.IP == nil {</code></span>
+<span class="codeline" id="line-44"><code>		return true</code></span>
+<span class="codeline" id="line-45"><code>	}</code></span>
+<span class="codeline" id="line-46"><code>	return a.IP.IsUnspecified()</code></span>
+<span class="codeline" id="line-47"><code>}</code></span>
+<span class="codeline" id="line-48"><code></code></span>
+<span class="codeline" id="line-49"><code>func (a *UDPAddr) opAddr() Addr {</code></span>
+<span class="codeline" id="line-50"><code>	if a == nil {</code></span>
+<span class="codeline" id="line-51"><code>		return nil</code></span>
+<span class="codeline" id="line-52"><code>	}</code></span>
+<span class="codeline" id="line-53"><code>	return a</code></span>
+<span class="codeline" id="line-54"><code>}</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>// ResolveUDPAddr returns an address of UDP end point.</code></span>
+<span class="codeline" id="line-57"><code>//</code></span>
+<span class="codeline" id="line-58"><code>// The network must be a UDP network name.</code></span>
+<span class="codeline" id="line-59"><code>//</code></span>
+<span class="codeline" id="line-60"><code>// If the host in the address parameter is not a literal IP address or</code></span>
+<span class="codeline" id="line-61"><code>// the port is not a literal port number, ResolveUDPAddr resolves the</code></span>
+<span class="codeline" id="line-62"><code>// address to an address of UDP end point.</code></span>
+<span class="codeline" id="line-63"><code>// Otherwise, it parses the address as a pair of literal IP address</code></span>
+<span class="codeline" id="line-64"><code>// and port number.</code></span>
+<span class="codeline" id="line-65"><code>// The address parameter can use a host name, but this is not</code></span>
+<span class="codeline" id="line-66"><code>// recommended, because it will return at most one of the host name's</code></span>
+<span class="codeline" id="line-67"><code>// IP addresses.</code></span>
+<span class="codeline" id="line-68"><code>//</code></span>
+<span class="codeline" id="line-69"><code>// See func Dial for a description of the network and address</code></span>
+<span class="codeline" id="line-70"><code>// parameters.</code></span>
+<span class="codeline" id="line-71"><code>func ResolveUDPAddr(network, address string) (*UDPAddr, error) {</code></span>
+<span class="codeline" id="line-72"><code>	switch network {</code></span>
+<span class="codeline" id="line-73"><code>	case "udp", "udp4", "udp6":</code></span>
+<span class="codeline" id="line-74"><code>	case "": // a hint wildcard for Go 1.0 undocumented behavior</code></span>
+<span class="codeline" id="line-75"><code>		network = "udp"</code></span>
+<span class="codeline" id="line-76"><code>	default:</code></span>
+<span class="codeline" id="line-77"><code>		return nil, UnknownNetworkError(network)</code></span>
+<span class="codeline" id="line-78"><code>	}</code></span>
+<span class="codeline" id="line-79"><code>	addrs, err := DefaultResolver.internetAddrList(context.Background(), network, address)</code></span>
+<span class="codeline" id="line-80"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-81"><code>		return nil, err</code></span>
+<span class="codeline" id="line-82"><code>	}</code></span>
+<span class="codeline" id="line-83"><code>	return addrs.forResolve(network, address).(*UDPAddr), nil</code></span>
+<span class="codeline" id="line-84"><code>}</code></span>
+<span class="codeline" id="line-85"><code></code></span>
+<span class="codeline" id="line-86"><code>// UDPConn is the implementation of the Conn and PacketConn interfaces</code></span>
+<span class="codeline" id="line-87"><code>// for UDP network connections.</code></span>
+<span class="codeline" id="line-88"><code>type UDPConn struct {</code></span>
+<span class="codeline" id="line-89"><code>	conn</code></span>
+<span class="codeline" id="line-90"><code>}</code></span>
+<span class="codeline" id="line-91"><code></code></span>
+<span class="codeline" id="line-92"><code>// SyscallConn returns a raw network connection.</code></span>
+<span class="codeline" id="line-93"><code>// This implements the syscall.Conn interface.</code></span>
+<span class="codeline" id="line-94"><code>func (c *UDPConn) SyscallConn() (syscall.RawConn, error) {</code></span>
+<span class="codeline" id="line-95"><code>	if !c.ok() {</code></span>
+<span class="codeline" id="line-96"><code>		return nil, syscall.EINVAL</code></span>
+<span class="codeline" id="line-97"><code>	}</code></span>
+<span class="codeline" id="line-98"><code>	return newRawConn(c.fd)</code></span>
+<span class="codeline" id="line-99"><code>}</code></span>
+<span class="codeline" id="line-100"><code></code></span>
+<span class="codeline" id="line-101"><code>// ReadFromUDP acts like ReadFrom but returns a UDPAddr.</code></span>
+<span class="codeline" id="line-102"><code>func (c *UDPConn) ReadFromUDP(b []byte) (int, *UDPAddr, error) {</code></span>
+<span class="codeline" id="line-103"><code>	if !c.ok() {</code></span>
+<span class="codeline" id="line-104"><code>		return 0, nil, syscall.EINVAL</code></span>
+<span class="codeline" id="line-105"><code>	}</code></span>
+<span class="codeline" id="line-106"><code>	n, addr, err := c.readFrom(b)</code></span>
+<span class="codeline" id="line-107"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-108"><code>		err = &amp;OpError{Op: "read", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}</code></span>
+<span class="codeline" id="line-109"><code>	}</code></span>
+<span class="codeline" id="line-110"><code>	return n, addr, err</code></span>
+<span class="codeline" id="line-111"><code>}</code></span>
+<span class="codeline" id="line-112"><code></code></span>
+<span class="codeline" id="line-113"><code>// ReadFrom implements the PacketConn ReadFrom method.</code></span>
+<span class="codeline" id="line-114"><code>func (c *UDPConn) ReadFrom(b []byte) (int, Addr, error) {</code></span>
+<span class="codeline" id="line-115"><code>	if !c.ok() {</code></span>
+<span class="codeline" id="line-116"><code>		return 0, nil, syscall.EINVAL</code></span>
+<span class="codeline" id="line-117"><code>	}</code></span>
+<span class="codeline" id="line-118"><code>	n, addr, err := c.readFrom(b)</code></span>
+<span class="codeline" id="line-119"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-120"><code>		err = &amp;OpError{Op: "read", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}</code></span>
+<span class="codeline" id="line-121"><code>	}</code></span>
+<span class="codeline" id="line-122"><code>	if addr == nil {</code></span>
+<span class="codeline" id="line-123"><code>		return n, nil, err</code></span>
+<span class="codeline" id="line-124"><code>	}</code></span>
+<span class="codeline" id="line-125"><code>	return n, addr, err</code></span>
+<span class="codeline" id="line-126"><code>}</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>// ReadMsgUDP reads a message from c, copying the payload into b and</code></span>
+<span class="codeline" id="line-129"><code>// the associated out-of-band data into oob. It returns the number of</code></span>
+<span class="codeline" id="line-130"><code>// bytes copied into b, the number of bytes copied into oob, the flags</code></span>
+<span class="codeline" id="line-131"><code>// that were set on the message and the source address of the message.</code></span>
+<span class="codeline" id="line-132"><code>//</code></span>
+<span class="codeline" id="line-133"><code>// The packages golang.org/x/net/ipv4 and golang.org/x/net/ipv6 can be</code></span>
+<span class="codeline" id="line-134"><code>// used to manipulate IP-level socket options in oob.</code></span>
+<span class="codeline" id="line-135"><code>func (c *UDPConn) ReadMsgUDP(b, oob []byte) (n, oobn, flags int, addr *UDPAddr, err error) {</code></span>
+<span class="codeline" id="line-136"><code>	if !c.ok() {</code></span>
+<span class="codeline" id="line-137"><code>		return 0, 0, 0, nil, syscall.EINVAL</code></span>
+<span class="codeline" id="line-138"><code>	}</code></span>
+<span class="codeline" id="line-139"><code>	n, oobn, flags, addr, err = c.readMsg(b, oob)</code></span>
+<span class="codeline" id="line-140"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-141"><code>		err = &amp;OpError{Op: "read", Net: c.fd.net, Source: c.fd.laddr, Addr: c.fd.raddr, Err: err}</code></span>
+<span class="codeline" id="line-142"><code>	}</code></span>
+<span class="codeline" id="line-143"><code>	return</code></span>
+<span class="codeline" id="line-144"><code>}</code></span>
+<span class="codeline" id="line-145"><code></code></span>
+<span class="codeline" id="line-146"><code>// WriteToUDP acts like WriteTo but takes a UDPAddr.</code></span>
+<span class="codeline" id="line-147"><code>func (c *UDPConn) WriteToUDP(b []byte, addr *UDPAddr) (int, error) {</code></span>
+<span class="codeline" id="line-148"><code>	if !c.ok() {</code></span>
+<span class="codeline" id="line-149"><code>		return 0, syscall.EINVAL</code></span>
+<span class="codeline" id="line-150"><code>	}</code></span>
+<span class="codeline" id="line-151"><code>	n, err := c.writeTo(b, addr)</code></span>
+<span class="codeline" id="line-152"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-153"><code>		err = &amp;OpError{Op: "write", Net: c.fd.net, Source: c.fd.laddr, Addr: addr.opAddr(), Err: err}</code></span>
+<span class="codeline" id="line-154"><code>	}</code></span>
+<span class="codeline" id="line-155"><code>	return n, err</code></span>
+<span class="codeline" id="line-156"><code>}</code></span>
+<span class="codeline" id="line-157"><code></code></span>
+<span class="codeline" id="line-158"><code>// WriteTo implements the PacketConn WriteTo method.</code></span>
+<span class="codeline" id="line-159"><code>func (c *UDPConn) WriteTo(b []byte, addr Addr) (int, error) {</code></span>
+<span class="codeline" id="line-160"><code>	if !c.ok() {</code></span>
+<span class="codeline" id="line-161"><code>		return 0, syscall.EINVAL</code></span>
+<span class="codeline" id="line-162"><code>	}</code></span>
+<span class="codeline" id="line-163"><code>	a, ok := addr.(*UDPAddr)</code></span>
+<span class="codeline" id="line-164"><code>	if !ok {</code></span>
+<span class="codeline" id="line-165"><code>		return 0, &amp;OpError{Op: "write", Net: c.fd.net, Source: c.fd.laddr, Addr: addr, Err: syscall.EINVAL}</code></span>
+<span class="codeline" id="line-166"><code>	}</code></span>
+<span class="codeline" id="line-167"><code>	n, err := c.writeTo(b, a)</code></span>
+<span class="codeline" id="line-168"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-169"><code>		err = &amp;OpError{Op: "write", Net: c.fd.net, Source: c.fd.laddr, Addr: a.opAddr(), Err: err}</code></span>
+<span class="codeline" id="line-170"><code>	}</code></span>
+<span class="codeline" id="line-171"><code>	return n, err</code></span>
+<span class="codeline" id="line-172"><code>}</code></span>
+<span class="codeline" id="line-173"><code></code></span>
+<span class="codeline" id="line-174"><code>// WriteMsgUDP writes a message to addr via c if c isn't connected, or</code></span>
+<span class="codeline" id="line-175"><code>// to c's remote address if c is connected (in which case addr must be</code></span>
+<span class="codeline" id="line-176"><code>// nil). The payload is copied from b and the associated out-of-band</code></span>
+<span class="codeline" id="line-177"><code>// data is copied from oob. It returns the number of payload and</code></span>
+<span class="codeline" id="line-178"><code>// out-of-band bytes written.</code></span>
+<span class="codeline" id="line-179"><code>//</code></span>
+<span class="codeline" id="line-180"><code>// The packages golang.org/x/net/ipv4 and golang.org/x/net/ipv6 can be</code></span>
+<span class="codeline" id="line-181"><code>// used to manipulate IP-level socket options in oob.</code></span>
+<span class="codeline" id="line-182"><code>func (c *UDPConn) WriteMsgUDP(b, oob []byte, addr *UDPAddr) (n, oobn int, err error) {</code></span>
+<span class="codeline" id="line-183"><code>	if !c.ok() {</code></span>
+<span class="codeline" id="line-184"><code>		return 0, 0, syscall.EINVAL</code></span>
+<span class="codeline" id="line-185"><code>	}</code></span>
+<span class="codeline" id="line-186"><code>	n, oobn, err = c.writeMsg(b, oob, addr)</code></span>
+<span class="codeline" id="line-187"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-188"><code>		err = &amp;OpError{Op: "write", Net: c.fd.net, Source: c.fd.laddr, Addr: addr.opAddr(), Err: err}</code></span>
+<span class="codeline" id="line-189"><code>	}</code></span>
+<span class="codeline" id="line-190"><code>	return</code></span>
+<span class="codeline" id="line-191"><code>}</code></span>
+<span class="codeline" id="line-192"><code></code></span>
+<span class="codeline" id="line-193"><code>func newUDPConn(fd *netFD) *UDPConn { return &amp;UDPConn{conn{fd}} }</code></span>
+<span class="codeline" id="line-194"><code></code></span>
+<span class="codeline" id="line-195"><code>// DialUDP acts like Dial for UDP networks.</code></span>
+<span class="codeline" id="line-196"><code>//</code></span>
+<span class="codeline" id="line-197"><code>// The network must be a UDP network name; see func Dial for details.</code></span>
+<span class="codeline" id="line-198"><code>//</code></span>
+<span class="codeline" id="line-199"><code>// If laddr is nil, a local address is automatically chosen.</code></span>
+<span class="codeline" id="line-200"><code>// If the IP field of raddr is nil or an unspecified IP address, the</code></span>
+<span class="codeline" id="line-201"><code>// local system is assumed.</code></span>
+<span class="codeline" id="line-202"><code>func DialUDP(network string, laddr, raddr *UDPAddr) (*UDPConn, error) {</code></span>
+<span class="codeline" id="line-203"><code>	switch network {</code></span>
+<span class="codeline" id="line-204"><code>	case "udp", "udp4", "udp6":</code></span>
+<span class="codeline" id="line-205"><code>	default:</code></span>
+<span class="codeline" id="line-206"><code>		return nil, &amp;OpError{Op: "dial", Net: network, Source: laddr.opAddr(), Addr: raddr.opAddr(), Err: UnknownNetworkError(network)}</code></span>
+<span class="codeline" id="line-207"><code>	}</code></span>
+<span class="codeline" id="line-208"><code>	if raddr == nil {</code></span>
+<span class="codeline" id="line-209"><code>		return nil, &amp;OpError{Op: "dial", Net: network, Source: laddr.opAddr(), Addr: nil, Err: errMissingAddress}</code></span>
+<span class="codeline" id="line-210"><code>	}</code></span>
+<span class="codeline" id="line-211"><code>	sd := &amp;sysDialer{network: network, address: raddr.String()}</code></span>
+<span class="codeline" id="line-212"><code>	c, err := sd.dialUDP(context.Background(), laddr, raddr)</code></span>
+<span class="codeline" id="line-213"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-214"><code>		return nil, &amp;OpError{Op: "dial", Net: network, Source: laddr.opAddr(), Addr: raddr.opAddr(), Err: err}</code></span>
+<span class="codeline" id="line-215"><code>	}</code></span>
+<span class="codeline" id="line-216"><code>	return c, nil</code></span>
+<span class="codeline" id="line-217"><code>}</code></span>
+<span class="codeline" id="line-218"><code></code></span>
+<span class="codeline" id="line-219"><code>// ListenUDP acts like ListenPacket for UDP networks.</code></span>
+<span class="codeline" id="line-220"><code>//</code></span>
+<span class="codeline" id="line-221"><code>// The network must be a UDP network name; see func Dial for details.</code></span>
+<span class="codeline" id="line-222"><code>//</code></span>
+<span class="codeline" id="line-223"><code>// If the IP field of laddr is nil or an unspecified IP address,</code></span>
+<span class="codeline" id="line-224"><code>// ListenUDP listens on all available IP addresses of the local system</code></span>
+<span class="codeline" id="line-225"><code>// except multicast IP addresses.</code></span>
+<span class="codeline" id="line-226"><code>// If the Port field of laddr is 0, a port number is automatically</code></span>
+<span class="codeline" id="line-227"><code>// chosen.</code></span>
+<span class="codeline" id="line-228"><code>func ListenUDP(network string, laddr *UDPAddr) (*UDPConn, error) {</code></span>
+<span class="codeline" id="line-229"><code>	switch network {</code></span>
+<span class="codeline" id="line-230"><code>	case "udp", "udp4", "udp6":</code></span>
+<span class="codeline" id="line-231"><code>	default:</code></span>
+<span class="codeline" id="line-232"><code>		return nil, &amp;OpError{Op: "listen", Net: network, Source: nil, Addr: laddr.opAddr(), Err: UnknownNetworkError(network)}</code></span>
+<span class="codeline" id="line-233"><code>	}</code></span>
+<span class="codeline" id="line-234"><code>	if laddr == nil {</code></span>
+<span class="codeline" id="line-235"><code>		laddr = &amp;UDPAddr{}</code></span>
+<span class="codeline" id="line-236"><code>	}</code></span>
+<span class="codeline" id="line-237"><code>	sl := &amp;sysListener{network: network, address: laddr.String()}</code></span>
+<span class="codeline" id="line-238"><code>	c, err := sl.listenUDP(context.Background(), laddr)</code></span>
+<span class="codeline" id="line-239"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-240"><code>		return nil, &amp;OpError{Op: "listen", Net: network, Source: nil, Addr: laddr.opAddr(), Err: err}</code></span>
+<span class="codeline" id="line-241"><code>	}</code></span>
+<span class="codeline" id="line-242"><code>	return c, nil</code></span>
+<span class="codeline" id="line-243"><code>}</code></span>
+<span class="codeline" id="line-244"><code></code></span>
+<span class="codeline" id="line-245"><code>// ListenMulticastUDP acts like ListenPacket for UDP networks but</code></span>
+<span class="codeline" id="line-246"><code>// takes a group address on a specific network interface.</code></span>
+<span class="codeline" id="line-247"><code>//</code></span>
+<span class="codeline" id="line-248"><code>// The network must be a UDP network name; see func Dial for details.</code></span>
+<span class="codeline" id="line-249"><code>//</code></span>
+<span class="codeline" id="line-250"><code>// ListenMulticastUDP listens on all available IP addresses of the</code></span>
+<span class="codeline" id="line-251"><code>// local system including the group, multicast IP address.</code></span>
+<span class="codeline" id="line-252"><code>// If ifi is nil, ListenMulticastUDP uses the system-assigned</code></span>
+<span class="codeline" id="line-253"><code>// multicast interface, although this is not recommended because the</code></span>
+<span class="codeline" id="line-254"><code>// assignment depends on platforms and sometimes it might require</code></span>
+<span class="codeline" id="line-255"><code>// routing configuration.</code></span>
+<span class="codeline" id="line-256"><code>// If the Port field of gaddr is 0, a port number is automatically</code></span>
+<span class="codeline" id="line-257"><code>// chosen.</code></span>
+<span class="codeline" id="line-258"><code>//</code></span>
+<span class="codeline" id="line-259"><code>// ListenMulticastUDP is just for convenience of simple, small</code></span>
+<span class="codeline" id="line-260"><code>// applications. There are golang.org/x/net/ipv4 and</code></span>
+<span class="codeline" id="line-261"><code>// golang.org/x/net/ipv6 packages for general purpose uses.</code></span>
+<span class="codeline" id="line-262"><code>func ListenMulticastUDP(network string, ifi *Interface, gaddr *UDPAddr) (*UDPConn, error) {</code></span>
+<span class="codeline" id="line-263"><code>	switch network {</code></span>
+<span class="codeline" id="line-264"><code>	case "udp", "udp4", "udp6":</code></span>
+<span class="codeline" id="line-265"><code>	default:</code></span>
+<span class="codeline" id="line-266"><code>		return nil, &amp;OpError{Op: "listen", Net: network, Source: nil, Addr: gaddr.opAddr(), Err: UnknownNetworkError(network)}</code></span>
+<span class="codeline" id="line-267"><code>	}</code></span>
+<span class="codeline" id="line-268"><code>	if gaddr == nil || gaddr.IP == nil {</code></span>
+<span class="codeline" id="line-269"><code>		return nil, &amp;OpError{Op: "listen", Net: network, Source: nil, Addr: gaddr.opAddr(), Err: errMissingAddress}</code></span>
+<span class="codeline" id="line-270"><code>	}</code></span>
+<span class="codeline" id="line-271"><code>	sl := &amp;sysListener{network: network, address: gaddr.String()}</code></span>
+<span class="codeline" id="line-272"><code>	c, err := sl.listenMulticastUDP(context.Background(), ifi, gaddr)</code></span>
+<span class="codeline" id="line-273"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-274"><code>		return nil, &amp;OpError{Op: "listen", Net: network, Source: nil, Addr: gaddr.opAddr(), Err: err}</code></span>
+<span class="codeline" id="line-275"><code>	}</code></span>
+<span class="codeline" id="line-276"><code>	return c, nil</code></span>
+<span class="codeline" id="line-277"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

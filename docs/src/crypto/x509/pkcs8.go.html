@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: pkcs8.go in package crypto/x509</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	pkcs8.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/x509.html">crypto/x509</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package x509</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"crypto/ecdsa"</code></span>
+<span class="codeline" id="line-9"><code>	"crypto/ed25519"</code></span>
+<span class="codeline" id="line-10"><code>	"crypto/rsa"</code></span>
+<span class="codeline" id="line-11"><code>	"crypto/x509/pkix"</code></span>
+<span class="codeline" id="line-12"><code>	"encoding/asn1"</code></span>
+<span class="codeline" id="line-13"><code>	"errors"</code></span>
+<span class="codeline" id="line-14"><code>	"fmt"</code></span>
+<span class="codeline" id="line-15"><code>)</code></span>
+<span class="codeline" id="line-16"><code></code></span>
+<span class="codeline" id="line-17"><code>// pkcs8 reflects an ASN.1, PKCS #8 PrivateKey. See</code></span>
+<span class="codeline" id="line-18"><code>// ftp://ftp.rsasecurity.com/pub/pkcs/pkcs-8/pkcs-8v1_2.asn</code></span>
+<span class="codeline" id="line-19"><code>// and RFC 5208.</code></span>
+<span class="codeline" id="line-20"><code>type pkcs8 struct {</code></span>
+<span class="codeline" id="line-21"><code>	Version    int</code></span>
+<span class="codeline" id="line-22"><code>	Algo       pkix.AlgorithmIdentifier</code></span>
+<span class="codeline" id="line-23"><code>	PrivateKey []byte</code></span>
+<span class="codeline" id="line-24"><code>	// optional attributes omitted.</code></span>
+<span class="codeline" id="line-25"><code>}</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>// ParsePKCS8PrivateKey parses an unencrypted private key in PKCS #8, ASN.1 DER form.</code></span>
+<span class="codeline" id="line-28"><code>//</code></span>
+<span class="codeline" id="line-29"><code>// It returns a *rsa.PrivateKey, a *ecdsa.PrivateKey, or a ed25519.PrivateKey.</code></span>
+<span class="codeline" id="line-30"><code>// More types might be supported in the future.</code></span>
+<span class="codeline" id="line-31"><code>//</code></span>
+<span class="codeline" id="line-32"><code>// This kind of key is commonly encoded in PEM blocks of type "PRIVATE KEY".</code></span>
+<span class="codeline" id="line-33"><code>func ParsePKCS8PrivateKey(der []byte) (key interface{}, err error) {</code></span>
+<span class="codeline" id="line-34"><code>	var privKey pkcs8</code></span>
+<span class="codeline" id="line-35"><code>	if _, err := asn1.Unmarshal(der, &amp;privKey); err != nil {</code></span>
+<span class="codeline" id="line-36"><code>		if _, err := asn1.Unmarshal(der, &amp;ecPrivateKey{}); err == nil {</code></span>
+<span class="codeline" id="line-37"><code>			return nil, errors.New("x509: failed to parse private key (use ParseECPrivateKey instead for this key format)")</code></span>
+<span class="codeline" id="line-38"><code>		}</code></span>
+<span class="codeline" id="line-39"><code>		if _, err := asn1.Unmarshal(der, &amp;pkcs1PrivateKey{}); err == nil {</code></span>
+<span class="codeline" id="line-40"><code>			return nil, errors.New("x509: failed to parse private key (use ParsePKCS1PrivateKey instead for this key format)")</code></span>
+<span class="codeline" id="line-41"><code>		}</code></span>
+<span class="codeline" id="line-42"><code>		return nil, err</code></span>
+<span class="codeline" id="line-43"><code>	}</code></span>
+<span class="codeline" id="line-44"><code>	switch {</code></span>
+<span class="codeline" id="line-45"><code>	case privKey.Algo.Algorithm.Equal(oidPublicKeyRSA):</code></span>
+<span class="codeline" id="line-46"><code>		key, err = ParsePKCS1PrivateKey(privKey.PrivateKey)</code></span>
+<span class="codeline" id="line-47"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-48"><code>			return nil, errors.New("x509: failed to parse RSA private key embedded in PKCS#8: " + err.Error())</code></span>
+<span class="codeline" id="line-49"><code>		}</code></span>
+<span class="codeline" id="line-50"><code>		return key, nil</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>	case privKey.Algo.Algorithm.Equal(oidPublicKeyECDSA):</code></span>
+<span class="codeline" id="line-53"><code>		bytes := privKey.Algo.Parameters.FullBytes</code></span>
+<span class="codeline" id="line-54"><code>		namedCurveOID := new(asn1.ObjectIdentifier)</code></span>
+<span class="codeline" id="line-55"><code>		if _, err := asn1.Unmarshal(bytes, namedCurveOID); err != nil {</code></span>
+<span class="codeline" id="line-56"><code>			namedCurveOID = nil</code></span>
+<span class="codeline" id="line-57"><code>		}</code></span>
+<span class="codeline" id="line-58"><code>		key, err = parseECPrivateKey(namedCurveOID, privKey.PrivateKey)</code></span>
+<span class="codeline" id="line-59"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-60"><code>			return nil, errors.New("x509: failed to parse EC private key embedded in PKCS#8: " + err.Error())</code></span>
+<span class="codeline" id="line-61"><code>		}</code></span>
+<span class="codeline" id="line-62"><code>		return key, nil</code></span>
+<span class="codeline" id="line-63"><code></code></span>
+<span class="codeline" id="line-64"><code>	case privKey.Algo.Algorithm.Equal(oidPublicKeyEd25519):</code></span>
+<span class="codeline" id="line-65"><code>		if l := len(privKey.Algo.Parameters.FullBytes); l != 0 {</code></span>
+<span class="codeline" id="line-66"><code>			return nil, errors.New("x509: invalid Ed25519 private key parameters")</code></span>
+<span class="codeline" id="line-67"><code>		}</code></span>
+<span class="codeline" id="line-68"><code>		var curvePrivateKey []byte</code></span>
+<span class="codeline" id="line-69"><code>		if _, err := asn1.Unmarshal(privKey.PrivateKey, &amp;curvePrivateKey); err != nil {</code></span>
+<span class="codeline" id="line-70"><code>			return nil, fmt.Errorf("x509: invalid Ed25519 private key: %v", err)</code></span>
+<span class="codeline" id="line-71"><code>		}</code></span>
+<span class="codeline" id="line-72"><code>		if l := len(curvePrivateKey); l != ed25519.SeedSize {</code></span>
+<span class="codeline" id="line-73"><code>			return nil, fmt.Errorf("x509: invalid Ed25519 private key length: %d", l)</code></span>
+<span class="codeline" id="line-74"><code>		}</code></span>
+<span class="codeline" id="line-75"><code>		return ed25519.NewKeyFromSeed(curvePrivateKey), nil</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>	default:</code></span>
+<span class="codeline" id="line-78"><code>		return nil, fmt.Errorf("x509: PKCS#8 wrapping contained private key with unknown algorithm: %v", privKey.Algo.Algorithm)</code></span>
+<span class="codeline" id="line-79"><code>	}</code></span>
+<span class="codeline" id="line-80"><code>}</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>// MarshalPKCS8PrivateKey converts a private key to PKCS #8, ASN.1 DER form.</code></span>
+<span class="codeline" id="line-83"><code>//</code></span>
+<span class="codeline" id="line-84"><code>// The following key types are currently supported: *rsa.PrivateKey, *ecdsa.PrivateKey</code></span>
+<span class="codeline" id="line-85"><code>// and ed25519.PrivateKey. Unsupported key types result in an error.</code></span>
+<span class="codeline" id="line-86"><code>//</code></span>
+<span class="codeline" id="line-87"><code>// This kind of key is commonly encoded in PEM blocks of type "PRIVATE KEY".</code></span>
+<span class="codeline" id="line-88"><code>func MarshalPKCS8PrivateKey(key interface{}) ([]byte, error) {</code></span>
+<span class="codeline" id="line-89"><code>	var privKey pkcs8</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>	switch k := key.(type) {</code></span>
+<span class="codeline" id="line-92"><code>	case *rsa.PrivateKey:</code></span>
+<span class="codeline" id="line-93"><code>		privKey.Algo = pkix.AlgorithmIdentifier{</code></span>
+<span class="codeline" id="line-94"><code>			Algorithm:  oidPublicKeyRSA,</code></span>
+<span class="codeline" id="line-95"><code>			Parameters: asn1.NullRawValue,</code></span>
+<span class="codeline" id="line-96"><code>		}</code></span>
+<span class="codeline" id="line-97"><code>		privKey.PrivateKey = MarshalPKCS1PrivateKey(k)</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>	case *ecdsa.PrivateKey:</code></span>
+<span class="codeline" id="line-100"><code>		oid, ok := oidFromNamedCurve(k.Curve)</code></span>
+<span class="codeline" id="line-101"><code>		if !ok {</code></span>
+<span class="codeline" id="line-102"><code>			return nil, errors.New("x509: unknown curve while marshaling to PKCS#8")</code></span>
+<span class="codeline" id="line-103"><code>		}</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>		oidBytes, err := asn1.Marshal(oid)</code></span>
+<span class="codeline" id="line-106"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-107"><code>			return nil, errors.New("x509: failed to marshal curve OID: " + err.Error())</code></span>
+<span class="codeline" id="line-108"><code>		}</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>		privKey.Algo = pkix.AlgorithmIdentifier{</code></span>
+<span class="codeline" id="line-111"><code>			Algorithm: oidPublicKeyECDSA,</code></span>
+<span class="codeline" id="line-112"><code>			Parameters: asn1.RawValue{</code></span>
+<span class="codeline" id="line-113"><code>				FullBytes: oidBytes,</code></span>
+<span class="codeline" id="line-114"><code>			},</code></span>
+<span class="codeline" id="line-115"><code>		}</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>		if privKey.PrivateKey, err = marshalECPrivateKeyWithOID(k, nil); err != nil {</code></span>
+<span class="codeline" id="line-118"><code>			return nil, errors.New("x509: failed to marshal EC private key while building PKCS#8: " + err.Error())</code></span>
+<span class="codeline" id="line-119"><code>		}</code></span>
+<span class="codeline" id="line-120"><code></code></span>
+<span class="codeline" id="line-121"><code>	case ed25519.PrivateKey:</code></span>
+<span class="codeline" id="line-122"><code>		privKey.Algo = pkix.AlgorithmIdentifier{</code></span>
+<span class="codeline" id="line-123"><code>			Algorithm: oidPublicKeyEd25519,</code></span>
+<span class="codeline" id="line-124"><code>		}</code></span>
+<span class="codeline" id="line-125"><code>		curvePrivateKey, err := asn1.Marshal(k.Seed())</code></span>
+<span class="codeline" id="line-126"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-127"><code>			return nil, fmt.Errorf("x509: failed to marshal private key: %v", err)</code></span>
+<span class="codeline" id="line-128"><code>		}</code></span>
+<span class="codeline" id="line-129"><code>		privKey.PrivateKey = curvePrivateKey</code></span>
+<span class="codeline" id="line-130"><code></code></span>
+<span class="codeline" id="line-131"><code>	default:</code></span>
+<span class="codeline" id="line-132"><code>		return nil, fmt.Errorf("x509: unknown key type while marshaling PKCS#8: %T", key)</code></span>
+<span class="codeline" id="line-133"><code>	}</code></span>
+<span class="codeline" id="line-134"><code></code></span>
+<span class="codeline" id="line-135"><code>	return asn1.Marshal(privKey)</code></span>
+<span class="codeline" id="line-136"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

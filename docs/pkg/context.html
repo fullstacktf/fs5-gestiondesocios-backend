@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: context</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>context</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-context">context</a><i> (on <a href="https://golang.org/pkg/context/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/context" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/context.html">5 packages</a>, and imported by <a href="../dep/context.html#imported-by">13 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../src/context/context.go.html#doc">d-&gt;</a> <a href="../src/context/context.go.html">context.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-CancelFunc" data-popularity="225">	 type <a href="../src/context/context.go.html#line-224">CancelFunc</a> <i>(func)</i>
+		A CancelFunc tells an operation to abandon its work.
+		A CancelFunc does not wait for the work to stop.
+		A CancelFunc may be called by multiple goroutines simultaneously.
+		After the first call, subsequent calls to a CancelFunc do nothing.
+
+		<input type='checkbox' class="stat" id="CancelFunc-stat-results"><label for="CancelFunc-stat-results">As Outputs Of (3+)</label><span id='CancelFunc-stat-results-content' class="stat-content">
+			func <a href="#name-WithCancel">WithCancel</a>(parent <a href="#name-Context">Context</a>) (ctx <a href="#name-Context">Context</a>, cancel <b>CancelFunc</b>)
+			func <a href="#name-WithDeadline">WithDeadline</a>(parent <a href="#name-Context">Context</a>, d <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) (<a href="#name-Context">Context</a>, <b>CancelFunc</b>)
+			func <a href="#name-WithTimeout">WithTimeout</a>(parent <a href="#name-Context">Context</a>, timeout <a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a>) (<a href="#name-Context">Context</a>, <b>CancelFunc</b>)</span></div>
+<div class="anchor" id="name-Context" data-popularity="3355">	 type <a href="../src/context/context.go.html#line-62">Context</a> <b<i>(interface)</i></b>
+		A Context carries a deadline, a cancellation signal, and other values across
+		API boundaries.
+
+		Context's methods may be called by multiple goroutines simultaneously.
+
+		<input type='checkbox' class="stat" id="Context-stat-methods"><label for="Context-stat-methods">Exported Methods (4)</label><span id='Context-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/context/context.go.html#line-66">Deadline</a>() (deadline <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>, ok <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/context/context.go.html#line-99">Done</a>() &lt;-chan struct{}
+			 (T) <a href="../src/context/context.go.html#line-106">Err</a>() <a href="builtin.html#name-error">error</a>
+			 (T) <a href="../src/context/context.go.html#line-153">Value</a>(key interface{}) interface{}</span>
+		<input type='checkbox' class="stat" id="Context-stat-results"><label for="Context-stat-results">As Outputs Of (8+)</label><span id='Context-stat-results-content' class="stat-content">
+			func <a href="#name-Background">Background</a>() <b>Context</b>
+			func <a href="#name-TODO">TODO</a>() <b>Context</b>
+			func <a href="#name-WithCancel">WithCancel</a>(parent <b>Context</b>) (ctx <b>Context</b>, cancel <a href="#name-CancelFunc">CancelFunc</a>)
+			func <a href="#name-WithDeadline">WithDeadline</a>(parent <b>Context</b>, d <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) (<b>Context</b>, <a href="#name-CancelFunc">CancelFunc</a>)
+			func <a href="#name-WithTimeout">WithTimeout</a>(parent <b>Context</b>, timeout <a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a>) (<b>Context</b>, <a href="#name-CancelFunc">CancelFunc</a>)
+			func <a href="#name-WithValue">WithValue</a>(parent <b>Context</b>, key, val interface{}) <b>Context</b>
+			func net/http.(*<a href="net/http.html#name-Request">Request</a>).<a href="../src/net/http/request.go.html#line-333">Context</a>() <b>Context</b>
+			func net/http/httptrace.<a href="net/http/httptrace.html#name-WithClientTrace">WithClientTrace</a>(ctx <b>Context</b>, trace *<a href="net/http/httptrace.html">httptrace</a>.<a href="net/http/httptrace.html#name-ClientTrace">ClientTrace</a>) <b>Context</b></span>
+		<input type='checkbox' class="stat" id="Context-stat-params"><label for="Context-stat-params">As Inputs Of (73+)</label><span id='Context-stat-params-content' class="stat-content">
+			func <a href="#name-WithCancel">WithCancel</a>(parent <b>Context</b>) (ctx <b>Context</b>, cancel <a href="#name-CancelFunc">CancelFunc</a>)
+			func <a href="#name-WithDeadline">WithDeadline</a>(parent <b>Context</b>, d <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) (<b>Context</b>, <a href="#name-CancelFunc">CancelFunc</a>)
+			func <a href="#name-WithTimeout">WithTimeout</a>(parent <b>Context</b>, timeout <a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a>) (<b>Context</b>, <a href="#name-CancelFunc">CancelFunc</a>)
+			func <a href="#name-WithValue">WithValue</a>(parent <b>Context</b>, key, val interface{}) <b>Context</b>
+			func crypto/tls.(*<a href="crypto/tls.html#name-Dialer">Dialer</a>).<a href="../src/crypto/tls/tls.go.html#line-247">DialContext</a>(ctx <b>Context</b>, network, addr <a href="builtin.html#name-string">string</a>) (<a href="net.html">net</a>.<a href="net.html#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Conn">Conn</a>).<a href="../src/database/sql/sql.go.html#line-1960">BeginTx</a>(ctx <b>Context</b>, opts *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-TxOptions">TxOptions</a>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Tx">Tx</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Conn">Conn</a>).<a href="../src/database/sql/sql.go.html#line-1872">ExecContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Result">Result</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Conn">Conn</a>).<a href="../src/database/sql/sql.go.html#line-1862">PingContext</a>(ctx <b>Context</b>) <a href="builtin.html#name-error">error</a>
+			func database/sql.(*<a href="database/sql.html#name-Conn">Conn</a>).<a href="../src/database/sql/sql.go.html#line-1909">PrepareContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Stmt">Stmt</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Conn">Conn</a>).<a href="../src/database/sql/sql.go.html#line-1882">QueryContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Rows">Rows</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Conn">Conn</a>).<a href="../src/database/sql/sql.go.html#line-1896">QueryRowContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Row">Row</a>
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-1723">BeginTx</a>(ctx <b>Context</b>, opts *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-TxOptions">TxOptions</a>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Tx">Tx</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-1799">Conn</a>(ctx <b>Context</b>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-1524">ExecContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Result">Result</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-794">PingContext</a>(ctx <b>Context</b>) <a href="builtin.html#name-error">error</a>
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-1451">PrepareContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Stmt">Stmt</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-1594">QueryContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Rows">Rows</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-DB">DB</a>).<a href="../src/database/sql/sql.go.html#line-1698">QueryRowContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Row">Row</a>
+			func database/sql.(*<a href="database/sql.html#name-Stmt">Stmt</a>).<a href="../src/database/sql/sql.go.html#line-2477">ExecContext</a>(ctx <b>Context</b>, args ...interface{}) (<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Result">Result</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Stmt">Stmt</a>).<a href="../src/database/sql/sql.go.html#line-2622">QueryContext</a>(ctx <b>Context</b>, args ...interface{}) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Rows">Rows</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Stmt">Stmt</a>).<a href="../src/database/sql/sql.go.html#line-2697">QueryRowContext</a>(ctx <b>Context</b>, args ...interface{}) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Row">Row</a>
+			func database/sql.(*<a href="database/sql.html#name-Tx">Tx</a>).<a href="../src/database/sql/sql.go.html#line-2354">ExecContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Result">Result</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Tx">Tx</a>).<a href="../src/database/sql/sql.go.html#line-2223">PrepareContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Stmt">Stmt</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Tx">Tx</a>).<a href="../src/database/sql/sql.go.html#line-2369">QueryContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Rows">Rows</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql.(*<a href="database/sql.html#name-Tx">Tx</a>).<a href="../src/database/sql/sql.go.html#line-2389">QueryRowContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Row">Row</a>
+			func database/sql.(*<a href="database/sql.html#name-Tx">Tx</a>).<a href="../src/database/sql/sql.go.html#line-2264">StmtContext</a>(ctx <b>Context</b>, stmt *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Stmt">Stmt</a>) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Stmt">Stmt</a>
+			func database/sql/driver.<a href="database/sql/driver.html#name-ConnBeginTx">ConnBeginTx</a>.<a href="../src/database/sql/driver/driver.go.html#line-286">BeginTx</a>(ctx <b>Context</b>, opts <a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-TxOptions">TxOptions</a>) (<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-Tx">Tx</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql/driver.<a href="database/sql/driver.html#name-Connector">Connector</a>.<a href="../src/database/sql/driver/driver.go.html#line-132">Connect</a>(<b>Context</b>) (<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql/driver.<a href="database/sql/driver.html#name-ConnPrepareContext">ConnPrepareContext</a>.<a href="../src/database/sql/driver/driver.go.html#line-255">PrepareContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>) (<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-Stmt">Stmt</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql/driver.<a href="database/sql/driver.html#name-ExecerContext">ExecerContext</a>.<a href="../src/database/sql/driver/driver.go.html#line-193">ExecContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args []<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-NamedValue">NamedValue</a>) (<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-Result">Result</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql/driver.<a href="database/sql/driver.html#name-Pinger">Pinger</a>.<a href="../src/database/sql/driver/driver.go.html#line-166">Ping</a>(ctx <b>Context</b>) <a href="builtin.html#name-error">error</a>
+			func database/sql/driver.<a href="database/sql/driver.html#name-QueryerContext">QueryerContext</a>.<a href="../src/database/sql/driver/driver.go.html#line-220">QueryContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args []<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-NamedValue">NamedValue</a>) (<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-Rows">Rows</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql/driver.<a href="database/sql/driver.html#name-SessionResetter">SessionResetter</a>.<a href="../src/database/sql/driver/driver.go.html#line-295">ResetSession</a>(ctx <b>Context</b>) <a href="builtin.html#name-error">error</a>
+			func database/sql/driver.<a href="database/sql/driver.html#name-StmtExecContext">StmtExecContext</a>.<a href="../src/database/sql/driver/driver.go.html#line-363">ExecContext</a>(ctx <b>Context</b>, args []<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-NamedValue">NamedValue</a>) (<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-Result">Result</a>, <a href="builtin.html#name-error">error</a>)
+			func database/sql/driver.<a href="database/sql/driver.html#name-StmtQueryContext">StmtQueryContext</a>.<a href="../src/database/sql/driver/driver.go.html#line-372">QueryContext</a>(ctx <b>Context</b>, args []<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-NamedValue">NamedValue</a>) (<a href="database/sql/driver.html">driver</a>.<a href="database/sql/driver.html#name-Rows">Rows</a>, <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../src/gorm.io/gorm/interfaces.go.html#line-32">ExecContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Result">Result</a>, <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../src/gorm.io/gorm/interfaces.go.html#line-31">PrepareContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Stmt">Stmt</a>, <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../src/gorm.io/gorm/interfaces.go.html#line-33">QueryContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Rows">Rows</a>, <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../src/gorm.io/gorm/interfaces.go.html#line-34">QueryRowContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Row">Row</a>
+			func gorm.io/gorm.<a href="gorm.io/gorm.html#name-ConnPoolBeginner">ConnPoolBeginner</a>.<a href="../src/gorm.io/gorm/interfaces.go.html#line-48">BeginTx</a>(ctx <b>Context</b>, opts *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-TxOptions">TxOptions</a>) (<a href="gorm.io/gorm.html">gorm</a>.<a href="gorm.io/gorm.html#name-ConnPool">ConnPool</a>, <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-DB">DB</a>).<a href="../src/gorm.io/gorm/gorm.go.html#line-212">WithContext</a>(ctx <b>Context</b>) *<a href="gorm.io/gorm.html">gorm</a>.<a href="gorm.io/gorm.html#name-DB">DB</a>
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../src/gorm.io/gorm/prepare_stmt.go.html#line-53">BeginTx</a>(ctx <b>Context</b>, opt *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-TxOptions">TxOptions</a>) (<a href="gorm.io/gorm.html">gorm</a>.<a href="gorm.io/gorm.html#name-ConnPool">ConnPool</a>, <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../src/gorm.io/gorm/prepare_stmt.go.html#line-61">ExecContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (result <a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Result">Result</a>, err <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../src/gorm.io/gorm/prepare_stmt.go.html#line-75">QueryContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (rows *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Rows">Rows</a>, err <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../src/gorm.io/gorm/prepare_stmt.go.html#line-89">QueryRowContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Row">Row</a>
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-PreparedStmtTX">PreparedStmtTX</a>).<a href="../src/gorm.io/gorm/prepare_stmt.go.html#line-116">ExecContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (result <a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Result">Result</a>, err <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-PreparedStmtTX">PreparedStmtTX</a>).<a href="../src/gorm.io/gorm/prepare_stmt.go.html#line-130">QueryContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) (rows *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Rows">Rows</a>, err <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="gorm.io/gorm.html#name-PreparedStmtTX">PreparedStmtTX</a>).<a href="../src/gorm.io/gorm/prepare_stmt.go.html#line-144">QueryRowContext</a>(ctx <b>Context</b>, query <a href="builtin.html#name-string">string</a>, args ...interface{}) *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Row">Row</a>
+			func gorm.io/gorm.<a href="gorm.io/gorm.html#name-TxBeginner">TxBeginner</a>.<a href="../src/gorm.io/gorm/interfaces.go.html#line-44">BeginTx</a>(ctx <b>Context</b>, opts *<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-TxOptions">TxOptions</a>) (*<a href="database/sql.html">sql</a>.<a href="database/sql.html#name-Tx">Tx</a>, <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="gorm.io/gorm.html#name-Valuer">Valuer</a>.<a href="../src/gorm.io/gorm/interfaces.go.html#line-58">GormValue</a>(<b>Context</b>, *<a href="gorm.io/gorm.html">gorm</a>.<a href="gorm.io/gorm.html#name-DB">DB</a>) <a href="gorm.io/gorm/clause.html">clause</a>.<a href="gorm.io/gorm/clause.html#name-Expr">Expr</a>
+			func gorm.io/gorm/logger.<a href="gorm.io/gorm/logger.html#name-Interface">Interface</a>.<a href="../src/gorm.io/gorm/logger/logger.go.html#line-56">Error</a>(<b>Context</b>, <a href="builtin.html#name-string">string</a>, ...interface{})
+			func gorm.io/gorm/logger.<a href="gorm.io/gorm/logger.html#name-Interface">Interface</a>.<a href="../src/gorm.io/gorm/logger/logger.go.html#line-54">Info</a>(<b>Context</b>, <a href="builtin.html#name-string">string</a>, ...interface{})
+			func gorm.io/gorm/logger.<a href="gorm.io/gorm/logger.html#name-Interface">Interface</a>.<a href="../src/gorm.io/gorm/logger/logger.go.html#line-57">Trace</a>(ctx <b>Context</b>, begin <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>, fc func() (<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-int64">int64</a>), err <a href="builtin.html#name-error">error</a>)
+			func gorm.io/gorm/logger.<a href="gorm.io/gorm/logger.html#name-Interface">Interface</a>.<a href="../src/gorm.io/gorm/logger/logger.go.html#line-55">Warn</a>(<b>Context</b>, <a href="builtin.html#name-string">string</a>, ...interface{})
+			func net.(*<a href="net.html#name-Dialer">Dialer</a>).<a href="../src/net/dial.go.html#line-369">DialContext</a>(ctx <b>Context</b>, network, address <a href="builtin.html#name-string">string</a>) (<a href="net.html">net</a>.<a href="net.html#name-Conn">Conn</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-ListenConfig">ListenConfig</a>).<a href="../src/net/dial.go.html#line-622">Listen</a>(ctx <b>Context</b>, network, address <a href="builtin.html#name-string">string</a>) (<a href="net.html">net</a>.<a href="net.html#name-Listener">Listener</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-ListenConfig">ListenConfig</a>).<a href="../src/net/dial.go.html#line-652">ListenPacket</a>(ctx <b>Context</b>, network, address <a href="builtin.html#name-string">string</a>) (<a href="net.html">net</a>.<a href="net.html#name-PacketConn">PacketConn</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-477">LookupAddr</a>(ctx <b>Context</b>, addr <a href="builtin.html#name-string">string</a>) (names []<a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-406">LookupCNAME</a>(ctx <b>Context</b>, host <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-175">LookupHost</a>(ctx <b>Context</b>, host <a href="builtin.html#name-string">string</a>) (addrs []<a href="builtin.html#name-string">string</a>, err <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-211">LookupIP</a>(ctx <b>Context</b>, network, host <a href="builtin.html#name-string">string</a>) ([]<a href="net.html">net</a>.<a href="net.html#name-IP">IP</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-203">LookupIPAddr</a>(ctx <b>Context</b>, host <a href="builtin.html#name-string">string</a>) ([]<a href="net.html">net</a>.<a href="net.html#name-IPAddr">IPAddr</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-442">LookupMX</a>(ctx <b>Context</b>, name <a href="builtin.html#name-string">string</a>) ([]*<a href="net.html">net</a>.<a href="net.html#name-MX">MX</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-452">LookupNS</a>(ctx <b>Context</b>, name <a href="builtin.html#name-string">string</a>) ([]*<a href="net.html">net</a>.<a href="net.html#name-NS">NS</a>, <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-361">LookupPort</a>(ctx <b>Context</b>, network, service <a href="builtin.html#name-string">string</a>) (port <a href="builtin.html#name-int">int</a>, err <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-432">LookupSRV</a>(ctx <b>Context</b>, service, proto, name <a href="builtin.html#name-string">string</a>) (cname <a href="builtin.html#name-string">string</a>, addrs []*<a href="net.html">net</a>.<a href="net.html#name-SRV">SRV</a>, err <a href="builtin.html#name-error">error</a>)
+			func net.(*<a href="net.html#name-Resolver">Resolver</a>).<a href="../src/net/lookup.go.html#line-462">LookupTXT</a>(ctx <b>Context</b>, name <a href="builtin.html#name-string">string</a>) ([]<a href="builtin.html#name-string">string</a>, <a href="builtin.html#name-error">error</a>)
+			func net/http.<a href="net/http.html#name-NewRequestWithContext">NewRequestWithContext</a>(ctx <b>Context</b>, method, url <a href="builtin.html#name-string">string</a>, body <a href="io.html">io</a>.<a href="io.html#name-Reader">Reader</a>) (*<a href="net/http.html">http</a>.<a href="net/http.html#name-Request">Request</a>, <a href="builtin.html#name-error">error</a>)
+			func net/http.(*<a href="net/http.html#name-Request">Request</a>).<a href="../src/net/http/request.go.html#line-368">Clone</a>(ctx <b>Context</b>) *<a href="net/http.html">http</a>.<a href="net/http.html#name-Request">Request</a>
+			func net/http.(*<a href="net/http.html#name-Request">Request</a>).<a href="../src/net/http/request.go.html#line-351">WithContext</a>(ctx <b>Context</b>) *<a href="net/http.html">http</a>.<a href="net/http.html#name-Request">Request</a>
+			func net/http.(*<a href="net/http.html#name-Server">Server</a>).<a href="../src/net/http/server.go.html#line-2699">Shutdown</a>(ctx <b>Context</b>) <a href="builtin.html#name-error">error</a>
+			func net/http/httptrace.<a href="net/http/httptrace.html#name-ContextClientTrace">ContextClientTrace</a>(ctx <b>Context</b>) *<a href="net/http/httptrace.html">httptrace</a>.<a href="net/http/httptrace.html#name-ClientTrace">ClientTrace</a>
+			func net/http/httptrace.<a href="net/http/httptrace.html#name-WithClientTrace">WithClientTrace</a>(ctx <b>Context</b>, trace *<a href="net/http/httptrace.html">httptrace</a>.<a href="net/http/httptrace.html#name-ClientTrace">ClientTrace</a>) <b>Context</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Background">	 func <a href="../src/context/context.go.html#line-208">Background</a>() <a href="#name-Context">Context</a>
+		Background returns a non-nil, empty Context. It is never canceled, has no
+		values, and has no deadline. It is typically used by the main function,
+		initialization, and tests, and as the top-level Context for incoming
+		requests.</div>
+<div class="anchor" id="name-Canceled">	  var <a href="../src/context/context.go.html#line-157">Canceled</a> <a href="builtin.html#name-error">error</a>
+		Canceled is the error returned by Context.Err when the context is canceled.</div>
+<div class="anchor" id="name-DeadlineExceeded">	  var <a href="../src/context/context.go.html#line-161">DeadlineExceeded</a> <a href="builtin.html#name-error">error</a>
+		DeadlineExceeded is the error returned by Context.Err when the context's
+		deadline passes.</div>
+<div class="anchor" id="name-TODO">	 func <a href="../src/context/context.go.html#line-216">TODO</a>() <a href="#name-Context">Context</a>
+		TODO returns a non-nil, empty Context. Code should use context.TODO when
+		it's unclear which Context to use or it is not yet available (because the
+		surrounding function has not yet been extended to accept a Context
+		parameter).</div>
+<div class="anchor" id="name-WithCancel">	 func <a href="../src/context/context.go.html#line-232">WithCancel</a>(parent <a href="#name-Context">Context</a>) (ctx <a href="#name-Context">Context</a>, cancel <a href="#name-CancelFunc">CancelFunc</a>)
+		WithCancel returns a copy of parent with a new Done channel. The returned
+		context's Done channel is closed when the returned cancel function is called
+		or when the parent context's Done channel is closed, whichever happens first.
+
+		Canceling this context releases resources associated with it, so code should
+		call cancel as soon as the operations running in this Context complete.</div>
+<div class="anchor" id="name-WithDeadline">	 func <a href="../src/context/context.go.html#line-430">WithDeadline</a>(parent <a href="#name-Context">Context</a>, d <a href="time.html">time</a>.<a href="time.html#name-Time">Time</a>) (<a href="#name-Context">Context</a>, <a href="#name-CancelFunc">CancelFunc</a>)
+		WithDeadline returns a copy of the parent context with the deadline adjusted
+		to be no later than d. If the parent's deadline is already earlier than d,
+		WithDeadline(parent, d) is semantically equivalent to parent. The returned
+		context's Done channel is closed when the deadline expires, when the returned
+		cancel function is called, or when the parent context's Done channel is
+		closed, whichever happens first.
+
+		Canceling this context releases resources associated with it, so code should
+		call cancel as soon as the operations running in this Context complete.</div>
+<div class="anchor" id="name-WithTimeout">	 func <a href="../src/context/context.go.html#line-502">WithTimeout</a>(parent <a href="#name-Context">Context</a>, timeout <a href="time.html">time</a>.<a href="time.html#name-Duration">Duration</a>) (<a href="#name-Context">Context</a>, <a href="#name-CancelFunc">CancelFunc</a>)
+		WithTimeout returns WithDeadline(parent, time.Now().Add(timeout)).
+
+		Canceling this context releases resources associated with it, so code should
+		call cancel as soon as the operations running in this Context complete:
+
+			func slowOperationWithTimeout(ctx context.Context) (Result, error) {
+				ctx, cancel := context.WithTimeout(ctx, 100*time.Millisecond)
+				defer cancel()  // releases resources if slowOperation completes before timeout elapses
+				return slowOperation(ctx)
+			}</div>
+<div class="anchor" id="name-WithValue">	 func <a href="../src/context/context.go.html#line-519">WithValue</a>(parent <a href="#name-Context">Context</a>, key, val interface{}) <a href="#name-Context">Context</a>
+		WithValue returns a copy of parent in which the value associated with key is
+		val.
+
+		Use context Values only for request-scoped data that transits processes and
+		APIs, not for passing optional parameters to functions.
+
+		The provided key must be comparable and should not be of type
+		string or any other built-in type to avoid collisions between
+		packages using context. Users of WithValue should define their own
+		types for keys. To avoid allocating when assigning to an
+		interface{}, context keys often have concrete type
+		struct{}. Alternatively, exported context key variables' static
+		type should be a pointer or interface.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

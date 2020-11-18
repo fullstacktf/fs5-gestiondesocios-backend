@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: infile.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	infile.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2013 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"fmt"</code></span>
+<span class="codeline" id="line-13"><code>	"io"</code></span>
+<span class="codeline" id="line-14"><code>	"os"</code></span>
+<span class="codeline" id="line-15"><code>	"strings"</code></span>
+<span class="codeline" id="line-16"><code>	"sync"</code></span>
+<span class="codeline" id="line-17"><code>)</code></span>
+<span class="codeline" id="line-18"><code></code></span>
+<span class="codeline" id="line-19"><code>var (</code></span>
+<span class="codeline" id="line-20"><code>	fileRegister       map[string]bool</code></span>
+<span class="codeline" id="line-21"><code>	fileRegisterLock   sync.RWMutex</code></span>
+<span class="codeline" id="line-22"><code>	readerRegister     map[string]func() io.Reader</code></span>
+<span class="codeline" id="line-23"><code>	readerRegisterLock sync.RWMutex</code></span>
+<span class="codeline" id="line-24"><code>)</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>// RegisterLocalFile adds the given file to the file whitelist,</code></span>
+<span class="codeline" id="line-27"><code>// so that it can be used by "LOAD DATA LOCAL INFILE &lt;filepath&gt;".</code></span>
+<span class="codeline" id="line-28"><code>// Alternatively you can allow the use of all local files with</code></span>
+<span class="codeline" id="line-29"><code>// the DSN parameter 'allowAllFiles=true'</code></span>
+<span class="codeline" id="line-30"><code>//</code></span>
+<span class="codeline" id="line-31"><code>//  filePath := "/home/gopher/data.csv"</code></span>
+<span class="codeline" id="line-32"><code>//  mysql.RegisterLocalFile(filePath)</code></span>
+<span class="codeline" id="line-33"><code>//  err := db.Exec("LOAD DATA LOCAL INFILE '" + filePath + "' INTO TABLE foo")</code></span>
+<span class="codeline" id="line-34"><code>//  if err != nil {</code></span>
+<span class="codeline" id="line-35"><code>//  ...</code></span>
+<span class="codeline" id="line-36"><code>//</code></span>
+<span class="codeline" id="line-37"><code>func RegisterLocalFile(filePath string) {</code></span>
+<span class="codeline" id="line-38"><code>	fileRegisterLock.Lock()</code></span>
+<span class="codeline" id="line-39"><code>	// lazy map init</code></span>
+<span class="codeline" id="line-40"><code>	if fileRegister == nil {</code></span>
+<span class="codeline" id="line-41"><code>		fileRegister = make(map[string]bool)</code></span>
+<span class="codeline" id="line-42"><code>	}</code></span>
+<span class="codeline" id="line-43"><code></code></span>
+<span class="codeline" id="line-44"><code>	fileRegister[strings.Trim(filePath, `"`)] = true</code></span>
+<span class="codeline" id="line-45"><code>	fileRegisterLock.Unlock()</code></span>
+<span class="codeline" id="line-46"><code>}</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>// DeregisterLocalFile removes the given filepath from the whitelist.</code></span>
+<span class="codeline" id="line-49"><code>func DeregisterLocalFile(filePath string) {</code></span>
+<span class="codeline" id="line-50"><code>	fileRegisterLock.Lock()</code></span>
+<span class="codeline" id="line-51"><code>	delete(fileRegister, strings.Trim(filePath, `"`))</code></span>
+<span class="codeline" id="line-52"><code>	fileRegisterLock.Unlock()</code></span>
+<span class="codeline" id="line-53"><code>}</code></span>
+<span class="codeline" id="line-54"><code></code></span>
+<span class="codeline" id="line-55"><code>// RegisterReaderHandler registers a handler function which is used</code></span>
+<span class="codeline" id="line-56"><code>// to receive a io.Reader.</code></span>
+<span class="codeline" id="line-57"><code>// The Reader can be used by "LOAD DATA LOCAL INFILE Reader::&lt;name&gt;".</code></span>
+<span class="codeline" id="line-58"><code>// If the handler returns a io.ReadCloser Close() is called when the</code></span>
+<span class="codeline" id="line-59"><code>// request is finished.</code></span>
+<span class="codeline" id="line-60"><code>//</code></span>
+<span class="codeline" id="line-61"><code>//  mysql.RegisterReaderHandler("data", func() io.Reader {</code></span>
+<span class="codeline" id="line-62"><code>//  	var csvReader io.Reader // Some Reader that returns CSV data</code></span>
+<span class="codeline" id="line-63"><code>//  	... // Open Reader here</code></span>
+<span class="codeline" id="line-64"><code>//  	return csvReader</code></span>
+<span class="codeline" id="line-65"><code>//  })</code></span>
+<span class="codeline" id="line-66"><code>//  err := db.Exec("LOAD DATA LOCAL INFILE 'Reader::data' INTO TABLE foo")</code></span>
+<span class="codeline" id="line-67"><code>//  if err != nil {</code></span>
+<span class="codeline" id="line-68"><code>//  ...</code></span>
+<span class="codeline" id="line-69"><code>//</code></span>
+<span class="codeline" id="line-70"><code>func RegisterReaderHandler(name string, handler func() io.Reader) {</code></span>
+<span class="codeline" id="line-71"><code>	readerRegisterLock.Lock()</code></span>
+<span class="codeline" id="line-72"><code>	// lazy map init</code></span>
+<span class="codeline" id="line-73"><code>	if readerRegister == nil {</code></span>
+<span class="codeline" id="line-74"><code>		readerRegister = make(map[string]func() io.Reader)</code></span>
+<span class="codeline" id="line-75"><code>	}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>	readerRegister[name] = handler</code></span>
+<span class="codeline" id="line-78"><code>	readerRegisterLock.Unlock()</code></span>
+<span class="codeline" id="line-79"><code>}</code></span>
+<span class="codeline" id="line-80"><code></code></span>
+<span class="codeline" id="line-81"><code>// DeregisterReaderHandler removes the ReaderHandler function with</code></span>
+<span class="codeline" id="line-82"><code>// the given name from the registry.</code></span>
+<span class="codeline" id="line-83"><code>func DeregisterReaderHandler(name string) {</code></span>
+<span class="codeline" id="line-84"><code>	readerRegisterLock.Lock()</code></span>
+<span class="codeline" id="line-85"><code>	delete(readerRegister, name)</code></span>
+<span class="codeline" id="line-86"><code>	readerRegisterLock.Unlock()</code></span>
+<span class="codeline" id="line-87"><code>}</code></span>
+<span class="codeline" id="line-88"><code></code></span>
+<span class="codeline" id="line-89"><code>func deferredClose(err *error, closer io.Closer) {</code></span>
+<span class="codeline" id="line-90"><code>	closeErr := closer.Close()</code></span>
+<span class="codeline" id="line-91"><code>	if *err == nil {</code></span>
+<span class="codeline" id="line-92"><code>		*err = closeErr</code></span>
+<span class="codeline" id="line-93"><code>	}</code></span>
+<span class="codeline" id="line-94"><code>}</code></span>
+<span class="codeline" id="line-95"><code></code></span>
+<span class="codeline" id="line-96"><code>func (mc *mysqlConn) handleInFileRequest(name string) (err error) {</code></span>
+<span class="codeline" id="line-97"><code>	var rdr io.Reader</code></span>
+<span class="codeline" id="line-98"><code>	var data []byte</code></span>
+<span class="codeline" id="line-99"><code>	packetSize := 16 * 1024 // 16KB is small enough for disk readahead and large enough for TCP</code></span>
+<span class="codeline" id="line-100"><code>	if mc.maxWriteSize &lt; packetSize {</code></span>
+<span class="codeline" id="line-101"><code>		packetSize = mc.maxWriteSize</code></span>
+<span class="codeline" id="line-102"><code>	}</code></span>
+<span class="codeline" id="line-103"><code></code></span>
+<span class="codeline" id="line-104"><code>	if idx := strings.Index(name, "Reader::"); idx == 0 || (idx &gt; 0 &amp;&amp; name[idx-1] == '/') { // io.Reader</code></span>
+<span class="codeline" id="line-105"><code>		// The server might return an an absolute path. See issue #355.</code></span>
+<span class="codeline" id="line-106"><code>		name = name[idx+8:]</code></span>
+<span class="codeline" id="line-107"><code></code></span>
+<span class="codeline" id="line-108"><code>		readerRegisterLock.RLock()</code></span>
+<span class="codeline" id="line-109"><code>		handler, inMap := readerRegister[name]</code></span>
+<span class="codeline" id="line-110"><code>		readerRegisterLock.RUnlock()</code></span>
+<span class="codeline" id="line-111"><code></code></span>
+<span class="codeline" id="line-112"><code>		if inMap {</code></span>
+<span class="codeline" id="line-113"><code>			rdr = handler()</code></span>
+<span class="codeline" id="line-114"><code>			if rdr != nil {</code></span>
+<span class="codeline" id="line-115"><code>				if cl, ok := rdr.(io.Closer); ok {</code></span>
+<span class="codeline" id="line-116"><code>					defer deferredClose(&amp;err, cl)</code></span>
+<span class="codeline" id="line-117"><code>				}</code></span>
+<span class="codeline" id="line-118"><code>			} else {</code></span>
+<span class="codeline" id="line-119"><code>				err = fmt.Errorf("Reader '%s' is &lt;nil&gt;", name)</code></span>
+<span class="codeline" id="line-120"><code>			}</code></span>
+<span class="codeline" id="line-121"><code>		} else {</code></span>
+<span class="codeline" id="line-122"><code>			err = fmt.Errorf("Reader '%s' is not registered", name)</code></span>
+<span class="codeline" id="line-123"><code>		}</code></span>
+<span class="codeline" id="line-124"><code>	} else { // File</code></span>
+<span class="codeline" id="line-125"><code>		name = strings.Trim(name, `"`)</code></span>
+<span class="codeline" id="line-126"><code>		fileRegisterLock.RLock()</code></span>
+<span class="codeline" id="line-127"><code>		fr := fileRegister[name]</code></span>
+<span class="codeline" id="line-128"><code>		fileRegisterLock.RUnlock()</code></span>
+<span class="codeline" id="line-129"><code>		if mc.cfg.AllowAllFiles || fr {</code></span>
+<span class="codeline" id="line-130"><code>			var file *os.File</code></span>
+<span class="codeline" id="line-131"><code>			var fi os.FileInfo</code></span>
+<span class="codeline" id="line-132"><code></code></span>
+<span class="codeline" id="line-133"><code>			if file, err = os.Open(name); err == nil {</code></span>
+<span class="codeline" id="line-134"><code>				defer deferredClose(&amp;err, file)</code></span>
+<span class="codeline" id="line-135"><code></code></span>
+<span class="codeline" id="line-136"><code>				// get file size</code></span>
+<span class="codeline" id="line-137"><code>				if fi, err = file.Stat(); err == nil {</code></span>
+<span class="codeline" id="line-138"><code>					rdr = file</code></span>
+<span class="codeline" id="line-139"><code>					if fileSize := int(fi.Size()); fileSize &lt; packetSize {</code></span>
+<span class="codeline" id="line-140"><code>						packetSize = fileSize</code></span>
+<span class="codeline" id="line-141"><code>					}</code></span>
+<span class="codeline" id="line-142"><code>				}</code></span>
+<span class="codeline" id="line-143"><code>			}</code></span>
+<span class="codeline" id="line-144"><code>		} else {</code></span>
+<span class="codeline" id="line-145"><code>			err = fmt.Errorf("local file '%s' is not registered", name)</code></span>
+<span class="codeline" id="line-146"><code>		}</code></span>
+<span class="codeline" id="line-147"><code>	}</code></span>
+<span class="codeline" id="line-148"><code></code></span>
+<span class="codeline" id="line-149"><code>	// send content packets</code></span>
+<span class="codeline" id="line-150"><code>	// if packetSize == 0, the Reader contains no data</code></span>
+<span class="codeline" id="line-151"><code>	if err == nil &amp;&amp; packetSize &gt; 0 {</code></span>
+<span class="codeline" id="line-152"><code>		data := make([]byte, 4+packetSize)</code></span>
+<span class="codeline" id="line-153"><code>		var n int</code></span>
+<span class="codeline" id="line-154"><code>		for err == nil {</code></span>
+<span class="codeline" id="line-155"><code>			n, err = rdr.Read(data[4:])</code></span>
+<span class="codeline" id="line-156"><code>			if n &gt; 0 {</code></span>
+<span class="codeline" id="line-157"><code>				if ioErr := mc.writePacket(data[:4+n]); ioErr != nil {</code></span>
+<span class="codeline" id="line-158"><code>					return ioErr</code></span>
+<span class="codeline" id="line-159"><code>				}</code></span>
+<span class="codeline" id="line-160"><code>			}</code></span>
+<span class="codeline" id="line-161"><code>		}</code></span>
+<span class="codeline" id="line-162"><code>		if err == io.EOF {</code></span>
+<span class="codeline" id="line-163"><code>			err = nil</code></span>
+<span class="codeline" id="line-164"><code>		}</code></span>
+<span class="codeline" id="line-165"><code>	}</code></span>
+<span class="codeline" id="line-166"><code></code></span>
+<span class="codeline" id="line-167"><code>	// send empty packet (termination)</code></span>
+<span class="codeline" id="line-168"><code>	if data == nil {</code></span>
+<span class="codeline" id="line-169"><code>		data = make([]byte, 4)</code></span>
+<span class="codeline" id="line-170"><code>	}</code></span>
+<span class="codeline" id="line-171"><code>	if ioErr := mc.writePacket(data[:4]); ioErr != nil {</code></span>
+<span class="codeline" id="line-172"><code>		return ioErr</code></span>
+<span class="codeline" id="line-173"><code>	}</code></span>
+<span class="codeline" id="line-174"><code></code></span>
+<span class="codeline" id="line-175"><code>	// read OK packet</code></span>
+<span class="codeline" id="line-176"><code>	if err == nil {</code></span>
+<span class="codeline" id="line-177"><code>		return mc.readResultOK()</code></span>
+<span class="codeline" id="line-178"><code>	}</code></span>
+<span class="codeline" id="line-179"><code></code></span>
+<span class="codeline" id="line-180"><code>	mc.readPacket()</code></span>
+<span class="codeline" id="line-181"><code>	return err</code></span>
+<span class="codeline" id="line-182"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

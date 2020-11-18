@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: gorm.io/gorm/callbacks</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>callbacks</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-gorm.io/gorm/callbacks">gorm.io/gorm/callbacks</a><i> (on <a href="https://pkg.go.dev/gorm.io/gorm/callbacks" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/gorm.io/gorm/callbacks.html">8 packages</a>, and imported by <a href="../../../dep/gorm.io/gorm/callbacks.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../src/gorm.io/gorm/callbacks/associations.go.html">associations.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/callbacks.go.html">callbacks.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/callmethod.go.html">callmethod.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/create.go.html">create.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/delete.go.html">delete.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/helper.go.html">helper.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html">interfaces.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/preload.go.html">preload.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/query.go.html">query.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/raw.go.html">raw.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/row.go.html">row.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/transaction.go.html">transaction.go</a>
+	    <a href="../../../src/gorm.io/gorm/callbacks/update.go.html">update.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-AfterCreateInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-9">AfterCreateInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="AfterCreateInterface-stat-methods"><label for="AfterCreateInterface-stat-methods">One Exported Method</label><span id='AfterCreateInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-10">AfterCreate</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-AfterDeleteInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-33">AfterDeleteInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="AfterDeleteInterface-stat-methods"><label for="AfterDeleteInterface-stat-methods">One Exported Method</label><span id='AfterDeleteInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-34">AfterDelete</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-AfterFindInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-37">AfterFindInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="AfterFindInterface-stat-methods"><label for="AfterFindInterface-stat-methods">One Exported Method</label><span id='AfterFindInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-38">AfterFind</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-AfterSaveInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-25">AfterSaveInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="AfterSaveInterface-stat-methods"><label for="AfterSaveInterface-stat-methods">One Exported Method</label><span id='AfterSaveInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-26">AfterSave</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-AfterUpdateInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-17">AfterUpdateInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="AfterUpdateInterface-stat-methods"><label for="AfterUpdateInterface-stat-methods">One Exported Method</label><span id='AfterUpdateInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-18">AfterUpdate</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-BeforeCreateInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-5">BeforeCreateInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="BeforeCreateInterface-stat-methods"><label for="BeforeCreateInterface-stat-methods">One Exported Method</label><span id='BeforeCreateInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-6">BeforeCreate</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-BeforeDeleteInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-29">BeforeDeleteInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="BeforeDeleteInterface-stat-methods"><label for="BeforeDeleteInterface-stat-methods">One Exported Method</label><span id='BeforeDeleteInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-30">BeforeDelete</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-BeforeSaveInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-21">BeforeSaveInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="BeforeSaveInterface-stat-methods"><label for="BeforeSaveInterface-stat-methods">One Exported Method</label><span id='BeforeSaveInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-22">BeforeSave</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-BeforeUpdateInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-13">BeforeUpdateInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="BeforeUpdateInterface-stat-methods"><label for="BeforeUpdateInterface-stat-methods">One Exported Method</label><span id='BeforeUpdateInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-14">BeforeUpdate</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Config" data-popularity="70">	 type <a href="../../../src/gorm.io/gorm/callbacks/callbacks.go.html#line-7">Config</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Config-stat-fields"><label for="Config-stat-fields">Exported Fields (2)</label><span id='Config-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/callbacks/callbacks.go.html#line-8">LastInsertIDReversed</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/callbacks/callbacks.go.html#line-9">WithReturning</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Config-stat-params"><label for="Config-stat-params">As Inputs Of (2+)</label><span id='Config-stat-params-content' class="stat-content">
+			func <a href="#name-Create">Create</a>(config *<b>Config</b>) func(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)
+			func <a href="#name-RegisterDefaultCallbacks">RegisterDefaultCallbacks</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, config *<b>Config</b>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-AfterCreate">	 func <a href="../../../src/gorm.io/gorm/callbacks/create.go.html#line-206">AfterCreate</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-AfterDelete">	 func <a href="../../../src/gorm.io/gorm/callbacks/delete.go.html#line-155">AfterDelete</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-AfterQuery">	 func <a href="../../../src/gorm.io/gorm/callbacks/query.go.html#line-214">AfterQuery</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-AfterUpdate">	 func <a href="../../../src/gorm.io/gorm/callbacks/update.go.html#line-89">AfterUpdate</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-BeforeCreate">	 func <a href="../../../src/gorm.io/gorm/callbacks/create.go.html#line-12">BeforeCreate</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-BeforeDelete">	 func <a href="../../../src/gorm.io/gorm/callbacks/delete.go.html#line-12">BeforeDelete</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-BeforeUpdate">	 func <a href="../../../src/gorm.io/gorm/callbacks/update.go.html#line-31">BeforeUpdate</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-BeginTransaction">	 func <a href="../../../src/gorm.io/gorm/callbacks/transaction.go.html#line-7">BeginTransaction</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-BuildQuerySQL">	 func <a href="../../../src/gorm.io/gorm/callbacks/query.go.html#line-31">BuildQuerySQL</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-CommitOrRollbackTransaction">	 func <a href="../../../src/gorm.io/gorm/callbacks/transaction.go.html#line-18">CommitOrRollbackTransaction</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-ConvertMapToValuesForCreate">	 func <a href="../../../src/gorm.io/gorm/callbacks/helper.go.html#line-11">ConvertMapToValuesForCreate</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, mapValue map[<a href="../../builtin.html#name-string">string</a>]interface{}) (values <a href="clause.html">clause</a>.<a href="clause.html#name-Values">Values</a>)
+		ConvertMapToValuesForCreate convert map to values</div>
+<div class="anchor" id="name-ConvertSliceOfMapToValuesForCreate">	 func <a href="../../../src/gorm.io/gorm/callbacks/helper.go.html#line-42">ConvertSliceOfMapToValuesForCreate</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, mapValues []map[<a href="../../builtin.html#name-string">string</a>]interface{}) (values <a href="clause.html">clause</a>.<a href="clause.html#name-Values">Values</a>)
+		ConvertSliceOfMapToValuesForCreate convert slice of map to values</div>
+<div class="anchor" id="name-ConvertToAssignments">	 func <a href="../../../src/gorm.io/gorm/callbacks/update.go.html#line-111">ConvertToAssignments</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) (set <a href="clause.html">clause</a>.<a href="clause.html#name-Set">Set</a>)
+		ConvertToAssignments convert to update assignments</div>
+<div class="anchor" id="name-ConvertToCreateValues">	 func <a href="../../../src/gorm.io/gorm/callbacks/create.go.html#line-228">ConvertToCreateValues</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) (values <a href="clause.html">clause</a>.<a href="clause.html#name-Values">Values</a>)
+		ConvertToCreateValues convert to create values</div>
+<div class="anchor" id="name-Create">	 func <a href="../../../src/gorm.io/gorm/callbacks/create.go.html#line-33">Create</a>(config *<a href="#name-Config">Config</a>) func(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-CreateWithReturning">	 func <a href="../../../src/gorm.io/gorm/callbacks/create.go.html#line-111">CreateWithReturning</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-Delete">	 func <a href="../../../src/gorm.io/gorm/callbacks/delete.go.html#line-104">Delete</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-DeleteBeforeAssociations">	 func <a href="../../../src/gorm.io/gorm/callbacks/delete.go.html#line-25">DeleteBeforeAssociations</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-Preload">	 func <a href="../../../src/gorm.io/gorm/callbacks/query.go.html#line-167">Preload</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-Query">	 func <a href="../../../src/gorm.io/gorm/callbacks/query.go.html#line-14">Query</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-RawExec">	 func <a href="../../../src/gorm.io/gorm/callbacks/raw.go.html#line-7">RawExec</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-RegisterDefaultCallbacks">	 func <a href="../../../src/gorm.io/gorm/callbacks/callbacks.go.html#line-12">RegisterDefaultCallbacks</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, config *<a href="#name-Config">Config</a>)</div>
+<div class="anchor" id="name-RowQuery">	 func <a href="../../../src/gorm.io/gorm/callbacks/row.go.html#line-7">RowQuery</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-SaveAfterAssociations">	 func <a href="../../../src/gorm.io/gorm/callbacks/associations.go.html#line-91">SaveAfterAssociations</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-SaveBeforeAssociations">	 func <a href="../../../src/gorm.io/gorm/callbacks/associations.go.html#line-11">SaveBeforeAssociations</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-SetupUpdateReflectValue">	 func <a href="../../../src/gorm.io/gorm/callbacks/update.go.html#line-12">SetupUpdateReflectValue</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div>
+<div class="anchor" id="name-Update">	 func <a href="../../../src/gorm.io/gorm/callbacks/update.go.html#line-53">Update</a>(db *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

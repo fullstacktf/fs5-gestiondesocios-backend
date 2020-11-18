@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: key_agreement.go in package crypto/tls</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	key_agreement.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/tls.html">crypto/tls</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2010 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package tls</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"crypto"</code></span>
+<span class="codeline" id="line-9"><code>	"crypto/md5"</code></span>
+<span class="codeline" id="line-10"><code>	"crypto/rsa"</code></span>
+<span class="codeline" id="line-11"><code>	"crypto/sha1"</code></span>
+<span class="codeline" id="line-12"><code>	"crypto/x509"</code></span>
+<span class="codeline" id="line-13"><code>	"errors"</code></span>
+<span class="codeline" id="line-14"><code>	"fmt"</code></span>
+<span class="codeline" id="line-15"><code>	"io"</code></span>
+<span class="codeline" id="line-16"><code>)</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>var errClientKeyExchange = errors.New("tls: invalid ClientKeyExchange message")</code></span>
+<span class="codeline" id="line-19"><code>var errServerKeyExchange = errors.New("tls: invalid ServerKeyExchange message")</code></span>
+<span class="codeline" id="line-20"><code></code></span>
+<span class="codeline" id="line-21"><code>// rsaKeyAgreement implements the standard TLS key agreement where the client</code></span>
+<span class="codeline" id="line-22"><code>// encrypts the pre-master secret to the server's public key.</code></span>
+<span class="codeline" id="line-23"><code>type rsaKeyAgreement struct{}</code></span>
+<span class="codeline" id="line-24"><code></code></span>
+<span class="codeline" id="line-25"><code>func (ka rsaKeyAgreement) generateServerKeyExchange(config *Config, cert *Certificate, clientHello *clientHelloMsg, hello *serverHelloMsg) (*serverKeyExchangeMsg, error) {</code></span>
+<span class="codeline" id="line-26"><code>	return nil, nil</code></span>
+<span class="codeline" id="line-27"><code>}</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>func (ka rsaKeyAgreement) processClientKeyExchange(config *Config, cert *Certificate, ckx *clientKeyExchangeMsg, version uint16) ([]byte, error) {</code></span>
+<span class="codeline" id="line-30"><code>	if len(ckx.ciphertext) &lt; 2 {</code></span>
+<span class="codeline" id="line-31"><code>		return nil, errClientKeyExchange</code></span>
+<span class="codeline" id="line-32"><code>	}</code></span>
+<span class="codeline" id="line-33"><code>	ciphertextLen := int(ckx.ciphertext[0])&lt;&lt;8 | int(ckx.ciphertext[1])</code></span>
+<span class="codeline" id="line-34"><code>	if ciphertextLen != len(ckx.ciphertext)-2 {</code></span>
+<span class="codeline" id="line-35"><code>		return nil, errClientKeyExchange</code></span>
+<span class="codeline" id="line-36"><code>	}</code></span>
+<span class="codeline" id="line-37"><code>	ciphertext := ckx.ciphertext[2:]</code></span>
+<span class="codeline" id="line-38"><code></code></span>
+<span class="codeline" id="line-39"><code>	priv, ok := cert.PrivateKey.(crypto.Decrypter)</code></span>
+<span class="codeline" id="line-40"><code>	if !ok {</code></span>
+<span class="codeline" id="line-41"><code>		return nil, errors.New("tls: certificate private key does not implement crypto.Decrypter")</code></span>
+<span class="codeline" id="line-42"><code>	}</code></span>
+<span class="codeline" id="line-43"><code>	// Perform constant time RSA PKCS #1 v1.5 decryption</code></span>
+<span class="codeline" id="line-44"><code>	preMasterSecret, err := priv.Decrypt(config.rand(), ciphertext, &amp;rsa.PKCS1v15DecryptOptions{SessionKeyLen: 48})</code></span>
+<span class="codeline" id="line-45"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-46"><code>		return nil, err</code></span>
+<span class="codeline" id="line-47"><code>	}</code></span>
+<span class="codeline" id="line-48"><code>	// We don't check the version number in the premaster secret. For one,</code></span>
+<span class="codeline" id="line-49"><code>	// by checking it, we would leak information about the validity of the</code></span>
+<span class="codeline" id="line-50"><code>	// encrypted pre-master secret. Secondly, it provides only a small</code></span>
+<span class="codeline" id="line-51"><code>	// benefit against a downgrade attack and some implementations send the</code></span>
+<span class="codeline" id="line-52"><code>	// wrong version anyway. See the discussion at the end of section</code></span>
+<span class="codeline" id="line-53"><code>	// 7.4.7.1 of RFC 4346.</code></span>
+<span class="codeline" id="line-54"><code>	return preMasterSecret, nil</code></span>
+<span class="codeline" id="line-55"><code>}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>func (ka rsaKeyAgreement) processServerKeyExchange(config *Config, clientHello *clientHelloMsg, serverHello *serverHelloMsg, cert *x509.Certificate, skx *serverKeyExchangeMsg) error {</code></span>
+<span class="codeline" id="line-58"><code>	return errors.New("tls: unexpected ServerKeyExchange")</code></span>
+<span class="codeline" id="line-59"><code>}</code></span>
+<span class="codeline" id="line-60"><code></code></span>
+<span class="codeline" id="line-61"><code>func (ka rsaKeyAgreement) generateClientKeyExchange(config *Config, clientHello *clientHelloMsg, cert *x509.Certificate) ([]byte, *clientKeyExchangeMsg, error) {</code></span>
+<span class="codeline" id="line-62"><code>	preMasterSecret := make([]byte, 48)</code></span>
+<span class="codeline" id="line-63"><code>	preMasterSecret[0] = byte(clientHello.vers &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-64"><code>	preMasterSecret[1] = byte(clientHello.vers)</code></span>
+<span class="codeline" id="line-65"><code>	_, err := io.ReadFull(config.rand(), preMasterSecret[2:])</code></span>
+<span class="codeline" id="line-66"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-67"><code>		return nil, nil, err</code></span>
+<span class="codeline" id="line-68"><code>	}</code></span>
+<span class="codeline" id="line-69"><code></code></span>
+<span class="codeline" id="line-70"><code>	encrypted, err := rsa.EncryptPKCS1v15(config.rand(), cert.PublicKey.(*rsa.PublicKey), preMasterSecret)</code></span>
+<span class="codeline" id="line-71"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-72"><code>		return nil, nil, err</code></span>
+<span class="codeline" id="line-73"><code>	}</code></span>
+<span class="codeline" id="line-74"><code>	ckx := new(clientKeyExchangeMsg)</code></span>
+<span class="codeline" id="line-75"><code>	ckx.ciphertext = make([]byte, len(encrypted)+2)</code></span>
+<span class="codeline" id="line-76"><code>	ckx.ciphertext[0] = byte(len(encrypted) &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-77"><code>	ckx.ciphertext[1] = byte(len(encrypted))</code></span>
+<span class="codeline" id="line-78"><code>	copy(ckx.ciphertext[2:], encrypted)</code></span>
+<span class="codeline" id="line-79"><code>	return preMasterSecret, ckx, nil</code></span>
+<span class="codeline" id="line-80"><code>}</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>// sha1Hash calculates a SHA1 hash over the given byte slices.</code></span>
+<span class="codeline" id="line-83"><code>func sha1Hash(slices [][]byte) []byte {</code></span>
+<span class="codeline" id="line-84"><code>	hsha1 := sha1.New()</code></span>
+<span class="codeline" id="line-85"><code>	for _, slice := range slices {</code></span>
+<span class="codeline" id="line-86"><code>		hsha1.Write(slice)</code></span>
+<span class="codeline" id="line-87"><code>	}</code></span>
+<span class="codeline" id="line-88"><code>	return hsha1.Sum(nil)</code></span>
+<span class="codeline" id="line-89"><code>}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>// md5SHA1Hash implements TLS 1.0's hybrid hash function which consists of the</code></span>
+<span class="codeline" id="line-92"><code>// concatenation of an MD5 and SHA1 hash.</code></span>
+<span class="codeline" id="line-93"><code>func md5SHA1Hash(slices [][]byte) []byte {</code></span>
+<span class="codeline" id="line-94"><code>	md5sha1 := make([]byte, md5.Size+sha1.Size)</code></span>
+<span class="codeline" id="line-95"><code>	hmd5 := md5.New()</code></span>
+<span class="codeline" id="line-96"><code>	for _, slice := range slices {</code></span>
+<span class="codeline" id="line-97"><code>		hmd5.Write(slice)</code></span>
+<span class="codeline" id="line-98"><code>	}</code></span>
+<span class="codeline" id="line-99"><code>	copy(md5sha1, hmd5.Sum(nil))</code></span>
+<span class="codeline" id="line-100"><code>	copy(md5sha1[md5.Size:], sha1Hash(slices))</code></span>
+<span class="codeline" id="line-101"><code>	return md5sha1</code></span>
+<span class="codeline" id="line-102"><code>}</code></span>
+<span class="codeline" id="line-103"><code></code></span>
+<span class="codeline" id="line-104"><code>// hashForServerKeyExchange hashes the given slices and returns their digest</code></span>
+<span class="codeline" id="line-105"><code>// using the given hash function (for &gt;= TLS 1.2) or using a default based on</code></span>
+<span class="codeline" id="line-106"><code>// the sigType (for earlier TLS versions). For Ed25519 signatures, which don't</code></span>
+<span class="codeline" id="line-107"><code>// do pre-hashing, it returns the concatenation of the slices.</code></span>
+<span class="codeline" id="line-108"><code>func hashForServerKeyExchange(sigType uint8, hashFunc crypto.Hash, version uint16, slices ...[]byte) []byte {</code></span>
+<span class="codeline" id="line-109"><code>	if sigType == signatureEd25519 {</code></span>
+<span class="codeline" id="line-110"><code>		var signed []byte</code></span>
+<span class="codeline" id="line-111"><code>		for _, slice := range slices {</code></span>
+<span class="codeline" id="line-112"><code>			signed = append(signed, slice...)</code></span>
+<span class="codeline" id="line-113"><code>		}</code></span>
+<span class="codeline" id="line-114"><code>		return signed</code></span>
+<span class="codeline" id="line-115"><code>	}</code></span>
+<span class="codeline" id="line-116"><code>	if version &gt;= VersionTLS12 {</code></span>
+<span class="codeline" id="line-117"><code>		h := hashFunc.New()</code></span>
+<span class="codeline" id="line-118"><code>		for _, slice := range slices {</code></span>
+<span class="codeline" id="line-119"><code>			h.Write(slice)</code></span>
+<span class="codeline" id="line-120"><code>		}</code></span>
+<span class="codeline" id="line-121"><code>		digest := h.Sum(nil)</code></span>
+<span class="codeline" id="line-122"><code>		return digest</code></span>
+<span class="codeline" id="line-123"><code>	}</code></span>
+<span class="codeline" id="line-124"><code>	if sigType == signatureECDSA {</code></span>
+<span class="codeline" id="line-125"><code>		return sha1Hash(slices)</code></span>
+<span class="codeline" id="line-126"><code>	}</code></span>
+<span class="codeline" id="line-127"><code>	return md5SHA1Hash(slices)</code></span>
+<span class="codeline" id="line-128"><code>}</code></span>
+<span class="codeline" id="line-129"><code></code></span>
+<span class="codeline" id="line-130"><code>// ecdheKeyAgreement implements a TLS key agreement where the server</code></span>
+<span class="codeline" id="line-131"><code>// generates an ephemeral EC public/private key pair and signs it. The</code></span>
+<span class="codeline" id="line-132"><code>// pre-master secret is then calculated using ECDH. The signature may</code></span>
+<span class="codeline" id="line-133"><code>// be ECDSA, Ed25519 or RSA.</code></span>
+<span class="codeline" id="line-134"><code>type ecdheKeyAgreement struct {</code></span>
+<span class="codeline" id="line-135"><code>	version uint16</code></span>
+<span class="codeline" id="line-136"><code>	isRSA   bool</code></span>
+<span class="codeline" id="line-137"><code>	params  ecdheParameters</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>	// ckx and preMasterSecret are generated in processServerKeyExchange</code></span>
+<span class="codeline" id="line-140"><code>	// and returned in generateClientKeyExchange.</code></span>
+<span class="codeline" id="line-141"><code>	ckx             *clientKeyExchangeMsg</code></span>
+<span class="codeline" id="line-142"><code>	preMasterSecret []byte</code></span>
+<span class="codeline" id="line-143"><code>}</code></span>
+<span class="codeline" id="line-144"><code></code></span>
+<span class="codeline" id="line-145"><code>func (ka *ecdheKeyAgreement) generateServerKeyExchange(config *Config, cert *Certificate, clientHello *clientHelloMsg, hello *serverHelloMsg) (*serverKeyExchangeMsg, error) {</code></span>
+<span class="codeline" id="line-146"><code>	var curveID CurveID</code></span>
+<span class="codeline" id="line-147"><code>	for _, c := range clientHello.supportedCurves {</code></span>
+<span class="codeline" id="line-148"><code>		if config.supportsCurve(c) {</code></span>
+<span class="codeline" id="line-149"><code>			curveID = c</code></span>
+<span class="codeline" id="line-150"><code>			break</code></span>
+<span class="codeline" id="line-151"><code>		}</code></span>
+<span class="codeline" id="line-152"><code>	}</code></span>
+<span class="codeline" id="line-153"><code></code></span>
+<span class="codeline" id="line-154"><code>	if curveID == 0 {</code></span>
+<span class="codeline" id="line-155"><code>		return nil, errors.New("tls: no supported elliptic curves offered")</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code>	if _, ok := curveForCurveID(curveID); curveID != X25519 &amp;&amp; !ok {</code></span>
+<span class="codeline" id="line-158"><code>		return nil, errors.New("tls: CurvePreferences includes unsupported curve")</code></span>
+<span class="codeline" id="line-159"><code>	}</code></span>
+<span class="codeline" id="line-160"><code></code></span>
+<span class="codeline" id="line-161"><code>	params, err := generateECDHEParameters(config.rand(), curveID)</code></span>
+<span class="codeline" id="line-162"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-163"><code>		return nil, err</code></span>
+<span class="codeline" id="line-164"><code>	}</code></span>
+<span class="codeline" id="line-165"><code>	ka.params = params</code></span>
+<span class="codeline" id="line-166"><code></code></span>
+<span class="codeline" id="line-167"><code>	// See RFC 4492, Section 5.4.</code></span>
+<span class="codeline" id="line-168"><code>	ecdhePublic := params.PublicKey()</code></span>
+<span class="codeline" id="line-169"><code>	serverECDHEParams := make([]byte, 1+2+1+len(ecdhePublic))</code></span>
+<span class="codeline" id="line-170"><code>	serverECDHEParams[0] = 3 // named curve</code></span>
+<span class="codeline" id="line-171"><code>	serverECDHEParams[1] = byte(curveID &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-172"><code>	serverECDHEParams[2] = byte(curveID)</code></span>
+<span class="codeline" id="line-173"><code>	serverECDHEParams[3] = byte(len(ecdhePublic))</code></span>
+<span class="codeline" id="line-174"><code>	copy(serverECDHEParams[4:], ecdhePublic)</code></span>
+<span class="codeline" id="line-175"><code></code></span>
+<span class="codeline" id="line-176"><code>	priv, ok := cert.PrivateKey.(crypto.Signer)</code></span>
+<span class="codeline" id="line-177"><code>	if !ok {</code></span>
+<span class="codeline" id="line-178"><code>		return nil, fmt.Errorf("tls: certificate private key of type %T does not implement crypto.Signer", cert.PrivateKey)</code></span>
+<span class="codeline" id="line-179"><code>	}</code></span>
+<span class="codeline" id="line-180"><code></code></span>
+<span class="codeline" id="line-181"><code>	var signatureAlgorithm SignatureScheme</code></span>
+<span class="codeline" id="line-182"><code>	var sigType uint8</code></span>
+<span class="codeline" id="line-183"><code>	var sigHash crypto.Hash</code></span>
+<span class="codeline" id="line-184"><code>	if ka.version &gt;= VersionTLS12 {</code></span>
+<span class="codeline" id="line-185"><code>		signatureAlgorithm, err = selectSignatureScheme(ka.version, cert, clientHello.supportedSignatureAlgorithms)</code></span>
+<span class="codeline" id="line-186"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-187"><code>			return nil, err</code></span>
+<span class="codeline" id="line-188"><code>		}</code></span>
+<span class="codeline" id="line-189"><code>		sigType, sigHash, err = typeAndHashFromSignatureScheme(signatureAlgorithm)</code></span>
+<span class="codeline" id="line-190"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-191"><code>			return nil, err</code></span>
+<span class="codeline" id="line-192"><code>		}</code></span>
+<span class="codeline" id="line-193"><code>	} else {</code></span>
+<span class="codeline" id="line-194"><code>		sigType, sigHash, err = legacyTypeAndHashFromPublicKey(priv.Public())</code></span>
+<span class="codeline" id="line-195"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-196"><code>			return nil, err</code></span>
+<span class="codeline" id="line-197"><code>		}</code></span>
+<span class="codeline" id="line-198"><code>	}</code></span>
+<span class="codeline" id="line-199"><code>	if (sigType == signaturePKCS1v15 || sigType == signatureRSAPSS) != ka.isRSA {</code></span>
+<span class="codeline" id="line-200"><code>		return nil, errors.New("tls: certificate cannot be used with the selected cipher suite")</code></span>
+<span class="codeline" id="line-201"><code>	}</code></span>
+<span class="codeline" id="line-202"><code></code></span>
+<span class="codeline" id="line-203"><code>	signed := hashForServerKeyExchange(sigType, sigHash, ka.version, clientHello.random, hello.random, serverECDHEParams)</code></span>
+<span class="codeline" id="line-204"><code></code></span>
+<span class="codeline" id="line-205"><code>	signOpts := crypto.SignerOpts(sigHash)</code></span>
+<span class="codeline" id="line-206"><code>	if sigType == signatureRSAPSS {</code></span>
+<span class="codeline" id="line-207"><code>		signOpts = &amp;rsa.PSSOptions{SaltLength: rsa.PSSSaltLengthEqualsHash, Hash: sigHash}</code></span>
+<span class="codeline" id="line-208"><code>	}</code></span>
+<span class="codeline" id="line-209"><code>	sig, err := priv.Sign(config.rand(), signed, signOpts)</code></span>
+<span class="codeline" id="line-210"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-211"><code>		return nil, errors.New("tls: failed to sign ECDHE parameters: " + err.Error())</code></span>
+<span class="codeline" id="line-212"><code>	}</code></span>
+<span class="codeline" id="line-213"><code></code></span>
+<span class="codeline" id="line-214"><code>	skx := new(serverKeyExchangeMsg)</code></span>
+<span class="codeline" id="line-215"><code>	sigAndHashLen := 0</code></span>
+<span class="codeline" id="line-216"><code>	if ka.version &gt;= VersionTLS12 {</code></span>
+<span class="codeline" id="line-217"><code>		sigAndHashLen = 2</code></span>
+<span class="codeline" id="line-218"><code>	}</code></span>
+<span class="codeline" id="line-219"><code>	skx.key = make([]byte, len(serverECDHEParams)+sigAndHashLen+2+len(sig))</code></span>
+<span class="codeline" id="line-220"><code>	copy(skx.key, serverECDHEParams)</code></span>
+<span class="codeline" id="line-221"><code>	k := skx.key[len(serverECDHEParams):]</code></span>
+<span class="codeline" id="line-222"><code>	if ka.version &gt;= VersionTLS12 {</code></span>
+<span class="codeline" id="line-223"><code>		k[0] = byte(signatureAlgorithm &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-224"><code>		k[1] = byte(signatureAlgorithm)</code></span>
+<span class="codeline" id="line-225"><code>		k = k[2:]</code></span>
+<span class="codeline" id="line-226"><code>	}</code></span>
+<span class="codeline" id="line-227"><code>	k[0] = byte(len(sig) &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-228"><code>	k[1] = byte(len(sig))</code></span>
+<span class="codeline" id="line-229"><code>	copy(k[2:], sig)</code></span>
+<span class="codeline" id="line-230"><code></code></span>
+<span class="codeline" id="line-231"><code>	return skx, nil</code></span>
+<span class="codeline" id="line-232"><code>}</code></span>
+<span class="codeline" id="line-233"><code></code></span>
+<span class="codeline" id="line-234"><code>func (ka *ecdheKeyAgreement) processClientKeyExchange(config *Config, cert *Certificate, ckx *clientKeyExchangeMsg, version uint16) ([]byte, error) {</code></span>
+<span class="codeline" id="line-235"><code>	if len(ckx.ciphertext) == 0 || int(ckx.ciphertext[0]) != len(ckx.ciphertext)-1 {</code></span>
+<span class="codeline" id="line-236"><code>		return nil, errClientKeyExchange</code></span>
+<span class="codeline" id="line-237"><code>	}</code></span>
+<span class="codeline" id="line-238"><code></code></span>
+<span class="codeline" id="line-239"><code>	preMasterSecret := ka.params.SharedKey(ckx.ciphertext[1:])</code></span>
+<span class="codeline" id="line-240"><code>	if preMasterSecret == nil {</code></span>
+<span class="codeline" id="line-241"><code>		return nil, errClientKeyExchange</code></span>
+<span class="codeline" id="line-242"><code>	}</code></span>
+<span class="codeline" id="line-243"><code></code></span>
+<span class="codeline" id="line-244"><code>	return preMasterSecret, nil</code></span>
+<span class="codeline" id="line-245"><code>}</code></span>
+<span class="codeline" id="line-246"><code></code></span>
+<span class="codeline" id="line-247"><code>func (ka *ecdheKeyAgreement) processServerKeyExchange(config *Config, clientHello *clientHelloMsg, serverHello *serverHelloMsg, cert *x509.Certificate, skx *serverKeyExchangeMsg) error {</code></span>
+<span class="codeline" id="line-248"><code>	if len(skx.key) &lt; 4 {</code></span>
+<span class="codeline" id="line-249"><code>		return errServerKeyExchange</code></span>
+<span class="codeline" id="line-250"><code>	}</code></span>
+<span class="codeline" id="line-251"><code>	if skx.key[0] != 3 { // named curve</code></span>
+<span class="codeline" id="line-252"><code>		return errors.New("tls: server selected unsupported curve")</code></span>
+<span class="codeline" id="line-253"><code>	}</code></span>
+<span class="codeline" id="line-254"><code>	curveID := CurveID(skx.key[1])&lt;&lt;8 | CurveID(skx.key[2])</code></span>
+<span class="codeline" id="line-255"><code></code></span>
+<span class="codeline" id="line-256"><code>	publicLen := int(skx.key[3])</code></span>
+<span class="codeline" id="line-257"><code>	if publicLen+4 &gt; len(skx.key) {</code></span>
+<span class="codeline" id="line-258"><code>		return errServerKeyExchange</code></span>
+<span class="codeline" id="line-259"><code>	}</code></span>
+<span class="codeline" id="line-260"><code>	serverECDHEParams := skx.key[:4+publicLen]</code></span>
+<span class="codeline" id="line-261"><code>	publicKey := serverECDHEParams[4:]</code></span>
+<span class="codeline" id="line-262"><code></code></span>
+<span class="codeline" id="line-263"><code>	sig := skx.key[4+publicLen:]</code></span>
+<span class="codeline" id="line-264"><code>	if len(sig) &lt; 2 {</code></span>
+<span class="codeline" id="line-265"><code>		return errServerKeyExchange</code></span>
+<span class="codeline" id="line-266"><code>	}</code></span>
+<span class="codeline" id="line-267"><code></code></span>
+<span class="codeline" id="line-268"><code>	if _, ok := curveForCurveID(curveID); curveID != X25519 &amp;&amp; !ok {</code></span>
+<span class="codeline" id="line-269"><code>		return errors.New("tls: server selected unsupported curve")</code></span>
+<span class="codeline" id="line-270"><code>	}</code></span>
+<span class="codeline" id="line-271"><code></code></span>
+<span class="codeline" id="line-272"><code>	params, err := generateECDHEParameters(config.rand(), curveID)</code></span>
+<span class="codeline" id="line-273"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-274"><code>		return err</code></span>
+<span class="codeline" id="line-275"><code>	}</code></span>
+<span class="codeline" id="line-276"><code>	ka.params = params</code></span>
+<span class="codeline" id="line-277"><code></code></span>
+<span class="codeline" id="line-278"><code>	ka.preMasterSecret = params.SharedKey(publicKey)</code></span>
+<span class="codeline" id="line-279"><code>	if ka.preMasterSecret == nil {</code></span>
+<span class="codeline" id="line-280"><code>		return errServerKeyExchange</code></span>
+<span class="codeline" id="line-281"><code>	}</code></span>
+<span class="codeline" id="line-282"><code></code></span>
+<span class="codeline" id="line-283"><code>	ourPublicKey := params.PublicKey()</code></span>
+<span class="codeline" id="line-284"><code>	ka.ckx = new(clientKeyExchangeMsg)</code></span>
+<span class="codeline" id="line-285"><code>	ka.ckx.ciphertext = make([]byte, 1+len(ourPublicKey))</code></span>
+<span class="codeline" id="line-286"><code>	ka.ckx.ciphertext[0] = byte(len(ourPublicKey))</code></span>
+<span class="codeline" id="line-287"><code>	copy(ka.ckx.ciphertext[1:], ourPublicKey)</code></span>
+<span class="codeline" id="line-288"><code></code></span>
+<span class="codeline" id="line-289"><code>	var sigType uint8</code></span>
+<span class="codeline" id="line-290"><code>	var sigHash crypto.Hash</code></span>
+<span class="codeline" id="line-291"><code>	if ka.version &gt;= VersionTLS12 {</code></span>
+<span class="codeline" id="line-292"><code>		signatureAlgorithm := SignatureScheme(sig[0])&lt;&lt;8 | SignatureScheme(sig[1])</code></span>
+<span class="codeline" id="line-293"><code>		sig = sig[2:]</code></span>
+<span class="codeline" id="line-294"><code>		if len(sig) &lt; 2 {</code></span>
+<span class="codeline" id="line-295"><code>			return errServerKeyExchange</code></span>
+<span class="codeline" id="line-296"><code>		}</code></span>
+<span class="codeline" id="line-297"><code></code></span>
+<span class="codeline" id="line-298"><code>		if !isSupportedSignatureAlgorithm(signatureAlgorithm, clientHello.supportedSignatureAlgorithms) {</code></span>
+<span class="codeline" id="line-299"><code>			return errors.New("tls: certificate used with invalid signature algorithm")</code></span>
+<span class="codeline" id="line-300"><code>		}</code></span>
+<span class="codeline" id="line-301"><code>		sigType, sigHash, err = typeAndHashFromSignatureScheme(signatureAlgorithm)</code></span>
+<span class="codeline" id="line-302"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-303"><code>			return err</code></span>
+<span class="codeline" id="line-304"><code>		}</code></span>
+<span class="codeline" id="line-305"><code>	} else {</code></span>
+<span class="codeline" id="line-306"><code>		sigType, sigHash, err = legacyTypeAndHashFromPublicKey(cert.PublicKey)</code></span>
+<span class="codeline" id="line-307"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-308"><code>			return err</code></span>
+<span class="codeline" id="line-309"><code>		}</code></span>
+<span class="codeline" id="line-310"><code>	}</code></span>
+<span class="codeline" id="line-311"><code>	if (sigType == signaturePKCS1v15 || sigType == signatureRSAPSS) != ka.isRSA {</code></span>
+<span class="codeline" id="line-312"><code>		return errServerKeyExchange</code></span>
+<span class="codeline" id="line-313"><code>	}</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>	sigLen := int(sig[0])&lt;&lt;8 | int(sig[1])</code></span>
+<span class="codeline" id="line-316"><code>	if sigLen+2 != len(sig) {</code></span>
+<span class="codeline" id="line-317"><code>		return errServerKeyExchange</code></span>
+<span class="codeline" id="line-318"><code>	}</code></span>
+<span class="codeline" id="line-319"><code>	sig = sig[2:]</code></span>
+<span class="codeline" id="line-320"><code></code></span>
+<span class="codeline" id="line-321"><code>	signed := hashForServerKeyExchange(sigType, sigHash, ka.version, clientHello.random, serverHello.random, serverECDHEParams)</code></span>
+<span class="codeline" id="line-322"><code>	if err := verifyHandshakeSignature(sigType, cert.PublicKey, sigHash, signed, sig); err != nil {</code></span>
+<span class="codeline" id="line-323"><code>		return errors.New("tls: invalid signature by the server certificate: " + err.Error())</code></span>
+<span class="codeline" id="line-324"><code>	}</code></span>
+<span class="codeline" id="line-325"><code>	return nil</code></span>
+<span class="codeline" id="line-326"><code>}</code></span>
+<span class="codeline" id="line-327"><code></code></span>
+<span class="codeline" id="line-328"><code>func (ka *ecdheKeyAgreement) generateClientKeyExchange(config *Config, clientHello *clientHelloMsg, cert *x509.Certificate) ([]byte, *clientKeyExchangeMsg, error) {</code></span>
+<span class="codeline" id="line-329"><code>	if ka.ckx == nil {</code></span>
+<span class="codeline" id="line-330"><code>		return nil, nil, errors.New("tls: missing ServerKeyExchange message")</code></span>
+<span class="codeline" id="line-331"><code>	}</code></span>
+<span class="codeline" id="line-332"><code></code></span>
+<span class="codeline" id="line-333"><code>	return ka.preMasterSecret, ka.ckx, nil</code></span>
+<span class="codeline" id="line-334"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

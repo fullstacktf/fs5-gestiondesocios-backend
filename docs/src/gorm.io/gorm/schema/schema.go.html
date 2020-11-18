@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: schema.go in package gorm.io/gorm/schema</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	schema.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/gorm.io/gorm/schema.html">gorm.io/gorm/schema</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>package schema</code></span>
+<span class="codeline" id="line-2"><code></code></span>
+<span class="codeline" id="line-3"><code>import (</code></span>
+<span class="codeline" id="line-4"><code>	"context"</code></span>
+<span class="codeline" id="line-5"><code>	"errors"</code></span>
+<span class="codeline" id="line-6"><code>	"fmt"</code></span>
+<span class="codeline" id="line-7"><code>	"go/ast"</code></span>
+<span class="codeline" id="line-8"><code>	"reflect"</code></span>
+<span class="codeline" id="line-9"><code>	"sync"</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>	"gorm.io/gorm/clause"</code></span>
+<span class="codeline" id="line-12"><code>	"gorm.io/gorm/logger"</code></span>
+<span class="codeline" id="line-13"><code>)</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>// ErrUnsupportedDataType unsupported data type</code></span>
+<span class="codeline" id="line-16"><code>var ErrUnsupportedDataType = errors.New("unsupported data type")</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>type Schema struct {</code></span>
+<span class="codeline" id="line-19"><code>	Name                      string</code></span>
+<span class="codeline" id="line-20"><code>	ModelType                 reflect.Type</code></span>
+<span class="codeline" id="line-21"><code>	Table                     string</code></span>
+<span class="codeline" id="line-22"><code>	PrioritizedPrimaryField   *Field</code></span>
+<span class="codeline" id="line-23"><code>	DBNames                   []string</code></span>
+<span class="codeline" id="line-24"><code>	PrimaryFields             []*Field</code></span>
+<span class="codeline" id="line-25"><code>	PrimaryFieldDBNames       []string</code></span>
+<span class="codeline" id="line-26"><code>	Fields                    []*Field</code></span>
+<span class="codeline" id="line-27"><code>	FieldsByName              map[string]*Field</code></span>
+<span class="codeline" id="line-28"><code>	FieldsByDBName            map[string]*Field</code></span>
+<span class="codeline" id="line-29"><code>	FieldsWithDefaultDBValue  []*Field // fields with default value assigned by database</code></span>
+<span class="codeline" id="line-30"><code>	Relationships             Relationships</code></span>
+<span class="codeline" id="line-31"><code>	CreateClauses             []clause.Interface</code></span>
+<span class="codeline" id="line-32"><code>	QueryClauses              []clause.Interface</code></span>
+<span class="codeline" id="line-33"><code>	UpdateClauses             []clause.Interface</code></span>
+<span class="codeline" id="line-34"><code>	DeleteClauses             []clause.Interface</code></span>
+<span class="codeline" id="line-35"><code>	BeforeCreate, AfterCreate bool</code></span>
+<span class="codeline" id="line-36"><code>	BeforeUpdate, AfterUpdate bool</code></span>
+<span class="codeline" id="line-37"><code>	BeforeDelete, AfterDelete bool</code></span>
+<span class="codeline" id="line-38"><code>	BeforeSave, AfterSave     bool</code></span>
+<span class="codeline" id="line-39"><code>	AfterFind                 bool</code></span>
+<span class="codeline" id="line-40"><code>	err                       error</code></span>
+<span class="codeline" id="line-41"><code>	namer                     Namer</code></span>
+<span class="codeline" id="line-42"><code>	cacheStore                *sync.Map</code></span>
+<span class="codeline" id="line-43"><code>}</code></span>
+<span class="codeline" id="line-44"><code></code></span>
+<span class="codeline" id="line-45"><code>func (schema Schema) String() string {</code></span>
+<span class="codeline" id="line-46"><code>	if schema.ModelType.Name() == "" {</code></span>
+<span class="codeline" id="line-47"><code>		return fmt.Sprintf("%v(%v)", schema.Name, schema.Table)</code></span>
+<span class="codeline" id="line-48"><code>	}</code></span>
+<span class="codeline" id="line-49"><code>	return fmt.Sprintf("%v.%v", schema.ModelType.PkgPath(), schema.ModelType.Name())</code></span>
+<span class="codeline" id="line-50"><code>}</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>func (schema Schema) MakeSlice() reflect.Value {</code></span>
+<span class="codeline" id="line-53"><code>	slice := reflect.MakeSlice(reflect.SliceOf(reflect.PtrTo(schema.ModelType)), 0, 0)</code></span>
+<span class="codeline" id="line-54"><code>	results := reflect.New(slice.Type())</code></span>
+<span class="codeline" id="line-55"><code>	results.Elem().Set(slice)</code></span>
+<span class="codeline" id="line-56"><code>	return results</code></span>
+<span class="codeline" id="line-57"><code>}</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>func (schema Schema) LookUpField(name string) *Field {</code></span>
+<span class="codeline" id="line-60"><code>	if field, ok := schema.FieldsByDBName[name]; ok {</code></span>
+<span class="codeline" id="line-61"><code>		return field</code></span>
+<span class="codeline" id="line-62"><code>	}</code></span>
+<span class="codeline" id="line-63"><code>	if field, ok := schema.FieldsByName[name]; ok {</code></span>
+<span class="codeline" id="line-64"><code>		return field</code></span>
+<span class="codeline" id="line-65"><code>	}</code></span>
+<span class="codeline" id="line-66"><code>	return nil</code></span>
+<span class="codeline" id="line-67"><code>}</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>type Tabler interface {</code></span>
+<span class="codeline" id="line-70"><code>	TableName() string</code></span>
+<span class="codeline" id="line-71"><code>}</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>// get data type from dialector</code></span>
+<span class="codeline" id="line-74"><code>func Parse(dest interface{}, cacheStore *sync.Map, namer Namer) (*Schema, error) {</code></span>
+<span class="codeline" id="line-75"><code>	if dest == nil {</code></span>
+<span class="codeline" id="line-76"><code>		return nil, fmt.Errorf("%w: %+v", ErrUnsupportedDataType, dest)</code></span>
+<span class="codeline" id="line-77"><code>	}</code></span>
+<span class="codeline" id="line-78"><code></code></span>
+<span class="codeline" id="line-79"><code>	modelType := reflect.ValueOf(dest).Type()</code></span>
+<span class="codeline" id="line-80"><code>	for modelType.Kind() == reflect.Slice || modelType.Kind() == reflect.Array || modelType.Kind() == reflect.Ptr {</code></span>
+<span class="codeline" id="line-81"><code>		modelType = modelType.Elem()</code></span>
+<span class="codeline" id="line-82"><code>	}</code></span>
+<span class="codeline" id="line-83"><code></code></span>
+<span class="codeline" id="line-84"><code>	if modelType.Kind() != reflect.Struct {</code></span>
+<span class="codeline" id="line-85"><code>		if modelType.PkgPath() == "" {</code></span>
+<span class="codeline" id="line-86"><code>			return nil, fmt.Errorf("%w: %+v", ErrUnsupportedDataType, dest)</code></span>
+<span class="codeline" id="line-87"><code>		}</code></span>
+<span class="codeline" id="line-88"><code>		return nil, fmt.Errorf("%w: %v.%v", ErrUnsupportedDataType, modelType.PkgPath(), modelType.Name())</code></span>
+<span class="codeline" id="line-89"><code>	}</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>	if v, ok := cacheStore.Load(modelType); ok {</code></span>
+<span class="codeline" id="line-92"><code>		return v.(*Schema), nil</code></span>
+<span class="codeline" id="line-93"><code>	}</code></span>
+<span class="codeline" id="line-94"><code></code></span>
+<span class="codeline" id="line-95"><code>	modelValue := reflect.New(modelType)</code></span>
+<span class="codeline" id="line-96"><code>	tableName := namer.TableName(modelType.Name())</code></span>
+<span class="codeline" id="line-97"><code>	if tabler, ok := modelValue.Interface().(Tabler); ok {</code></span>
+<span class="codeline" id="line-98"><code>		tableName = tabler.TableName()</code></span>
+<span class="codeline" id="line-99"><code>	}</code></span>
+<span class="codeline" id="line-100"><code>	if en, ok := namer.(embeddedNamer); ok {</code></span>
+<span class="codeline" id="line-101"><code>		tableName = en.Table</code></span>
+<span class="codeline" id="line-102"><code>	}</code></span>
+<span class="codeline" id="line-103"><code></code></span>
+<span class="codeline" id="line-104"><code>	schema := &amp;Schema{</code></span>
+<span class="codeline" id="line-105"><code>		Name:           modelType.Name(),</code></span>
+<span class="codeline" id="line-106"><code>		ModelType:      modelType,</code></span>
+<span class="codeline" id="line-107"><code>		Table:          tableName,</code></span>
+<span class="codeline" id="line-108"><code>		FieldsByName:   map[string]*Field{},</code></span>
+<span class="codeline" id="line-109"><code>		FieldsByDBName: map[string]*Field{},</code></span>
+<span class="codeline" id="line-110"><code>		Relationships:  Relationships{Relations: map[string]*Relationship{}},</code></span>
+<span class="codeline" id="line-111"><code>		cacheStore:     cacheStore,</code></span>
+<span class="codeline" id="line-112"><code>		namer:          namer,</code></span>
+<span class="codeline" id="line-113"><code>	}</code></span>
+<span class="codeline" id="line-114"><code></code></span>
+<span class="codeline" id="line-115"><code>	defer func() {</code></span>
+<span class="codeline" id="line-116"><code>		if schema.err != nil {</code></span>
+<span class="codeline" id="line-117"><code>			logger.Default.Error(context.Background(), schema.err.Error())</code></span>
+<span class="codeline" id="line-118"><code>			cacheStore.Delete(modelType)</code></span>
+<span class="codeline" id="line-119"><code>		}</code></span>
+<span class="codeline" id="line-120"><code>	}()</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>	for i := 0; i &lt; modelType.NumField(); i++ {</code></span>
+<span class="codeline" id="line-123"><code>		if fieldStruct := modelType.Field(i); ast.IsExported(fieldStruct.Name) {</code></span>
+<span class="codeline" id="line-124"><code>			if field := schema.ParseField(fieldStruct); field.EmbeddedSchema != nil {</code></span>
+<span class="codeline" id="line-125"><code>				schema.Fields = append(schema.Fields, field.EmbeddedSchema.Fields...)</code></span>
+<span class="codeline" id="line-126"><code>			} else {</code></span>
+<span class="codeline" id="line-127"><code>				schema.Fields = append(schema.Fields, field)</code></span>
+<span class="codeline" id="line-128"><code>			}</code></span>
+<span class="codeline" id="line-129"><code>		}</code></span>
+<span class="codeline" id="line-130"><code>	}</code></span>
+<span class="codeline" id="line-131"><code></code></span>
+<span class="codeline" id="line-132"><code>	for _, field := range schema.Fields {</code></span>
+<span class="codeline" id="line-133"><code>		if field.DBName == "" &amp;&amp; field.DataType != "" {</code></span>
+<span class="codeline" id="line-134"><code>			field.DBName = namer.ColumnName(schema.Table, field.Name)</code></span>
+<span class="codeline" id="line-135"><code>		}</code></span>
+<span class="codeline" id="line-136"><code></code></span>
+<span class="codeline" id="line-137"><code>		if field.DBName != "" {</code></span>
+<span class="codeline" id="line-138"><code>			// nonexistence or shortest path or first appear prioritized if has permission</code></span>
+<span class="codeline" id="line-139"><code>			if v, ok := schema.FieldsByDBName[field.DBName]; !ok || ((field.Creatable || field.Updatable || field.Readable) &amp;&amp; len(field.BindNames) &lt; len(v.BindNames)) {</code></span>
+<span class="codeline" id="line-140"><code>				if _, ok := schema.FieldsByDBName[field.DBName]; !ok {</code></span>
+<span class="codeline" id="line-141"><code>					schema.DBNames = append(schema.DBNames, field.DBName)</code></span>
+<span class="codeline" id="line-142"><code>				}</code></span>
+<span class="codeline" id="line-143"><code>				schema.FieldsByDBName[field.DBName] = field</code></span>
+<span class="codeline" id="line-144"><code>				schema.FieldsByName[field.Name] = field</code></span>
+<span class="codeline" id="line-145"><code></code></span>
+<span class="codeline" id="line-146"><code>				if v != nil &amp;&amp; v.PrimaryKey {</code></span>
+<span class="codeline" id="line-147"><code>					for idx, f := range schema.PrimaryFields {</code></span>
+<span class="codeline" id="line-148"><code>						if f == v {</code></span>
+<span class="codeline" id="line-149"><code>							schema.PrimaryFields = append(schema.PrimaryFields[0:idx], schema.PrimaryFields[idx+1:]...)</code></span>
+<span class="codeline" id="line-150"><code>						}</code></span>
+<span class="codeline" id="line-151"><code>					}</code></span>
+<span class="codeline" id="line-152"><code>				}</code></span>
+<span class="codeline" id="line-153"><code></code></span>
+<span class="codeline" id="line-154"><code>				if field.PrimaryKey {</code></span>
+<span class="codeline" id="line-155"><code>					schema.PrimaryFields = append(schema.PrimaryFields, field)</code></span>
+<span class="codeline" id="line-156"><code>				}</code></span>
+<span class="codeline" id="line-157"><code>			}</code></span>
+<span class="codeline" id="line-158"><code>		}</code></span>
+<span class="codeline" id="line-159"><code></code></span>
+<span class="codeline" id="line-160"><code>		if _, ok := schema.FieldsByName[field.Name]; !ok {</code></span>
+<span class="codeline" id="line-161"><code>			schema.FieldsByName[field.Name] = field</code></span>
+<span class="codeline" id="line-162"><code>		}</code></span>
+<span class="codeline" id="line-163"><code></code></span>
+<span class="codeline" id="line-164"><code>		field.setupValuerAndSetter()</code></span>
+<span class="codeline" id="line-165"><code>	}</code></span>
+<span class="codeline" id="line-166"><code></code></span>
+<span class="codeline" id="line-167"><code>	prioritizedPrimaryField := schema.LookUpField("id")</code></span>
+<span class="codeline" id="line-168"><code>	if prioritizedPrimaryField == nil {</code></span>
+<span class="codeline" id="line-169"><code>		prioritizedPrimaryField = schema.LookUpField("ID")</code></span>
+<span class="codeline" id="line-170"><code>	}</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>	if prioritizedPrimaryField != nil {</code></span>
+<span class="codeline" id="line-173"><code>		if prioritizedPrimaryField.PrimaryKey {</code></span>
+<span class="codeline" id="line-174"><code>			schema.PrioritizedPrimaryField = prioritizedPrimaryField</code></span>
+<span class="codeline" id="line-175"><code>		} else if len(schema.PrimaryFields) == 0 {</code></span>
+<span class="codeline" id="line-176"><code>			prioritizedPrimaryField.PrimaryKey = true</code></span>
+<span class="codeline" id="line-177"><code>			schema.PrioritizedPrimaryField = prioritizedPrimaryField</code></span>
+<span class="codeline" id="line-178"><code>			schema.PrimaryFields = append(schema.PrimaryFields, prioritizedPrimaryField)</code></span>
+<span class="codeline" id="line-179"><code>		}</code></span>
+<span class="codeline" id="line-180"><code>	}</code></span>
+<span class="codeline" id="line-181"><code></code></span>
+<span class="codeline" id="line-182"><code>	if schema.PrioritizedPrimaryField == nil &amp;&amp; len(schema.PrimaryFields) == 1 {</code></span>
+<span class="codeline" id="line-183"><code>		schema.PrioritizedPrimaryField = schema.PrimaryFields[0]</code></span>
+<span class="codeline" id="line-184"><code>	}</code></span>
+<span class="codeline" id="line-185"><code></code></span>
+<span class="codeline" id="line-186"><code>	for _, field := range schema.PrimaryFields {</code></span>
+<span class="codeline" id="line-187"><code>		schema.PrimaryFieldDBNames = append(schema.PrimaryFieldDBNames, field.DBName)</code></span>
+<span class="codeline" id="line-188"><code>	}</code></span>
+<span class="codeline" id="line-189"><code></code></span>
+<span class="codeline" id="line-190"><code>	for _, field := range schema.FieldsByDBName {</code></span>
+<span class="codeline" id="line-191"><code>		if field.HasDefaultValue &amp;&amp; field.DefaultValueInterface == nil {</code></span>
+<span class="codeline" id="line-192"><code>			schema.FieldsWithDefaultDBValue = append(schema.FieldsWithDefaultDBValue, field)</code></span>
+<span class="codeline" id="line-193"><code>		}</code></span>
+<span class="codeline" id="line-194"><code>	}</code></span>
+<span class="codeline" id="line-195"><code></code></span>
+<span class="codeline" id="line-196"><code>	if field := schema.PrioritizedPrimaryField; field != nil {</code></span>
+<span class="codeline" id="line-197"><code>		switch field.GORMDataType {</code></span>
+<span class="codeline" id="line-198"><code>		case Int, Uint:</code></span>
+<span class="codeline" id="line-199"><code>			if _, ok := field.TagSettings["AUTOINCREMENT"]; !ok {</code></span>
+<span class="codeline" id="line-200"><code>				if !field.HasDefaultValue || field.DefaultValueInterface != nil {</code></span>
+<span class="codeline" id="line-201"><code>					schema.FieldsWithDefaultDBValue = append(schema.FieldsWithDefaultDBValue, field)</code></span>
+<span class="codeline" id="line-202"><code>				}</code></span>
+<span class="codeline" id="line-203"><code></code></span>
+<span class="codeline" id="line-204"><code>				field.HasDefaultValue = true</code></span>
+<span class="codeline" id="line-205"><code>				field.AutoIncrement = true</code></span>
+<span class="codeline" id="line-206"><code>			}</code></span>
+<span class="codeline" id="line-207"><code>		}</code></span>
+<span class="codeline" id="line-208"><code>	}</code></span>
+<span class="codeline" id="line-209"><code></code></span>
+<span class="codeline" id="line-210"><code>	callbacks := []string{"BeforeCreate", "AfterCreate", "BeforeUpdate", "AfterUpdate", "BeforeSave", "AfterSave", "BeforeDelete", "AfterDelete", "AfterFind"}</code></span>
+<span class="codeline" id="line-211"><code>	for _, name := range callbacks {</code></span>
+<span class="codeline" id="line-212"><code>		if methodValue := modelValue.MethodByName(name); methodValue.IsValid() {</code></span>
+<span class="codeline" id="line-213"><code>			switch methodValue.Type().String() {</code></span>
+<span class="codeline" id="line-214"><code>			case "func(*gorm.DB) error": // TODO hack</code></span>
+<span class="codeline" id="line-215"><code>				reflect.Indirect(reflect.ValueOf(schema)).FieldByName(name).SetBool(true)</code></span>
+<span class="codeline" id="line-216"><code>			default:</code></span>
+<span class="codeline" id="line-217"><code>				logger.Default.Warn(context.Background(), "Model %v don't match %vInterface, should be %v(*gorm.DB)", schema, name, name)</code></span>
+<span class="codeline" id="line-218"><code>			}</code></span>
+<span class="codeline" id="line-219"><code>		}</code></span>
+<span class="codeline" id="line-220"><code>	}</code></span>
+<span class="codeline" id="line-221"><code></code></span>
+<span class="codeline" id="line-222"><code>	if _, loaded := cacheStore.LoadOrStore(modelType, schema); !loaded {</code></span>
+<span class="codeline" id="line-223"><code>		if _, embedded := schema.cacheStore.Load(embeddedCacheKey); !embedded {</code></span>
+<span class="codeline" id="line-224"><code>			for _, field := range schema.Fields {</code></span>
+<span class="codeline" id="line-225"><code>				if field.DataType == "" &amp;&amp; (field.Creatable || field.Updatable || field.Readable) {</code></span>
+<span class="codeline" id="line-226"><code>					if schema.parseRelation(field); schema.err != nil {</code></span>
+<span class="codeline" id="line-227"><code>						return schema, schema.err</code></span>
+<span class="codeline" id="line-228"><code>					}</code></span>
+<span class="codeline" id="line-229"><code>				}</code></span>
+<span class="codeline" id="line-230"><code></code></span>
+<span class="codeline" id="line-231"><code>				fieldValue := reflect.New(field.IndirectFieldType)</code></span>
+<span class="codeline" id="line-232"><code>				if fc, ok := fieldValue.Interface().(CreateClausesInterface); ok {</code></span>
+<span class="codeline" id="line-233"><code>					field.Schema.CreateClauses = append(field.Schema.CreateClauses, fc.CreateClauses(field)...)</code></span>
+<span class="codeline" id="line-234"><code>				}</code></span>
+<span class="codeline" id="line-235"><code></code></span>
+<span class="codeline" id="line-236"><code>				if fc, ok := fieldValue.Interface().(QueryClausesInterface); ok {</code></span>
+<span class="codeline" id="line-237"><code>					field.Schema.QueryClauses = append(field.Schema.QueryClauses, fc.QueryClauses(field)...)</code></span>
+<span class="codeline" id="line-238"><code>				}</code></span>
+<span class="codeline" id="line-239"><code></code></span>
+<span class="codeline" id="line-240"><code>				if fc, ok := fieldValue.Interface().(UpdateClausesInterface); ok {</code></span>
+<span class="codeline" id="line-241"><code>					field.Schema.UpdateClauses = append(field.Schema.UpdateClauses, fc.UpdateClauses(field)...)</code></span>
+<span class="codeline" id="line-242"><code>				}</code></span>
+<span class="codeline" id="line-243"><code></code></span>
+<span class="codeline" id="line-244"><code>				if fc, ok := fieldValue.Interface().(DeleteClausesInterface); ok {</code></span>
+<span class="codeline" id="line-245"><code>					field.Schema.DeleteClauses = append(field.Schema.DeleteClauses, fc.DeleteClauses(field)...)</code></span>
+<span class="codeline" id="line-246"><code>				}</code></span>
+<span class="codeline" id="line-247"><code>			}</code></span>
+<span class="codeline" id="line-248"><code>		}</code></span>
+<span class="codeline" id="line-249"><code>	}</code></span>
+<span class="codeline" id="line-250"><code></code></span>
+<span class="codeline" id="line-251"><code>	return schema, schema.err</code></span>
+<span class="codeline" id="line-252"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

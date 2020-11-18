@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: elliptic.go in package crypto/elliptic</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	elliptic.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/elliptic.html">crypto/elliptic</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2010 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<div class="anchor" id="doc"><span class="codeline" id="line-5"><code>// Package elliptic implements several standard elliptic curves over prime</code></span>
+<span class="codeline" id="line-6"><code>// fields.</code></span></div><span class="codeline" id="line-7"><code>package elliptic</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>// This package operates, internally, on Jacobian coordinates. For a given</code></span>
+<span class="codeline" id="line-10"><code>// (x, y) position on the curve, the Jacobian coordinates are (x1, y1, z1)</code></span>
+<span class="codeline" id="line-11"><code>// where x = x1/z1² and y = y1/z1³. The greatest speedups come when the whole</code></span>
+<span class="codeline" id="line-12"><code>// calculation can be performed within the transform (as in ScalarMult and</code></span>
+<span class="codeline" id="line-13"><code>// ScalarBaseMult). But even for Add and Double, it's faster to apply and</code></span>
+<span class="codeline" id="line-14"><code>// reverse the transform than to operate in affine coordinates.</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>import (</code></span>
+<span class="codeline" id="line-17"><code>	"io"</code></span>
+<span class="codeline" id="line-18"><code>	"math/big"</code></span>
+<span class="codeline" id="line-19"><code>	"sync"</code></span>
+<span class="codeline" id="line-20"><code>)</code></span>
+<span class="codeline" id="line-21"><code></code></span>
+<span class="codeline" id="line-22"><code>// A Curve represents a short-form Weierstrass curve with a=-3.</code></span>
+<span class="codeline" id="line-23"><code>//</code></span>
+<span class="codeline" id="line-24"><code>// Note that the point at infinity (0, 0) is not considered on the curve, and</code></span>
+<span class="codeline" id="line-25"><code>// although it can be returned by Add, Double, ScalarMult, or ScalarBaseMult, it</code></span>
+<span class="codeline" id="line-26"><code>// can't be marshaled or unmarshaled, and IsOnCurve will return false for it.</code></span>
+<span class="codeline" id="line-27"><code>type Curve interface {</code></span>
+<span class="codeline" id="line-28"><code>	// Params returns the parameters for the curve.</code></span>
+<span class="codeline" id="line-29"><code>	Params() *CurveParams</code></span>
+<span class="codeline" id="line-30"><code>	// IsOnCurve reports whether the given (x,y) lies on the curve.</code></span>
+<span class="codeline" id="line-31"><code>	IsOnCurve(x, y *big.Int) bool</code></span>
+<span class="codeline" id="line-32"><code>	// Add returns the sum of (x1,y1) and (x2,y2)</code></span>
+<span class="codeline" id="line-33"><code>	Add(x1, y1, x2, y2 *big.Int) (x, y *big.Int)</code></span>
+<span class="codeline" id="line-34"><code>	// Double returns 2*(x,y)</code></span>
+<span class="codeline" id="line-35"><code>	Double(x1, y1 *big.Int) (x, y *big.Int)</code></span>
+<span class="codeline" id="line-36"><code>	// ScalarMult returns k*(Bx,By) where k is a number in big-endian form.</code></span>
+<span class="codeline" id="line-37"><code>	ScalarMult(x1, y1 *big.Int, k []byte) (x, y *big.Int)</code></span>
+<span class="codeline" id="line-38"><code>	// ScalarBaseMult returns k*G, where G is the base point of the group</code></span>
+<span class="codeline" id="line-39"><code>	// and k is an integer in big-endian form.</code></span>
+<span class="codeline" id="line-40"><code>	ScalarBaseMult(k []byte) (x, y *big.Int)</code></span>
+<span class="codeline" id="line-41"><code>}</code></span>
+<span class="codeline" id="line-42"><code></code></span>
+<span class="codeline" id="line-43"><code>// CurveParams contains the parameters of an elliptic curve and also provides</code></span>
+<span class="codeline" id="line-44"><code>// a generic, non-constant time implementation of Curve.</code></span>
+<span class="codeline" id="line-45"><code>type CurveParams struct {</code></span>
+<span class="codeline" id="line-46"><code>	P       *big.Int // the order of the underlying field</code></span>
+<span class="codeline" id="line-47"><code>	N       *big.Int // the order of the base point</code></span>
+<span class="codeline" id="line-48"><code>	B       *big.Int // the constant of the curve equation</code></span>
+<span class="codeline" id="line-49"><code>	Gx, Gy  *big.Int // (x,y) of the base point</code></span>
+<span class="codeline" id="line-50"><code>	BitSize int      // the size of the underlying field</code></span>
+<span class="codeline" id="line-51"><code>	Name    string   // the canonical name of the curve</code></span>
+<span class="codeline" id="line-52"><code>}</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>func (curve *CurveParams) Params() *CurveParams {</code></span>
+<span class="codeline" id="line-55"><code>	return curve</code></span>
+<span class="codeline" id="line-56"><code>}</code></span>
+<span class="codeline" id="line-57"><code></code></span>
+<span class="codeline" id="line-58"><code>// polynomial returns x³ - 3x + b.</code></span>
+<span class="codeline" id="line-59"><code>func (curve *CurveParams) polynomial(x *big.Int) *big.Int {</code></span>
+<span class="codeline" id="line-60"><code>	x3 := new(big.Int).Mul(x, x)</code></span>
+<span class="codeline" id="line-61"><code>	x3.Mul(x3, x)</code></span>
+<span class="codeline" id="line-62"><code></code></span>
+<span class="codeline" id="line-63"><code>	threeX := new(big.Int).Lsh(x, 1)</code></span>
+<span class="codeline" id="line-64"><code>	threeX.Add(threeX, x)</code></span>
+<span class="codeline" id="line-65"><code></code></span>
+<span class="codeline" id="line-66"><code>	x3.Sub(x3, threeX)</code></span>
+<span class="codeline" id="line-67"><code>	x3.Add(x3, curve.B)</code></span>
+<span class="codeline" id="line-68"><code>	x3.Mod(x3, curve.P)</code></span>
+<span class="codeline" id="line-69"><code></code></span>
+<span class="codeline" id="line-70"><code>	return x3</code></span>
+<span class="codeline" id="line-71"><code>}</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>func (curve *CurveParams) IsOnCurve(x, y *big.Int) bool {</code></span>
+<span class="codeline" id="line-74"><code>	// y² = x³ - 3x + b</code></span>
+<span class="codeline" id="line-75"><code>	y2 := new(big.Int).Mul(y, y)</code></span>
+<span class="codeline" id="line-76"><code>	y2.Mod(y2, curve.P)</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>	return curve.polynomial(x).Cmp(y2) == 0</code></span>
+<span class="codeline" id="line-79"><code>}</code></span>
+<span class="codeline" id="line-80"><code></code></span>
+<span class="codeline" id="line-81"><code>// zForAffine returns a Jacobian Z value for the affine point (x, y). If x and</code></span>
+<span class="codeline" id="line-82"><code>// y are zero, it assumes that they represent the point at infinity because (0,</code></span>
+<span class="codeline" id="line-83"><code>// 0) is not on the any of the curves handled here.</code></span>
+<span class="codeline" id="line-84"><code>func zForAffine(x, y *big.Int) *big.Int {</code></span>
+<span class="codeline" id="line-85"><code>	z := new(big.Int)</code></span>
+<span class="codeline" id="line-86"><code>	if x.Sign() != 0 || y.Sign() != 0 {</code></span>
+<span class="codeline" id="line-87"><code>		z.SetInt64(1)</code></span>
+<span class="codeline" id="line-88"><code>	}</code></span>
+<span class="codeline" id="line-89"><code>	return z</code></span>
+<span class="codeline" id="line-90"><code>}</code></span>
+<span class="codeline" id="line-91"><code></code></span>
+<span class="codeline" id="line-92"><code>// affineFromJacobian reverses the Jacobian transform. See the comment at the</code></span>
+<span class="codeline" id="line-93"><code>// top of the file. If the point is ∞ it returns 0, 0.</code></span>
+<span class="codeline" id="line-94"><code>func (curve *CurveParams) affineFromJacobian(x, y, z *big.Int) (xOut, yOut *big.Int) {</code></span>
+<span class="codeline" id="line-95"><code>	if z.Sign() == 0 {</code></span>
+<span class="codeline" id="line-96"><code>		return new(big.Int), new(big.Int)</code></span>
+<span class="codeline" id="line-97"><code>	}</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>	zinv := new(big.Int).ModInverse(z, curve.P)</code></span>
+<span class="codeline" id="line-100"><code>	zinvsq := new(big.Int).Mul(zinv, zinv)</code></span>
+<span class="codeline" id="line-101"><code></code></span>
+<span class="codeline" id="line-102"><code>	xOut = new(big.Int).Mul(x, zinvsq)</code></span>
+<span class="codeline" id="line-103"><code>	xOut.Mod(xOut, curve.P)</code></span>
+<span class="codeline" id="line-104"><code>	zinvsq.Mul(zinvsq, zinv)</code></span>
+<span class="codeline" id="line-105"><code>	yOut = new(big.Int).Mul(y, zinvsq)</code></span>
+<span class="codeline" id="line-106"><code>	yOut.Mod(yOut, curve.P)</code></span>
+<span class="codeline" id="line-107"><code>	return</code></span>
+<span class="codeline" id="line-108"><code>}</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>func (curve *CurveParams) Add(x1, y1, x2, y2 *big.Int) (*big.Int, *big.Int) {</code></span>
+<span class="codeline" id="line-111"><code>	z1 := zForAffine(x1, y1)</code></span>
+<span class="codeline" id="line-112"><code>	z2 := zForAffine(x2, y2)</code></span>
+<span class="codeline" id="line-113"><code>	return curve.affineFromJacobian(curve.addJacobian(x1, y1, z1, x2, y2, z2))</code></span>
+<span class="codeline" id="line-114"><code>}</code></span>
+<span class="codeline" id="line-115"><code></code></span>
+<span class="codeline" id="line-116"><code>// addJacobian takes two points in Jacobian coordinates, (x1, y1, z1) and</code></span>
+<span class="codeline" id="line-117"><code>// (x2, y2, z2) and returns their sum, also in Jacobian form.</code></span>
+<span class="codeline" id="line-118"><code>func (curve *CurveParams) addJacobian(x1, y1, z1, x2, y2, z2 *big.Int) (*big.Int, *big.Int, *big.Int) {</code></span>
+<span class="codeline" id="line-119"><code>	// See https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#addition-add-2007-bl</code></span>
+<span class="codeline" id="line-120"><code>	x3, y3, z3 := new(big.Int), new(big.Int), new(big.Int)</code></span>
+<span class="codeline" id="line-121"><code>	if z1.Sign() == 0 {</code></span>
+<span class="codeline" id="line-122"><code>		x3.Set(x2)</code></span>
+<span class="codeline" id="line-123"><code>		y3.Set(y2)</code></span>
+<span class="codeline" id="line-124"><code>		z3.Set(z2)</code></span>
+<span class="codeline" id="line-125"><code>		return x3, y3, z3</code></span>
+<span class="codeline" id="line-126"><code>	}</code></span>
+<span class="codeline" id="line-127"><code>	if z2.Sign() == 0 {</code></span>
+<span class="codeline" id="line-128"><code>		x3.Set(x1)</code></span>
+<span class="codeline" id="line-129"><code>		y3.Set(y1)</code></span>
+<span class="codeline" id="line-130"><code>		z3.Set(z1)</code></span>
+<span class="codeline" id="line-131"><code>		return x3, y3, z3</code></span>
+<span class="codeline" id="line-132"><code>	}</code></span>
+<span class="codeline" id="line-133"><code></code></span>
+<span class="codeline" id="line-134"><code>	z1z1 := new(big.Int).Mul(z1, z1)</code></span>
+<span class="codeline" id="line-135"><code>	z1z1.Mod(z1z1, curve.P)</code></span>
+<span class="codeline" id="line-136"><code>	z2z2 := new(big.Int).Mul(z2, z2)</code></span>
+<span class="codeline" id="line-137"><code>	z2z2.Mod(z2z2, curve.P)</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>	u1 := new(big.Int).Mul(x1, z2z2)</code></span>
+<span class="codeline" id="line-140"><code>	u1.Mod(u1, curve.P)</code></span>
+<span class="codeline" id="line-141"><code>	u2 := new(big.Int).Mul(x2, z1z1)</code></span>
+<span class="codeline" id="line-142"><code>	u2.Mod(u2, curve.P)</code></span>
+<span class="codeline" id="line-143"><code>	h := new(big.Int).Sub(u2, u1)</code></span>
+<span class="codeline" id="line-144"><code>	xEqual := h.Sign() == 0</code></span>
+<span class="codeline" id="line-145"><code>	if h.Sign() == -1 {</code></span>
+<span class="codeline" id="line-146"><code>		h.Add(h, curve.P)</code></span>
+<span class="codeline" id="line-147"><code>	}</code></span>
+<span class="codeline" id="line-148"><code>	i := new(big.Int).Lsh(h, 1)</code></span>
+<span class="codeline" id="line-149"><code>	i.Mul(i, i)</code></span>
+<span class="codeline" id="line-150"><code>	j := new(big.Int).Mul(h, i)</code></span>
+<span class="codeline" id="line-151"><code></code></span>
+<span class="codeline" id="line-152"><code>	s1 := new(big.Int).Mul(y1, z2)</code></span>
+<span class="codeline" id="line-153"><code>	s1.Mul(s1, z2z2)</code></span>
+<span class="codeline" id="line-154"><code>	s1.Mod(s1, curve.P)</code></span>
+<span class="codeline" id="line-155"><code>	s2 := new(big.Int).Mul(y2, z1)</code></span>
+<span class="codeline" id="line-156"><code>	s2.Mul(s2, z1z1)</code></span>
+<span class="codeline" id="line-157"><code>	s2.Mod(s2, curve.P)</code></span>
+<span class="codeline" id="line-158"><code>	r := new(big.Int).Sub(s2, s1)</code></span>
+<span class="codeline" id="line-159"><code>	if r.Sign() == -1 {</code></span>
+<span class="codeline" id="line-160"><code>		r.Add(r, curve.P)</code></span>
+<span class="codeline" id="line-161"><code>	}</code></span>
+<span class="codeline" id="line-162"><code>	yEqual := r.Sign() == 0</code></span>
+<span class="codeline" id="line-163"><code>	if xEqual &amp;&amp; yEqual {</code></span>
+<span class="codeline" id="line-164"><code>		return curve.doubleJacobian(x1, y1, z1)</code></span>
+<span class="codeline" id="line-165"><code>	}</code></span>
+<span class="codeline" id="line-166"><code>	r.Lsh(r, 1)</code></span>
+<span class="codeline" id="line-167"><code>	v := new(big.Int).Mul(u1, i)</code></span>
+<span class="codeline" id="line-168"><code></code></span>
+<span class="codeline" id="line-169"><code>	x3.Set(r)</code></span>
+<span class="codeline" id="line-170"><code>	x3.Mul(x3, x3)</code></span>
+<span class="codeline" id="line-171"><code>	x3.Sub(x3, j)</code></span>
+<span class="codeline" id="line-172"><code>	x3.Sub(x3, v)</code></span>
+<span class="codeline" id="line-173"><code>	x3.Sub(x3, v)</code></span>
+<span class="codeline" id="line-174"><code>	x3.Mod(x3, curve.P)</code></span>
+<span class="codeline" id="line-175"><code></code></span>
+<span class="codeline" id="line-176"><code>	y3.Set(r)</code></span>
+<span class="codeline" id="line-177"><code>	v.Sub(v, x3)</code></span>
+<span class="codeline" id="line-178"><code>	y3.Mul(y3, v)</code></span>
+<span class="codeline" id="line-179"><code>	s1.Mul(s1, j)</code></span>
+<span class="codeline" id="line-180"><code>	s1.Lsh(s1, 1)</code></span>
+<span class="codeline" id="line-181"><code>	y3.Sub(y3, s1)</code></span>
+<span class="codeline" id="line-182"><code>	y3.Mod(y3, curve.P)</code></span>
+<span class="codeline" id="line-183"><code></code></span>
+<span class="codeline" id="line-184"><code>	z3.Add(z1, z2)</code></span>
+<span class="codeline" id="line-185"><code>	z3.Mul(z3, z3)</code></span>
+<span class="codeline" id="line-186"><code>	z3.Sub(z3, z1z1)</code></span>
+<span class="codeline" id="line-187"><code>	z3.Sub(z3, z2z2)</code></span>
+<span class="codeline" id="line-188"><code>	z3.Mul(z3, h)</code></span>
+<span class="codeline" id="line-189"><code>	z3.Mod(z3, curve.P)</code></span>
+<span class="codeline" id="line-190"><code></code></span>
+<span class="codeline" id="line-191"><code>	return x3, y3, z3</code></span>
+<span class="codeline" id="line-192"><code>}</code></span>
+<span class="codeline" id="line-193"><code></code></span>
+<span class="codeline" id="line-194"><code>func (curve *CurveParams) Double(x1, y1 *big.Int) (*big.Int, *big.Int) {</code></span>
+<span class="codeline" id="line-195"><code>	z1 := zForAffine(x1, y1)</code></span>
+<span class="codeline" id="line-196"><code>	return curve.affineFromJacobian(curve.doubleJacobian(x1, y1, z1))</code></span>
+<span class="codeline" id="line-197"><code>}</code></span>
+<span class="codeline" id="line-198"><code></code></span>
+<span class="codeline" id="line-199"><code>// doubleJacobian takes a point in Jacobian coordinates, (x, y, z), and</code></span>
+<span class="codeline" id="line-200"><code>// returns its double, also in Jacobian form.</code></span>
+<span class="codeline" id="line-201"><code>func (curve *CurveParams) doubleJacobian(x, y, z *big.Int) (*big.Int, *big.Int, *big.Int) {</code></span>
+<span class="codeline" id="line-202"><code>	// See https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#doubling-dbl-2001-b</code></span>
+<span class="codeline" id="line-203"><code>	delta := new(big.Int).Mul(z, z)</code></span>
+<span class="codeline" id="line-204"><code>	delta.Mod(delta, curve.P)</code></span>
+<span class="codeline" id="line-205"><code>	gamma := new(big.Int).Mul(y, y)</code></span>
+<span class="codeline" id="line-206"><code>	gamma.Mod(gamma, curve.P)</code></span>
+<span class="codeline" id="line-207"><code>	alpha := new(big.Int).Sub(x, delta)</code></span>
+<span class="codeline" id="line-208"><code>	if alpha.Sign() == -1 {</code></span>
+<span class="codeline" id="line-209"><code>		alpha.Add(alpha, curve.P)</code></span>
+<span class="codeline" id="line-210"><code>	}</code></span>
+<span class="codeline" id="line-211"><code>	alpha2 := new(big.Int).Add(x, delta)</code></span>
+<span class="codeline" id="line-212"><code>	alpha.Mul(alpha, alpha2)</code></span>
+<span class="codeline" id="line-213"><code>	alpha2.Set(alpha)</code></span>
+<span class="codeline" id="line-214"><code>	alpha.Lsh(alpha, 1)</code></span>
+<span class="codeline" id="line-215"><code>	alpha.Add(alpha, alpha2)</code></span>
+<span class="codeline" id="line-216"><code></code></span>
+<span class="codeline" id="line-217"><code>	beta := alpha2.Mul(x, gamma)</code></span>
+<span class="codeline" id="line-218"><code></code></span>
+<span class="codeline" id="line-219"><code>	x3 := new(big.Int).Mul(alpha, alpha)</code></span>
+<span class="codeline" id="line-220"><code>	beta8 := new(big.Int).Lsh(beta, 3)</code></span>
+<span class="codeline" id="line-221"><code>	beta8.Mod(beta8, curve.P)</code></span>
+<span class="codeline" id="line-222"><code>	x3.Sub(x3, beta8)</code></span>
+<span class="codeline" id="line-223"><code>	if x3.Sign() == -1 {</code></span>
+<span class="codeline" id="line-224"><code>		x3.Add(x3, curve.P)</code></span>
+<span class="codeline" id="line-225"><code>	}</code></span>
+<span class="codeline" id="line-226"><code>	x3.Mod(x3, curve.P)</code></span>
+<span class="codeline" id="line-227"><code></code></span>
+<span class="codeline" id="line-228"><code>	z3 := new(big.Int).Add(y, z)</code></span>
+<span class="codeline" id="line-229"><code>	z3.Mul(z3, z3)</code></span>
+<span class="codeline" id="line-230"><code>	z3.Sub(z3, gamma)</code></span>
+<span class="codeline" id="line-231"><code>	if z3.Sign() == -1 {</code></span>
+<span class="codeline" id="line-232"><code>		z3.Add(z3, curve.P)</code></span>
+<span class="codeline" id="line-233"><code>	}</code></span>
+<span class="codeline" id="line-234"><code>	z3.Sub(z3, delta)</code></span>
+<span class="codeline" id="line-235"><code>	if z3.Sign() == -1 {</code></span>
+<span class="codeline" id="line-236"><code>		z3.Add(z3, curve.P)</code></span>
+<span class="codeline" id="line-237"><code>	}</code></span>
+<span class="codeline" id="line-238"><code>	z3.Mod(z3, curve.P)</code></span>
+<span class="codeline" id="line-239"><code></code></span>
+<span class="codeline" id="line-240"><code>	beta.Lsh(beta, 2)</code></span>
+<span class="codeline" id="line-241"><code>	beta.Sub(beta, x3)</code></span>
+<span class="codeline" id="line-242"><code>	if beta.Sign() == -1 {</code></span>
+<span class="codeline" id="line-243"><code>		beta.Add(beta, curve.P)</code></span>
+<span class="codeline" id="line-244"><code>	}</code></span>
+<span class="codeline" id="line-245"><code>	y3 := alpha.Mul(alpha, beta)</code></span>
+<span class="codeline" id="line-246"><code></code></span>
+<span class="codeline" id="line-247"><code>	gamma.Mul(gamma, gamma)</code></span>
+<span class="codeline" id="line-248"><code>	gamma.Lsh(gamma, 3)</code></span>
+<span class="codeline" id="line-249"><code>	gamma.Mod(gamma, curve.P)</code></span>
+<span class="codeline" id="line-250"><code></code></span>
+<span class="codeline" id="line-251"><code>	y3.Sub(y3, gamma)</code></span>
+<span class="codeline" id="line-252"><code>	if y3.Sign() == -1 {</code></span>
+<span class="codeline" id="line-253"><code>		y3.Add(y3, curve.P)</code></span>
+<span class="codeline" id="line-254"><code>	}</code></span>
+<span class="codeline" id="line-255"><code>	y3.Mod(y3, curve.P)</code></span>
+<span class="codeline" id="line-256"><code></code></span>
+<span class="codeline" id="line-257"><code>	return x3, y3, z3</code></span>
+<span class="codeline" id="line-258"><code>}</code></span>
+<span class="codeline" id="line-259"><code></code></span>
+<span class="codeline" id="line-260"><code>func (curve *CurveParams) ScalarMult(Bx, By *big.Int, k []byte) (*big.Int, *big.Int) {</code></span>
+<span class="codeline" id="line-261"><code>	Bz := new(big.Int).SetInt64(1)</code></span>
+<span class="codeline" id="line-262"><code>	x, y, z := new(big.Int), new(big.Int), new(big.Int)</code></span>
+<span class="codeline" id="line-263"><code></code></span>
+<span class="codeline" id="line-264"><code>	for _, byte := range k {</code></span>
+<span class="codeline" id="line-265"><code>		for bitNum := 0; bitNum &lt; 8; bitNum++ {</code></span>
+<span class="codeline" id="line-266"><code>			x, y, z = curve.doubleJacobian(x, y, z)</code></span>
+<span class="codeline" id="line-267"><code>			if byte&amp;0x80 == 0x80 {</code></span>
+<span class="codeline" id="line-268"><code>				x, y, z = curve.addJacobian(Bx, By, Bz, x, y, z)</code></span>
+<span class="codeline" id="line-269"><code>			}</code></span>
+<span class="codeline" id="line-270"><code>			byte &lt;&lt;= 1</code></span>
+<span class="codeline" id="line-271"><code>		}</code></span>
+<span class="codeline" id="line-272"><code>	}</code></span>
+<span class="codeline" id="line-273"><code></code></span>
+<span class="codeline" id="line-274"><code>	return curve.affineFromJacobian(x, y, z)</code></span>
+<span class="codeline" id="line-275"><code>}</code></span>
+<span class="codeline" id="line-276"><code></code></span>
+<span class="codeline" id="line-277"><code>func (curve *CurveParams) ScalarBaseMult(k []byte) (*big.Int, *big.Int) {</code></span>
+<span class="codeline" id="line-278"><code>	return curve.ScalarMult(curve.Gx, curve.Gy, k)</code></span>
+<span class="codeline" id="line-279"><code>}</code></span>
+<span class="codeline" id="line-280"><code></code></span>
+<span class="codeline" id="line-281"><code>var mask = []byte{0xff, 0x1, 0x3, 0x7, 0xf, 0x1f, 0x3f, 0x7f}</code></span>
+<span class="codeline" id="line-282"><code></code></span>
+<span class="codeline" id="line-283"><code>// GenerateKey returns a public/private key pair. The private key is</code></span>
+<span class="codeline" id="line-284"><code>// generated using the given reader, which must return random data.</code></span>
+<span class="codeline" id="line-285"><code>func GenerateKey(curve Curve, rand io.Reader) (priv []byte, x, y *big.Int, err error) {</code></span>
+<span class="codeline" id="line-286"><code>	N := curve.Params().N</code></span>
+<span class="codeline" id="line-287"><code>	bitSize := N.BitLen()</code></span>
+<span class="codeline" id="line-288"><code>	byteLen := (bitSize + 7) / 8</code></span>
+<span class="codeline" id="line-289"><code>	priv = make([]byte, byteLen)</code></span>
+<span class="codeline" id="line-290"><code></code></span>
+<span class="codeline" id="line-291"><code>	for x == nil {</code></span>
+<span class="codeline" id="line-292"><code>		_, err = io.ReadFull(rand, priv)</code></span>
+<span class="codeline" id="line-293"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-294"><code>			return</code></span>
+<span class="codeline" id="line-295"><code>		}</code></span>
+<span class="codeline" id="line-296"><code>		// We have to mask off any excess bits in the case that the size of the</code></span>
+<span class="codeline" id="line-297"><code>		// underlying field is not a whole number of bytes.</code></span>
+<span class="codeline" id="line-298"><code>		priv[0] &amp;= mask[bitSize%8]</code></span>
+<span class="codeline" id="line-299"><code>		// This is because, in tests, rand will return all zeros and we don't</code></span>
+<span class="codeline" id="line-300"><code>		// want to get the point at infinity and loop forever.</code></span>
+<span class="codeline" id="line-301"><code>		priv[1] ^= 0x42</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>		// If the scalar is out of range, sample another random number.</code></span>
+<span class="codeline" id="line-304"><code>		if new(big.Int).SetBytes(priv).Cmp(N) &gt;= 0 {</code></span>
+<span class="codeline" id="line-305"><code>			continue</code></span>
+<span class="codeline" id="line-306"><code>		}</code></span>
+<span class="codeline" id="line-307"><code></code></span>
+<span class="codeline" id="line-308"><code>		x, y = curve.ScalarBaseMult(priv)</code></span>
+<span class="codeline" id="line-309"><code>	}</code></span>
+<span class="codeline" id="line-310"><code>	return</code></span>
+<span class="codeline" id="line-311"><code>}</code></span>
+<span class="codeline" id="line-312"><code></code></span>
+<span class="codeline" id="line-313"><code>// Marshal converts a point on the curve into the uncompressed form specified in</code></span>
+<span class="codeline" id="line-314"><code>// section 4.3.6 of ANSI X9.62.</code></span>
+<span class="codeline" id="line-315"><code>func Marshal(curve Curve, x, y *big.Int) []byte {</code></span>
+<span class="codeline" id="line-316"><code>	byteLen := (curve.Params().BitSize + 7) / 8</code></span>
+<span class="codeline" id="line-317"><code></code></span>
+<span class="codeline" id="line-318"><code>	ret := make([]byte, 1+2*byteLen)</code></span>
+<span class="codeline" id="line-319"><code>	ret[0] = 4 // uncompressed point</code></span>
+<span class="codeline" id="line-320"><code></code></span>
+<span class="codeline" id="line-321"><code>	x.FillBytes(ret[1 : 1+byteLen])</code></span>
+<span class="codeline" id="line-322"><code>	y.FillBytes(ret[1+byteLen : 1+2*byteLen])</code></span>
+<span class="codeline" id="line-323"><code></code></span>
+<span class="codeline" id="line-324"><code>	return ret</code></span>
+<span class="codeline" id="line-325"><code>}</code></span>
+<span class="codeline" id="line-326"><code></code></span>
+<span class="codeline" id="line-327"><code>// MarshalCompressed converts a point on the curve into the compressed form</code></span>
+<span class="codeline" id="line-328"><code>// specified in section 4.3.6 of ANSI X9.62.</code></span>
+<span class="codeline" id="line-329"><code>func MarshalCompressed(curve Curve, x, y *big.Int) []byte {</code></span>
+<span class="codeline" id="line-330"><code>	byteLen := (curve.Params().BitSize + 7) / 8</code></span>
+<span class="codeline" id="line-331"><code>	compressed := make([]byte, 1+byteLen)</code></span>
+<span class="codeline" id="line-332"><code>	compressed[0] = byte(y.Bit(0)) | 2</code></span>
+<span class="codeline" id="line-333"><code>	x.FillBytes(compressed[1:])</code></span>
+<span class="codeline" id="line-334"><code>	return compressed</code></span>
+<span class="codeline" id="line-335"><code>}</code></span>
+<span class="codeline" id="line-336"><code></code></span>
+<span class="codeline" id="line-337"><code>// Unmarshal converts a point, serialized by Marshal, into an x, y pair.</code></span>
+<span class="codeline" id="line-338"><code>// It is an error if the point is not in uncompressed form or is not on the curve.</code></span>
+<span class="codeline" id="line-339"><code>// On error, x = nil.</code></span>
+<span class="codeline" id="line-340"><code>func Unmarshal(curve Curve, data []byte) (x, y *big.Int) {</code></span>
+<span class="codeline" id="line-341"><code>	byteLen := (curve.Params().BitSize + 7) / 8</code></span>
+<span class="codeline" id="line-342"><code>	if len(data) != 1+2*byteLen {</code></span>
+<span class="codeline" id="line-343"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-344"><code>	}</code></span>
+<span class="codeline" id="line-345"><code>	if data[0] != 4 { // uncompressed form</code></span>
+<span class="codeline" id="line-346"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-347"><code>	}</code></span>
+<span class="codeline" id="line-348"><code>	p := curve.Params().P</code></span>
+<span class="codeline" id="line-349"><code>	x = new(big.Int).SetBytes(data[1 : 1+byteLen])</code></span>
+<span class="codeline" id="line-350"><code>	y = new(big.Int).SetBytes(data[1+byteLen:])</code></span>
+<span class="codeline" id="line-351"><code>	if x.Cmp(p) &gt;= 0 || y.Cmp(p) &gt;= 0 {</code></span>
+<span class="codeline" id="line-352"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-353"><code>	}</code></span>
+<span class="codeline" id="line-354"><code>	if !curve.IsOnCurve(x, y) {</code></span>
+<span class="codeline" id="line-355"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-356"><code>	}</code></span>
+<span class="codeline" id="line-357"><code>	return</code></span>
+<span class="codeline" id="line-358"><code>}</code></span>
+<span class="codeline" id="line-359"><code></code></span>
+<span class="codeline" id="line-360"><code>// UnmarshalCompressed converts a point, serialized by MarshalCompressed, into an x, y pair.</code></span>
+<span class="codeline" id="line-361"><code>// It is an error if the point is not in compressed form or is not on the curve.</code></span>
+<span class="codeline" id="line-362"><code>// On error, x = nil.</code></span>
+<span class="codeline" id="line-363"><code>func UnmarshalCompressed(curve Curve, data []byte) (x, y *big.Int) {</code></span>
+<span class="codeline" id="line-364"><code>	byteLen := (curve.Params().BitSize + 7) / 8</code></span>
+<span class="codeline" id="line-365"><code>	if len(data) != 1+byteLen {</code></span>
+<span class="codeline" id="line-366"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-367"><code>	}</code></span>
+<span class="codeline" id="line-368"><code>	if data[0] != 2 &amp;&amp; data[0] != 3 { // compressed form</code></span>
+<span class="codeline" id="line-369"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-370"><code>	}</code></span>
+<span class="codeline" id="line-371"><code>	p := curve.Params().P</code></span>
+<span class="codeline" id="line-372"><code>	x = new(big.Int).SetBytes(data[1:])</code></span>
+<span class="codeline" id="line-373"><code>	if x.Cmp(p) &gt;= 0 {</code></span>
+<span class="codeline" id="line-374"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-375"><code>	}</code></span>
+<span class="codeline" id="line-376"><code>	// y² = x³ - 3x + b</code></span>
+<span class="codeline" id="line-377"><code>	y = curve.Params().polynomial(x)</code></span>
+<span class="codeline" id="line-378"><code>	y = y.ModSqrt(y, p)</code></span>
+<span class="codeline" id="line-379"><code>	if y == nil {</code></span>
+<span class="codeline" id="line-380"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-381"><code>	}</code></span>
+<span class="codeline" id="line-382"><code>	if byte(y.Bit(0)) != data[0]&amp;1 {</code></span>
+<span class="codeline" id="line-383"><code>		y.Neg(y).Mod(y, p)</code></span>
+<span class="codeline" id="line-384"><code>	}</code></span>
+<span class="codeline" id="line-385"><code>	if !curve.IsOnCurve(x, y) {</code></span>
+<span class="codeline" id="line-386"><code>		return nil, nil</code></span>
+<span class="codeline" id="line-387"><code>	}</code></span>
+<span class="codeline" id="line-388"><code>	return</code></span>
+<span class="codeline" id="line-389"><code>}</code></span>
+<span class="codeline" id="line-390"><code></code></span>
+<span class="codeline" id="line-391"><code>var initonce sync.Once</code></span>
+<span class="codeline" id="line-392"><code>var p384 *CurveParams</code></span>
+<span class="codeline" id="line-393"><code>var p521 *CurveParams</code></span>
+<span class="codeline" id="line-394"><code></code></span>
+<span class="codeline" id="line-395"><code>func initAll() {</code></span>
+<span class="codeline" id="line-396"><code>	initP224()</code></span>
+<span class="codeline" id="line-397"><code>	initP256()</code></span>
+<span class="codeline" id="line-398"><code>	initP384()</code></span>
+<span class="codeline" id="line-399"><code>	initP521()</code></span>
+<span class="codeline" id="line-400"><code>}</code></span>
+<span class="codeline" id="line-401"><code></code></span>
+<span class="codeline" id="line-402"><code>func initP384() {</code></span>
+<span class="codeline" id="line-403"><code>	// See FIPS 186-3, section D.2.4</code></span>
+<span class="codeline" id="line-404"><code>	p384 = &amp;CurveParams{Name: "P-384"}</code></span>
+<span class="codeline" id="line-405"><code>	p384.P, _ = new(big.Int).SetString("39402006196394479212279040100143613805079739270465446667948293404245721771496870329047266088258938001861606973112319", 10)</code></span>
+<span class="codeline" id="line-406"><code>	p384.N, _ = new(big.Int).SetString("39402006196394479212279040100143613805079739270465446667946905279627659399113263569398956308152294913554433653942643", 10)</code></span>
+<span class="codeline" id="line-407"><code>	p384.B, _ = new(big.Int).SetString("b3312fa7e23ee7e4988e056be3f82d19181d9c6efe8141120314088f5013875ac656398d8a2ed19d2a85c8edd3ec2aef", 16)</code></span>
+<span class="codeline" id="line-408"><code>	p384.Gx, _ = new(big.Int).SetString("aa87ca22be8b05378eb1c71ef320ad746e1d3b628ba79b9859f741e082542a385502f25dbf55296c3a545e3872760ab7", 16)</code></span>
+<span class="codeline" id="line-409"><code>	p384.Gy, _ = new(big.Int).SetString("3617de4a96262c6f5d9e98bf9292dc29f8f41dbd289a147ce9da3113b5f0b8c00a60b1ce1d7e819d7a431d7c90ea0e5f", 16)</code></span>
+<span class="codeline" id="line-410"><code>	p384.BitSize = 384</code></span>
+<span class="codeline" id="line-411"><code>}</code></span>
+<span class="codeline" id="line-412"><code></code></span>
+<span class="codeline" id="line-413"><code>func initP521() {</code></span>
+<span class="codeline" id="line-414"><code>	// See FIPS 186-3, section D.2.5</code></span>
+<span class="codeline" id="line-415"><code>	p521 = &amp;CurveParams{Name: "P-521"}</code></span>
+<span class="codeline" id="line-416"><code>	p521.P, _ = new(big.Int).SetString("6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151", 10)</code></span>
+<span class="codeline" id="line-417"><code>	p521.N, _ = new(big.Int).SetString("6864797660130609714981900799081393217269435300143305409394463459185543183397655394245057746333217197532963996371363321113864768612440380340372808892707005449", 10)</code></span>
+<span class="codeline" id="line-418"><code>	p521.B, _ = new(big.Int).SetString("051953eb9618e1c9a1f929a21a0b68540eea2da725b99b315f3b8b489918ef109e156193951ec7e937b1652c0bd3bb1bf073573df883d2c34f1ef451fd46b503f00", 16)</code></span>
+<span class="codeline" id="line-419"><code>	p521.Gx, _ = new(big.Int).SetString("c6858e06b70404e9cd9e3ecb662395b4429c648139053fb521f828af606b4d3dbaa14b5e77efe75928fe1dc127a2ffa8de3348b3c1856a429bf97e7e31c2e5bd66", 16)</code></span>
+<span class="codeline" id="line-420"><code>	p521.Gy, _ = new(big.Int).SetString("11839296a789a3bc0045c8a5fb42c7d1bd998f54449579b446817afbd17273e662c97ee72995ef42640c550b9013fad0761353c7086a272c24088be94769fd16650", 16)</code></span>
+<span class="codeline" id="line-421"><code>	p521.BitSize = 521</code></span>
+<span class="codeline" id="line-422"><code>}</code></span>
+<span class="codeline" id="line-423"><code></code></span>
+<span class="codeline" id="line-424"><code>// P256 returns a Curve which implements NIST P-256 (FIPS 186-3, section D.2.3),</code></span>
+<span class="codeline" id="line-425"><code>// also known as secp256r1 or prime256v1. The CurveParams.Name of this Curve is</code></span>
+<span class="codeline" id="line-426"><code>// "P-256".</code></span>
+<span class="codeline" id="line-427"><code>//</code></span>
+<span class="codeline" id="line-428"><code>// Multiple invocations of this function will return the same value, so it can</code></span>
+<span class="codeline" id="line-429"><code>// be used for equality checks and switch statements.</code></span>
+<span class="codeline" id="line-430"><code>//</code></span>
+<span class="codeline" id="line-431"><code>// The cryptographic operations are implemented using constant-time algorithms.</code></span>
+<span class="codeline" id="line-432"><code>func P256() Curve {</code></span>
+<span class="codeline" id="line-433"><code>	initonce.Do(initAll)</code></span>
+<span class="codeline" id="line-434"><code>	return p256</code></span>
+<span class="codeline" id="line-435"><code>}</code></span>
+<span class="codeline" id="line-436"><code></code></span>
+<span class="codeline" id="line-437"><code>// P384 returns a Curve which implements NIST P-384 (FIPS 186-3, section D.2.4),</code></span>
+<span class="codeline" id="line-438"><code>// also known as secp384r1. The CurveParams.Name of this Curve is "P-384".</code></span>
+<span class="codeline" id="line-439"><code>//</code></span>
+<span class="codeline" id="line-440"><code>// Multiple invocations of this function will return the same value, so it can</code></span>
+<span class="codeline" id="line-441"><code>// be used for equality checks and switch statements.</code></span>
+<span class="codeline" id="line-442"><code>//</code></span>
+<span class="codeline" id="line-443"><code>// The cryptographic operations do not use constant-time algorithms.</code></span>
+<span class="codeline" id="line-444"><code>func P384() Curve {</code></span>
+<span class="codeline" id="line-445"><code>	initonce.Do(initAll)</code></span>
+<span class="codeline" id="line-446"><code>	return p384</code></span>
+<span class="codeline" id="line-447"><code>}</code></span>
+<span class="codeline" id="line-448"><code></code></span>
+<span class="codeline" id="line-449"><code>// P521 returns a Curve which implements NIST P-521 (FIPS 186-3, section D.2.5),</code></span>
+<span class="codeline" id="line-450"><code>// also known as secp521r1. The CurveParams.Name of this Curve is "P-521".</code></span>
+<span class="codeline" id="line-451"><code>//</code></span>
+<span class="codeline" id="line-452"><code>// Multiple invocations of this function will return the same value, so it can</code></span>
+<span class="codeline" id="line-453"><code>// be used for equality checks and switch statements.</code></span>
+<span class="codeline" id="line-454"><code>//</code></span>
+<span class="codeline" id="line-455"><code>// The cryptographic operations do not use constant-time algorithms.</code></span>
+<span class="codeline" id="line-456"><code>func P521() Curve {</code></span>
+<span class="codeline" id="line-457"><code>	initonce.Do(initAll)</code></span>
+<span class="codeline" id="line-458"><code>	return p521</code></span>
+<span class="codeline" id="line-459"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

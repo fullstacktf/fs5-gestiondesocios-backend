@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: relationship.go in package gorm.io/gorm/schema</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	relationship.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/gorm.io/gorm/schema.html">gorm.io/gorm/schema</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>package schema</code></span>
+<span class="codeline" id="line-2"><code></code></span>
+<span class="codeline" id="line-3"><code>import (</code></span>
+<span class="codeline" id="line-4"><code>	"fmt"</code></span>
+<span class="codeline" id="line-5"><code>	"reflect"</code></span>
+<span class="codeline" id="line-6"><code>	"regexp"</code></span>
+<span class="codeline" id="line-7"><code>	"strings"</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>	"github.com/jinzhu/inflection"</code></span>
+<span class="codeline" id="line-10"><code>	"gorm.io/gorm/clause"</code></span>
+<span class="codeline" id="line-11"><code>)</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>// RelationshipType relationship type</code></span>
+<span class="codeline" id="line-14"><code>type RelationshipType string</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>const (</code></span>
+<span class="codeline" id="line-17"><code>	HasOne    RelationshipType = "has_one"      // HasOneRel has one relationship</code></span>
+<span class="codeline" id="line-18"><code>	HasMany   RelationshipType = "has_many"     // HasManyRel has many relationship</code></span>
+<span class="codeline" id="line-19"><code>	BelongsTo RelationshipType = "belongs_to"   // BelongsToRel belongs to relationship</code></span>
+<span class="codeline" id="line-20"><code>	Many2Many RelationshipType = "many_to_many" // Many2ManyRel many to many relationship</code></span>
+<span class="codeline" id="line-21"><code>)</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>type Relationships struct {</code></span>
+<span class="codeline" id="line-24"><code>	HasOne    []*Relationship</code></span>
+<span class="codeline" id="line-25"><code>	BelongsTo []*Relationship</code></span>
+<span class="codeline" id="line-26"><code>	HasMany   []*Relationship</code></span>
+<span class="codeline" id="line-27"><code>	Many2Many []*Relationship</code></span>
+<span class="codeline" id="line-28"><code>	Relations map[string]*Relationship</code></span>
+<span class="codeline" id="line-29"><code>}</code></span>
+<span class="codeline" id="line-30"><code></code></span>
+<span class="codeline" id="line-31"><code>type Relationship struct {</code></span>
+<span class="codeline" id="line-32"><code>	Name                     string</code></span>
+<span class="codeline" id="line-33"><code>	Type                     RelationshipType</code></span>
+<span class="codeline" id="line-34"><code>	Field                    *Field</code></span>
+<span class="codeline" id="line-35"><code>	Polymorphic              *Polymorphic</code></span>
+<span class="codeline" id="line-36"><code>	References               []*Reference</code></span>
+<span class="codeline" id="line-37"><code>	Schema                   *Schema</code></span>
+<span class="codeline" id="line-38"><code>	FieldSchema              *Schema</code></span>
+<span class="codeline" id="line-39"><code>	JoinTable                *Schema</code></span>
+<span class="codeline" id="line-40"><code>	foreignKeys, primaryKeys []string</code></span>
+<span class="codeline" id="line-41"><code>}</code></span>
+<span class="codeline" id="line-42"><code></code></span>
+<span class="codeline" id="line-43"><code>type Polymorphic struct {</code></span>
+<span class="codeline" id="line-44"><code>	PolymorphicID   *Field</code></span>
+<span class="codeline" id="line-45"><code>	PolymorphicType *Field</code></span>
+<span class="codeline" id="line-46"><code>	Value           string</code></span>
+<span class="codeline" id="line-47"><code>}</code></span>
+<span class="codeline" id="line-48"><code></code></span>
+<span class="codeline" id="line-49"><code>type Reference struct {</code></span>
+<span class="codeline" id="line-50"><code>	PrimaryKey    *Field</code></span>
+<span class="codeline" id="line-51"><code>	PrimaryValue  string</code></span>
+<span class="codeline" id="line-52"><code>	ForeignKey    *Field</code></span>
+<span class="codeline" id="line-53"><code>	OwnPrimaryKey bool</code></span>
+<span class="codeline" id="line-54"><code>}</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>func (schema *Schema) parseRelation(field *Field) {</code></span>
+<span class="codeline" id="line-57"><code>	var (</code></span>
+<span class="codeline" id="line-58"><code>		err        error</code></span>
+<span class="codeline" id="line-59"><code>		fieldValue = reflect.New(field.IndirectFieldType).Interface()</code></span>
+<span class="codeline" id="line-60"><code>		relation   = &amp;Relationship{</code></span>
+<span class="codeline" id="line-61"><code>			Name:        field.Name,</code></span>
+<span class="codeline" id="line-62"><code>			Field:       field,</code></span>
+<span class="codeline" id="line-63"><code>			Schema:      schema,</code></span>
+<span class="codeline" id="line-64"><code>			foreignKeys: toColumns(field.TagSettings["FOREIGNKEY"]),</code></span>
+<span class="codeline" id="line-65"><code>			primaryKeys: toColumns(field.TagSettings["REFERENCES"]),</code></span>
+<span class="codeline" id="line-66"><code>		}</code></span>
+<span class="codeline" id="line-67"><code>	)</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>	cacheStore := schema.cacheStore</code></span>
+<span class="codeline" id="line-70"><code>	if field.OwnerSchema != nil {</code></span>
+<span class="codeline" id="line-71"><code>		cacheStore = field.OwnerSchema.cacheStore</code></span>
+<span class="codeline" id="line-72"><code>	}</code></span>
+<span class="codeline" id="line-73"><code></code></span>
+<span class="codeline" id="line-74"><code>	if relation.FieldSchema, err = Parse(fieldValue, cacheStore, schema.namer); err != nil {</code></span>
+<span class="codeline" id="line-75"><code>		schema.err = err</code></span>
+<span class="codeline" id="line-76"><code>		return</code></span>
+<span class="codeline" id="line-77"><code>	}</code></span>
+<span class="codeline" id="line-78"><code></code></span>
+<span class="codeline" id="line-79"><code>	if polymorphic := field.TagSettings["POLYMORPHIC"]; polymorphic != "" {</code></span>
+<span class="codeline" id="line-80"><code>		schema.buildPolymorphicRelation(relation, field, polymorphic)</code></span>
+<span class="codeline" id="line-81"><code>	} else if many2many := field.TagSettings["MANY2MANY"]; many2many != "" {</code></span>
+<span class="codeline" id="line-82"><code>		schema.buildMany2ManyRelation(relation, field, many2many)</code></span>
+<span class="codeline" id="line-83"><code>	} else {</code></span>
+<span class="codeline" id="line-84"><code>		switch field.IndirectFieldType.Kind() {</code></span>
+<span class="codeline" id="line-85"><code>		case reflect.Struct:</code></span>
+<span class="codeline" id="line-86"><code>			schema.guessRelation(relation, field, guessBelongs)</code></span>
+<span class="codeline" id="line-87"><code>		case reflect.Slice:</code></span>
+<span class="codeline" id="line-88"><code>			schema.guessRelation(relation, field, guessHas)</code></span>
+<span class="codeline" id="line-89"><code>		default:</code></span>
+<span class="codeline" id="line-90"><code>			schema.err = fmt.Errorf("unsupported data type %v for %v on field %v", relation.FieldSchema, schema, field.Name)</code></span>
+<span class="codeline" id="line-91"><code>		}</code></span>
+<span class="codeline" id="line-92"><code>	}</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>	if relation.Type == "has" {</code></span>
+<span class="codeline" id="line-95"><code>		if relation.FieldSchema != relation.Schema &amp;&amp; relation.Polymorphic == nil {</code></span>
+<span class="codeline" id="line-96"><code>			relation.FieldSchema.Relationships.Relations["_"+relation.Schema.Name+"_"+relation.Name] = relation</code></span>
+<span class="codeline" id="line-97"><code>		}</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>		switch field.IndirectFieldType.Kind() {</code></span>
+<span class="codeline" id="line-100"><code>		case reflect.Struct:</code></span>
+<span class="codeline" id="line-101"><code>			relation.Type = HasOne</code></span>
+<span class="codeline" id="line-102"><code>		case reflect.Slice:</code></span>
+<span class="codeline" id="line-103"><code>			relation.Type = HasMany</code></span>
+<span class="codeline" id="line-104"><code>		}</code></span>
+<span class="codeline" id="line-105"><code>	}</code></span>
+<span class="codeline" id="line-106"><code></code></span>
+<span class="codeline" id="line-107"><code>	if schema.err == nil {</code></span>
+<span class="codeline" id="line-108"><code>		schema.Relationships.Relations[relation.Name] = relation</code></span>
+<span class="codeline" id="line-109"><code>		switch relation.Type {</code></span>
+<span class="codeline" id="line-110"><code>		case HasOne:</code></span>
+<span class="codeline" id="line-111"><code>			schema.Relationships.HasOne = append(schema.Relationships.HasOne, relation)</code></span>
+<span class="codeline" id="line-112"><code>		case HasMany:</code></span>
+<span class="codeline" id="line-113"><code>			schema.Relationships.HasMany = append(schema.Relationships.HasMany, relation)</code></span>
+<span class="codeline" id="line-114"><code>		case BelongsTo:</code></span>
+<span class="codeline" id="line-115"><code>			schema.Relationships.BelongsTo = append(schema.Relationships.BelongsTo, relation)</code></span>
+<span class="codeline" id="line-116"><code>		case Many2Many:</code></span>
+<span class="codeline" id="line-117"><code>			schema.Relationships.Many2Many = append(schema.Relationships.Many2Many, relation)</code></span>
+<span class="codeline" id="line-118"><code>		}</code></span>
+<span class="codeline" id="line-119"><code>	}</code></span>
+<span class="codeline" id="line-120"><code>}</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>// User has many Toys, its `Polymorphic` is `Owner`, Pet has one Toy, its `Polymorphic` is `Owner`</code></span>
+<span class="codeline" id="line-123"><code>//     type User struct {</code></span>
+<span class="codeline" id="line-124"><code>//       Toys []Toy `gorm:"polymorphic:Owner;"`</code></span>
+<span class="codeline" id="line-125"><code>//     }</code></span>
+<span class="codeline" id="line-126"><code>//     type Pet struct {</code></span>
+<span class="codeline" id="line-127"><code>//       Toy Toy `gorm:"polymorphic:Owner;"`</code></span>
+<span class="codeline" id="line-128"><code>//     }</code></span>
+<span class="codeline" id="line-129"><code>//     type Toy struct {</code></span>
+<span class="codeline" id="line-130"><code>//       OwnerID   int</code></span>
+<span class="codeline" id="line-131"><code>//       OwnerType string</code></span>
+<span class="codeline" id="line-132"><code>//     }</code></span>
+<span class="codeline" id="line-133"><code>func (schema *Schema) buildPolymorphicRelation(relation *Relationship, field *Field, polymorphic string) {</code></span>
+<span class="codeline" id="line-134"><code>	relation.Polymorphic = &amp;Polymorphic{</code></span>
+<span class="codeline" id="line-135"><code>		Value:           schema.Table,</code></span>
+<span class="codeline" id="line-136"><code>		PolymorphicType: relation.FieldSchema.FieldsByName[polymorphic+"Type"],</code></span>
+<span class="codeline" id="line-137"><code>		PolymorphicID:   relation.FieldSchema.FieldsByName[polymorphic+"ID"],</code></span>
+<span class="codeline" id="line-138"><code>	}</code></span>
+<span class="codeline" id="line-139"><code></code></span>
+<span class="codeline" id="line-140"><code>	if value, ok := field.TagSettings["POLYMORPHICVALUE"]; ok {</code></span>
+<span class="codeline" id="line-141"><code>		relation.Polymorphic.Value = strings.TrimSpace(value)</code></span>
+<span class="codeline" id="line-142"><code>	}</code></span>
+<span class="codeline" id="line-143"><code></code></span>
+<span class="codeline" id="line-144"><code>	if relation.Polymorphic.PolymorphicType == nil {</code></span>
+<span class="codeline" id="line-145"><code>		schema.err = fmt.Errorf("invalid polymorphic type %v for %v on field %v, missing field %v", relation.FieldSchema, schema, field.Name, polymorphic+"Type")</code></span>
+<span class="codeline" id="line-146"><code>	}</code></span>
+<span class="codeline" id="line-147"><code></code></span>
+<span class="codeline" id="line-148"><code>	if relation.Polymorphic.PolymorphicID == nil {</code></span>
+<span class="codeline" id="line-149"><code>		schema.err = fmt.Errorf("invalid polymorphic type %v for %v on field %v, missing field %v", relation.FieldSchema, schema, field.Name, polymorphic+"ID")</code></span>
+<span class="codeline" id="line-150"><code>	}</code></span>
+<span class="codeline" id="line-151"><code></code></span>
+<span class="codeline" id="line-152"><code>	if schema.err == nil {</code></span>
+<span class="codeline" id="line-153"><code>		relation.References = append(relation.References, &amp;Reference{</code></span>
+<span class="codeline" id="line-154"><code>			PrimaryValue: relation.Polymorphic.Value,</code></span>
+<span class="codeline" id="line-155"><code>			ForeignKey:   relation.Polymorphic.PolymorphicType,</code></span>
+<span class="codeline" id="line-156"><code>		})</code></span>
+<span class="codeline" id="line-157"><code></code></span>
+<span class="codeline" id="line-158"><code>		primaryKeyField := schema.PrioritizedPrimaryField</code></span>
+<span class="codeline" id="line-159"><code>		if len(relation.foreignKeys) &gt; 0 {</code></span>
+<span class="codeline" id="line-160"><code>			if primaryKeyField = schema.LookUpField(relation.foreignKeys[0]); primaryKeyField == nil || len(relation.foreignKeys) &gt; 1 {</code></span>
+<span class="codeline" id="line-161"><code>				schema.err = fmt.Errorf("invalid polymorphic foreign keys %+v for %v on field %v", relation.foreignKeys, schema, field.Name)</code></span>
+<span class="codeline" id="line-162"><code>			}</code></span>
+<span class="codeline" id="line-163"><code>		}</code></span>
+<span class="codeline" id="line-164"><code></code></span>
+<span class="codeline" id="line-165"><code>		// use same data type for foreign keys</code></span>
+<span class="codeline" id="line-166"><code>		relation.Polymorphic.PolymorphicID.DataType = primaryKeyField.DataType</code></span>
+<span class="codeline" id="line-167"><code>		relation.Polymorphic.PolymorphicID.GORMDataType = primaryKeyField.GORMDataType</code></span>
+<span class="codeline" id="line-168"><code>		if relation.Polymorphic.PolymorphicID.Size == 0 {</code></span>
+<span class="codeline" id="line-169"><code>			relation.Polymorphic.PolymorphicID.Size = primaryKeyField.Size</code></span>
+<span class="codeline" id="line-170"><code>		}</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>		relation.References = append(relation.References, &amp;Reference{</code></span>
+<span class="codeline" id="line-173"><code>			PrimaryKey:    primaryKeyField,</code></span>
+<span class="codeline" id="line-174"><code>			ForeignKey:    relation.Polymorphic.PolymorphicID,</code></span>
+<span class="codeline" id="line-175"><code>			OwnPrimaryKey: true,</code></span>
+<span class="codeline" id="line-176"><code>		})</code></span>
+<span class="codeline" id="line-177"><code>	}</code></span>
+<span class="codeline" id="line-178"><code></code></span>
+<span class="codeline" id="line-179"><code>	relation.Type = "has"</code></span>
+<span class="codeline" id="line-180"><code>}</code></span>
+<span class="codeline" id="line-181"><code></code></span>
+<span class="codeline" id="line-182"><code>func (schema *Schema) buildMany2ManyRelation(relation *Relationship, field *Field, many2many string) {</code></span>
+<span class="codeline" id="line-183"><code>	relation.Type = Many2Many</code></span>
+<span class="codeline" id="line-184"><code></code></span>
+<span class="codeline" id="line-185"><code>	var (</code></span>
+<span class="codeline" id="line-186"><code>		err             error</code></span>
+<span class="codeline" id="line-187"><code>		joinTableFields []reflect.StructField</code></span>
+<span class="codeline" id="line-188"><code>		fieldsMap       = map[string]*Field{}</code></span>
+<span class="codeline" id="line-189"><code>		ownFieldsMap    = map[string]bool{} // fix self join many2many</code></span>
+<span class="codeline" id="line-190"><code>		joinForeignKeys = toColumns(field.TagSettings["JOINFOREIGNKEY"])</code></span>
+<span class="codeline" id="line-191"><code>		joinReferences  = toColumns(field.TagSettings["JOINREFERENCES"])</code></span>
+<span class="codeline" id="line-192"><code>	)</code></span>
+<span class="codeline" id="line-193"><code></code></span>
+<span class="codeline" id="line-194"><code>	ownForeignFields := schema.PrimaryFields</code></span>
+<span class="codeline" id="line-195"><code>	refForeignFields := relation.FieldSchema.PrimaryFields</code></span>
+<span class="codeline" id="line-196"><code></code></span>
+<span class="codeline" id="line-197"><code>	if len(relation.foreignKeys) &gt; 0 {</code></span>
+<span class="codeline" id="line-198"><code>		ownForeignFields = []*Field{}</code></span>
+<span class="codeline" id="line-199"><code>		for _, foreignKey := range relation.foreignKeys {</code></span>
+<span class="codeline" id="line-200"><code>			if field := schema.LookUpField(foreignKey); field != nil {</code></span>
+<span class="codeline" id="line-201"><code>				ownForeignFields = append(ownForeignFields, field)</code></span>
+<span class="codeline" id="line-202"><code>			} else {</code></span>
+<span class="codeline" id="line-203"><code>				schema.err = fmt.Errorf("invalid foreign key: %v", foreignKey)</code></span>
+<span class="codeline" id="line-204"><code>				return</code></span>
+<span class="codeline" id="line-205"><code>			}</code></span>
+<span class="codeline" id="line-206"><code>		}</code></span>
+<span class="codeline" id="line-207"><code>	}</code></span>
+<span class="codeline" id="line-208"><code></code></span>
+<span class="codeline" id="line-209"><code>	if len(relation.primaryKeys) &gt; 0 {</code></span>
+<span class="codeline" id="line-210"><code>		refForeignFields = []*Field{}</code></span>
+<span class="codeline" id="line-211"><code>		for _, foreignKey := range relation.primaryKeys {</code></span>
+<span class="codeline" id="line-212"><code>			if field := relation.FieldSchema.LookUpField(foreignKey); field != nil {</code></span>
+<span class="codeline" id="line-213"><code>				refForeignFields = append(refForeignFields, field)</code></span>
+<span class="codeline" id="line-214"><code>			} else {</code></span>
+<span class="codeline" id="line-215"><code>				schema.err = fmt.Errorf("invalid foreign key: %v", foreignKey)</code></span>
+<span class="codeline" id="line-216"><code>				return</code></span>
+<span class="codeline" id="line-217"><code>			}</code></span>
+<span class="codeline" id="line-218"><code>		}</code></span>
+<span class="codeline" id="line-219"><code>	}</code></span>
+<span class="codeline" id="line-220"><code></code></span>
+<span class="codeline" id="line-221"><code>	for idx, ownField := range ownForeignFields {</code></span>
+<span class="codeline" id="line-222"><code>		joinFieldName := schema.Name + ownField.Name</code></span>
+<span class="codeline" id="line-223"><code>		if len(joinForeignKeys) &gt; idx {</code></span>
+<span class="codeline" id="line-224"><code>			joinFieldName = strings.Title(joinForeignKeys[idx])</code></span>
+<span class="codeline" id="line-225"><code>		}</code></span>
+<span class="codeline" id="line-226"><code></code></span>
+<span class="codeline" id="line-227"><code>		ownFieldsMap[joinFieldName] = true</code></span>
+<span class="codeline" id="line-228"><code>		fieldsMap[joinFieldName] = ownField</code></span>
+<span class="codeline" id="line-229"><code>		joinTableFields = append(joinTableFields, reflect.StructField{</code></span>
+<span class="codeline" id="line-230"><code>			Name:    joinFieldName,</code></span>
+<span class="codeline" id="line-231"><code>			PkgPath: ownField.StructField.PkgPath,</code></span>
+<span class="codeline" id="line-232"><code>			Type:    ownField.StructField.Type,</code></span>
+<span class="codeline" id="line-233"><code>			Tag:     removeSettingFromTag(ownField.StructField.Tag, "column", "autoincrement", "index", "unique", "uniqueindex"),</code></span>
+<span class="codeline" id="line-234"><code>		})</code></span>
+<span class="codeline" id="line-235"><code>	}</code></span>
+<span class="codeline" id="line-236"><code></code></span>
+<span class="codeline" id="line-237"><code>	for idx, relField := range refForeignFields {</code></span>
+<span class="codeline" id="line-238"><code>		joinFieldName := relation.FieldSchema.Name + relField.Name</code></span>
+<span class="codeline" id="line-239"><code>		if len(joinReferences) &gt; idx {</code></span>
+<span class="codeline" id="line-240"><code>			joinFieldName = strings.Title(joinReferences[idx])</code></span>
+<span class="codeline" id="line-241"><code>		}</code></span>
+<span class="codeline" id="line-242"><code></code></span>
+<span class="codeline" id="line-243"><code>		if _, ok := ownFieldsMap[joinFieldName]; ok {</code></span>
+<span class="codeline" id="line-244"><code>			if field.Name != relation.FieldSchema.Name {</code></span>
+<span class="codeline" id="line-245"><code>				joinFieldName = inflection.Singular(field.Name) + relField.Name</code></span>
+<span class="codeline" id="line-246"><code>			} else {</code></span>
+<span class="codeline" id="line-247"><code>				joinFieldName += "Reference"</code></span>
+<span class="codeline" id="line-248"><code>			}</code></span>
+<span class="codeline" id="line-249"><code>		}</code></span>
+<span class="codeline" id="line-250"><code></code></span>
+<span class="codeline" id="line-251"><code>		fieldsMap[joinFieldName] = relField</code></span>
+<span class="codeline" id="line-252"><code>		joinTableFields = append(joinTableFields, reflect.StructField{</code></span>
+<span class="codeline" id="line-253"><code>			Name:    joinFieldName,</code></span>
+<span class="codeline" id="line-254"><code>			PkgPath: relField.StructField.PkgPath,</code></span>
+<span class="codeline" id="line-255"><code>			Type:    relField.StructField.Type,</code></span>
+<span class="codeline" id="line-256"><code>			Tag:     removeSettingFromTag(relField.StructField.Tag, "column", "autoincrement", "index", "unique", "uniqueindex"),</code></span>
+<span class="codeline" id="line-257"><code>		})</code></span>
+<span class="codeline" id="line-258"><code>	}</code></span>
+<span class="codeline" id="line-259"><code></code></span>
+<span class="codeline" id="line-260"><code>	joinTableFields = append(joinTableFields, reflect.StructField{</code></span>
+<span class="codeline" id="line-261"><code>		Name: schema.Name + field.Name,</code></span>
+<span class="codeline" id="line-262"><code>		Type: schema.ModelType,</code></span>
+<span class="codeline" id="line-263"><code>		Tag:  `gorm:"-"`,</code></span>
+<span class="codeline" id="line-264"><code>	})</code></span>
+<span class="codeline" id="line-265"><code></code></span>
+<span class="codeline" id="line-266"><code>	if relation.JoinTable, err = Parse(reflect.New(reflect.StructOf(joinTableFields)).Interface(), schema.cacheStore, schema.namer); err != nil {</code></span>
+<span class="codeline" id="line-267"><code>		schema.err = err</code></span>
+<span class="codeline" id="line-268"><code>	}</code></span>
+<span class="codeline" id="line-269"><code>	relation.JoinTable.Name = many2many</code></span>
+<span class="codeline" id="line-270"><code>	relation.JoinTable.Table = schema.namer.JoinTableName(many2many)</code></span>
+<span class="codeline" id="line-271"><code>	relation.JoinTable.PrimaryFields = make([]*Field, 0, len(relation.JoinTable.Fields))</code></span>
+<span class="codeline" id="line-272"><code></code></span>
+<span class="codeline" id="line-273"><code>	relName := relation.Schema.Name</code></span>
+<span class="codeline" id="line-274"><code>	relRefName := relation.FieldSchema.Name</code></span>
+<span class="codeline" id="line-275"><code>	if relName == relRefName {</code></span>
+<span class="codeline" id="line-276"><code>		relRefName = relation.Field.Name</code></span>
+<span class="codeline" id="line-277"><code>	}</code></span>
+<span class="codeline" id="line-278"><code></code></span>
+<span class="codeline" id="line-279"><code>	if _, ok := relation.JoinTable.Relationships.Relations[relName]; !ok {</code></span>
+<span class="codeline" id="line-280"><code>		relation.JoinTable.Relationships.Relations[relName] = &amp;Relationship{</code></span>
+<span class="codeline" id="line-281"><code>			Name:        relName,</code></span>
+<span class="codeline" id="line-282"><code>			Type:        BelongsTo,</code></span>
+<span class="codeline" id="line-283"><code>			Schema:      relation.JoinTable,</code></span>
+<span class="codeline" id="line-284"><code>			FieldSchema: relation.Schema,</code></span>
+<span class="codeline" id="line-285"><code>		}</code></span>
+<span class="codeline" id="line-286"><code>	} else {</code></span>
+<span class="codeline" id="line-287"><code>		relation.JoinTable.Relationships.Relations[relName].References = []*Reference{}</code></span>
+<span class="codeline" id="line-288"><code>	}</code></span>
+<span class="codeline" id="line-289"><code></code></span>
+<span class="codeline" id="line-290"><code>	if _, ok := relation.JoinTable.Relationships.Relations[relRefName]; !ok {</code></span>
+<span class="codeline" id="line-291"><code>		relation.JoinTable.Relationships.Relations[relRefName] = &amp;Relationship{</code></span>
+<span class="codeline" id="line-292"><code>			Name:        relRefName,</code></span>
+<span class="codeline" id="line-293"><code>			Type:        BelongsTo,</code></span>
+<span class="codeline" id="line-294"><code>			Schema:      relation.JoinTable,</code></span>
+<span class="codeline" id="line-295"><code>			FieldSchema: relation.FieldSchema,</code></span>
+<span class="codeline" id="line-296"><code>		}</code></span>
+<span class="codeline" id="line-297"><code>	} else {</code></span>
+<span class="codeline" id="line-298"><code>		relation.JoinTable.Relationships.Relations[relRefName].References = []*Reference{}</code></span>
+<span class="codeline" id="line-299"><code>	}</code></span>
+<span class="codeline" id="line-300"><code></code></span>
+<span class="codeline" id="line-301"><code>	// build references</code></span>
+<span class="codeline" id="line-302"><code>	for _, f := range relation.JoinTable.Fields {</code></span>
+<span class="codeline" id="line-303"><code>		if f.Creatable || f.Readable || f.Updatable {</code></span>
+<span class="codeline" id="line-304"><code>			// use same data type for foreign keys</code></span>
+<span class="codeline" id="line-305"><code>			f.DataType = fieldsMap[f.Name].DataType</code></span>
+<span class="codeline" id="line-306"><code>			f.GORMDataType = fieldsMap[f.Name].GORMDataType</code></span>
+<span class="codeline" id="line-307"><code>			if f.Size == 0 {</code></span>
+<span class="codeline" id="line-308"><code>				f.Size = fieldsMap[f.Name].Size</code></span>
+<span class="codeline" id="line-309"><code>			}</code></span>
+<span class="codeline" id="line-310"><code>			relation.JoinTable.PrimaryFields = append(relation.JoinTable.PrimaryFields, f)</code></span>
+<span class="codeline" id="line-311"><code>			ownPriamryField := schema == fieldsMap[f.Name].Schema &amp;&amp; ownFieldsMap[f.Name]</code></span>
+<span class="codeline" id="line-312"><code></code></span>
+<span class="codeline" id="line-313"><code>			if ownPriamryField {</code></span>
+<span class="codeline" id="line-314"><code>				joinRel := relation.JoinTable.Relationships.Relations[relName]</code></span>
+<span class="codeline" id="line-315"><code>				joinRel.Field = relation.Field</code></span>
+<span class="codeline" id="line-316"><code>				joinRel.References = append(joinRel.References, &amp;Reference{</code></span>
+<span class="codeline" id="line-317"><code>					PrimaryKey: fieldsMap[f.Name],</code></span>
+<span class="codeline" id="line-318"><code>					ForeignKey: f,</code></span>
+<span class="codeline" id="line-319"><code>				})</code></span>
+<span class="codeline" id="line-320"><code>			} else {</code></span>
+<span class="codeline" id="line-321"><code>				joinRefRel := relation.JoinTable.Relationships.Relations[relRefName]</code></span>
+<span class="codeline" id="line-322"><code>				if joinRefRel.Field == nil {</code></span>
+<span class="codeline" id="line-323"><code>					joinRefRel.Field = relation.Field</code></span>
+<span class="codeline" id="line-324"><code>				}</code></span>
+<span class="codeline" id="line-325"><code>				joinRefRel.References = append(joinRefRel.References, &amp;Reference{</code></span>
+<span class="codeline" id="line-326"><code>					PrimaryKey: fieldsMap[f.Name],</code></span>
+<span class="codeline" id="line-327"><code>					ForeignKey: f,</code></span>
+<span class="codeline" id="line-328"><code>				})</code></span>
+<span class="codeline" id="line-329"><code>			}</code></span>
+<span class="codeline" id="line-330"><code></code></span>
+<span class="codeline" id="line-331"><code>			relation.References = append(relation.References, &amp;Reference{</code></span>
+<span class="codeline" id="line-332"><code>				PrimaryKey:    fieldsMap[f.Name],</code></span>
+<span class="codeline" id="line-333"><code>				ForeignKey:    f,</code></span>
+<span class="codeline" id="line-334"><code>				OwnPrimaryKey: ownPriamryField,</code></span>
+<span class="codeline" id="line-335"><code>			})</code></span>
+<span class="codeline" id="line-336"><code>		}</code></span>
+<span class="codeline" id="line-337"><code>	}</code></span>
+<span class="codeline" id="line-338"><code>}</code></span>
+<span class="codeline" id="line-339"><code></code></span>
+<span class="codeline" id="line-340"><code>type guessLevel int</code></span>
+<span class="codeline" id="line-341"><code></code></span>
+<span class="codeline" id="line-342"><code>const (</code></span>
+<span class="codeline" id="line-343"><code>	guessBelongs guessLevel = iota</code></span>
+<span class="codeline" id="line-344"><code>	guessEmbeddedBelongs</code></span>
+<span class="codeline" id="line-345"><code>	guessHas</code></span>
+<span class="codeline" id="line-346"><code>	guessEmbeddedHas</code></span>
+<span class="codeline" id="line-347"><code>)</code></span>
+<span class="codeline" id="line-348"><code></code></span>
+<span class="codeline" id="line-349"><code>func (schema *Schema) guessRelation(relation *Relationship, field *Field, gl guessLevel) {</code></span>
+<span class="codeline" id="line-350"><code>	var (</code></span>
+<span class="codeline" id="line-351"><code>		primaryFields, foreignFields []*Field</code></span>
+<span class="codeline" id="line-352"><code>		primarySchema, foreignSchema = schema, relation.FieldSchema</code></span>
+<span class="codeline" id="line-353"><code>	)</code></span>
+<span class="codeline" id="line-354"><code></code></span>
+<span class="codeline" id="line-355"><code>	reguessOrErr := func() {</code></span>
+<span class="codeline" id="line-356"><code>		switch gl {</code></span>
+<span class="codeline" id="line-357"><code>		case guessBelongs:</code></span>
+<span class="codeline" id="line-358"><code>			schema.guessRelation(relation, field, guessEmbeddedBelongs)</code></span>
+<span class="codeline" id="line-359"><code>		case guessEmbeddedBelongs:</code></span>
+<span class="codeline" id="line-360"><code>			schema.guessRelation(relation, field, guessHas)</code></span>
+<span class="codeline" id="line-361"><code>		case guessHas:</code></span>
+<span class="codeline" id="line-362"><code>			schema.guessRelation(relation, field, guessEmbeddedHas)</code></span>
+<span class="codeline" id="line-363"><code>		// case guessEmbeddedHas:</code></span>
+<span class="codeline" id="line-364"><code>		default:</code></span>
+<span class="codeline" id="line-365"><code>			schema.err = fmt.Errorf("invalid field found for struct %v's field %v, need to define a foreign key for relations or it need to implement the Valuer/Scanner interface", schema, field.Name)</code></span>
+<span class="codeline" id="line-366"><code>		}</code></span>
+<span class="codeline" id="line-367"><code>	}</code></span>
+<span class="codeline" id="line-368"><code></code></span>
+<span class="codeline" id="line-369"><code>	switch gl {</code></span>
+<span class="codeline" id="line-370"><code>	case guessBelongs:</code></span>
+<span class="codeline" id="line-371"><code>		primarySchema, foreignSchema = relation.FieldSchema, schema</code></span>
+<span class="codeline" id="line-372"><code>	case guessEmbeddedBelongs:</code></span>
+<span class="codeline" id="line-373"><code>		if field.OwnerSchema != nil {</code></span>
+<span class="codeline" id="line-374"><code>			primarySchema, foreignSchema = relation.FieldSchema, field.OwnerSchema</code></span>
+<span class="codeline" id="line-375"><code>		} else {</code></span>
+<span class="codeline" id="line-376"><code>			reguessOrErr()</code></span>
+<span class="codeline" id="line-377"><code>			return</code></span>
+<span class="codeline" id="line-378"><code>		}</code></span>
+<span class="codeline" id="line-379"><code>	case guessHas:</code></span>
+<span class="codeline" id="line-380"><code>	case guessEmbeddedHas:</code></span>
+<span class="codeline" id="line-381"><code>		if field.OwnerSchema != nil {</code></span>
+<span class="codeline" id="line-382"><code>			primarySchema, foreignSchema = field.OwnerSchema, relation.FieldSchema</code></span>
+<span class="codeline" id="line-383"><code>		} else {</code></span>
+<span class="codeline" id="line-384"><code>			reguessOrErr()</code></span>
+<span class="codeline" id="line-385"><code>			return</code></span>
+<span class="codeline" id="line-386"><code>		}</code></span>
+<span class="codeline" id="line-387"><code>	}</code></span>
+<span class="codeline" id="line-388"><code></code></span>
+<span class="codeline" id="line-389"><code>	if len(relation.foreignKeys) &gt; 0 {</code></span>
+<span class="codeline" id="line-390"><code>		for _, foreignKey := range relation.foreignKeys {</code></span>
+<span class="codeline" id="line-391"><code>			if f := foreignSchema.LookUpField(foreignKey); f != nil {</code></span>
+<span class="codeline" id="line-392"><code>				foreignFields = append(foreignFields, f)</code></span>
+<span class="codeline" id="line-393"><code>			} else {</code></span>
+<span class="codeline" id="line-394"><code>				reguessOrErr()</code></span>
+<span class="codeline" id="line-395"><code>				return</code></span>
+<span class="codeline" id="line-396"><code>			}</code></span>
+<span class="codeline" id="line-397"><code>		}</code></span>
+<span class="codeline" id="line-398"><code>	} else {</code></span>
+<span class="codeline" id="line-399"><code>		for _, primaryField := range primarySchema.PrimaryFields {</code></span>
+<span class="codeline" id="line-400"><code>			lookUpName := primarySchema.Name + primaryField.Name</code></span>
+<span class="codeline" id="line-401"><code>			if gl == guessBelongs {</code></span>
+<span class="codeline" id="line-402"><code>				lookUpName = field.Name + primaryField.Name</code></span>
+<span class="codeline" id="line-403"><code>			}</code></span>
+<span class="codeline" id="line-404"><code></code></span>
+<span class="codeline" id="line-405"><code>			if f := foreignSchema.LookUpField(lookUpName); f != nil {</code></span>
+<span class="codeline" id="line-406"><code>				foreignFields = append(foreignFields, f)</code></span>
+<span class="codeline" id="line-407"><code>				primaryFields = append(primaryFields, primaryField)</code></span>
+<span class="codeline" id="line-408"><code>			}</code></span>
+<span class="codeline" id="line-409"><code>		}</code></span>
+<span class="codeline" id="line-410"><code>	}</code></span>
+<span class="codeline" id="line-411"><code></code></span>
+<span class="codeline" id="line-412"><code>	if len(foreignFields) == 0 {</code></span>
+<span class="codeline" id="line-413"><code>		reguessOrErr()</code></span>
+<span class="codeline" id="line-414"><code>		return</code></span>
+<span class="codeline" id="line-415"><code>	} else if len(relation.primaryKeys) &gt; 0 {</code></span>
+<span class="codeline" id="line-416"><code>		for idx, primaryKey := range relation.primaryKeys {</code></span>
+<span class="codeline" id="line-417"><code>			if f := primarySchema.LookUpField(primaryKey); f != nil {</code></span>
+<span class="codeline" id="line-418"><code>				if len(primaryFields) &lt; idx+1 {</code></span>
+<span class="codeline" id="line-419"><code>					primaryFields = append(primaryFields, f)</code></span>
+<span class="codeline" id="line-420"><code>				} else if f != primaryFields[idx] {</code></span>
+<span class="codeline" id="line-421"><code>					reguessOrErr()</code></span>
+<span class="codeline" id="line-422"><code>					return</code></span>
+<span class="codeline" id="line-423"><code>				}</code></span>
+<span class="codeline" id="line-424"><code>			} else {</code></span>
+<span class="codeline" id="line-425"><code>				reguessOrErr()</code></span>
+<span class="codeline" id="line-426"><code>				return</code></span>
+<span class="codeline" id="line-427"><code>			}</code></span>
+<span class="codeline" id="line-428"><code>		}</code></span>
+<span class="codeline" id="line-429"><code>	} else if len(primaryFields) == 0 {</code></span>
+<span class="codeline" id="line-430"><code>		if len(foreignFields) == 1 {</code></span>
+<span class="codeline" id="line-431"><code>			primaryFields = append(primaryFields, primarySchema.PrioritizedPrimaryField)</code></span>
+<span class="codeline" id="line-432"><code>		} else if len(primarySchema.PrimaryFields) == len(foreignFields) {</code></span>
+<span class="codeline" id="line-433"><code>			primaryFields = append(primaryFields, primarySchema.PrimaryFields...)</code></span>
+<span class="codeline" id="line-434"><code>		} else {</code></span>
+<span class="codeline" id="line-435"><code>			reguessOrErr()</code></span>
+<span class="codeline" id="line-436"><code>			return</code></span>
+<span class="codeline" id="line-437"><code>		}</code></span>
+<span class="codeline" id="line-438"><code>	}</code></span>
+<span class="codeline" id="line-439"><code></code></span>
+<span class="codeline" id="line-440"><code>	// build references</code></span>
+<span class="codeline" id="line-441"><code>	for idx, foreignField := range foreignFields {</code></span>
+<span class="codeline" id="line-442"><code>		// use same data type for foreign keys</code></span>
+<span class="codeline" id="line-443"><code>		foreignField.DataType = primaryFields[idx].DataType</code></span>
+<span class="codeline" id="line-444"><code>		foreignField.GORMDataType = primaryFields[idx].GORMDataType</code></span>
+<span class="codeline" id="line-445"><code>		if foreignField.Size == 0 {</code></span>
+<span class="codeline" id="line-446"><code>			foreignField.Size = primaryFields[idx].Size</code></span>
+<span class="codeline" id="line-447"><code>		}</code></span>
+<span class="codeline" id="line-448"><code></code></span>
+<span class="codeline" id="line-449"><code>		relation.References = append(relation.References, &amp;Reference{</code></span>
+<span class="codeline" id="line-450"><code>			PrimaryKey:    primaryFields[idx],</code></span>
+<span class="codeline" id="line-451"><code>			ForeignKey:    foreignField,</code></span>
+<span class="codeline" id="line-452"><code>			OwnPrimaryKey: (schema == primarySchema &amp;&amp; gl == guessHas) || (field.OwnerSchema == primarySchema &amp;&amp; gl == guessEmbeddedHas),</code></span>
+<span class="codeline" id="line-453"><code>		})</code></span>
+<span class="codeline" id="line-454"><code>	}</code></span>
+<span class="codeline" id="line-455"><code></code></span>
+<span class="codeline" id="line-456"><code>	if gl == guessHas || gl == guessEmbeddedHas {</code></span>
+<span class="codeline" id="line-457"><code>		relation.Type = "has"</code></span>
+<span class="codeline" id="line-458"><code>	} else {</code></span>
+<span class="codeline" id="line-459"><code>		relation.Type = BelongsTo</code></span>
+<span class="codeline" id="line-460"><code>	}</code></span>
+<span class="codeline" id="line-461"><code>}</code></span>
+<span class="codeline" id="line-462"><code></code></span>
+<span class="codeline" id="line-463"><code>type Constraint struct {</code></span>
+<span class="codeline" id="line-464"><code>	Name            string</code></span>
+<span class="codeline" id="line-465"><code>	Field           *Field</code></span>
+<span class="codeline" id="line-466"><code>	Schema          *Schema</code></span>
+<span class="codeline" id="line-467"><code>	ForeignKeys     []*Field</code></span>
+<span class="codeline" id="line-468"><code>	ReferenceSchema *Schema</code></span>
+<span class="codeline" id="line-469"><code>	References      []*Field</code></span>
+<span class="codeline" id="line-470"><code>	OnDelete        string</code></span>
+<span class="codeline" id="line-471"><code>	OnUpdate        string</code></span>
+<span class="codeline" id="line-472"><code>}</code></span>
+<span class="codeline" id="line-473"><code></code></span>
+<span class="codeline" id="line-474"><code>func (rel *Relationship) ParseConstraint() *Constraint {</code></span>
+<span class="codeline" id="line-475"><code>	str := rel.Field.TagSettings["CONSTRAINT"]</code></span>
+<span class="codeline" id="line-476"><code>	if str == "-" {</code></span>
+<span class="codeline" id="line-477"><code>		return nil</code></span>
+<span class="codeline" id="line-478"><code>	}</code></span>
+<span class="codeline" id="line-479"><code></code></span>
+<span class="codeline" id="line-480"><code>	var (</code></span>
+<span class="codeline" id="line-481"><code>		name     string</code></span>
+<span class="codeline" id="line-482"><code>		idx      = strings.Index(str, ",")</code></span>
+<span class="codeline" id="line-483"><code>		settings = ParseTagSetting(str, ",")</code></span>
+<span class="codeline" id="line-484"><code>	)</code></span>
+<span class="codeline" id="line-485"><code></code></span>
+<span class="codeline" id="line-486"><code>	if idx != -1 &amp;&amp; regexp.MustCompile("^[A-Za-z-_]+$").MatchString(str[0:idx]) {</code></span>
+<span class="codeline" id="line-487"><code>		name = str[0:idx]</code></span>
+<span class="codeline" id="line-488"><code>	} else {</code></span>
+<span class="codeline" id="line-489"><code>		name = rel.Schema.namer.RelationshipFKName(*rel)</code></span>
+<span class="codeline" id="line-490"><code>	}</code></span>
+<span class="codeline" id="line-491"><code></code></span>
+<span class="codeline" id="line-492"><code>	constraint := Constraint{</code></span>
+<span class="codeline" id="line-493"><code>		Name:     name,</code></span>
+<span class="codeline" id="line-494"><code>		Field:    rel.Field,</code></span>
+<span class="codeline" id="line-495"><code>		OnUpdate: settings["ONUPDATE"],</code></span>
+<span class="codeline" id="line-496"><code>		OnDelete: settings["ONDELETE"],</code></span>
+<span class="codeline" id="line-497"><code>	}</code></span>
+<span class="codeline" id="line-498"><code></code></span>
+<span class="codeline" id="line-499"><code>	for _, ref := range rel.References {</code></span>
+<span class="codeline" id="line-500"><code>		if ref.PrimaryKey != nil {</code></span>
+<span class="codeline" id="line-501"><code>			constraint.ForeignKeys = append(constraint.ForeignKeys, ref.ForeignKey)</code></span>
+<span class="codeline" id="line-502"><code>			constraint.References = append(constraint.References, ref.PrimaryKey)</code></span>
+<span class="codeline" id="line-503"><code></code></span>
+<span class="codeline" id="line-504"><code>			if ref.OwnPrimaryKey {</code></span>
+<span class="codeline" id="line-505"><code>				constraint.Schema = ref.ForeignKey.Schema</code></span>
+<span class="codeline" id="line-506"><code>				constraint.ReferenceSchema = rel.Schema</code></span>
+<span class="codeline" id="line-507"><code>			} else {</code></span>
+<span class="codeline" id="line-508"><code>				constraint.Schema = rel.Schema</code></span>
+<span class="codeline" id="line-509"><code>				constraint.ReferenceSchema = ref.PrimaryKey.Schema</code></span>
+<span class="codeline" id="line-510"><code>			}</code></span>
+<span class="codeline" id="line-511"><code>		}</code></span>
+<span class="codeline" id="line-512"><code>	}</code></span>
+<span class="codeline" id="line-513"><code></code></span>
+<span class="codeline" id="line-514"><code>	if rel.JoinTable != nil {</code></span>
+<span class="codeline" id="line-515"><code>		return nil</code></span>
+<span class="codeline" id="line-516"><code>	}</code></span>
+<span class="codeline" id="line-517"><code></code></span>
+<span class="codeline" id="line-518"><code>	return &amp;constraint</code></span>
+<span class="codeline" id="line-519"><code>}</code></span>
+<span class="codeline" id="line-520"><code></code></span>
+<span class="codeline" id="line-521"><code>func (rel *Relationship) ToQueryConditions(reflectValue reflect.Value) (conds []clause.Expression) {</code></span>
+<span class="codeline" id="line-522"><code>	table := rel.FieldSchema.Table</code></span>
+<span class="codeline" id="line-523"><code>	foreignFields := []*Field{}</code></span>
+<span class="codeline" id="line-524"><code>	relForeignKeys := []string{}</code></span>
+<span class="codeline" id="line-525"><code></code></span>
+<span class="codeline" id="line-526"><code>	if rel.JoinTable != nil {</code></span>
+<span class="codeline" id="line-527"><code>		table = rel.JoinTable.Table</code></span>
+<span class="codeline" id="line-528"><code>		for _, ref := range rel.References {</code></span>
+<span class="codeline" id="line-529"><code>			if ref.OwnPrimaryKey {</code></span>
+<span class="codeline" id="line-530"><code>				foreignFields = append(foreignFields, ref.PrimaryKey)</code></span>
+<span class="codeline" id="line-531"><code>				relForeignKeys = append(relForeignKeys, ref.ForeignKey.DBName)</code></span>
+<span class="codeline" id="line-532"><code>			} else if ref.PrimaryValue != "" {</code></span>
+<span class="codeline" id="line-533"><code>				conds = append(conds, clause.Eq{</code></span>
+<span class="codeline" id="line-534"><code>					Column: clause.Column{Table: rel.JoinTable.Table, Name: ref.ForeignKey.DBName},</code></span>
+<span class="codeline" id="line-535"><code>					Value:  ref.PrimaryValue,</code></span>
+<span class="codeline" id="line-536"><code>				})</code></span>
+<span class="codeline" id="line-537"><code>			} else {</code></span>
+<span class="codeline" id="line-538"><code>				conds = append(conds, clause.Eq{</code></span>
+<span class="codeline" id="line-539"><code>					Column: clause.Column{Table: rel.JoinTable.Table, Name: ref.ForeignKey.DBName},</code></span>
+<span class="codeline" id="line-540"><code>					Value:  clause.Column{Table: rel.FieldSchema.Table, Name: ref.PrimaryKey.DBName},</code></span>
+<span class="codeline" id="line-541"><code>				})</code></span>
+<span class="codeline" id="line-542"><code>			}</code></span>
+<span class="codeline" id="line-543"><code>		}</code></span>
+<span class="codeline" id="line-544"><code>	} else {</code></span>
+<span class="codeline" id="line-545"><code>		for _, ref := range rel.References {</code></span>
+<span class="codeline" id="line-546"><code>			if ref.OwnPrimaryKey {</code></span>
+<span class="codeline" id="line-547"><code>				relForeignKeys = append(relForeignKeys, ref.ForeignKey.DBName)</code></span>
+<span class="codeline" id="line-548"><code>				foreignFields = append(foreignFields, ref.PrimaryKey)</code></span>
+<span class="codeline" id="line-549"><code>			} else if ref.PrimaryValue != "" {</code></span>
+<span class="codeline" id="line-550"><code>				conds = append(conds, clause.Eq{</code></span>
+<span class="codeline" id="line-551"><code>					Column: clause.Column{Table: rel.FieldSchema.Table, Name: ref.ForeignKey.DBName},</code></span>
+<span class="codeline" id="line-552"><code>					Value:  ref.PrimaryValue,</code></span>
+<span class="codeline" id="line-553"><code>				})</code></span>
+<span class="codeline" id="line-554"><code>			} else {</code></span>
+<span class="codeline" id="line-555"><code>				relForeignKeys = append(relForeignKeys, ref.PrimaryKey.DBName)</code></span>
+<span class="codeline" id="line-556"><code>				foreignFields = append(foreignFields, ref.ForeignKey)</code></span>
+<span class="codeline" id="line-557"><code>			}</code></span>
+<span class="codeline" id="line-558"><code>		}</code></span>
+<span class="codeline" id="line-559"><code>	}</code></span>
+<span class="codeline" id="line-560"><code></code></span>
+<span class="codeline" id="line-561"><code>	_, foreignValues := GetIdentityFieldValuesMap(reflectValue, foreignFields)</code></span>
+<span class="codeline" id="line-562"><code>	column, values := ToQueryValues(table, relForeignKeys, foreignValues)</code></span>
+<span class="codeline" id="line-563"><code></code></span>
+<span class="codeline" id="line-564"><code>	conds = append(conds, clause.IN{Column: column, Values: values})</code></span>
+<span class="codeline" id="line-565"><code>	return</code></span>
+<span class="codeline" id="line-566"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: database/sql/driver</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>driver</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-database/sql/driver">database/sql/driver</a><i> (on <a href="https://golang.org/pkg/database/sql/driver/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/database/sql/driver" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/database/sql/driver.html">6 packages</a>, and imported by <a href="../../../dep/database/sql/driver.html#imported-by">7 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../src/database/sql/driver/driver.go.html#doc">d-&gt;</a> <a href="../../../src/database/sql/driver/driver.go.html">driver.go</a>
+	    <a href="../../../src/database/sql/driver/types.go.html">types.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-ColumnConverter" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-408">ColumnConverter</a> <b<i>(interface)</i></b>
+		ColumnConverter may be optionally implemented by Stmt if the
+		statement is aware of its own columns' types and can convert from
+		any type to a driver Value.
+
+		Deprecated: Drivers should implement NamedValueChecker.
+
+		<input type='checkbox' class="stat" id="ColumnConverter-stat-methods"><label for="ColumnConverter-stat-methods">One Exported Method</label><span id='ColumnConverter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-413">ColumnConverter</a>(idx <a href="../../builtin.html#name-int">int</a>) <a href="#name-ValueConverter">ValueConverter</a></span></div>
+<div class="anchor" id="name-Conn" data-popularity="425">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-227">Conn</a> <b<i>(interface)</i></b>
+		Conn is a connection to a database. It is not used concurrently
+		by multiple goroutines.
+
+		Conn is assumed to be stateful.
+
+		<input type='checkbox' class="stat" id="Conn-stat-methods"><label for="Conn-stat-methods">Exported Methods (3)</label><span id='Conn-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-247">Begin</a>() (<a href="#name-Tx">Tx</a>, <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-242">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-229">Prepare</a>(query <a href="../../builtin.html#name-string">string</a>) (<a href="#name-Stmt">Stmt</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Conn-stat-impls"><label for="Conn-stat-impls">Implements (1+)</label><span id='Conn-stat-impls-content' class="stat-content">
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Conn-stat-results"><label for="Conn-stat-results">As Outputs Of (3+)</label><span id='Conn-stat-results-content' class="stat-content">
+			func <a href="#name-Connector">Connector</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-132">Connect</a>(<a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>) (<b>Conn</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Driver">Driver</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-94">Open</a>(name <a href="../../builtin.html#name-string">string</a>) (<b>Conn</b>, <a href="../../builtin.html#name-error">error</a>)
+			func github.com/go-sql-driver/mysql.<a href="../../github.com/go-sql-driver/mysql.html#name-MySQLDriver">MySQLDriver</a>.<a href="../../../src/github.com/go-sql-driver/mysql/driver.go.html#line-72">Open</a>(dsn <a href="../../builtin.html#name-string">string</a>) (<b>Conn</b>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ConnBeginTx" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-273">ConnBeginTx</a> <b<i>(interface)</i></b>
+		ConnBeginTx enhances the Conn interface with context and TxOptions.
+
+		<input type='checkbox' class="stat" id="ConnBeginTx-stat-methods"><label for="ConnBeginTx-stat-methods">One Exported Method</label><span id='ConnBeginTx-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-286">BeginTx</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, opts <a href="#name-TxOptions">TxOptions</a>) (<a href="#name-Tx">Tx</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Connector" data-popularity="360">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-118">Connector</a> <b<i>(interface)</i></b>
+		A Connector represents a driver in a fixed configuration
+		and can create any number of equivalent Conns for use
+		by multiple goroutines.
+
+		A Connector can be passed to sql.OpenDB, to allow drivers
+		to implement their own sql.DB constructors, or returned by
+		DriverContext's OpenConnector method, to allow drivers
+		access to context and to avoid repeated parsing of driver
+		configuration.
+
+		<input type='checkbox' class="stat" id="Connector-stat-methods"><label for="Connector-stat-methods">Exported Methods (2)</label><span id='Connector-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-132">Connect</a>(<a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>) (<a href="#name-Conn">Conn</a>, <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-137">Driver</a>() <a href="#name-Driver">Driver</a></span>
+		<input type='checkbox' class="stat" id="Connector-stat-results"><label for="Connector-stat-results">As Outputs Of (3+)</label><span id='Connector-stat-results-content' class="stat-content">
+			func <a href="#name-DriverContext">DriverContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-106">OpenConnector</a>(name <a href="../../builtin.html#name-string">string</a>) (<b>Connector</b>, <a href="../../builtin.html#name-error">error</a>)
+			func github.com/go-sql-driver/mysql.<a href="../../github.com/go-sql-driver/mysql.html#name-NewConnector">NewConnector</a>(cfg *<a href="../../github.com/go-sql-driver/mysql.html">mysql</a>.<a href="../../github.com/go-sql-driver/mysql.html#name-Config">Config</a>) (<b>Connector</b>, <a href="../../builtin.html#name-error">error</a>)
+			func github.com/go-sql-driver/mysql.<a href="../../github.com/go-sql-driver/mysql.html#name-MySQLDriver">MySQLDriver</a>.<a href="../../../src/github.com/go-sql-driver/mysql/driver.go.html#line-99">OpenConnector</a>(dsn <a href="../../builtin.html#name-string">string</a>) (<b>Connector</b>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Connector-stat-params"><label for="Connector-stat-params">As Inputs Of (1+)</label><span id='Connector-stat-params-content' class="stat-content">
+			func database/sql.<a href="../sql.html#name-OpenDB">OpenDB</a>(c <b>Connector</b>) *<a href="../sql.html">sql</a>.<a href="../sql.html#name-DB">DB</a></span></div>
+<div class="anchor" id="name-ConnPrepareContext" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-251">ConnPrepareContext</a> <b<i>(interface)</i></b>
+		ConnPrepareContext enhances the Conn interface with context.
+
+		<input type='checkbox' class="stat" id="ConnPrepareContext-stat-methods"><label for="ConnPrepareContext-stat-methods">One Exported Method</label><span id='ConnPrepareContext-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-255">PrepareContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>) (<a href="#name-Stmt">Stmt</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Driver" data-popularity="385">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-84">Driver</a> <b<i>(interface)</i></b>
+		Driver is the interface that must be implemented by a database
+		driver.
+
+		Database drivers may implement DriverContext for access
+		to contexts and to parse the name only once for a pool of connections,
+		instead of once per connection.
+
+		<input type='checkbox' class="stat" id="Driver-stat-methods"><label for="Driver-stat-methods">One Exported Method</label><span id='Driver-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-94">Open</a>(name <a href="../../builtin.html#name-string">string</a>) (<a href="#name-Conn">Conn</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Driver-stat-impledby"><label for="Driver-stat-impledby">Implemented By (1+)</label><span id='Driver-stat-impledby-content' class="stat-content">
+			github.com/go-sql-driver/mysql.<a href="../../github.com/go-sql-driver/mysql.html#name-MySQLDriver">MySQLDriver</a></span>
+		<input type='checkbox' class="stat" id="Driver-stat-results"><label for="Driver-stat-results">As Outputs Of (2+)</label><span id='Driver-stat-results-content' class="stat-content">
+			func <a href="#name-Connector">Connector</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-137">Driver</a>() <b>Driver</b>
+			func database/sql.(*<a href="../sql.html#name-DB">DB</a>).<a href="../../../src/database/sql/sql.go.html#line-1784">Driver</a>() <b>Driver</b></span>
+		<input type='checkbox' class="stat" id="Driver-stat-params"><label for="Driver-stat-params">As Inputs Of (1+)</label><span id='Driver-stat-params-content' class="stat-content">
+			func database/sql.<a href="../sql.html#name-Register">Register</a>(name <a href="../../builtin.html#name-string">string</a>, driver <b>Driver</b>)</span></div>
+<div class="anchor" id="name-DriverContext" data-popularity="200">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-103">DriverContext</a> <b<i>(interface)</i></b>
+		If a Driver implements DriverContext, then sql.DB will call
+		OpenConnector to obtain a Connector and then invoke
+		that Connector's Connect method to obtain each needed connection,
+		instead of invoking the Driver's Open method for each connection.
+		The two-step sequence allows drivers to parse the name just once
+		and also provides access to per-Conn contexts.
+
+		<input type='checkbox' class="stat" id="DriverContext-stat-methods"><label for="DriverContext-stat-methods">One Exported Method</label><span id='DriverContext-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-106">OpenConnector</a>(name <a href="../../builtin.html#name-string">string</a>) (<a href="#name-Connector">Connector</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="DriverContext-stat-impledby"><label for="DriverContext-stat-impledby">Implemented By (1+)</label><span id='DriverContext-stat-impledby-content' class="stat-content">
+			github.com/go-sql-driver/mysql.<a href="../../github.com/go-sql-driver/mysql.html#name-MySQLDriver">MySQLDriver</a></span></div>
+<div class="anchor" id="name-Execer" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-178">Execer</a> <b<i>(interface)</i></b>
+		Execer is an optional interface that may be implemented by a Conn.
+
+		If a Conn implements neither ExecerContext nor Execer,
+		the sql package's DB.Exec will first prepare a query, execute the statement,
+		and then close the statement.
+
+		Exec may return ErrSkip.
+
+		Deprecated: Drivers should implement ExecerContext instead.
+
+		<input type='checkbox' class="stat" id="Execer-stat-methods"><label for="Execer-stat-methods">One Exported Method</label><span id='Execer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-179">Exec</a>(query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-Value">Value</a>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ExecerContext" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-192">ExecerContext</a> <b<i>(interface)</i></b>
+		ExecerContext is an optional interface that may be implemented by a Conn.
+
+		If a Conn does not implement ExecerContext, the sql package's DB.Exec
+		will fall back to Execer; if the Conn does not implement Execer either,
+		DB.Exec will first prepare a query, execute the statement, and then
+		close the statement.
+
+		ExecerContext may return ErrSkip.
+
+		ExecerContext must honor the context timeout and return when the context is canceled.
+
+		<input type='checkbox' class="stat" id="ExecerContext-stat-methods"><label for="ExecerContext-stat-methods">One Exported Method</label><span id='ExecerContext-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-193">ExecContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-IsolationLevel" data-popularity="0">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-262">IsolationLevel</a> <a href="../../builtin.html#name-int">int</a>
+		IsolationLevel is the transaction isolation level stored in TxOptions.
+
+		This type should be considered identical to sql.IsolationLevel along
+		with any values defined on it.
+</div>
+<div class="anchor" id="name-NamedValue" data-popularity="175">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-64">NamedValue</a> <i>(struct)</i>
+		NamedValue holds both the value name and value.
+
+		<input type='checkbox' class="stat" id="NamedValue-stat-fields"><label for="NamedValue-stat-fields">Exported Fields (3)</label><span id='NamedValue-stat-fields-content' class="stat-content">
+			<a href="../../../src/database/sql/driver/driver.go.html#line-69">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/database/sql/driver/driver.go.html#line-72">Ordinal</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/database/sql/driver/driver.go.html#line-75">Value</a> <i><a href="#name-Value">Value</a></i></span>
+		<input type='checkbox' class="stat" id="NamedValue-stat-params"><label for="NamedValue-stat-params">As Inputs Of (5+)</label><span id='NamedValue-stat-params-content' class="stat-content">
+			func <a href="#name-ExecerContext">ExecerContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-193">ExecContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>, args []<b>NamedValue</b>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-NamedValueChecker">NamedValueChecker</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-400">CheckNamedValue</a>(*<b>NamedValue</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-QueryerContext">QueryerContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-220">QueryContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>, args []<b>NamedValue</b>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-StmtExecContext">StmtExecContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-363">ExecContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, args []<b>NamedValue</b>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-StmtQueryContext">StmtQueryContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-372">QueryContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, args []<b>NamedValue</b>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-NamedValueChecker" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-396">NamedValueChecker</a> <b<i>(interface)</i></b>
+		NamedValueChecker may be optionally implemented by Conn or Stmt. It provides
+		the driver more control to handle Go and database types beyond the default
+		Values types allowed.
+
+		The sql package checks for value checkers in the following order,
+		stopping at the first found match: Stmt.NamedValueChecker, Conn.NamedValueChecker,
+		Stmt.ColumnConverter, DefaultParameterConverter.
+
+		If CheckNamedValue returns ErrRemoveArgument, the NamedValue will not be included in
+		the final query arguments. This may be used to pass special options to
+		the query itself.
+
+		If ErrSkip is returned the column converter error checking
+		path is used for the argument. Drivers may wish to return ErrSkip after
+		they have exhausted their own special cases.
+
+		<input type='checkbox' class="stat" id="NamedValueChecker-stat-methods"><label for="NamedValueChecker-stat-methods">One Exported Method</label><span id='NamedValueChecker-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-400">CheckNamedValue</a>(*<a href="#name-NamedValue">NamedValue</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-NotNull" data-popularity="100">	 type <a href="../../../src/database/sql/driver/types.go.html#line-164">NotNull</a> <i>(struct)</i>
+		NotNull is a type that implements ValueConverter by disallowing nil
+		values but otherwise delegating to another ValueConverter.
+
+		<input type='checkbox' class="stat" id="NotNull-stat-fields"><label for="NotNull-stat-fields">One Exported Field</label><span id='NotNull-stat-fields-content' class="stat-content">
+			<a href="../../../src/database/sql/driver/types.go.html#line-152">Converter</a> <i><a href="#name-ValueConverter">ValueConverter</a></i></span>
+		<input type='checkbox' class="stat" id="NotNull-stat-methods"><label for="NotNull-stat-methods">One Exported Method</label><span id='NotNull-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/types.go.html#line-168">ConvertValue</a>(v interface{}) (<a href="#name-Value">Value</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NotNull-stat-impls"><label for="NotNull-stat-impls">Implements (1+)</label><span id='NotNull-stat-impls-content' class="stat-content">
+			 T : <a href="#name-ValueConverter">ValueConverter</a></span></div>
+<div class="anchor" id="name-Null" data-popularity="100">	 type <a href="../../../src/database/sql/driver/types.go.html#line-151">Null</a> <i>(struct)</i>
+		Null is a type that implements ValueConverter by allowing nil
+		values but otherwise delegating to another ValueConverter.
+
+		<input type='checkbox' class="stat" id="Null-stat-fields"><label for="Null-stat-fields">One Exported Field</label><span id='Null-stat-fields-content' class="stat-content">
+			<a href="../../../src/database/sql/driver/types.go.html#line-152">Converter</a> <i><a href="#name-ValueConverter">ValueConverter</a></i></span>
+		<input type='checkbox' class="stat" id="Null-stat-methods"><label for="Null-stat-methods">One Exported Method</label><span id='Null-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/types.go.html#line-155">ConvertValue</a>(v interface{}) (<a href="#name-Value">Value</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Null-stat-impls"><label for="Null-stat-impls">Implements (1+)</label><span id='Null-stat-impls-content' class="stat-content">
+			 T : <a href="#name-ValueConverter">ValueConverter</a></span></div>
+<div class="anchor" id="name-Pinger" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-165">Pinger</a> <b<i>(interface)</i></b>
+		Pinger is an optional interface that may be implemented by a Conn.
+
+		If a Conn does not implement Pinger, the sql package's DB.Ping and
+		DB.PingContext will check if there is at least one Conn available.
+
+		If Conn.Ping returns ErrBadConn, DB.Ping and DB.PingContext will remove
+		the Conn from pool.
+
+		<input type='checkbox' class="stat" id="Pinger-stat-methods"><label for="Pinger-stat-methods">One Exported Method</label><span id='Pinger-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-166">Ping</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Queryer" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-205">Queryer</a> <b<i>(interface)</i></b>
+		Queryer is an optional interface that may be implemented by a Conn.
+
+		If a Conn implements neither QueryerContext nor Queryer,
+		the sql package's DB.Query will first prepare a query, execute the statement,
+		and then close the statement.
+
+		Query may return ErrSkip.
+
+		Deprecated: Drivers should implement QueryerContext instead.
+
+		<input type='checkbox' class="stat" id="Queryer-stat-methods"><label for="Queryer-stat-methods">One Exported Method</label><span id='Queryer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-206">Query</a>(query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-Value">Value</a>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-QueryerContext" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-219">QueryerContext</a> <b<i>(interface)</i></b>
+		QueryerContext is an optional interface that may be implemented by a Conn.
+
+		If a Conn does not implement QueryerContext, the sql package's DB.Query
+		will fall back to Queryer; if the Conn does not implement Queryer either,
+		DB.Query will first prepare a query, execute the statement, and then
+		close the statement.
+
+		QueryerContext may return ErrSkip.
+
+		QueryerContext must honor the context timeout and return when the context is canceled.
+
+		<input type='checkbox' class="stat" id="QueryerContext-stat-methods"><label for="QueryerContext-stat-methods">One Exported Method</label><span id='QueryerContext-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-220">QueryContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Result" data-popularity="750">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-310">Result</a> <b<i>(interface)</i></b>
+		Result is the result of a query execution.
+
+		<input type='checkbox' class="stat" id="Result-stat-methods"><label for="Result-stat-methods">Exported Methods (2)</label><span id='Result-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-314">LastInsertId</a>() (<a href="../../builtin.html#name-int64">int64</a>, <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-318">RowsAffected</a>() (<a href="../../builtin.html#name-int64">int64</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Result-stat-impledby"><label for="Result-stat-impledby">Implemented By (2+)</label><span id='Result-stat-impledby-content' class="stat-content">
+			<a href="#name-RowsAffected">RowsAffected</a>
+			database/sql.<a href="../sql.html#name-Result">Result</a> <i>(interface)</i></span>
+		<input type='checkbox' class="stat" id="Result-stat-impls"><label for="Result-stat-impls">Implements (1+)</label><span id='Result-stat-impls-content' class="stat-content">
+			 T : database/sql.<a href="../sql.html#name-Result">Result</a></span>
+		<input type='checkbox' class="stat" id="Result-stat-results"><label for="Result-stat-results">As Outputs Of (4+)</label><span id='Result-stat-results-content' class="stat-content">
+			func <a href="#name-Execer">Execer</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-179">Exec</a>(query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-Value">Value</a>) (<b>Result</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-ExecerContext">ExecerContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-193">ExecContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<b>Result</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Stmt">Stmt</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-348">Exec</a>(args []<a href="#name-Value">Value</a>) (<b>Result</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-StmtExecContext">StmtExecContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-363">ExecContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<b>Result</b>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Rows" data-popularity="1400">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-417">Rows</a> <b<i>(interface)</i></b>
+		Rows is an iterator over an executed query's results.
+
+		<input type='checkbox' class="stat" id="Rows-stat-methods"><label for="Rows-stat-methods">Exported Methods (3)</label><span id='Rows-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-425">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-422">Columns</a>() []<a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<a href="#name-Value">Value</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Rows-stat-impledby"><label for="Rows-stat-impledby">Implemented By (6+)</label><span id='Rows-stat-impledby-content' class="stat-content">
+			<a href="#name-RowsColumnTypeDatabaseTypeName">RowsColumnTypeDatabaseTypeName</a> <i>(interface)</i>
+			<a href="#name-RowsColumnTypeLength">RowsColumnTypeLength</a> <i>(interface)</i>
+			<a href="#name-RowsColumnTypeNullable">RowsColumnTypeNullable</a> <i>(interface)</i>
+			<a href="#name-RowsColumnTypePrecisionScale">RowsColumnTypePrecisionScale</a> <i>(interface)</i>
+			<a href="#name-RowsColumnTypeScanType">RowsColumnTypeScanType</a> <i>(interface)</i>
+			<a href="#name-RowsNextResultSet">RowsNextResultSet</a> <i>(interface)</i></span>
+		<input type='checkbox' class="stat" id="Rows-stat-impls"><label for="Rows-stat-impls">Implements (1+)</label><span id='Rows-stat-impls-content' class="stat-content">
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Rows-stat-results"><label for="Rows-stat-results">As Outputs Of (4+)</label><span id='Rows-stat-results-content' class="stat-content">
+			func <a href="#name-Queryer">Queryer</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-206">Query</a>(query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-Value">Value</a>) (<b>Rows</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-QueryerContext">QueryerContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-220">QueryContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<b>Rows</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Stmt">Stmt</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-354">Query</a>(args []<a href="#name-Value">Value</a>) (<b>Rows</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-StmtQueryContext">StmtQueryContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-372">QueryContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<b>Rows</b>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-RowsAffected" data-popularity="200">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-517">RowsAffected</a> <a href="../../builtin.html#name-int64">int64</a>
+		RowsAffected implements Result for an INSERT or UPDATE operation
+		which mutates a number of rows.
+
+		<input type='checkbox' class="stat" id="RowsAffected-stat-methods"><label for="RowsAffected-stat-methods">Exported Methods (2)</label><span id='RowsAffected-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-521">LastInsertId</a>() (<a href="../../builtin.html#name-int64">int64</a>, <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-525">RowsAffected</a>() (<a href="../../builtin.html#name-int64">int64</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="RowsAffected-stat-impls"><label for="RowsAffected-stat-impls">Implements (2+)</label><span id='RowsAffected-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Result">Result</a>
+			 T : database/sql.<a href="../sql.html#name-Result">Result</a></span></div>
+<div class="anchor" id="name-RowsColumnTypeDatabaseTypeName" data-popularity="300">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-468">RowsColumnTypeDatabaseTypeName</a> <b<i>(interface)</i></b>
+		RowsColumnTypeDatabaseTypeName may be implemented by Rows. It should return the
+		database system type name without the length. Type names should be uppercase.
+		Examples of returned types: "VARCHAR", "NVARCHAR", "VARCHAR2", "CHAR", "TEXT",
+		"DECIMAL", "SMALLINT", "INT", "BIGINT", "BOOL", "[]BIGINT", "JSONB", "XML",
+		"TIMESTAMP".
+
+		<input type='checkbox' class="stat" id="RowsColumnTypeDatabaseTypeName-stat-methods"><label for="RowsColumnTypeDatabaseTypeName-stat-methods">Exported Methods (4)</label><span id='RowsColumnTypeDatabaseTypeName-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-425">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-470">ColumnTypeDatabaseTypeName</a>(index <a href="../../builtin.html#name-int">int</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-422">Columns</a>() []<a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<a href="#name-Value">Value</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="RowsColumnTypeDatabaseTypeName-stat-impls"><label for="RowsColumnTypeDatabaseTypeName-stat-impls">Implements (2+)</label><span id='RowsColumnTypeDatabaseTypeName-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Rows">Rows</a>
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span></div>
+<div class="anchor" id="name-RowsColumnTypeLength" data-popularity="300">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-484">RowsColumnTypeLength</a> <b<i>(interface)</i></b>
+		RowsColumnTypeLength may be implemented by Rows. It should return the length
+		of the column type if the column is a variable length type. If the column is
+		not a variable length type ok should return false.
+		If length is not limited other than system limits, it should return math.MaxInt64.
+		The following are examples of returned values for various types:
+		  TEXT          (math.MaxInt64, true)
+		  varchar(10)   (10, true)
+		  nvarchar(10)  (10, true)
+		  decimal       (0, false)
+		  int           (0, false)
+		  bytea(30)     (30, true)
+
+		<input type='checkbox' class="stat" id="RowsColumnTypeLength-stat-methods"><label for="RowsColumnTypeLength-stat-methods">Exported Methods (4)</label><span id='RowsColumnTypeLength-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-425">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-486">ColumnTypeLength</a>(index <a href="../../builtin.html#name-int">int</a>) (length <a href="../../builtin.html#name-int64">int64</a>, ok <a href="../../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-422">Columns</a>() []<a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<a href="#name-Value">Value</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="RowsColumnTypeLength-stat-impls"><label for="RowsColumnTypeLength-stat-impls">Implements (2+)</label><span id='RowsColumnTypeLength-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Rows">Rows</a>
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span></div>
+<div class="anchor" id="name-RowsColumnTypeNullable" data-popularity="300">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-493">RowsColumnTypeNullable</a> <b<i>(interface)</i></b>
+		RowsColumnTypeNullable may be implemented by Rows. The nullable value should
+		be true if it is known the column may be null, or false if the column is known
+		to be not nullable.
+		If the column nullability is unknown, ok should be false.
+
+		<input type='checkbox' class="stat" id="RowsColumnTypeNullable-stat-methods"><label for="RowsColumnTypeNullable-stat-methods">Exported Methods (4)</label><span id='RowsColumnTypeNullable-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-425">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-495">ColumnTypeNullable</a>(index <a href="../../builtin.html#name-int">int</a>) (nullable, ok <a href="../../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-422">Columns</a>() []<a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<a href="#name-Value">Value</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="RowsColumnTypeNullable-stat-impls"><label for="RowsColumnTypeNullable-stat-impls">Implements (2+)</label><span id='RowsColumnTypeNullable-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Rows">Rows</a>
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span></div>
+<div class="anchor" id="name-RowsColumnTypePrecisionScale" data-popularity="300">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-504">RowsColumnTypePrecisionScale</a> <b<i>(interface)</i></b>
+		RowsColumnTypePrecisionScale may be implemented by Rows. It should return
+		the precision and scale for decimal types. If not applicable, ok should be false.
+		The following are examples of returned values for various types:
+		  decimal(38, 4)    (38, 4, true)
+		  int               (0, 0, false)
+		  decimal           (math.MaxInt64, math.MaxInt64, true)
+
+		<input type='checkbox' class="stat" id="RowsColumnTypePrecisionScale-stat-methods"><label for="RowsColumnTypePrecisionScale-stat-methods">Exported Methods (4)</label><span id='RowsColumnTypePrecisionScale-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-425">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-506">ColumnTypePrecisionScale</a>(index <a href="../../builtin.html#name-int">int</a>) (precision, scale <a href="../../builtin.html#name-int64">int64</a>, ok <a href="../../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-422">Columns</a>() []<a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<a href="#name-Value">Value</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="RowsColumnTypePrecisionScale-stat-impls"><label for="RowsColumnTypePrecisionScale-stat-impls">Implements (2+)</label><span id='RowsColumnTypePrecisionScale-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Rows">Rows</a>
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span></div>
+<div class="anchor" id="name-RowsColumnTypeScanType" data-popularity="300">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-458">RowsColumnTypeScanType</a> <b<i>(interface)</i></b>
+		RowsColumnTypeScanType may be implemented by Rows. It should return
+		the value type that can be used to scan types into. For example, the database
+		column type "bigint" this should return "reflect.TypeOf(int64(0))".
+
+		<input type='checkbox' class="stat" id="RowsColumnTypeScanType-stat-methods"><label for="RowsColumnTypeScanType-stat-methods">Exported Methods (4)</label><span id='RowsColumnTypeScanType-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-425">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-460">ColumnTypeScanType</a>(index <a href="../../builtin.html#name-int">int</a>) <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-422">Columns</a>() []<a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<a href="#name-Value">Value</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="RowsColumnTypeScanType-stat-impls"><label for="RowsColumnTypeScanType-stat-impls">Implements (2+)</label><span id='RowsColumnTypeScanType-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Rows">Rows</a>
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span></div>
+<div class="anchor" id="name-RowsNextResultSet" data-popularity="350">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-441">RowsNextResultSet</a> <b<i>(interface)</i></b>
+		RowsNextResultSet extends the Rows interface by providing a way to signal
+		the driver to advance to the next result set.
+
+		<input type='checkbox' class="stat" id="RowsNextResultSet-stat-methods"><label for="RowsNextResultSet-stat-methods">Exported Methods (5)</label><span id='RowsNextResultSet-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-425">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-422">Columns</a>() []<a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-446">HasNextResultSet</a>() <a href="../../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<a href="#name-Value">Value</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-452">NextResultSet</a>() <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="RowsNextResultSet-stat-impls"><label for="RowsNextResultSet-stat-impls">Implements (2+)</label><span id='RowsNextResultSet-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Rows">Rows</a>
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span></div>
+<div class="anchor" id="name-SessionResetter" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-291">SessionResetter</a> <b<i>(interface)</i></b>
+		SessionResetter may be implemented by Conn to allow drivers to reset the
+		session state associated with the connection and to signal a bad connection.
+
+		<input type='checkbox' class="stat" id="SessionResetter-stat-methods"><label for="SessionResetter-stat-methods">One Exported Method</label><span id='SessionResetter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-295">ResetSession</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Stmt" data-popularity="400">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-323">Stmt</a> <b<i>(interface)</i></b>
+		Stmt is a prepared statement. It is bound to a Conn and not
+		used by multiple goroutines concurrently.
+
+		<input type='checkbox' class="stat" id="Stmt-stat-methods"><label for="Stmt-stat-methods">Exported Methods (4)</label><span id='Stmt-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-331">Close</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-348">Exec</a>(args []<a href="#name-Value">Value</a>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-342">NumInput</a>() <a href="../../builtin.html#name-int">int</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-354">Query</a>(args []<a href="#name-Value">Value</a>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Stmt-stat-impls"><label for="Stmt-stat-impls">Implements (1+)</label><span id='Stmt-stat-impls-content' class="stat-content">
+			 T : io.<a href="../../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Stmt-stat-results"><label for="Stmt-stat-results">As Outputs Of (2+)</label><span id='Stmt-stat-results-content' class="stat-content">
+			func <a href="#name-Conn">Conn</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-229">Prepare</a>(query <a href="../../builtin.html#name-string">string</a>) (<b>Stmt</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-ConnPrepareContext">ConnPrepareContext</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-255">PrepareContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, query <a href="../../builtin.html#name-string">string</a>) (<b>Stmt</b>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-StmtExecContext" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-358">StmtExecContext</a> <b<i>(interface)</i></b>
+		StmtExecContext enhances the Stmt interface by providing Exec with context.
+
+		<input type='checkbox' class="stat" id="StmtExecContext-stat-methods"><label for="StmtExecContext-stat-methods">One Exported Method</label><span id='StmtExecContext-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-363">ExecContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-StmtQueryContext" data-popularity="50">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-367">StmtQueryContext</a> <b<i>(interface)</i></b>
+		StmtQueryContext enhances the Stmt interface by providing Query with context.
+
+		<input type='checkbox' class="stat" id="StmtQueryContext-stat-methods"><label for="StmtQueryContext-stat-methods">One Exported Method</label><span id='StmtQueryContext-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-372">QueryContext</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, args []<a href="#name-NamedValue">NamedValue</a>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Tx" data-popularity="750">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-510">Tx</a> <b<i>(interface)</i></b>
+		Tx is a transaction.
+
+		<input type='checkbox' class="stat" id="Tx-stat-methods"><label for="Tx-stat-methods">Exported Methods (2)</label><span id='Tx-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-511">Commit</a>() <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-512">Rollback</a>() <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Tx-stat-impledby"><label for="Tx-stat-impledby">Implemented By (3+)</label><span id='Tx-stat-impledby-content' class="stat-content">
+			database/sql.(*<a href="../sql.html#name-Tx">Tx</a>)
+			gorm.io/gorm.(*<a href="../../gorm.io/gorm.html#name-PreparedStmtTX">PreparedStmtTX</a>)
+			gorm.io/gorm.<a href="../../gorm.io/gorm.html#name-TxCommitter">TxCommitter</a> <i>(interface)</i></span>
+		<input type='checkbox' class="stat" id="Tx-stat-impls"><label for="Tx-stat-impls">Implements (1+)</label><span id='Tx-stat-impls-content' class="stat-content">
+			 T : gorm.io/gorm.<a href="../../gorm.io/gorm.html#name-TxCommitter">TxCommitter</a></span>
+		<input type='checkbox' class="stat" id="Tx-stat-results"><label for="Tx-stat-results">As Outputs Of (2+)</label><span id='Tx-stat-results-content' class="stat-content">
+			func <a href="#name-Conn">Conn</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-247">Begin</a>() (<b>Tx</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-ConnBeginTx">ConnBeginTx</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-286">BeginTx</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, opts <a href="#name-TxOptions">TxOptions</a>) (<b>Tx</b>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-TxOptions" data-popularity="35">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-267">TxOptions</a> <i>(struct)</i>
+		TxOptions holds the transaction options.
+
+		This type should be considered identical to sql.TxOptions.
+
+		<input type='checkbox' class="stat" id="TxOptions-stat-fields"><label for="TxOptions-stat-fields">Exported Fields (2)</label><span id='TxOptions-stat-fields-content' class="stat-content">
+			<a href="../../../src/database/sql/driver/driver.go.html#line-268">Isolation</a> <i><a href="#name-IsolationLevel">IsolationLevel</a></i>
+			<a href="../../../src/database/sql/driver/driver.go.html#line-269">ReadOnly</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="TxOptions-stat-params"><label for="TxOptions-stat-params">As Inputs Of (1+)</label><span id='TxOptions-stat-params-content' class="stat-content">
+			func <a href="#name-ConnBeginTx">ConnBeginTx</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-286">BeginTx</a>(ctx <a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, opts <b>TxOptions</b>) (<a href="#name-Tx">Tx</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Validator" data-popularity="650">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-303">Validator</a> <b<i>(interface)</i></b>
+		Validator may be implemented by Conn to allow drivers to
+		signal if a connection is valid or if it should be discarded.
+
+		If implemented, drivers may return the underlying error from queries,
+		even if the connection should be discarded by the connection pool.
+
+		<input type='checkbox' class="stat" id="Validator-stat-methods"><label for="Validator-stat-methods">One Exported Method</label><span id='Validator-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/driver.go.html#line-306">IsValid</a>() <a href="../../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="Validator-stat-impledby"><label for="Validator-stat-impledby">Implemented By (4+)</label><span id='Validator-stat-impledby-content' class="stat-content">
+			go/token.<a href="../../go/token.html#name-Pos">Pos</a>
+			go/token.(*<a href="../../go/token.html#name-Position">Position</a>)
+			internal/reflectlite.<a href="../../internal/reflectlite.html#name-Value">Value</a>
+			reflect.<a href="../../reflect.html#name-Value">Value</a></span></div>
+<div class="anchor" id="name-Value" data-popularity="1285">	 type <a href="../../../src/database/sql/driver/driver.go.html#line-61">Value</a> <b<i>(interface)</i></b>
+		Value is a value that drivers must be able to handle.
+		It is either nil, a type handled by a database driver's NamedValueChecker
+		interface, or an instance of one of these types:
+
+		  int64
+		  float64
+		  bool
+		  []byte
+		  string
+		  time.Time
+
+		If the driver supports cursors, a returned Value may also implement the Rows interface
+		in this package. This is used, for example, when a user selects a cursor
+		such as "select cursor(select * from my_table) from dual". If the Rows
+		from the select is closed, the cursor Rows will also be closed.
+
+		<input type='checkbox' class="stat" id="Value-stat-results"><label for="Value-stat-results">As Outputs Of (12+)</label><span id='Value-stat-results-content' class="stat-content">
+			func <a href="#name-NotNull">NotNull</a>.<a href="../../../src/database/sql/driver/types.go.html#line-168">ConvertValue</a>(v interface{}) (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Null">Null</a>.<a href="../../../src/database/sql/driver/types.go.html#line-155">ConvertValue</a>(v interface{}) (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-ValueConverter">ValueConverter</a>.<a href="../../../src/database/sql/driver/types.go.html#line-32">ConvertValue</a>(v interface{}) (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Valuer">Valuer</a>.<a href="../../../src/database/sql/driver/types.go.html#line-42">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func database/sql.<a href="../sql.html#name-NullBool">NullBool</a>.<a href="../../../src/database/sql/sql.go.html#line-308">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func database/sql.<a href="../sql.html#name-NullFloat64">NullFloat64</a>.<a href="../../../src/database/sql/sql.go.html#line-282">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func database/sql.<a href="../sql.html#name-NullInt32">NullInt32</a>.<a href="../../../src/database/sql/sql.go.html#line-256">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func database/sql.<a href="../sql.html#name-NullInt64">NullInt64</a>.<a href="../../../src/database/sql/sql.go.html#line-230">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func database/sql.<a href="../sql.html#name-NullString">NullString</a>.<a href="../../../src/database/sql/sql.go.html#line-204">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func database/sql.<a href="../sql.html#name-NullTime">NullTime</a>.<a href="../../../src/database/sql/sql.go.html#line-334">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func github.com/go-sql-driver/mysql.<a href="../../github.com/go-sql-driver/mysql.html#name-NullTime">NullTime</a>.<a href="../../../src/github.com/go-sql-driver/mysql/nulltime.go.html#line-45">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="../../gorm.io/gorm.html#name-DeletedAt">DeletedAt</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-21">Value</a>() (<b>Value</b>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Value-stat-params"><label for="Value-stat-params">As Inputs Of (11+)</label><span id='Value-stat-params-content' class="stat-content">
+			func <a href="#name-Execer">Execer</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-179">Exec</a>(query <a href="../../builtin.html#name-string">string</a>, args []<b>Value</b>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Queryer">Queryer</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-206">Query</a>(query <a href="../../builtin.html#name-string">string</a>, args []<b>Value</b>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Rows">Rows</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<b>Value</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-RowsColumnTypeDatabaseTypeName">RowsColumnTypeDatabaseTypeName</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<b>Value</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-RowsColumnTypeLength">RowsColumnTypeLength</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<b>Value</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-RowsColumnTypeNullable">RowsColumnTypeNullable</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<b>Value</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-RowsColumnTypePrecisionScale">RowsColumnTypePrecisionScale</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<b>Value</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-RowsColumnTypeScanType">RowsColumnTypeScanType</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<b>Value</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-RowsNextResultSet">RowsNextResultSet</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-436">Next</a>(dest []<b>Value</b>) <a href="../../builtin.html#name-error">error</a>
+			func <a href="#name-Stmt">Stmt</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-348">Exec</a>(args []<b>Value</b>) (<a href="#name-Result">Result</a>, <a href="../../builtin.html#name-error">error</a>)
+			func <a href="#name-Stmt">Stmt</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-354">Query</a>(args []<b>Value</b>) (<a href="#name-Rows">Rows</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ValueConverter" data-popularity="425">	 type <a href="../../../src/database/sql/driver/types.go.html#line-30">ValueConverter</a> <b<i>(interface)</i></b>
+		ValueConverter is the interface providing the ConvertValue method.
+
+		Various implementations of ValueConverter are provided by the
+		driver package to provide consistent implementations of conversions
+		between drivers. The ValueConverters have several uses:
+
+		 * converting from the Value types as provided by the sql package
+		   into a database table's specific column type and making sure it
+		   fits, such as making sure a particular int64 fits in a
+		   table's uint16 column.
+
+		 * converting a value as given from the database into one of the
+		   driver Value types.
+
+		 * by the sql package, for converting from a driver's Value type
+		   to a user's type in a scan.
+
+		<input type='checkbox' class="stat" id="ValueConverter-stat-methods"><label for="ValueConverter-stat-methods">One Exported Method</label><span id='ValueConverter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/types.go.html#line-32">ConvertValue</a>(v interface{}) (<a href="#name-Value">Value</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="ValueConverter-stat-impledby"><label for="ValueConverter-stat-impledby">Implemented By (2+)</label><span id='ValueConverter-stat-impledby-content' class="stat-content">
+			<a href="#name-NotNull">NotNull</a>
+			<a href="#name-Null">Null</a></span>
+		<input type='checkbox' class="stat" id="ValueConverter-stat-results"><label for="ValueConverter-stat-results">As Outputs Of (1+)</label><span id='ValueConverter-stat-results-content' class="stat-content">
+			func <a href="#name-ColumnConverter">ColumnConverter</a>.<a href="../../../src/database/sql/driver/driver.go.html#line-413">ColumnConverter</a>(idx <a href="../../builtin.html#name-int">int</a>) <b>ValueConverter</b></span></div>
+<div class="anchor" id="name-Valuer" data-popularity="1250">	 type <a href="../../../src/database/sql/driver/types.go.html#line-39">Valuer</a> <b<i>(interface)</i></b>
+		Valuer is the interface providing the Value method.
+
+		Types implementing Valuer interface are able to convert
+		themselves to a driver Value.
+
+		<input type='checkbox' class="stat" id="Valuer-stat-methods"><label for="Valuer-stat-methods">One Exported Method</label><span id='Valuer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/database/sql/driver/types.go.html#line-42">Value</a>() (<a href="#name-Value">Value</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Valuer-stat-impledby"><label for="Valuer-stat-impledby">Implemented By (8+)</label><span id='Valuer-stat-impledby-content' class="stat-content">
+			database/sql.<a href="../sql.html#name-NullBool">NullBool</a>
+			database/sql.<a href="../sql.html#name-NullFloat64">NullFloat64</a>
+			database/sql.<a href="../sql.html#name-NullInt32">NullInt32</a>
+			database/sql.<a href="../sql.html#name-NullInt64">NullInt64</a>
+			database/sql.<a href="../sql.html#name-NullString">NullString</a>
+			database/sql.<a href="../sql.html#name-NullTime">NullTime</a>
+			github.com/go-sql-driver/mysql.<a href="../../github.com/go-sql-driver/mysql.html#name-NullTime">NullTime</a>
+			gorm.io/gorm.<a href="../../gorm.io/gorm.html#name-DeletedAt">DeletedAt</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Bool">	  var <a href="../../../src/database/sql/driver/types.go.html#line-55">Bool</a> <a href="../../../src/database/sql/driver/types.go.html#line-57">boolType</a>
+		Bool is a ValueConverter that converts input values to bools.
+
+		The conversion rules are:
+		 - booleans are returned unchanged
+		 - for integer types,
+		      1 is true
+		      0 is false,
+		      other integers are an error
+		 - for strings and []byte, same rules as strconv.ParseBool
+		 - all other types are an error</div>
+<div class="anchor" id="name-DefaultParameterConverter">	  var <a href="../../../src/database/sql/driver/types.go.html#line-208">DefaultParameterConverter</a> <a href="../../../src/database/sql/driver/types.go.html#line-210">defaultConverter</a>
+		DefaultParameterConverter is the default implementation of
+		ValueConverter that's used when a Stmt doesn't implement
+		ColumnConverter.
+
+		DefaultParameterConverter returns its argument directly if
+		IsValue(arg). Otherwise, if the argument implements Valuer, its
+		Value method is used to return a Value. As a fallback, the provided
+		argument's underlying type is used to convert it to a Value:
+		underlying integer types are converted to int64, floats to float64,
+		bool, string, and []byte to themselves. If the argument is a nil
+		pointer, ConvertValue returns a nil Value. If the argument is a
+		non-nil pointer, it is dereferenced and ConvertValue is called
+		recursively. Other types are an error.</div>
+<div class="anchor" id="name-ErrBadConn">	  var <a href="../../../src/database/sql/driver/driver.go.html#line-156">ErrBadConn</a> <a href="../../builtin.html#name-error">error</a>
+		ErrBadConn should be returned by a driver to signal to the sql
+		package that a driver.Conn is in a bad state (such as the server
+		having earlier closed the connection) and the sql package should
+		retry on a new connection.
+
+		To prevent duplicate operations, ErrBadConn should NOT be returned
+		if there's a possibility that the database server might have
+		performed the operation. Even if the server sends back an error,
+		you shouldn't return ErrBadConn.</div>
+<div class="anchor" id="name-ErrRemoveArgument">	  var <a href="../../../src/database/sql/driver/driver.go.html#line-379">ErrRemoveArgument</a> <a href="../../builtin.html#name-error">error</a>
+		ErrRemoveArgument may be returned from NamedValueChecker to instruct the
+		sql package to not pass the argument to the driver query interface.
+		Return when accepting query specific options or structures that aren't
+		SQL query arguments.</div>
+<div class="anchor" id="name-ErrSkip">	  var <a href="../../../src/database/sql/driver/driver.go.html#line-145">ErrSkip</a> <a href="../../builtin.html#name-error">error</a>
+		ErrSkip may be returned by some optional interfaces' methods to
+		indicate at runtime that the fast path is unavailable and the sql
+		package should continue as if the optional interface was not
+		implemented. ErrSkip is only supported where explicitly
+		documented.</div>
+<div class="anchor" id="name-Int32">	  var <a href="../../../src/database/sql/driver/types.go.html#line-102">Int32</a> <a href="../../../src/database/sql/driver/types.go.html#line-104">int32Type</a>
+		Int32 is a ValueConverter that converts input values to int64,
+		respecting the limits of an int32 value.</div>
+<div class="anchor" id="name-IsScanValue">	 func <a href="../../../src/database/sql/driver/types.go.html#line-191">IsScanValue</a>(v interface{}) <a href="../../builtin.html#name-bool">bool</a>
+		IsScanValue is equivalent to IsValue.
+		It exists for compatibility.</div>
+<div class="anchor" id="name-IsValue">	 func <a href="../../../src/database/sql/driver/types.go.html#line-176">IsValue</a>(v interface{}) <a href="../../builtin.html#name-bool">bool</a>
+		IsValue reports whether v is a valid Value parameter type.</div>
+<div class="anchor" id="name-ResultNoRows">	  var <a href="../../../src/database/sql/driver/driver.go.html#line-532">ResultNoRows</a> <a href="../../../src/database/sql/driver/driver.go.html#line-534">noRows</a>
+		ResultNoRows is a pre-defined Result for drivers to return when a DDL
+		command (such as a CREATE TABLE) succeeds. It returns an error for both
+		LastInsertId and RowsAffected.</div>
+<div class="anchor" id="name-String">	  var <a href="../../../src/database/sql/driver/types.go.html#line-137">String</a> <a href="../../../src/database/sql/driver/types.go.html#line-139">stringType</a>
+		String is a ValueConverter that converts its input to a string.
+		If the value is already a string or []byte, it's unchanged.
+		If the value is of another type, conversion to string is done
+		with fmt.Sprintf("%v", v).</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

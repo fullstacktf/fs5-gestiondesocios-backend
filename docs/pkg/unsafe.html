@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: unsafe</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>unsafe</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-unsafe">unsafe</a><i> (on <a href="https://golang.org/pkg/unsafe/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/unsafe" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports 0 packages, and imported by <a href="../dep/unsafe.html#imported-by">25 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../src/unsafe/unsafe.go.html#doc">d-&gt;</a> <a href="../src/unsafe/unsafe.go.html">unsafe.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-ArbitraryType" data-popularity="0">	 type <a href="../src/unsafe/unsafe.go.html#line-15">ArbitraryType</a> <a href="builtin.html#name-int">int</a>
+		ArbitraryType is here for the purposes of documentation only and is not actually
+		part of the unsafe package. It represents the type of an arbitrary Go expression.
+</div>
+<div class="anchor" id="name-Pointer" data-popularity="995">	 type <a href="../src/unsafe/unsafe.go.html#line-180">Pointer</a>
+		Pointer represents a pointer to an arbitrary type. There are four special operations
+		available for type Pointer that are not available for other types:
+			- A pointer value of any type can be converted to a Pointer.
+			- A Pointer can be converted to a pointer value of any type.
+			- A uintptr can be converted to a Pointer.
+			- A Pointer can be converted to a uintptr.
+		Pointer therefore allows a program to defeat the type system and read and write
+		arbitrary memory. It should be used with extreme care.
+
+		The following patterns involving Pointer are valid.
+		Code not using these patterns is likely to be invalid today
+		or to become invalid in the future.
+		Even the valid patterns below come with important caveats.
+
+		Running "go vet" can help find uses of Pointer that do not conform to these patterns,
+		but silence from "go vet" is not a guarantee that the code is valid.
+
+		(1) Conversion of a *T1 to Pointer to *T2.
+
+		Provided that T2 is no larger than T1 and that the two share an equivalent
+		memory layout, this conversion allows reinterpreting data of one type as
+		data of another type. An example is the implementation of
+		math.Float64bits:
+
+			func Float64bits(f float64) uint64 {
+				return *(*uint64)(unsafe.Pointer(&amp;f))
+			}
+
+		(2) Conversion of a Pointer to a uintptr (but not back to Pointer).
+
+		Converting a Pointer to a uintptr produces the memory address of the value
+		pointed at, as an integer. The usual use for such a uintptr is to print it.
+
+		Conversion of a uintptr back to Pointer is not valid in general.
+
+		A uintptr is an integer, not a reference.
+		Converting a Pointer to a uintptr creates an integer value
+		with no pointer semantics.
+		Even if a uintptr holds the address of some object,
+		the garbage collector will not update that uintptr's value
+		if the object moves, nor will that uintptr keep the object
+		from being reclaimed.
+
+		The remaining patterns enumerate the only valid conversions
+		from uintptr to Pointer.
+
+		(3) Conversion of a Pointer to a uintptr and back, with arithmetic.
+
+		If p points into an allocated object, it can be advanced through the object
+		by conversion to uintptr, addition of an offset, and conversion back to Pointer.
+
+			p = unsafe.Pointer(uintptr(p) + offset)
+
+		The most common use of this pattern is to access fields in a struct
+		or elements of an array:
+
+			// equivalent to f := unsafe.Pointer(&amp;s.f)
+			f := unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + unsafe.Offsetof(s.f))
+
+			// equivalent to e := unsafe.Pointer(&amp;x[i])
+			e := unsafe.Pointer(uintptr(unsafe.Pointer(&amp;x[0])) + i*unsafe.Sizeof(x[0]))
+
+		It is valid both to add and to subtract offsets from a pointer in this way.
+		It is also valid to use &amp;^ to round pointers, usually for alignment.
+		In all cases, the result must continue to point into the original allocated object.
+
+		Unlike in C, it is not valid to advance a pointer just beyond the end of
+		its original allocation:
+
+			// INVALID: end points outside allocated space.
+			var s thing
+			end = unsafe.Pointer(uintptr(unsafe.Pointer(&amp;s)) + unsafe.Sizeof(s))
+
+			// INVALID: end points outside allocated space.
+			b := make([]byte, n)
+			end = unsafe.Pointer(uintptr(unsafe.Pointer(&amp;b[0])) + uintptr(n))
+
+		Note that both conversions must appear in the same expression, with only
+		the intervening arithmetic between them:
+
+			// INVALID: uintptr cannot be stored in variable
+			// before conversion back to Pointer.
+			u := uintptr(p)
+			p = unsafe.Pointer(u + offset)
+
+		Note that the pointer must point into an allocated object, so it may not be nil.
+
+			// INVALID: conversion of nil pointer
+			u := unsafe.Pointer(nil)
+			p := unsafe.Pointer(uintptr(u) + offset)
+
+		(4) Conversion of a Pointer to a uintptr when calling syscall.Syscall.
+
+		The Syscall functions in package syscall pass their uintptr arguments directly
+		to the operating system, which then may, depending on the details of the call,
+		reinterpret some of them as pointers.
+		That is, the system call implementation is implicitly converting certain arguments
+		back from uintptr to pointer.
+
+		If a pointer argument must be converted to uintptr for use as an argument,
+		that conversion must appear in the call expression itself:
+
+			syscall.Syscall(SYS_READ, uintptr(fd), uintptr(unsafe.Pointer(p)), uintptr(n))
+
+		The compiler handles a Pointer converted to a uintptr in the argument list of
+		a call to a function implemented in assembly by arranging that the referenced
+		allocated object, if any, is retained and not moved until the call completes,
+		even though from the types alone it would appear that the object is no longer
+		needed during the call.
+
+		For the compiler to recognize this pattern,
+		the conversion must appear in the argument list:
+
+			// INVALID: uintptr cannot be stored in variable
+			// before implicit conversion back to Pointer during system call.
+			u := uintptr(unsafe.Pointer(p))
+			syscall.Syscall(SYS_READ, uintptr(fd), u, uintptr(n))
+
+		(5) Conversion of the result of reflect.Value.Pointer or reflect.Value.UnsafeAddr
+		from uintptr to Pointer.
+
+		Package reflect's Value methods named Pointer and UnsafeAddr return type uintptr
+		instead of unsafe.Pointer to keep callers from changing the result to an arbitrary
+		type without first importing "unsafe". However, this means that the result is
+		fragile and must be converted to Pointer immediately after making the call,
+		in the same expression:
+
+			p := (*int)(unsafe.Pointer(reflect.ValueOf(new(int)).Pointer()))
+
+		As in the cases above, it is invalid to store the result before the conversion:
+
+			// INVALID: uintptr cannot be stored in variable
+			// before conversion back to Pointer.
+			u := reflect.ValueOf(new(int)).Pointer()
+			p := (*int)(unsafe.Pointer(u))
+
+		(6) Conversion of a reflect.SliceHeader or reflect.StringHeader Data field to or from Pointer.
+
+		As in the previous case, the reflect data structures SliceHeader and StringHeader
+		declare the field Data as a uintptr to keep callers from changing the result to
+		an arbitrary type without first importing "unsafe". However, this means that
+		SliceHeader and StringHeader are only valid when interpreting the content
+		of an actual slice or string value.
+
+			var s string
+			hdr := (*reflect.StringHeader)(unsafe.Pointer(&amp;s)) // case 1
+			hdr.Data = uintptr(unsafe.Pointer(p))              // case 6 (this case)
+			hdr.Len = n
+
+		In this usage hdr.Data is really an alternate way to refer to the underlying
+		pointer in the string header, not a uintptr variable itself.
+
+		In general, reflect.SliceHeader and reflect.StringHeader should be used
+		only as *reflect.SliceHeader and *reflect.StringHeader pointing at actual
+		slices or strings, never as plain structs.
+		A program should not declare or allocate variables of these struct types.
+
+			// INVALID: a directly-declared header will not hold Data as a reference.
+			var hdr reflect.StringHeader
+			hdr.Data = uintptr(unsafe.Pointer(p))
+			hdr.Len = n
+			s := *(*string)(unsafe.Pointer(&amp;hdr)) // p possibly already lost
+
+		<input type='checkbox' class="stat" id="Pointer-stat-results"><label for="Pointer-stat-results">As Outputs Of (3+)</label><span id='Pointer-stat-results-content' class="stat-content">
+			func runtime/internal/atomic.<a href="runtime/internal/atomic.html#name-Loadp">Loadp</a>(ptr <b>Pointer</b>) <b>Pointer</b>
+			func sync/atomic.<a href="sync/atomic.html#name-LoadPointer">LoadPointer</a>(addr *<b>Pointer</b>) (val <b>Pointer</b>)
+			func sync/atomic.<a href="sync/atomic.html#name-SwapPointer">SwapPointer</a>(addr *<b>Pointer</b>, new <b>Pointer</b>) (old <b>Pointer</b>)</span>
+		<input type='checkbox' class="stat" id="Pointer-stat-params"><label for="Pointer-stat-params">As Inputs Of (22+)</label><span id='Pointer-stat-params-content' class="stat-content">
+			func internal/race.<a href="internal/race.html#name-Acquire">Acquire</a>(addr <b>Pointer</b>)
+			func internal/race.<a href="internal/race.html#name-Read">Read</a>(addr <b>Pointer</b>)
+			func internal/race.<a href="internal/race.html#name-ReadRange">ReadRange</a>(addr <b>Pointer</b>, len <a href="builtin.html#name-int">int</a>)
+			func internal/race.<a href="internal/race.html#name-Release">Release</a>(addr <b>Pointer</b>)
+			func internal/race.<a href="internal/race.html#name-ReleaseMerge">ReleaseMerge</a>(addr <b>Pointer</b>)
+			func internal/race.<a href="internal/race.html#name-Write">Write</a>(addr <b>Pointer</b>)
+			func internal/race.<a href="internal/race.html#name-WriteRange">WriteRange</a>(addr <b>Pointer</b>, len <a href="builtin.html#name-int">int</a>)
+			func reflect.<a href="reflect.html#name-NewAt">NewAt</a>(typ <a href="reflect.html">reflect</a>.<a href="reflect.html#name-Type">Type</a>, p <b>Pointer</b>) <a href="reflect.html">reflect</a>.<a href="reflect.html#name-Value">Value</a>
+			func reflect.<a href="reflect.html#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1723">SetPointer</a>(x <b>Pointer</b>)
+			func runtime.<a href="runtime.html#name-SetCgoTraceback">SetCgoTraceback</a>(version <a href="builtin.html#name-int">int</a>, traceback, context, symbolizer <b>Pointer</b>)
+			func runtime/internal/atomic.<a href="runtime/internal/atomic.html#name-Casp1">Casp1</a>(ptr *<b>Pointer</b>, old, new <b>Pointer</b>) <a href="builtin.html#name-bool">bool</a>
+			func runtime/internal/atomic.<a href="runtime/internal/atomic.html#name-Casp1">Casp1</a>(ptr *<b>Pointer</b>, old, new <b>Pointer</b>) <a href="builtin.html#name-bool">bool</a>
+			func runtime/internal/atomic.<a href="runtime/internal/atomic.html#name-Loadp">Loadp</a>(ptr <b>Pointer</b>) <b>Pointer</b>
+			func runtime/internal/atomic.<a href="runtime/internal/atomic.html#name-StorepNoWB">StorepNoWB</a>(ptr <b>Pointer</b>, val <b>Pointer</b>)
+			func runtime/internal/atomic.<a href="runtime/internal/atomic.html#name-StorepNoWB">StorepNoWB</a>(ptr <b>Pointer</b>, val <b>Pointer</b>)
+			func sync/atomic.<a href="sync/atomic.html#name-CompareAndSwapPointer">CompareAndSwapPointer</a>(addr *<b>Pointer</b>, old, new <b>Pointer</b>) (swapped <a href="builtin.html#name-bool">bool</a>)
+			func sync/atomic.<a href="sync/atomic.html#name-CompareAndSwapPointer">CompareAndSwapPointer</a>(addr *<b>Pointer</b>, old, new <b>Pointer</b>) (swapped <a href="builtin.html#name-bool">bool</a>)
+			func sync/atomic.<a href="sync/atomic.html#name-LoadPointer">LoadPointer</a>(addr *<b>Pointer</b>) (val <b>Pointer</b>)
+			func sync/atomic.<a href="sync/atomic.html#name-StorePointer">StorePointer</a>(addr *<b>Pointer</b>, val <b>Pointer</b>)
+			func sync/atomic.<a href="sync/atomic.html#name-StorePointer">StorePointer</a>(addr *<b>Pointer</b>, val <b>Pointer</b>)
+			func sync/atomic.<a href="sync/atomic.html#name-SwapPointer">SwapPointer</a>(addr *<b>Pointer</b>, new <b>Pointer</b>) (old <b>Pointer</b>)
+			func sync/atomic.<a href="sync/atomic.html#name-SwapPointer">SwapPointer</a>(addr *<b>Pointer</b>, new <b>Pointer</b>) (old <b>Pointer</b>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Alignof">	 func <a href="../src/unsafe/unsafe.go.html#line-205">Alignof</a>(x <a href="#name-ArbitraryType">ArbitraryType</a>) <a href="builtin.html#name-uintptr">uintptr</a>
+		Alignof takes an expression x of any type and returns the required alignment
+		of a hypothetical variable v as if v was declared via var v = x.
+		It is the largest value m such that the address of v is always zero mod m.
+		It is the same as the value returned by reflect.TypeOf(x).Align().
+		As a special case, if a variable s is of struct type and f is a field
+		within that struct, then Alignof(s.f) will return the required alignment
+		of a field of that type within a struct. This case is the same as the
+		value returned by reflect.TypeOf(s.f).FieldAlign().
+		The return value of Alignof is a Go constant.</div>
+<div class="anchor" id="name-Offsetof">	 func <a href="../src/unsafe/unsafe.go.html#line-194">Offsetof</a>(x <a href="#name-ArbitraryType">ArbitraryType</a>) <a href="builtin.html#name-uintptr">uintptr</a>
+		Offsetof returns the offset within the struct of the field represented by x,
+		which must be of the form structValue.field. In other words, it returns the
+		number of bytes between the start of the struct and the start of the field.
+		The return value of Offsetof is a Go constant.</div>
+<div class="anchor" id="name-Sizeof">	 func <a href="../src/unsafe/unsafe.go.html#line-188">Sizeof</a>(x <a href="#name-ArbitraryType">ArbitraryType</a>) <a href="builtin.html#name-uintptr">uintptr</a>
+		Sizeof takes an expression x of any type and returns the size in bytes
+		of a hypothetical variable v as if v was declared via var v = x.
+		The size does not include any memory possibly referenced by x.
+		For instance, if x is a slice, Sizeof returns the size of the slice
+		descriptor, not the size of the memory referenced by the slice.
+		The return value of Sizeof is a Go constant.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

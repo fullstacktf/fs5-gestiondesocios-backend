@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: mux.go in package github.com/gorilla/mux</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	mux.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/gorilla/mux.html">github.com/gorilla/mux</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2012 The Gorilla Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package mux</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"context"</code></span>
+<span class="codeline" id="line-9"><code>	"errors"</code></span>
+<span class="codeline" id="line-10"><code>	"fmt"</code></span>
+<span class="codeline" id="line-11"><code>	"net/http"</code></span>
+<span class="codeline" id="line-12"><code>	"path"</code></span>
+<span class="codeline" id="line-13"><code>	"regexp"</code></span>
+<span class="codeline" id="line-14"><code>)</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>var (</code></span>
+<span class="codeline" id="line-17"><code>	// ErrMethodMismatch is returned when the method in the request does not match</code></span>
+<span class="codeline" id="line-18"><code>	// the method defined against the route.</code></span>
+<span class="codeline" id="line-19"><code>	ErrMethodMismatch = errors.New("method is not allowed")</code></span>
+<span class="codeline" id="line-20"><code>	// ErrNotFound is returned when no route match is found.</code></span>
+<span class="codeline" id="line-21"><code>	ErrNotFound = errors.New("no matching route was found")</code></span>
+<span class="codeline" id="line-22"><code>)</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>// NewRouter returns a new router instance.</code></span>
+<span class="codeline" id="line-25"><code>func NewRouter() *Router {</code></span>
+<span class="codeline" id="line-26"><code>	return &amp;Router{namedRoutes: make(map[string]*Route)}</code></span>
+<span class="codeline" id="line-27"><code>}</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>// Router registers routes to be matched and dispatches a handler.</code></span>
+<span class="codeline" id="line-30"><code>//</code></span>
+<span class="codeline" id="line-31"><code>// It implements the http.Handler interface, so it can be registered to serve</code></span>
+<span class="codeline" id="line-32"><code>// requests:</code></span>
+<span class="codeline" id="line-33"><code>//</code></span>
+<span class="codeline" id="line-34"><code>//     var router = mux.NewRouter()</code></span>
+<span class="codeline" id="line-35"><code>//</code></span>
+<span class="codeline" id="line-36"><code>//     func main() {</code></span>
+<span class="codeline" id="line-37"><code>//         http.Handle("/", router)</code></span>
+<span class="codeline" id="line-38"><code>//     }</code></span>
+<span class="codeline" id="line-39"><code>//</code></span>
+<span class="codeline" id="line-40"><code>// Or, for Google App Engine, register it in a init() function:</code></span>
+<span class="codeline" id="line-41"><code>//</code></span>
+<span class="codeline" id="line-42"><code>//     func init() {</code></span>
+<span class="codeline" id="line-43"><code>//         http.Handle("/", router)</code></span>
+<span class="codeline" id="line-44"><code>//     }</code></span>
+<span class="codeline" id="line-45"><code>//</code></span>
+<span class="codeline" id="line-46"><code>// This will send all incoming requests to the router.</code></span>
+<span class="codeline" id="line-47"><code>type Router struct {</code></span>
+<span class="codeline" id="line-48"><code>	// Configurable Handler to be used when no route matches.</code></span>
+<span class="codeline" id="line-49"><code>	NotFoundHandler http.Handler</code></span>
+<span class="codeline" id="line-50"><code></code></span>
+<span class="codeline" id="line-51"><code>	// Configurable Handler to be used when the request method does not match the route.</code></span>
+<span class="codeline" id="line-52"><code>	MethodNotAllowedHandler http.Handler</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>	// Routes to be matched, in order.</code></span>
+<span class="codeline" id="line-55"><code>	routes []*Route</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>	// Routes by name for URL building.</code></span>
+<span class="codeline" id="line-58"><code>	namedRoutes map[string]*Route</code></span>
+<span class="codeline" id="line-59"><code></code></span>
+<span class="codeline" id="line-60"><code>	// If true, do not clear the request context after handling the request.</code></span>
+<span class="codeline" id="line-61"><code>	//</code></span>
+<span class="codeline" id="line-62"><code>	// Deprecated: No effect, since the context is stored on the request itself.</code></span>
+<span class="codeline" id="line-63"><code>	KeepContext bool</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>	// Slice of middlewares to be called after a match is found</code></span>
+<span class="codeline" id="line-66"><code>	middlewares []middleware</code></span>
+<span class="codeline" id="line-67"><code></code></span>
+<span class="codeline" id="line-68"><code>	// configuration shared with `Route`</code></span>
+<span class="codeline" id="line-69"><code>	routeConf</code></span>
+<span class="codeline" id="line-70"><code>}</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>// common route configuration shared between `Router` and `Route`</code></span>
+<span class="codeline" id="line-73"><code>type routeConf struct {</code></span>
+<span class="codeline" id="line-74"><code>	// If true, "/path/foo%2Fbar/to" will match the path "/path/{var}/to"</code></span>
+<span class="codeline" id="line-75"><code>	useEncodedPath bool</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>	// If true, when the path pattern is "/path/", accessing "/path" will</code></span>
+<span class="codeline" id="line-78"><code>	// redirect to the former and vice versa.</code></span>
+<span class="codeline" id="line-79"><code>	strictSlash bool</code></span>
+<span class="codeline" id="line-80"><code></code></span>
+<span class="codeline" id="line-81"><code>	// If true, when the path pattern is "/path//to", accessing "/path//to"</code></span>
+<span class="codeline" id="line-82"><code>	// will not redirect</code></span>
+<span class="codeline" id="line-83"><code>	skipClean bool</code></span>
+<span class="codeline" id="line-84"><code></code></span>
+<span class="codeline" id="line-85"><code>	// Manager for the variables from host and path.</code></span>
+<span class="codeline" id="line-86"><code>	regexp routeRegexpGroup</code></span>
+<span class="codeline" id="line-87"><code></code></span>
+<span class="codeline" id="line-88"><code>	// List of matchers.</code></span>
+<span class="codeline" id="line-89"><code>	matchers []matcher</code></span>
+<span class="codeline" id="line-90"><code></code></span>
+<span class="codeline" id="line-91"><code>	// The scheme used when building URLs.</code></span>
+<span class="codeline" id="line-92"><code>	buildScheme string</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>	buildVarsFunc BuildVarsFunc</code></span>
+<span class="codeline" id="line-95"><code>}</code></span>
+<span class="codeline" id="line-96"><code></code></span>
+<span class="codeline" id="line-97"><code>// returns an effective deep copy of `routeConf`</code></span>
+<span class="codeline" id="line-98"><code>func copyRouteConf(r routeConf) routeConf {</code></span>
+<span class="codeline" id="line-99"><code>	c := r</code></span>
+<span class="codeline" id="line-100"><code></code></span>
+<span class="codeline" id="line-101"><code>	if r.regexp.path != nil {</code></span>
+<span class="codeline" id="line-102"><code>		c.regexp.path = copyRouteRegexp(r.regexp.path)</code></span>
+<span class="codeline" id="line-103"><code>	}</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>	if r.regexp.host != nil {</code></span>
+<span class="codeline" id="line-106"><code>		c.regexp.host = copyRouteRegexp(r.regexp.host)</code></span>
+<span class="codeline" id="line-107"><code>	}</code></span>
+<span class="codeline" id="line-108"><code></code></span>
+<span class="codeline" id="line-109"><code>	c.regexp.queries = make([]*routeRegexp, 0, len(r.regexp.queries))</code></span>
+<span class="codeline" id="line-110"><code>	for _, q := range r.regexp.queries {</code></span>
+<span class="codeline" id="line-111"><code>		c.regexp.queries = append(c.regexp.queries, copyRouteRegexp(q))</code></span>
+<span class="codeline" id="line-112"><code>	}</code></span>
+<span class="codeline" id="line-113"><code></code></span>
+<span class="codeline" id="line-114"><code>	c.matchers = make([]matcher, len(r.matchers))</code></span>
+<span class="codeline" id="line-115"><code>	copy(c.matchers, r.matchers)</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>	return c</code></span>
+<span class="codeline" id="line-118"><code>}</code></span>
+<span class="codeline" id="line-119"><code></code></span>
+<span class="codeline" id="line-120"><code>func copyRouteRegexp(r *routeRegexp) *routeRegexp {</code></span>
+<span class="codeline" id="line-121"><code>	c := *r</code></span>
+<span class="codeline" id="line-122"><code>	return &amp;c</code></span>
+<span class="codeline" id="line-123"><code>}</code></span>
+<span class="codeline" id="line-124"><code></code></span>
+<span class="codeline" id="line-125"><code>// Match attempts to match the given request against the router's registered routes.</code></span>
+<span class="codeline" id="line-126"><code>//</code></span>
+<span class="codeline" id="line-127"><code>// If the request matches a route of this router or one of its subrouters the Route,</code></span>
+<span class="codeline" id="line-128"><code>// Handler, and Vars fields of the the match argument are filled and this function</code></span>
+<span class="codeline" id="line-129"><code>// returns true.</code></span>
+<span class="codeline" id="line-130"><code>//</code></span>
+<span class="codeline" id="line-131"><code>// If the request does not match any of this router's or its subrouters' routes</code></span>
+<span class="codeline" id="line-132"><code>// then this function returns false. If available, a reason for the match failure</code></span>
+<span class="codeline" id="line-133"><code>// will be filled in the match argument's MatchErr field. If the match failure type</code></span>
+<span class="codeline" id="line-134"><code>// (eg: not found) has a registered handler, the handler is assigned to the Handler</code></span>
+<span class="codeline" id="line-135"><code>// field of the match argument.</code></span>
+<span class="codeline" id="line-136"><code>func (r *Router) Match(req *http.Request, match *RouteMatch) bool {</code></span>
+<span class="codeline" id="line-137"><code>	for _, route := range r.routes {</code></span>
+<span class="codeline" id="line-138"><code>		if route.Match(req, match) {</code></span>
+<span class="codeline" id="line-139"><code>			// Build middleware chain if no error was found</code></span>
+<span class="codeline" id="line-140"><code>			if match.MatchErr == nil {</code></span>
+<span class="codeline" id="line-141"><code>				for i := len(r.middlewares) - 1; i &gt;= 0; i-- {</code></span>
+<span class="codeline" id="line-142"><code>					match.Handler = r.middlewares[i].Middleware(match.Handler)</code></span>
+<span class="codeline" id="line-143"><code>				}</code></span>
+<span class="codeline" id="line-144"><code>			}</code></span>
+<span class="codeline" id="line-145"><code>			return true</code></span>
+<span class="codeline" id="line-146"><code>		}</code></span>
+<span class="codeline" id="line-147"><code>	}</code></span>
+<span class="codeline" id="line-148"><code></code></span>
+<span class="codeline" id="line-149"><code>	if match.MatchErr == ErrMethodMismatch {</code></span>
+<span class="codeline" id="line-150"><code>		if r.MethodNotAllowedHandler != nil {</code></span>
+<span class="codeline" id="line-151"><code>			match.Handler = r.MethodNotAllowedHandler</code></span>
+<span class="codeline" id="line-152"><code>			return true</code></span>
+<span class="codeline" id="line-153"><code>		}</code></span>
+<span class="codeline" id="line-154"><code></code></span>
+<span class="codeline" id="line-155"><code>		return false</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code></code></span>
+<span class="codeline" id="line-158"><code>	// Closest match for a router (includes sub-routers)</code></span>
+<span class="codeline" id="line-159"><code>	if r.NotFoundHandler != nil {</code></span>
+<span class="codeline" id="line-160"><code>		match.Handler = r.NotFoundHandler</code></span>
+<span class="codeline" id="line-161"><code>		match.MatchErr = ErrNotFound</code></span>
+<span class="codeline" id="line-162"><code>		return true</code></span>
+<span class="codeline" id="line-163"><code>	}</code></span>
+<span class="codeline" id="line-164"><code></code></span>
+<span class="codeline" id="line-165"><code>	match.MatchErr = ErrNotFound</code></span>
+<span class="codeline" id="line-166"><code>	return false</code></span>
+<span class="codeline" id="line-167"><code>}</code></span>
+<span class="codeline" id="line-168"><code></code></span>
+<span class="codeline" id="line-169"><code>// ServeHTTP dispatches the handler registered in the matched route.</code></span>
+<span class="codeline" id="line-170"><code>//</code></span>
+<span class="codeline" id="line-171"><code>// When there is a match, the route variables can be retrieved calling</code></span>
+<span class="codeline" id="line-172"><code>// mux.Vars(request).</code></span>
+<span class="codeline" id="line-173"><code>func (r *Router) ServeHTTP(w http.ResponseWriter, req *http.Request) {</code></span>
+<span class="codeline" id="line-174"><code>	if !r.skipClean {</code></span>
+<span class="codeline" id="line-175"><code>		path := req.URL.Path</code></span>
+<span class="codeline" id="line-176"><code>		if r.useEncodedPath {</code></span>
+<span class="codeline" id="line-177"><code>			path = req.URL.EscapedPath()</code></span>
+<span class="codeline" id="line-178"><code>		}</code></span>
+<span class="codeline" id="line-179"><code>		// Clean path to canonical form and redirect.</code></span>
+<span class="codeline" id="line-180"><code>		if p := cleanPath(path); p != path {</code></span>
+<span class="codeline" id="line-181"><code></code></span>
+<span class="codeline" id="line-182"><code>			// Added 3 lines (Philip Schlump) - It was dropping the query string and #whatever from query.</code></span>
+<span class="codeline" id="line-183"><code>			// This matches with fix in go 1.2 r.c. 4 for same problem.  Go Issue:</code></span>
+<span class="codeline" id="line-184"><code>			// http://code.google.com/p/go/issues/detail?id=5252</code></span>
+<span class="codeline" id="line-185"><code>			url := *req.URL</code></span>
+<span class="codeline" id="line-186"><code>			url.Path = p</code></span>
+<span class="codeline" id="line-187"><code>			p = url.String()</code></span>
+<span class="codeline" id="line-188"><code></code></span>
+<span class="codeline" id="line-189"><code>			w.Header().Set("Location", p)</code></span>
+<span class="codeline" id="line-190"><code>			w.WriteHeader(http.StatusMovedPermanently)</code></span>
+<span class="codeline" id="line-191"><code>			return</code></span>
+<span class="codeline" id="line-192"><code>		}</code></span>
+<span class="codeline" id="line-193"><code>	}</code></span>
+<span class="codeline" id="line-194"><code>	var match RouteMatch</code></span>
+<span class="codeline" id="line-195"><code>	var handler http.Handler</code></span>
+<span class="codeline" id="line-196"><code>	if r.Match(req, &amp;match) {</code></span>
+<span class="codeline" id="line-197"><code>		handler = match.Handler</code></span>
+<span class="codeline" id="line-198"><code>		req = requestWithVars(req, match.Vars)</code></span>
+<span class="codeline" id="line-199"><code>		req = requestWithRoute(req, match.Route)</code></span>
+<span class="codeline" id="line-200"><code>	}</code></span>
+<span class="codeline" id="line-201"><code></code></span>
+<span class="codeline" id="line-202"><code>	if handler == nil &amp;&amp; match.MatchErr == ErrMethodMismatch {</code></span>
+<span class="codeline" id="line-203"><code>		handler = methodNotAllowedHandler()</code></span>
+<span class="codeline" id="line-204"><code>	}</code></span>
+<span class="codeline" id="line-205"><code></code></span>
+<span class="codeline" id="line-206"><code>	if handler == nil {</code></span>
+<span class="codeline" id="line-207"><code>		handler = http.NotFoundHandler()</code></span>
+<span class="codeline" id="line-208"><code>	}</code></span>
+<span class="codeline" id="line-209"><code></code></span>
+<span class="codeline" id="line-210"><code>	handler.ServeHTTP(w, req)</code></span>
+<span class="codeline" id="line-211"><code>}</code></span>
+<span class="codeline" id="line-212"><code></code></span>
+<span class="codeline" id="line-213"><code>// Get returns a route registered with the given name.</code></span>
+<span class="codeline" id="line-214"><code>func (r *Router) Get(name string) *Route {</code></span>
+<span class="codeline" id="line-215"><code>	return r.namedRoutes[name]</code></span>
+<span class="codeline" id="line-216"><code>}</code></span>
+<span class="codeline" id="line-217"><code></code></span>
+<span class="codeline" id="line-218"><code>// GetRoute returns a route registered with the given name. This method</code></span>
+<span class="codeline" id="line-219"><code>// was renamed to Get() and remains here for backwards compatibility.</code></span>
+<span class="codeline" id="line-220"><code>func (r *Router) GetRoute(name string) *Route {</code></span>
+<span class="codeline" id="line-221"><code>	return r.namedRoutes[name]</code></span>
+<span class="codeline" id="line-222"><code>}</code></span>
+<span class="codeline" id="line-223"><code></code></span>
+<span class="codeline" id="line-224"><code>// StrictSlash defines the trailing slash behavior for new routes. The initial</code></span>
+<span class="codeline" id="line-225"><code>// value is false.</code></span>
+<span class="codeline" id="line-226"><code>//</code></span>
+<span class="codeline" id="line-227"><code>// When true, if the route path is "/path/", accessing "/path" will perform a redirect</code></span>
+<span class="codeline" id="line-228"><code>// to the former and vice versa. In other words, your application will always</code></span>
+<span class="codeline" id="line-229"><code>// see the path as specified in the route.</code></span>
+<span class="codeline" id="line-230"><code>//</code></span>
+<span class="codeline" id="line-231"><code>// When false, if the route path is "/path", accessing "/path/" will not match</code></span>
+<span class="codeline" id="line-232"><code>// this route and vice versa.</code></span>
+<span class="codeline" id="line-233"><code>//</code></span>
+<span class="codeline" id="line-234"><code>// The re-direct is a HTTP 301 (Moved Permanently). Note that when this is set for</code></span>
+<span class="codeline" id="line-235"><code>// routes with a non-idempotent method (e.g. POST, PUT), the subsequent re-directed</code></span>
+<span class="codeline" id="line-236"><code>// request will be made as a GET by most clients. Use middleware or client settings</code></span>
+<span class="codeline" id="line-237"><code>// to modify this behaviour as needed.</code></span>
+<span class="codeline" id="line-238"><code>//</code></span>
+<span class="codeline" id="line-239"><code>// Special case: when a route sets a path prefix using the PathPrefix() method,</code></span>
+<span class="codeline" id="line-240"><code>// strict slash is ignored for that route because the redirect behavior can't</code></span>
+<span class="codeline" id="line-241"><code>// be determined from a prefix alone. However, any subrouters created from that</code></span>
+<span class="codeline" id="line-242"><code>// route inherit the original StrictSlash setting.</code></span>
+<span class="codeline" id="line-243"><code>func (r *Router) StrictSlash(value bool) *Router {</code></span>
+<span class="codeline" id="line-244"><code>	r.strictSlash = value</code></span>
+<span class="codeline" id="line-245"><code>	return r</code></span>
+<span class="codeline" id="line-246"><code>}</code></span>
+<span class="codeline" id="line-247"><code></code></span>
+<span class="codeline" id="line-248"><code>// SkipClean defines the path cleaning behaviour for new routes. The initial</code></span>
+<span class="codeline" id="line-249"><code>// value is false. Users should be careful about which routes are not cleaned</code></span>
+<span class="codeline" id="line-250"><code>//</code></span>
+<span class="codeline" id="line-251"><code>// When true, if the route path is "/path//to", it will remain with the double</code></span>
+<span class="codeline" id="line-252"><code>// slash. This is helpful if you have a route like: /fetch/http://xkcd.com/534/</code></span>
+<span class="codeline" id="line-253"><code>//</code></span>
+<span class="codeline" id="line-254"><code>// When false, the path will be cleaned, so /fetch/http://xkcd.com/534/ will</code></span>
+<span class="codeline" id="line-255"><code>// become /fetch/http/xkcd.com/534</code></span>
+<span class="codeline" id="line-256"><code>func (r *Router) SkipClean(value bool) *Router {</code></span>
+<span class="codeline" id="line-257"><code>	r.skipClean = value</code></span>
+<span class="codeline" id="line-258"><code>	return r</code></span>
+<span class="codeline" id="line-259"><code>}</code></span>
+<span class="codeline" id="line-260"><code></code></span>
+<span class="codeline" id="line-261"><code>// UseEncodedPath tells the router to match the encoded original path</code></span>
+<span class="codeline" id="line-262"><code>// to the routes.</code></span>
+<span class="codeline" id="line-263"><code>// For eg. "/path/foo%2Fbar/to" will match the path "/path/{var}/to".</code></span>
+<span class="codeline" id="line-264"><code>//</code></span>
+<span class="codeline" id="line-265"><code>// If not called, the router will match the unencoded path to the routes.</code></span>
+<span class="codeline" id="line-266"><code>// For eg. "/path/foo%2Fbar/to" will match the path "/path/foo/bar/to"</code></span>
+<span class="codeline" id="line-267"><code>func (r *Router) UseEncodedPath() *Router {</code></span>
+<span class="codeline" id="line-268"><code>	r.useEncodedPath = true</code></span>
+<span class="codeline" id="line-269"><code>	return r</code></span>
+<span class="codeline" id="line-270"><code>}</code></span>
+<span class="codeline" id="line-271"><code></code></span>
+<span class="codeline" id="line-272"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-273"><code>// Route factories</code></span>
+<span class="codeline" id="line-274"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-275"><code></code></span>
+<span class="codeline" id="line-276"><code>// NewRoute registers an empty route.</code></span>
+<span class="codeline" id="line-277"><code>func (r *Router) NewRoute() *Route {</code></span>
+<span class="codeline" id="line-278"><code>	// initialize a route with a copy of the parent router's configuration</code></span>
+<span class="codeline" id="line-279"><code>	route := &amp;Route{routeConf: copyRouteConf(r.routeConf), namedRoutes: r.namedRoutes}</code></span>
+<span class="codeline" id="line-280"><code>	r.routes = append(r.routes, route)</code></span>
+<span class="codeline" id="line-281"><code>	return route</code></span>
+<span class="codeline" id="line-282"><code>}</code></span>
+<span class="codeline" id="line-283"><code></code></span>
+<span class="codeline" id="line-284"><code>// Name registers a new route with a name.</code></span>
+<span class="codeline" id="line-285"><code>// See Route.Name().</code></span>
+<span class="codeline" id="line-286"><code>func (r *Router) Name(name string) *Route {</code></span>
+<span class="codeline" id="line-287"><code>	return r.NewRoute().Name(name)</code></span>
+<span class="codeline" id="line-288"><code>}</code></span>
+<span class="codeline" id="line-289"><code></code></span>
+<span class="codeline" id="line-290"><code>// Handle registers a new route with a matcher for the URL path.</code></span>
+<span class="codeline" id="line-291"><code>// See Route.Path() and Route.Handler().</code></span>
+<span class="codeline" id="line-292"><code>func (r *Router) Handle(path string, handler http.Handler) *Route {</code></span>
+<span class="codeline" id="line-293"><code>	return r.NewRoute().Path(path).Handler(handler)</code></span>
+<span class="codeline" id="line-294"><code>}</code></span>
+<span class="codeline" id="line-295"><code></code></span>
+<span class="codeline" id="line-296"><code>// HandleFunc registers a new route with a matcher for the URL path.</code></span>
+<span class="codeline" id="line-297"><code>// See Route.Path() and Route.HandlerFunc().</code></span>
+<span class="codeline" id="line-298"><code>func (r *Router) HandleFunc(path string, f func(http.ResponseWriter,</code></span>
+<span class="codeline" id="line-299"><code>	*http.Request)) *Route {</code></span>
+<span class="codeline" id="line-300"><code>	return r.NewRoute().Path(path).HandlerFunc(f)</code></span>
+<span class="codeline" id="line-301"><code>}</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>// Headers registers a new route with a matcher for request header values.</code></span>
+<span class="codeline" id="line-304"><code>// See Route.Headers().</code></span>
+<span class="codeline" id="line-305"><code>func (r *Router) Headers(pairs ...string) *Route {</code></span>
+<span class="codeline" id="line-306"><code>	return r.NewRoute().Headers(pairs...)</code></span>
+<span class="codeline" id="line-307"><code>}</code></span>
+<span class="codeline" id="line-308"><code></code></span>
+<span class="codeline" id="line-309"><code>// Host registers a new route with a matcher for the URL host.</code></span>
+<span class="codeline" id="line-310"><code>// See Route.Host().</code></span>
+<span class="codeline" id="line-311"><code>func (r *Router) Host(tpl string) *Route {</code></span>
+<span class="codeline" id="line-312"><code>	return r.NewRoute().Host(tpl)</code></span>
+<span class="codeline" id="line-313"><code>}</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>// MatcherFunc registers a new route with a custom matcher function.</code></span>
+<span class="codeline" id="line-316"><code>// See Route.MatcherFunc().</code></span>
+<span class="codeline" id="line-317"><code>func (r *Router) MatcherFunc(f MatcherFunc) *Route {</code></span>
+<span class="codeline" id="line-318"><code>	return r.NewRoute().MatcherFunc(f)</code></span>
+<span class="codeline" id="line-319"><code>}</code></span>
+<span class="codeline" id="line-320"><code></code></span>
+<span class="codeline" id="line-321"><code>// Methods registers a new route with a matcher for HTTP methods.</code></span>
+<span class="codeline" id="line-322"><code>// See Route.Methods().</code></span>
+<span class="codeline" id="line-323"><code>func (r *Router) Methods(methods ...string) *Route {</code></span>
+<span class="codeline" id="line-324"><code>	return r.NewRoute().Methods(methods...)</code></span>
+<span class="codeline" id="line-325"><code>}</code></span>
+<span class="codeline" id="line-326"><code></code></span>
+<span class="codeline" id="line-327"><code>// Path registers a new route with a matcher for the URL path.</code></span>
+<span class="codeline" id="line-328"><code>// See Route.Path().</code></span>
+<span class="codeline" id="line-329"><code>func (r *Router) Path(tpl string) *Route {</code></span>
+<span class="codeline" id="line-330"><code>	return r.NewRoute().Path(tpl)</code></span>
+<span class="codeline" id="line-331"><code>}</code></span>
+<span class="codeline" id="line-332"><code></code></span>
+<span class="codeline" id="line-333"><code>// PathPrefix registers a new route with a matcher for the URL path prefix.</code></span>
+<span class="codeline" id="line-334"><code>// See Route.PathPrefix().</code></span>
+<span class="codeline" id="line-335"><code>func (r *Router) PathPrefix(tpl string) *Route {</code></span>
+<span class="codeline" id="line-336"><code>	return r.NewRoute().PathPrefix(tpl)</code></span>
+<span class="codeline" id="line-337"><code>}</code></span>
+<span class="codeline" id="line-338"><code></code></span>
+<span class="codeline" id="line-339"><code>// Queries registers a new route with a matcher for URL query values.</code></span>
+<span class="codeline" id="line-340"><code>// See Route.Queries().</code></span>
+<span class="codeline" id="line-341"><code>func (r *Router) Queries(pairs ...string) *Route {</code></span>
+<span class="codeline" id="line-342"><code>	return r.NewRoute().Queries(pairs...)</code></span>
+<span class="codeline" id="line-343"><code>}</code></span>
+<span class="codeline" id="line-344"><code></code></span>
+<span class="codeline" id="line-345"><code>// Schemes registers a new route with a matcher for URL schemes.</code></span>
+<span class="codeline" id="line-346"><code>// See Route.Schemes().</code></span>
+<span class="codeline" id="line-347"><code>func (r *Router) Schemes(schemes ...string) *Route {</code></span>
+<span class="codeline" id="line-348"><code>	return r.NewRoute().Schemes(schemes...)</code></span>
+<span class="codeline" id="line-349"><code>}</code></span>
+<span class="codeline" id="line-350"><code></code></span>
+<span class="codeline" id="line-351"><code>// BuildVarsFunc registers a new route with a custom function for modifying</code></span>
+<span class="codeline" id="line-352"><code>// route variables before building a URL.</code></span>
+<span class="codeline" id="line-353"><code>func (r *Router) BuildVarsFunc(f BuildVarsFunc) *Route {</code></span>
+<span class="codeline" id="line-354"><code>	return r.NewRoute().BuildVarsFunc(f)</code></span>
+<span class="codeline" id="line-355"><code>}</code></span>
+<span class="codeline" id="line-356"><code></code></span>
+<span class="codeline" id="line-357"><code>// Walk walks the router and all its sub-routers, calling walkFn for each route</code></span>
+<span class="codeline" id="line-358"><code>// in the tree. The routes are walked in the order they were added. Sub-routers</code></span>
+<span class="codeline" id="line-359"><code>// are explored depth-first.</code></span>
+<span class="codeline" id="line-360"><code>func (r *Router) Walk(walkFn WalkFunc) error {</code></span>
+<span class="codeline" id="line-361"><code>	return r.walk(walkFn, []*Route{})</code></span>
+<span class="codeline" id="line-362"><code>}</code></span>
+<span class="codeline" id="line-363"><code></code></span>
+<span class="codeline" id="line-364"><code>// SkipRouter is used as a return value from WalkFuncs to indicate that the</code></span>
+<span class="codeline" id="line-365"><code>// router that walk is about to descend down to should be skipped.</code></span>
+<span class="codeline" id="line-366"><code>var SkipRouter = errors.New("skip this router")</code></span>
+<span class="codeline" id="line-367"><code></code></span>
+<span class="codeline" id="line-368"><code>// WalkFunc is the type of the function called for each route visited by Walk.</code></span>
+<span class="codeline" id="line-369"><code>// At every invocation, it is given the current route, and the current router,</code></span>
+<span class="codeline" id="line-370"><code>// and a list of ancestor routes that lead to the current route.</code></span>
+<span class="codeline" id="line-371"><code>type WalkFunc func(route *Route, router *Router, ancestors []*Route) error</code></span>
+<span class="codeline" id="line-372"><code></code></span>
+<span class="codeline" id="line-373"><code>func (r *Router) walk(walkFn WalkFunc, ancestors []*Route) error {</code></span>
+<span class="codeline" id="line-374"><code>	for _, t := range r.routes {</code></span>
+<span class="codeline" id="line-375"><code>		err := walkFn(t, r, ancestors)</code></span>
+<span class="codeline" id="line-376"><code>		if err == SkipRouter {</code></span>
+<span class="codeline" id="line-377"><code>			continue</code></span>
+<span class="codeline" id="line-378"><code>		}</code></span>
+<span class="codeline" id="line-379"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-380"><code>			return err</code></span>
+<span class="codeline" id="line-381"><code>		}</code></span>
+<span class="codeline" id="line-382"><code>		for _, sr := range t.matchers {</code></span>
+<span class="codeline" id="line-383"><code>			if h, ok := sr.(*Router); ok {</code></span>
+<span class="codeline" id="line-384"><code>				ancestors = append(ancestors, t)</code></span>
+<span class="codeline" id="line-385"><code>				err := h.walk(walkFn, ancestors)</code></span>
+<span class="codeline" id="line-386"><code>				if err != nil {</code></span>
+<span class="codeline" id="line-387"><code>					return err</code></span>
+<span class="codeline" id="line-388"><code>				}</code></span>
+<span class="codeline" id="line-389"><code>				ancestors = ancestors[:len(ancestors)-1]</code></span>
+<span class="codeline" id="line-390"><code>			}</code></span>
+<span class="codeline" id="line-391"><code>		}</code></span>
+<span class="codeline" id="line-392"><code>		if h, ok := t.handler.(*Router); ok {</code></span>
+<span class="codeline" id="line-393"><code>			ancestors = append(ancestors, t)</code></span>
+<span class="codeline" id="line-394"><code>			err := h.walk(walkFn, ancestors)</code></span>
+<span class="codeline" id="line-395"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-396"><code>				return err</code></span>
+<span class="codeline" id="line-397"><code>			}</code></span>
+<span class="codeline" id="line-398"><code>			ancestors = ancestors[:len(ancestors)-1]</code></span>
+<span class="codeline" id="line-399"><code>		}</code></span>
+<span class="codeline" id="line-400"><code>	}</code></span>
+<span class="codeline" id="line-401"><code>	return nil</code></span>
+<span class="codeline" id="line-402"><code>}</code></span>
+<span class="codeline" id="line-403"><code></code></span>
+<span class="codeline" id="line-404"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-405"><code>// Context</code></span>
+<span class="codeline" id="line-406"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-407"><code></code></span>
+<span class="codeline" id="line-408"><code>// RouteMatch stores information about a matched route.</code></span>
+<span class="codeline" id="line-409"><code>type RouteMatch struct {</code></span>
+<span class="codeline" id="line-410"><code>	Route   *Route</code></span>
+<span class="codeline" id="line-411"><code>	Handler http.Handler</code></span>
+<span class="codeline" id="line-412"><code>	Vars    map[string]string</code></span>
+<span class="codeline" id="line-413"><code></code></span>
+<span class="codeline" id="line-414"><code>	// MatchErr is set to appropriate matching error</code></span>
+<span class="codeline" id="line-415"><code>	// It is set to ErrMethodMismatch if there is a mismatch in</code></span>
+<span class="codeline" id="line-416"><code>	// the request method and route method</code></span>
+<span class="codeline" id="line-417"><code>	MatchErr error</code></span>
+<span class="codeline" id="line-418"><code>}</code></span>
+<span class="codeline" id="line-419"><code></code></span>
+<span class="codeline" id="line-420"><code>type contextKey int</code></span>
+<span class="codeline" id="line-421"><code></code></span>
+<span class="codeline" id="line-422"><code>const (</code></span>
+<span class="codeline" id="line-423"><code>	varsKey contextKey = iota</code></span>
+<span class="codeline" id="line-424"><code>	routeKey</code></span>
+<span class="codeline" id="line-425"><code>)</code></span>
+<span class="codeline" id="line-426"><code></code></span>
+<span class="codeline" id="line-427"><code>// Vars returns the route variables for the current request, if any.</code></span>
+<span class="codeline" id="line-428"><code>func Vars(r *http.Request) map[string]string {</code></span>
+<span class="codeline" id="line-429"><code>	if rv := r.Context().Value(varsKey); rv != nil {</code></span>
+<span class="codeline" id="line-430"><code>		return rv.(map[string]string)</code></span>
+<span class="codeline" id="line-431"><code>	}</code></span>
+<span class="codeline" id="line-432"><code>	return nil</code></span>
+<span class="codeline" id="line-433"><code>}</code></span>
+<span class="codeline" id="line-434"><code></code></span>
+<span class="codeline" id="line-435"><code>// CurrentRoute returns the matched route for the current request, if any.</code></span>
+<span class="codeline" id="line-436"><code>// This only works when called inside the handler of the matched route</code></span>
+<span class="codeline" id="line-437"><code>// because the matched route is stored in the request context which is cleared</code></span>
+<span class="codeline" id="line-438"><code>// after the handler returns.</code></span>
+<span class="codeline" id="line-439"><code>func CurrentRoute(r *http.Request) *Route {</code></span>
+<span class="codeline" id="line-440"><code>	if rv := r.Context().Value(routeKey); rv != nil {</code></span>
+<span class="codeline" id="line-441"><code>		return rv.(*Route)</code></span>
+<span class="codeline" id="line-442"><code>	}</code></span>
+<span class="codeline" id="line-443"><code>	return nil</code></span>
+<span class="codeline" id="line-444"><code>}</code></span>
+<span class="codeline" id="line-445"><code></code></span>
+<span class="codeline" id="line-446"><code>func requestWithVars(r *http.Request, vars map[string]string) *http.Request {</code></span>
+<span class="codeline" id="line-447"><code>	ctx := context.WithValue(r.Context(), varsKey, vars)</code></span>
+<span class="codeline" id="line-448"><code>	return r.WithContext(ctx)</code></span>
+<span class="codeline" id="line-449"><code>}</code></span>
+<span class="codeline" id="line-450"><code></code></span>
+<span class="codeline" id="line-451"><code>func requestWithRoute(r *http.Request, route *Route) *http.Request {</code></span>
+<span class="codeline" id="line-452"><code>	ctx := context.WithValue(r.Context(), routeKey, route)</code></span>
+<span class="codeline" id="line-453"><code>	return r.WithContext(ctx)</code></span>
+<span class="codeline" id="line-454"><code>}</code></span>
+<span class="codeline" id="line-455"><code></code></span>
+<span class="codeline" id="line-456"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-457"><code>// Helpers</code></span>
+<span class="codeline" id="line-458"><code>// ----------------------------------------------------------------------------</code></span>
+<span class="codeline" id="line-459"><code></code></span>
+<span class="codeline" id="line-460"><code>// cleanPath returns the canonical path for p, eliminating . and .. elements.</code></span>
+<span class="codeline" id="line-461"><code>// Borrowed from the net/http package.</code></span>
+<span class="codeline" id="line-462"><code>func cleanPath(p string) string {</code></span>
+<span class="codeline" id="line-463"><code>	if p == "" {</code></span>
+<span class="codeline" id="line-464"><code>		return "/"</code></span>
+<span class="codeline" id="line-465"><code>	}</code></span>
+<span class="codeline" id="line-466"><code>	if p[0] != '/' {</code></span>
+<span class="codeline" id="line-467"><code>		p = "/" + p</code></span>
+<span class="codeline" id="line-468"><code>	}</code></span>
+<span class="codeline" id="line-469"><code>	np := path.Clean(p)</code></span>
+<span class="codeline" id="line-470"><code>	// path.Clean removes trailing slash except for root;</code></span>
+<span class="codeline" id="line-471"><code>	// put the trailing slash back if necessary.</code></span>
+<span class="codeline" id="line-472"><code>	if p[len(p)-1] == '/' &amp;&amp; np != "/" {</code></span>
+<span class="codeline" id="line-473"><code>		np += "/"</code></span>
+<span class="codeline" id="line-474"><code>	}</code></span>
+<span class="codeline" id="line-475"><code></code></span>
+<span class="codeline" id="line-476"><code>	return np</code></span>
+<span class="codeline" id="line-477"><code>}</code></span>
+<span class="codeline" id="line-478"><code></code></span>
+<span class="codeline" id="line-479"><code>// uniqueVars returns an error if two slices contain duplicated strings.</code></span>
+<span class="codeline" id="line-480"><code>func uniqueVars(s1, s2 []string) error {</code></span>
+<span class="codeline" id="line-481"><code>	for _, v1 := range s1 {</code></span>
+<span class="codeline" id="line-482"><code>		for _, v2 := range s2 {</code></span>
+<span class="codeline" id="line-483"><code>			if v1 == v2 {</code></span>
+<span class="codeline" id="line-484"><code>				return fmt.Errorf("mux: duplicated route variable %q", v2)</code></span>
+<span class="codeline" id="line-485"><code>			}</code></span>
+<span class="codeline" id="line-486"><code>		}</code></span>
+<span class="codeline" id="line-487"><code>	}</code></span>
+<span class="codeline" id="line-488"><code>	return nil</code></span>
+<span class="codeline" id="line-489"><code>}</code></span>
+<span class="codeline" id="line-490"><code></code></span>
+<span class="codeline" id="line-491"><code>// checkPairs returns the count of strings passed in, and an error if</code></span>
+<span class="codeline" id="line-492"><code>// the count is not an even number.</code></span>
+<span class="codeline" id="line-493"><code>func checkPairs(pairs ...string) (int, error) {</code></span>
+<span class="codeline" id="line-494"><code>	length := len(pairs)</code></span>
+<span class="codeline" id="line-495"><code>	if length%2 != 0 {</code></span>
+<span class="codeline" id="line-496"><code>		return length, fmt.Errorf(</code></span>
+<span class="codeline" id="line-497"><code>			"mux: number of parameters must be multiple of 2, got %v", pairs)</code></span>
+<span class="codeline" id="line-498"><code>	}</code></span>
+<span class="codeline" id="line-499"><code>	return length, nil</code></span>
+<span class="codeline" id="line-500"><code>}</code></span>
+<span class="codeline" id="line-501"><code></code></span>
+<span class="codeline" id="line-502"><code>// mapFromPairsToString converts variadic string parameters to a</code></span>
+<span class="codeline" id="line-503"><code>// string to string map.</code></span>
+<span class="codeline" id="line-504"><code>func mapFromPairsToString(pairs ...string) (map[string]string, error) {</code></span>
+<span class="codeline" id="line-505"><code>	length, err := checkPairs(pairs...)</code></span>
+<span class="codeline" id="line-506"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-507"><code>		return nil, err</code></span>
+<span class="codeline" id="line-508"><code>	}</code></span>
+<span class="codeline" id="line-509"><code>	m := make(map[string]string, length/2)</code></span>
+<span class="codeline" id="line-510"><code>	for i := 0; i &lt; length; i += 2 {</code></span>
+<span class="codeline" id="line-511"><code>		m[pairs[i]] = pairs[i+1]</code></span>
+<span class="codeline" id="line-512"><code>	}</code></span>
+<span class="codeline" id="line-513"><code>	return m, nil</code></span>
+<span class="codeline" id="line-514"><code>}</code></span>
+<span class="codeline" id="line-515"><code></code></span>
+<span class="codeline" id="line-516"><code>// mapFromPairsToRegex converts variadic string parameters to a</code></span>
+<span class="codeline" id="line-517"><code>// string to regex map.</code></span>
+<span class="codeline" id="line-518"><code>func mapFromPairsToRegex(pairs ...string) (map[string]*regexp.Regexp, error) {</code></span>
+<span class="codeline" id="line-519"><code>	length, err := checkPairs(pairs...)</code></span>
+<span class="codeline" id="line-520"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-521"><code>		return nil, err</code></span>
+<span class="codeline" id="line-522"><code>	}</code></span>
+<span class="codeline" id="line-523"><code>	m := make(map[string]*regexp.Regexp, length/2)</code></span>
+<span class="codeline" id="line-524"><code>	for i := 0; i &lt; length; i += 2 {</code></span>
+<span class="codeline" id="line-525"><code>		regex, err := regexp.Compile(pairs[i+1])</code></span>
+<span class="codeline" id="line-526"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-527"><code>			return nil, err</code></span>
+<span class="codeline" id="line-528"><code>		}</code></span>
+<span class="codeline" id="line-529"><code>		m[pairs[i]] = regex</code></span>
+<span class="codeline" id="line-530"><code>	}</code></span>
+<span class="codeline" id="line-531"><code>	return m, nil</code></span>
+<span class="codeline" id="line-532"><code>}</code></span>
+<span class="codeline" id="line-533"><code></code></span>
+<span class="codeline" id="line-534"><code>// matchInArray returns true if the given string value is in the array.</code></span>
+<span class="codeline" id="line-535"><code>func matchInArray(arr []string, value string) bool {</code></span>
+<span class="codeline" id="line-536"><code>	for _, v := range arr {</code></span>
+<span class="codeline" id="line-537"><code>		if v == value {</code></span>
+<span class="codeline" id="line-538"><code>			return true</code></span>
+<span class="codeline" id="line-539"><code>		}</code></span>
+<span class="codeline" id="line-540"><code>	}</code></span>
+<span class="codeline" id="line-541"><code>	return false</code></span>
+<span class="codeline" id="line-542"><code>}</code></span>
+<span class="codeline" id="line-543"><code></code></span>
+<span class="codeline" id="line-544"><code>// matchMapWithString returns true if the given key/value pairs exist in a given map.</code></span>
+<span class="codeline" id="line-545"><code>func matchMapWithString(toCheck map[string]string, toMatch map[string][]string, canonicalKey bool) bool {</code></span>
+<span class="codeline" id="line-546"><code>	for k, v := range toCheck {</code></span>
+<span class="codeline" id="line-547"><code>		// Check if key exists.</code></span>
+<span class="codeline" id="line-548"><code>		if canonicalKey {</code></span>
+<span class="codeline" id="line-549"><code>			k = http.CanonicalHeaderKey(k)</code></span>
+<span class="codeline" id="line-550"><code>		}</code></span>
+<span class="codeline" id="line-551"><code>		if values := toMatch[k]; values == nil {</code></span>
+<span class="codeline" id="line-552"><code>			return false</code></span>
+<span class="codeline" id="line-553"><code>		} else if v != "" {</code></span>
+<span class="codeline" id="line-554"><code>			// If value was defined as an empty string we only check that the</code></span>
+<span class="codeline" id="line-555"><code>			// key exists. Otherwise we also check for equality.</code></span>
+<span class="codeline" id="line-556"><code>			valueExists := false</code></span>
+<span class="codeline" id="line-557"><code>			for _, value := range values {</code></span>
+<span class="codeline" id="line-558"><code>				if v == value {</code></span>
+<span class="codeline" id="line-559"><code>					valueExists = true</code></span>
+<span class="codeline" id="line-560"><code>					break</code></span>
+<span class="codeline" id="line-561"><code>				}</code></span>
+<span class="codeline" id="line-562"><code>			}</code></span>
+<span class="codeline" id="line-563"><code>			if !valueExists {</code></span>
+<span class="codeline" id="line-564"><code>				return false</code></span>
+<span class="codeline" id="line-565"><code>			}</code></span>
+<span class="codeline" id="line-566"><code>		}</code></span>
+<span class="codeline" id="line-567"><code>	}</code></span>
+<span class="codeline" id="line-568"><code>	return true</code></span>
+<span class="codeline" id="line-569"><code>}</code></span>
+<span class="codeline" id="line-570"><code></code></span>
+<span class="codeline" id="line-571"><code>// matchMapWithRegex returns true if the given key/value pairs exist in a given map compiled against</code></span>
+<span class="codeline" id="line-572"><code>// the given regex</code></span>
+<span class="codeline" id="line-573"><code>func matchMapWithRegex(toCheck map[string]*regexp.Regexp, toMatch map[string][]string, canonicalKey bool) bool {</code></span>
+<span class="codeline" id="line-574"><code>	for k, v := range toCheck {</code></span>
+<span class="codeline" id="line-575"><code>		// Check if key exists.</code></span>
+<span class="codeline" id="line-576"><code>		if canonicalKey {</code></span>
+<span class="codeline" id="line-577"><code>			k = http.CanonicalHeaderKey(k)</code></span>
+<span class="codeline" id="line-578"><code>		}</code></span>
+<span class="codeline" id="line-579"><code>		if values := toMatch[k]; values == nil {</code></span>
+<span class="codeline" id="line-580"><code>			return false</code></span>
+<span class="codeline" id="line-581"><code>		} else if v != nil {</code></span>
+<span class="codeline" id="line-582"><code>			// If value was defined as an empty string we only check that the</code></span>
+<span class="codeline" id="line-583"><code>			// key exists. Otherwise we also check for equality.</code></span>
+<span class="codeline" id="line-584"><code>			valueExists := false</code></span>
+<span class="codeline" id="line-585"><code>			for _, value := range values {</code></span>
+<span class="codeline" id="line-586"><code>				if v.MatchString(value) {</code></span>
+<span class="codeline" id="line-587"><code>					valueExists = true</code></span>
+<span class="codeline" id="line-588"><code>					break</code></span>
+<span class="codeline" id="line-589"><code>				}</code></span>
+<span class="codeline" id="line-590"><code>			}</code></span>
+<span class="codeline" id="line-591"><code>			if !valueExists {</code></span>
+<span class="codeline" id="line-592"><code>				return false</code></span>
+<span class="codeline" id="line-593"><code>			}</code></span>
+<span class="codeline" id="line-594"><code>		}</code></span>
+<span class="codeline" id="line-595"><code>	}</code></span>
+<span class="codeline" id="line-596"><code>	return true</code></span>
+<span class="codeline" id="line-597"><code>}</code></span>
+<span class="codeline" id="line-598"><code></code></span>
+<span class="codeline" id="line-599"><code>// methodNotAllowed replies to the request with an HTTP status code 405.</code></span>
+<span class="codeline" id="line-600"><code>func methodNotAllowed(w http.ResponseWriter, r *http.Request) {</code></span>
+<span class="codeline" id="line-601"><code>	w.WriteHeader(http.StatusMethodNotAllowed)</code></span>
+<span class="codeline" id="line-602"><code>}</code></span>
+<span class="codeline" id="line-603"><code></code></span>
+<span class="codeline" id="line-604"><code>// methodNotAllowedHandler returns a simple request handler</code></span>
+<span class="codeline" id="line-605"><code>// that replies to each request with a status code 405.</code></span>
+<span class="codeline" id="line-606"><code>func methodNotAllowedHandler() http.Handler { return http.HandlerFunc(methodNotAllowed) }</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

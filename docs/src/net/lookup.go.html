@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: lookup.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	lookup.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2012 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package net</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"context"</code></span>
+<span class="codeline" id="line-9"><code>	"internal/nettrace"</code></span>
+<span class="codeline" id="line-10"><code>	"internal/singleflight"</code></span>
+<span class="codeline" id="line-11"><code>	"sync"</code></span>
+<span class="codeline" id="line-12"><code>)</code></span>
+<span class="codeline" id="line-13"><code></code></span>
+<span class="codeline" id="line-14"><code>// protocols contains minimal mappings between internet protocol</code></span>
+<span class="codeline" id="line-15"><code>// names and numbers for platforms that don't have a complete list of</code></span>
+<span class="codeline" id="line-16"><code>// protocol numbers.</code></span>
+<span class="codeline" id="line-17"><code>//</code></span>
+<span class="codeline" id="line-18"><code>// See https://www.iana.org/assignments/protocol-numbers</code></span>
+<span class="codeline" id="line-19"><code>//</code></span>
+<span class="codeline" id="line-20"><code>// On Unix, this map is augmented by readProtocols via lookupProtocol.</code></span>
+<span class="codeline" id="line-21"><code>var protocols = map[string]int{</code></span>
+<span class="codeline" id="line-22"><code>	"icmp":      1,</code></span>
+<span class="codeline" id="line-23"><code>	"igmp":      2,</code></span>
+<span class="codeline" id="line-24"><code>	"tcp":       6,</code></span>
+<span class="codeline" id="line-25"><code>	"udp":       17,</code></span>
+<span class="codeline" id="line-26"><code>	"ipv6-icmp": 58,</code></span>
+<span class="codeline" id="line-27"><code>}</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>// services contains minimal mappings between services names and port</code></span>
+<span class="codeline" id="line-30"><code>// numbers for platforms that don't have a complete list of port numbers.</code></span>
+<span class="codeline" id="line-31"><code>//</code></span>
+<span class="codeline" id="line-32"><code>// See https://www.iana.org/assignments/service-names-port-numbers</code></span>
+<span class="codeline" id="line-33"><code>//</code></span>
+<span class="codeline" id="line-34"><code>// On Unix, this map is augmented by readServices via goLookupPort.</code></span>
+<span class="codeline" id="line-35"><code>var services = map[string]map[string]int{</code></span>
+<span class="codeline" id="line-36"><code>	"udp": {</code></span>
+<span class="codeline" id="line-37"><code>		"domain": 53,</code></span>
+<span class="codeline" id="line-38"><code>	},</code></span>
+<span class="codeline" id="line-39"><code>	"tcp": {</code></span>
+<span class="codeline" id="line-40"><code>		"ftp":    21,</code></span>
+<span class="codeline" id="line-41"><code>		"ftps":   990,</code></span>
+<span class="codeline" id="line-42"><code>		"gopher": 70, // ʕ◔ϖ◔ʔ</code></span>
+<span class="codeline" id="line-43"><code>		"http":   80,</code></span>
+<span class="codeline" id="line-44"><code>		"https":  443,</code></span>
+<span class="codeline" id="line-45"><code>		"imap2":  143,</code></span>
+<span class="codeline" id="line-46"><code>		"imap3":  220,</code></span>
+<span class="codeline" id="line-47"><code>		"imaps":  993,</code></span>
+<span class="codeline" id="line-48"><code>		"pop3":   110,</code></span>
+<span class="codeline" id="line-49"><code>		"pop3s":  995,</code></span>
+<span class="codeline" id="line-50"><code>		"smtp":   25,</code></span>
+<span class="codeline" id="line-51"><code>		"ssh":    22,</code></span>
+<span class="codeline" id="line-52"><code>		"telnet": 23,</code></span>
+<span class="codeline" id="line-53"><code>	},</code></span>
+<span class="codeline" id="line-54"><code>}</code></span>
+<span class="codeline" id="line-55"><code></code></span>
+<span class="codeline" id="line-56"><code>// dnsWaitGroup can be used by tests to wait for all DNS goroutines to</code></span>
+<span class="codeline" id="line-57"><code>// complete. This avoids races on the test hooks.</code></span>
+<span class="codeline" id="line-58"><code>var dnsWaitGroup sync.WaitGroup</code></span>
+<span class="codeline" id="line-59"><code></code></span>
+<span class="codeline" id="line-60"><code>const maxProtoLength = len("RSVP-E2E-IGNORE") + 10 // with room to grow</code></span>
+<span class="codeline" id="line-61"><code></code></span>
+<span class="codeline" id="line-62"><code>func lookupProtocolMap(name string) (int, error) {</code></span>
+<span class="codeline" id="line-63"><code>	var lowerProtocol [maxProtoLength]byte</code></span>
+<span class="codeline" id="line-64"><code>	n := copy(lowerProtocol[:], name)</code></span>
+<span class="codeline" id="line-65"><code>	lowerASCIIBytes(lowerProtocol[:n])</code></span>
+<span class="codeline" id="line-66"><code>	proto, found := protocols[string(lowerProtocol[:n])]</code></span>
+<span class="codeline" id="line-67"><code>	if !found || n != len(name) {</code></span>
+<span class="codeline" id="line-68"><code>		return 0, &amp;AddrError{Err: "unknown IP protocol specified", Addr: name}</code></span>
+<span class="codeline" id="line-69"><code>	}</code></span>
+<span class="codeline" id="line-70"><code>	return proto, nil</code></span>
+<span class="codeline" id="line-71"><code>}</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>// maxPortBufSize is the longest reasonable name of a service</code></span>
+<span class="codeline" id="line-74"><code>// (non-numeric port).</code></span>
+<span class="codeline" id="line-75"><code>// Currently the longest known IANA-unregistered name is</code></span>
+<span class="codeline" id="line-76"><code>// "mobility-header", so we use that length, plus some slop in case</code></span>
+<span class="codeline" id="line-77"><code>// something longer is added in the future.</code></span>
+<span class="codeline" id="line-78"><code>const maxPortBufSize = len("mobility-header") + 10</code></span>
+<span class="codeline" id="line-79"><code></code></span>
+<span class="codeline" id="line-80"><code>func lookupPortMap(network, service string) (port int, error error) {</code></span>
+<span class="codeline" id="line-81"><code>	switch network {</code></span>
+<span class="codeline" id="line-82"><code>	case "tcp4", "tcp6":</code></span>
+<span class="codeline" id="line-83"><code>		network = "tcp"</code></span>
+<span class="codeline" id="line-84"><code>	case "udp4", "udp6":</code></span>
+<span class="codeline" id="line-85"><code>		network = "udp"</code></span>
+<span class="codeline" id="line-86"><code>	}</code></span>
+<span class="codeline" id="line-87"><code></code></span>
+<span class="codeline" id="line-88"><code>	if m, ok := services[network]; ok {</code></span>
+<span class="codeline" id="line-89"><code>		var lowerService [maxPortBufSize]byte</code></span>
+<span class="codeline" id="line-90"><code>		n := copy(lowerService[:], service)</code></span>
+<span class="codeline" id="line-91"><code>		lowerASCIIBytes(lowerService[:n])</code></span>
+<span class="codeline" id="line-92"><code>		if port, ok := m[string(lowerService[:n])]; ok &amp;&amp; n == len(service) {</code></span>
+<span class="codeline" id="line-93"><code>			return port, nil</code></span>
+<span class="codeline" id="line-94"><code>		}</code></span>
+<span class="codeline" id="line-95"><code>	}</code></span>
+<span class="codeline" id="line-96"><code>	return 0, &amp;AddrError{Err: "unknown port", Addr: network + "/" + service}</code></span>
+<span class="codeline" id="line-97"><code>}</code></span>
+<span class="codeline" id="line-98"><code></code></span>
+<span class="codeline" id="line-99"><code>// ipVersion returns the provided network's IP version: '4', '6' or 0</code></span>
+<span class="codeline" id="line-100"><code>// if network does not end in a '4' or '6' byte.</code></span>
+<span class="codeline" id="line-101"><code>func ipVersion(network string) byte {</code></span>
+<span class="codeline" id="line-102"><code>	if network == "" {</code></span>
+<span class="codeline" id="line-103"><code>		return 0</code></span>
+<span class="codeline" id="line-104"><code>	}</code></span>
+<span class="codeline" id="line-105"><code>	n := network[len(network)-1]</code></span>
+<span class="codeline" id="line-106"><code>	if n != '4' &amp;&amp; n != '6' {</code></span>
+<span class="codeline" id="line-107"><code>		n = 0</code></span>
+<span class="codeline" id="line-108"><code>	}</code></span>
+<span class="codeline" id="line-109"><code>	return n</code></span>
+<span class="codeline" id="line-110"><code>}</code></span>
+<span class="codeline" id="line-111"><code></code></span>
+<span class="codeline" id="line-112"><code>// DefaultResolver is the resolver used by the package-level Lookup</code></span>
+<span class="codeline" id="line-113"><code>// functions and by Dialers without a specified Resolver.</code></span>
+<span class="codeline" id="line-114"><code>var DefaultResolver = &amp;Resolver{}</code></span>
+<span class="codeline" id="line-115"><code></code></span>
+<span class="codeline" id="line-116"><code>// A Resolver looks up names and numbers.</code></span>
+<span class="codeline" id="line-117"><code>//</code></span>
+<span class="codeline" id="line-118"><code>// A nil *Resolver is equivalent to a zero Resolver.</code></span>
+<span class="codeline" id="line-119"><code>type Resolver struct {</code></span>
+<span class="codeline" id="line-120"><code>	// PreferGo controls whether Go's built-in DNS resolver is preferred</code></span>
+<span class="codeline" id="line-121"><code>	// on platforms where it's available. It is equivalent to setting</code></span>
+<span class="codeline" id="line-122"><code>	// GODEBUG=netdns=go, but scoped to just this resolver.</code></span>
+<span class="codeline" id="line-123"><code>	PreferGo bool</code></span>
+<span class="codeline" id="line-124"><code></code></span>
+<span class="codeline" id="line-125"><code>	// StrictErrors controls the behavior of temporary errors</code></span>
+<span class="codeline" id="line-126"><code>	// (including timeout, socket errors, and SERVFAIL) when using</code></span>
+<span class="codeline" id="line-127"><code>	// Go's built-in resolver. For a query composed of multiple</code></span>
+<span class="codeline" id="line-128"><code>	// sub-queries (such as an A+AAAA address lookup, or walking the</code></span>
+<span class="codeline" id="line-129"><code>	// DNS search list), this option causes such errors to abort the</code></span>
+<span class="codeline" id="line-130"><code>	// whole query instead of returning a partial result. This is</code></span>
+<span class="codeline" id="line-131"><code>	// not enabled by default because it may affect compatibility</code></span>
+<span class="codeline" id="line-132"><code>	// with resolvers that process AAAA queries incorrectly.</code></span>
+<span class="codeline" id="line-133"><code>	StrictErrors bool</code></span>
+<span class="codeline" id="line-134"><code></code></span>
+<span class="codeline" id="line-135"><code>	// Dial optionally specifies an alternate dialer for use by</code></span>
+<span class="codeline" id="line-136"><code>	// Go's built-in DNS resolver to make TCP and UDP connections</code></span>
+<span class="codeline" id="line-137"><code>	// to DNS services. The host in the address parameter will</code></span>
+<span class="codeline" id="line-138"><code>	// always be a literal IP address and not a host name, and the</code></span>
+<span class="codeline" id="line-139"><code>	// port in the address parameter will be a literal port number</code></span>
+<span class="codeline" id="line-140"><code>	// and not a service name.</code></span>
+<span class="codeline" id="line-141"><code>	// If the Conn returned is also a PacketConn, sent and received DNS</code></span>
+<span class="codeline" id="line-142"><code>	// messages must adhere to RFC 1035 section 4.2.1, "UDP usage".</code></span>
+<span class="codeline" id="line-143"><code>	// Otherwise, DNS messages transmitted over Conn must adhere</code></span>
+<span class="codeline" id="line-144"><code>	// to RFC 7766 section 5, "Transport Protocol Selection".</code></span>
+<span class="codeline" id="line-145"><code>	// If nil, the default dialer is used.</code></span>
+<span class="codeline" id="line-146"><code>	Dial func(ctx context.Context, network, address string) (Conn, error)</code></span>
+<span class="codeline" id="line-147"><code></code></span>
+<span class="codeline" id="line-148"><code>	// lookupGroup merges LookupIPAddr calls together for lookups for the same</code></span>
+<span class="codeline" id="line-149"><code>	// host. The lookupGroup key is the LookupIPAddr.host argument.</code></span>
+<span class="codeline" id="line-150"><code>	// The return values are ([]IPAddr, error).</code></span>
+<span class="codeline" id="line-151"><code>	lookupGroup singleflight.Group</code></span>
+<span class="codeline" id="line-152"><code></code></span>
+<span class="codeline" id="line-153"><code>	// TODO(bradfitz): optional interface impl override hook</code></span>
+<span class="codeline" id="line-154"><code>	// TODO(bradfitz): Timeout time.Duration?</code></span>
+<span class="codeline" id="line-155"><code>}</code></span>
+<span class="codeline" id="line-156"><code></code></span>
+<span class="codeline" id="line-157"><code>func (r *Resolver) preferGo() bool     { return r != nil &amp;&amp; r.PreferGo }</code></span>
+<span class="codeline" id="line-158"><code>func (r *Resolver) strictErrors() bool { return r != nil &amp;&amp; r.StrictErrors }</code></span>
+<span class="codeline" id="line-159"><code></code></span>
+<span class="codeline" id="line-160"><code>func (r *Resolver) getLookupGroup() *singleflight.Group {</code></span>
+<span class="codeline" id="line-161"><code>	if r == nil {</code></span>
+<span class="codeline" id="line-162"><code>		return &amp;DefaultResolver.lookupGroup</code></span>
+<span class="codeline" id="line-163"><code>	}</code></span>
+<span class="codeline" id="line-164"><code>	return &amp;r.lookupGroup</code></span>
+<span class="codeline" id="line-165"><code>}</code></span>
+<span class="codeline" id="line-166"><code></code></span>
+<span class="codeline" id="line-167"><code>// LookupHost looks up the given host using the local resolver.</code></span>
+<span class="codeline" id="line-168"><code>// It returns a slice of that host's addresses.</code></span>
+<span class="codeline" id="line-169"><code>func LookupHost(host string) (addrs []string, err error) {</code></span>
+<span class="codeline" id="line-170"><code>	return DefaultResolver.LookupHost(context.Background(), host)</code></span>
+<span class="codeline" id="line-171"><code>}</code></span>
+<span class="codeline" id="line-172"><code></code></span>
+<span class="codeline" id="line-173"><code>// LookupHost looks up the given host using the local resolver.</code></span>
+<span class="codeline" id="line-174"><code>// It returns a slice of that host's addresses.</code></span>
+<span class="codeline" id="line-175"><code>func (r *Resolver) LookupHost(ctx context.Context, host string) (addrs []string, err error) {</code></span>
+<span class="codeline" id="line-176"><code>	// Make sure that no matter what we do later, host=="" is rejected.</code></span>
+<span class="codeline" id="line-177"><code>	// parseIP, for example, does accept empty strings.</code></span>
+<span class="codeline" id="line-178"><code>	if host == "" {</code></span>
+<span class="codeline" id="line-179"><code>		return nil, &amp;DNSError{Err: errNoSuchHost.Error(), Name: host, IsNotFound: true}</code></span>
+<span class="codeline" id="line-180"><code>	}</code></span>
+<span class="codeline" id="line-181"><code>	if ip, _ := parseIPZone(host); ip != nil {</code></span>
+<span class="codeline" id="line-182"><code>		return []string{host}, nil</code></span>
+<span class="codeline" id="line-183"><code>	}</code></span>
+<span class="codeline" id="line-184"><code>	return r.lookupHost(ctx, host)</code></span>
+<span class="codeline" id="line-185"><code>}</code></span>
+<span class="codeline" id="line-186"><code></code></span>
+<span class="codeline" id="line-187"><code>// LookupIP looks up host using the local resolver.</code></span>
+<span class="codeline" id="line-188"><code>// It returns a slice of that host's IPv4 and IPv6 addresses.</code></span>
+<span class="codeline" id="line-189"><code>func LookupIP(host string) ([]IP, error) {</code></span>
+<span class="codeline" id="line-190"><code>	addrs, err := DefaultResolver.LookupIPAddr(context.Background(), host)</code></span>
+<span class="codeline" id="line-191"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-192"><code>		return nil, err</code></span>
+<span class="codeline" id="line-193"><code>	}</code></span>
+<span class="codeline" id="line-194"><code>	ips := make([]IP, len(addrs))</code></span>
+<span class="codeline" id="line-195"><code>	for i, ia := range addrs {</code></span>
+<span class="codeline" id="line-196"><code>		ips[i] = ia.IP</code></span>
+<span class="codeline" id="line-197"><code>	}</code></span>
+<span class="codeline" id="line-198"><code>	return ips, nil</code></span>
+<span class="codeline" id="line-199"><code>}</code></span>
+<span class="codeline" id="line-200"><code></code></span>
+<span class="codeline" id="line-201"><code>// LookupIPAddr looks up host using the local resolver.</code></span>
+<span class="codeline" id="line-202"><code>// It returns a slice of that host's IPv4 and IPv6 addresses.</code></span>
+<span class="codeline" id="line-203"><code>func (r *Resolver) LookupIPAddr(ctx context.Context, host string) ([]IPAddr, error) {</code></span>
+<span class="codeline" id="line-204"><code>	return r.lookupIPAddr(ctx, "ip", host)</code></span>
+<span class="codeline" id="line-205"><code>}</code></span>
+<span class="codeline" id="line-206"><code></code></span>
+<span class="codeline" id="line-207"><code>// LookupIP looks up host for the given network using the local resolver.</code></span>
+<span class="codeline" id="line-208"><code>// It returns a slice of that host's IP addresses of the type specified by</code></span>
+<span class="codeline" id="line-209"><code>// network.</code></span>
+<span class="codeline" id="line-210"><code>// network must be one of "ip", "ip4" or "ip6".</code></span>
+<span class="codeline" id="line-211"><code>func (r *Resolver) LookupIP(ctx context.Context, network, host string) ([]IP, error) {</code></span>
+<span class="codeline" id="line-212"><code>	afnet, _, err := parseNetwork(ctx, network, false)</code></span>
+<span class="codeline" id="line-213"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-214"><code>		return nil, err</code></span>
+<span class="codeline" id="line-215"><code>	}</code></span>
+<span class="codeline" id="line-216"><code>	switch afnet {</code></span>
+<span class="codeline" id="line-217"><code>	case "ip", "ip4", "ip6":</code></span>
+<span class="codeline" id="line-218"><code>	default:</code></span>
+<span class="codeline" id="line-219"><code>		return nil, UnknownNetworkError(network)</code></span>
+<span class="codeline" id="line-220"><code>	}</code></span>
+<span class="codeline" id="line-221"><code>	addrs, err := r.internetAddrList(ctx, afnet, host)</code></span>
+<span class="codeline" id="line-222"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-223"><code>		return nil, err</code></span>
+<span class="codeline" id="line-224"><code>	}</code></span>
+<span class="codeline" id="line-225"><code>	ips := make([]IP, 0, len(addrs))</code></span>
+<span class="codeline" id="line-226"><code>	for _, addr := range addrs {</code></span>
+<span class="codeline" id="line-227"><code>		ips = append(ips, addr.(*IPAddr).IP)</code></span>
+<span class="codeline" id="line-228"><code>	}</code></span>
+<span class="codeline" id="line-229"><code>	return ips, nil</code></span>
+<span class="codeline" id="line-230"><code>}</code></span>
+<span class="codeline" id="line-231"><code></code></span>
+<span class="codeline" id="line-232"><code>// onlyValuesCtx is a context that uses an underlying context</code></span>
+<span class="codeline" id="line-233"><code>// for value lookup if the underlying context hasn't yet expired.</code></span>
+<span class="codeline" id="line-234"><code>type onlyValuesCtx struct {</code></span>
+<span class="codeline" id="line-235"><code>	context.Context</code></span>
+<span class="codeline" id="line-236"><code>	lookupValues context.Context</code></span>
+<span class="codeline" id="line-237"><code>}</code></span>
+<span class="codeline" id="line-238"><code></code></span>
+<span class="codeline" id="line-239"><code>var _ context.Context = (*onlyValuesCtx)(nil)</code></span>
+<span class="codeline" id="line-240"><code></code></span>
+<span class="codeline" id="line-241"><code>// Value performs a lookup if the original context hasn't expired.</code></span>
+<span class="codeline" id="line-242"><code>func (ovc *onlyValuesCtx) Value(key interface{}) interface{} {</code></span>
+<span class="codeline" id="line-243"><code>	select {</code></span>
+<span class="codeline" id="line-244"><code>	case &lt;-ovc.lookupValues.Done():</code></span>
+<span class="codeline" id="line-245"><code>		return nil</code></span>
+<span class="codeline" id="line-246"><code>	default:</code></span>
+<span class="codeline" id="line-247"><code>		return ovc.lookupValues.Value(key)</code></span>
+<span class="codeline" id="line-248"><code>	}</code></span>
+<span class="codeline" id="line-249"><code>}</code></span>
+<span class="codeline" id="line-250"><code></code></span>
+<span class="codeline" id="line-251"><code>// withUnexpiredValuesPreserved returns a context.Context that only uses lookupCtx</code></span>
+<span class="codeline" id="line-252"><code>// for its values, otherwise it is never canceled and has no deadline.</code></span>
+<span class="codeline" id="line-253"><code>// If the lookup context expires, any looked up values will return nil.</code></span>
+<span class="codeline" id="line-254"><code>// See Issue 28600.</code></span>
+<span class="codeline" id="line-255"><code>func withUnexpiredValuesPreserved(lookupCtx context.Context) context.Context {</code></span>
+<span class="codeline" id="line-256"><code>	return &amp;onlyValuesCtx{Context: context.Background(), lookupValues: lookupCtx}</code></span>
+<span class="codeline" id="line-257"><code>}</code></span>
+<span class="codeline" id="line-258"><code></code></span>
+<span class="codeline" id="line-259"><code>// lookupIPAddr looks up host using the local resolver and particular network.</code></span>
+<span class="codeline" id="line-260"><code>// It returns a slice of that host's IPv4 and IPv6 addresses.</code></span>
+<span class="codeline" id="line-261"><code>func (r *Resolver) lookupIPAddr(ctx context.Context, network, host string) ([]IPAddr, error) {</code></span>
+<span class="codeline" id="line-262"><code>	// Make sure that no matter what we do later, host=="" is rejected.</code></span>
+<span class="codeline" id="line-263"><code>	// parseIP, for example, does accept empty strings.</code></span>
+<span class="codeline" id="line-264"><code>	if host == "" {</code></span>
+<span class="codeline" id="line-265"><code>		return nil, &amp;DNSError{Err: errNoSuchHost.Error(), Name: host, IsNotFound: true}</code></span>
+<span class="codeline" id="line-266"><code>	}</code></span>
+<span class="codeline" id="line-267"><code>	if ip, zone := parseIPZone(host); ip != nil {</code></span>
+<span class="codeline" id="line-268"><code>		return []IPAddr{{IP: ip, Zone: zone}}, nil</code></span>
+<span class="codeline" id="line-269"><code>	}</code></span>
+<span class="codeline" id="line-270"><code>	trace, _ := ctx.Value(nettrace.TraceKey{}).(*nettrace.Trace)</code></span>
+<span class="codeline" id="line-271"><code>	if trace != nil &amp;&amp; trace.DNSStart != nil {</code></span>
+<span class="codeline" id="line-272"><code>		trace.DNSStart(host)</code></span>
+<span class="codeline" id="line-273"><code>	}</code></span>
+<span class="codeline" id="line-274"><code>	// The underlying resolver func is lookupIP by default but it</code></span>
+<span class="codeline" id="line-275"><code>	// can be overridden by tests. This is needed by net/http, so it</code></span>
+<span class="codeline" id="line-276"><code>	// uses a context key instead of unexported variables.</code></span>
+<span class="codeline" id="line-277"><code>	resolverFunc := r.lookupIP</code></span>
+<span class="codeline" id="line-278"><code>	if alt, _ := ctx.Value(nettrace.LookupIPAltResolverKey{}).(func(context.Context, string, string) ([]IPAddr, error)); alt != nil {</code></span>
+<span class="codeline" id="line-279"><code>		resolverFunc = alt</code></span>
+<span class="codeline" id="line-280"><code>	}</code></span>
+<span class="codeline" id="line-281"><code></code></span>
+<span class="codeline" id="line-282"><code>	// We don't want a cancellation of ctx to affect the</code></span>
+<span class="codeline" id="line-283"><code>	// lookupGroup operation. Otherwise if our context gets</code></span>
+<span class="codeline" id="line-284"><code>	// canceled it might cause an error to be returned to a lookup</code></span>
+<span class="codeline" id="line-285"><code>	// using a completely different context. However we need to preserve</code></span>
+<span class="codeline" id="line-286"><code>	// only the values in context. See Issue 28600.</code></span>
+<span class="codeline" id="line-287"><code>	lookupGroupCtx, lookupGroupCancel := context.WithCancel(withUnexpiredValuesPreserved(ctx))</code></span>
+<span class="codeline" id="line-288"><code></code></span>
+<span class="codeline" id="line-289"><code>	lookupKey := network + "\000" + host</code></span>
+<span class="codeline" id="line-290"><code>	dnsWaitGroup.Add(1)</code></span>
+<span class="codeline" id="line-291"><code>	ch, called := r.getLookupGroup().DoChan(lookupKey, func() (interface{}, error) {</code></span>
+<span class="codeline" id="line-292"><code>		defer dnsWaitGroup.Done()</code></span>
+<span class="codeline" id="line-293"><code>		return testHookLookupIP(lookupGroupCtx, resolverFunc, network, host)</code></span>
+<span class="codeline" id="line-294"><code>	})</code></span>
+<span class="codeline" id="line-295"><code>	if !called {</code></span>
+<span class="codeline" id="line-296"><code>		dnsWaitGroup.Done()</code></span>
+<span class="codeline" id="line-297"><code>	}</code></span>
+<span class="codeline" id="line-298"><code></code></span>
+<span class="codeline" id="line-299"><code>	select {</code></span>
+<span class="codeline" id="line-300"><code>	case &lt;-ctx.Done():</code></span>
+<span class="codeline" id="line-301"><code>		// Our context was canceled. If we are the only</code></span>
+<span class="codeline" id="line-302"><code>		// goroutine looking up this key, then drop the key</code></span>
+<span class="codeline" id="line-303"><code>		// from the lookupGroup and cancel the lookup.</code></span>
+<span class="codeline" id="line-304"><code>		// If there are other goroutines looking up this key,</code></span>
+<span class="codeline" id="line-305"><code>		// let the lookup continue uncanceled, and let later</code></span>
+<span class="codeline" id="line-306"><code>		// lookups with the same key share the result.</code></span>
+<span class="codeline" id="line-307"><code>		// See issues 8602, 20703, 22724.</code></span>
+<span class="codeline" id="line-308"><code>		if r.getLookupGroup().ForgetUnshared(lookupKey) {</code></span>
+<span class="codeline" id="line-309"><code>			lookupGroupCancel()</code></span>
+<span class="codeline" id="line-310"><code>		} else {</code></span>
+<span class="codeline" id="line-311"><code>			go func() {</code></span>
+<span class="codeline" id="line-312"><code>				&lt;-ch</code></span>
+<span class="codeline" id="line-313"><code>				lookupGroupCancel()</code></span>
+<span class="codeline" id="line-314"><code>			}()</code></span>
+<span class="codeline" id="line-315"><code>		}</code></span>
+<span class="codeline" id="line-316"><code>		err := mapErr(ctx.Err())</code></span>
+<span class="codeline" id="line-317"><code>		if trace != nil &amp;&amp; trace.DNSDone != nil {</code></span>
+<span class="codeline" id="line-318"><code>			trace.DNSDone(nil, false, err)</code></span>
+<span class="codeline" id="line-319"><code>		}</code></span>
+<span class="codeline" id="line-320"><code>		return nil, err</code></span>
+<span class="codeline" id="line-321"><code>	case r := &lt;-ch:</code></span>
+<span class="codeline" id="line-322"><code>		lookupGroupCancel()</code></span>
+<span class="codeline" id="line-323"><code>		if trace != nil &amp;&amp; trace.DNSDone != nil {</code></span>
+<span class="codeline" id="line-324"><code>			addrs, _ := r.Val.([]IPAddr)</code></span>
+<span class="codeline" id="line-325"><code>			trace.DNSDone(ipAddrsEface(addrs), r.Shared, r.Err)</code></span>
+<span class="codeline" id="line-326"><code>		}</code></span>
+<span class="codeline" id="line-327"><code>		return lookupIPReturn(r.Val, r.Err, r.Shared)</code></span>
+<span class="codeline" id="line-328"><code>	}</code></span>
+<span class="codeline" id="line-329"><code>}</code></span>
+<span class="codeline" id="line-330"><code></code></span>
+<span class="codeline" id="line-331"><code>// lookupIPReturn turns the return values from singleflight.Do into</code></span>
+<span class="codeline" id="line-332"><code>// the return values from LookupIP.</code></span>
+<span class="codeline" id="line-333"><code>func lookupIPReturn(addrsi interface{}, err error, shared bool) ([]IPAddr, error) {</code></span>
+<span class="codeline" id="line-334"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-335"><code>		return nil, err</code></span>
+<span class="codeline" id="line-336"><code>	}</code></span>
+<span class="codeline" id="line-337"><code>	addrs := addrsi.([]IPAddr)</code></span>
+<span class="codeline" id="line-338"><code>	if shared {</code></span>
+<span class="codeline" id="line-339"><code>		clone := make([]IPAddr, len(addrs))</code></span>
+<span class="codeline" id="line-340"><code>		copy(clone, addrs)</code></span>
+<span class="codeline" id="line-341"><code>		addrs = clone</code></span>
+<span class="codeline" id="line-342"><code>	}</code></span>
+<span class="codeline" id="line-343"><code>	return addrs, nil</code></span>
+<span class="codeline" id="line-344"><code>}</code></span>
+<span class="codeline" id="line-345"><code></code></span>
+<span class="codeline" id="line-346"><code>// ipAddrsEface returns an empty interface slice of addrs.</code></span>
+<span class="codeline" id="line-347"><code>func ipAddrsEface(addrs []IPAddr) []interface{} {</code></span>
+<span class="codeline" id="line-348"><code>	s := make([]interface{}, len(addrs))</code></span>
+<span class="codeline" id="line-349"><code>	for i, v := range addrs {</code></span>
+<span class="codeline" id="line-350"><code>		s[i] = v</code></span>
+<span class="codeline" id="line-351"><code>	}</code></span>
+<span class="codeline" id="line-352"><code>	return s</code></span>
+<span class="codeline" id="line-353"><code>}</code></span>
+<span class="codeline" id="line-354"><code></code></span>
+<span class="codeline" id="line-355"><code>// LookupPort looks up the port for the given network and service.</code></span>
+<span class="codeline" id="line-356"><code>func LookupPort(network, service string) (port int, err error) {</code></span>
+<span class="codeline" id="line-357"><code>	return DefaultResolver.LookupPort(context.Background(), network, service)</code></span>
+<span class="codeline" id="line-358"><code>}</code></span>
+<span class="codeline" id="line-359"><code></code></span>
+<span class="codeline" id="line-360"><code>// LookupPort looks up the port for the given network and service.</code></span>
+<span class="codeline" id="line-361"><code>func (r *Resolver) LookupPort(ctx context.Context, network, service string) (port int, err error) {</code></span>
+<span class="codeline" id="line-362"><code>	port, needsLookup := parsePort(service)</code></span>
+<span class="codeline" id="line-363"><code>	if needsLookup {</code></span>
+<span class="codeline" id="line-364"><code>		switch network {</code></span>
+<span class="codeline" id="line-365"><code>		case "tcp", "tcp4", "tcp6", "udp", "udp4", "udp6":</code></span>
+<span class="codeline" id="line-366"><code>		case "": // a hint wildcard for Go 1.0 undocumented behavior</code></span>
+<span class="codeline" id="line-367"><code>			network = "ip"</code></span>
+<span class="codeline" id="line-368"><code>		default:</code></span>
+<span class="codeline" id="line-369"><code>			return 0, &amp;AddrError{Err: "unknown network", Addr: network}</code></span>
+<span class="codeline" id="line-370"><code>		}</code></span>
+<span class="codeline" id="line-371"><code>		port, err = r.lookupPort(ctx, network, service)</code></span>
+<span class="codeline" id="line-372"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-373"><code>			return 0, err</code></span>
+<span class="codeline" id="line-374"><code>		}</code></span>
+<span class="codeline" id="line-375"><code>	}</code></span>
+<span class="codeline" id="line-376"><code>	if 0 &gt; port || port &gt; 65535 {</code></span>
+<span class="codeline" id="line-377"><code>		return 0, &amp;AddrError{Err: "invalid port", Addr: service}</code></span>
+<span class="codeline" id="line-378"><code>	}</code></span>
+<span class="codeline" id="line-379"><code>	return port, nil</code></span>
+<span class="codeline" id="line-380"><code>}</code></span>
+<span class="codeline" id="line-381"><code></code></span>
+<span class="codeline" id="line-382"><code>// LookupCNAME returns the canonical name for the given host.</code></span>
+<span class="codeline" id="line-383"><code>// Callers that do not care about the canonical name can call</code></span>
+<span class="codeline" id="line-384"><code>// LookupHost or LookupIP directly; both take care of resolving</code></span>
+<span class="codeline" id="line-385"><code>// the canonical name as part of the lookup.</code></span>
+<span class="codeline" id="line-386"><code>//</code></span>
+<span class="codeline" id="line-387"><code>// A canonical name is the final name after following zero</code></span>
+<span class="codeline" id="line-388"><code>// or more CNAME records.</code></span>
+<span class="codeline" id="line-389"><code>// LookupCNAME does not return an error if host does not</code></span>
+<span class="codeline" id="line-390"><code>// contain DNS "CNAME" records, as long as host resolves to</code></span>
+<span class="codeline" id="line-391"><code>// address records.</code></span>
+<span class="codeline" id="line-392"><code>func LookupCNAME(host string) (cname string, err error) {</code></span>
+<span class="codeline" id="line-393"><code>	return DefaultResolver.lookupCNAME(context.Background(), host)</code></span>
+<span class="codeline" id="line-394"><code>}</code></span>
+<span class="codeline" id="line-395"><code></code></span>
+<span class="codeline" id="line-396"><code>// LookupCNAME returns the canonical name for the given host.</code></span>
+<span class="codeline" id="line-397"><code>// Callers that do not care about the canonical name can call</code></span>
+<span class="codeline" id="line-398"><code>// LookupHost or LookupIP directly; both take care of resolving</code></span>
+<span class="codeline" id="line-399"><code>// the canonical name as part of the lookup.</code></span>
+<span class="codeline" id="line-400"><code>//</code></span>
+<span class="codeline" id="line-401"><code>// A canonical name is the final name after following zero</code></span>
+<span class="codeline" id="line-402"><code>// or more CNAME records.</code></span>
+<span class="codeline" id="line-403"><code>// LookupCNAME does not return an error if host does not</code></span>
+<span class="codeline" id="line-404"><code>// contain DNS "CNAME" records, as long as host resolves to</code></span>
+<span class="codeline" id="line-405"><code>// address records.</code></span>
+<span class="codeline" id="line-406"><code>func (r *Resolver) LookupCNAME(ctx context.Context, host string) (cname string, err error) {</code></span>
+<span class="codeline" id="line-407"><code>	return r.lookupCNAME(ctx, host)</code></span>
+<span class="codeline" id="line-408"><code>}</code></span>
+<span class="codeline" id="line-409"><code></code></span>
+<span class="codeline" id="line-410"><code>// LookupSRV tries to resolve an SRV query of the given service,</code></span>
+<span class="codeline" id="line-411"><code>// protocol, and domain name. The proto is "tcp" or "udp".</code></span>
+<span class="codeline" id="line-412"><code>// The returned records are sorted by priority and randomized</code></span>
+<span class="codeline" id="line-413"><code>// by weight within a priority.</code></span>
+<span class="codeline" id="line-414"><code>//</code></span>
+<span class="codeline" id="line-415"><code>// LookupSRV constructs the DNS name to look up following RFC 2782.</code></span>
+<span class="codeline" id="line-416"><code>// That is, it looks up _service._proto.name. To accommodate services</code></span>
+<span class="codeline" id="line-417"><code>// publishing SRV records under non-standard names, if both service</code></span>
+<span class="codeline" id="line-418"><code>// and proto are empty strings, LookupSRV looks up name directly.</code></span>
+<span class="codeline" id="line-419"><code>func LookupSRV(service, proto, name string) (cname string, addrs []*SRV, err error) {</code></span>
+<span class="codeline" id="line-420"><code>	return DefaultResolver.lookupSRV(context.Background(), service, proto, name)</code></span>
+<span class="codeline" id="line-421"><code>}</code></span>
+<span class="codeline" id="line-422"><code></code></span>
+<span class="codeline" id="line-423"><code>// LookupSRV tries to resolve an SRV query of the given service,</code></span>
+<span class="codeline" id="line-424"><code>// protocol, and domain name. The proto is "tcp" or "udp".</code></span>
+<span class="codeline" id="line-425"><code>// The returned records are sorted by priority and randomized</code></span>
+<span class="codeline" id="line-426"><code>// by weight within a priority.</code></span>
+<span class="codeline" id="line-427"><code>//</code></span>
+<span class="codeline" id="line-428"><code>// LookupSRV constructs the DNS name to look up following RFC 2782.</code></span>
+<span class="codeline" id="line-429"><code>// That is, it looks up _service._proto.name. To accommodate services</code></span>
+<span class="codeline" id="line-430"><code>// publishing SRV records under non-standard names, if both service</code></span>
+<span class="codeline" id="line-431"><code>// and proto are empty strings, LookupSRV looks up name directly.</code></span>
+<span class="codeline" id="line-432"><code>func (r *Resolver) LookupSRV(ctx context.Context, service, proto, name string) (cname string, addrs []*SRV, err error) {</code></span>
+<span class="codeline" id="line-433"><code>	return r.lookupSRV(ctx, service, proto, name)</code></span>
+<span class="codeline" id="line-434"><code>}</code></span>
+<span class="codeline" id="line-435"><code></code></span>
+<span class="codeline" id="line-436"><code>// LookupMX returns the DNS MX records for the given domain name sorted by preference.</code></span>
+<span class="codeline" id="line-437"><code>func LookupMX(name string) ([]*MX, error) {</code></span>
+<span class="codeline" id="line-438"><code>	return DefaultResolver.lookupMX(context.Background(), name)</code></span>
+<span class="codeline" id="line-439"><code>}</code></span>
+<span class="codeline" id="line-440"><code></code></span>
+<span class="codeline" id="line-441"><code>// LookupMX returns the DNS MX records for the given domain name sorted by preference.</code></span>
+<span class="codeline" id="line-442"><code>func (r *Resolver) LookupMX(ctx context.Context, name string) ([]*MX, error) {</code></span>
+<span class="codeline" id="line-443"><code>	return r.lookupMX(ctx, name)</code></span>
+<span class="codeline" id="line-444"><code>}</code></span>
+<span class="codeline" id="line-445"><code></code></span>
+<span class="codeline" id="line-446"><code>// LookupNS returns the DNS NS records for the given domain name.</code></span>
+<span class="codeline" id="line-447"><code>func LookupNS(name string) ([]*NS, error) {</code></span>
+<span class="codeline" id="line-448"><code>	return DefaultResolver.lookupNS(context.Background(), name)</code></span>
+<span class="codeline" id="line-449"><code>}</code></span>
+<span class="codeline" id="line-450"><code></code></span>
+<span class="codeline" id="line-451"><code>// LookupNS returns the DNS NS records for the given domain name.</code></span>
+<span class="codeline" id="line-452"><code>func (r *Resolver) LookupNS(ctx context.Context, name string) ([]*NS, error) {</code></span>
+<span class="codeline" id="line-453"><code>	return r.lookupNS(ctx, name)</code></span>
+<span class="codeline" id="line-454"><code>}</code></span>
+<span class="codeline" id="line-455"><code></code></span>
+<span class="codeline" id="line-456"><code>// LookupTXT returns the DNS TXT records for the given domain name.</code></span>
+<span class="codeline" id="line-457"><code>func LookupTXT(name string) ([]string, error) {</code></span>
+<span class="codeline" id="line-458"><code>	return DefaultResolver.lookupTXT(context.Background(), name)</code></span>
+<span class="codeline" id="line-459"><code>}</code></span>
+<span class="codeline" id="line-460"><code></code></span>
+<span class="codeline" id="line-461"><code>// LookupTXT returns the DNS TXT records for the given domain name.</code></span>
+<span class="codeline" id="line-462"><code>func (r *Resolver) LookupTXT(ctx context.Context, name string) ([]string, error) {</code></span>
+<span class="codeline" id="line-463"><code>	return r.lookupTXT(ctx, name)</code></span>
+<span class="codeline" id="line-464"><code>}</code></span>
+<span class="codeline" id="line-465"><code></code></span>
+<span class="codeline" id="line-466"><code>// LookupAddr performs a reverse lookup for the given address, returning a list</code></span>
+<span class="codeline" id="line-467"><code>// of names mapping to that address.</code></span>
+<span class="codeline" id="line-468"><code>//</code></span>
+<span class="codeline" id="line-469"><code>// When using the host C library resolver, at most one result will be</code></span>
+<span class="codeline" id="line-470"><code>// returned. To bypass the host resolver, use a custom Resolver.</code></span>
+<span class="codeline" id="line-471"><code>func LookupAddr(addr string) (names []string, err error) {</code></span>
+<span class="codeline" id="line-472"><code>	return DefaultResolver.lookupAddr(context.Background(), addr)</code></span>
+<span class="codeline" id="line-473"><code>}</code></span>
+<span class="codeline" id="line-474"><code></code></span>
+<span class="codeline" id="line-475"><code>// LookupAddr performs a reverse lookup for the given address, returning a list</code></span>
+<span class="codeline" id="line-476"><code>// of names mapping to that address.</code></span>
+<span class="codeline" id="line-477"><code>func (r *Resolver) LookupAddr(ctx context.Context, addr string) (names []string, err error) {</code></span>
+<span class="codeline" id="line-478"><code>	return r.lookupAddr(ctx, addr)</code></span>
+<span class="codeline" id="line-479"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

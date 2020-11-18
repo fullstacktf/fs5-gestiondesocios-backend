@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: reflect</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>reflect</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-reflect">reflect</a><i> (on <a href="https://golang.org/pkg/reflect/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/reflect" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/reflect.html">8 packages</a>, and imported by <a href="../dep/reflect.html#imported-by">21 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../src/reflect/deepequal.go.html">deepequal.go</a>
+	    <a href="../src/reflect/makefunc.go.html">makefunc.go</a>
+	    <a href="../src/reflect/swapper.go.html">swapper.go</a>
+	<a href="../src/reflect/type.go.html#doc">d-&gt;</a> <a href="../src/reflect/type.go.html">type.go</a>
+	    <a href="../src/reflect/value.go.html">value.go</a>
+	    <a href="../src/reflect/asm_amd64.s.html">asm_amd64.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-ChanDir" data-popularity="225">	 type <a href="../src/reflect/type.go.html#line-340">ChanDir</a> <a href="builtin.html#name-int">int</a>
+		ChanDir represents a channel type's direction.
+
+		<input type='checkbox' class="stat" id="ChanDir-stat-methods"><label for="ChanDir-stat-methods">One Exported Method</label><span id='ChanDir-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/reflect/type.go.html#line-1038">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ChanDir-stat-impls"><label for="ChanDir-stat-impls">Implements (1+)</label><span id='ChanDir-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="ChanDir-stat-results"><label for="ChanDir-stat-results">As Outputs Of (1+)</label><span id='ChanDir-stat-results-content' class="stat-content">
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-131">ChanDir</a>() <b>ChanDir</b></span>
+		<input type='checkbox' class="stat" id="ChanDir-stat-params"><label for="ChanDir-stat-params">As Inputs Of (1+)</label><span id='ChanDir-stat-params-content' class="stat-content">
+			func <a href="#name-ChanOf">ChanOf</a>(dir <b>ChanDir</b>, t <a href="#name-Type">Type</a>) <a href="#name-Type">Type</a></span>
+		<input type='checkbox' class="stat" id="ChanDir-stat-values"><label for="ChanDir-stat-values">As Types Of (3+)</label><span id='ChanDir-stat-values-content' class="stat-content">
+			const <a href="#name-BothDir">BothDir</a>
+			const <a href="#name-RecvDir">RecvDir</a>
+			const <a href="#name-SendDir">SendDir</a></span></div>
+<div class="anchor" id="name-Kind" data-popularity="265">	 type <a href="../src/reflect/type.go.html#line-230">Kind</a> <a href="builtin.html#name-uint">uint</a>
+		A Kind represents the specific kind of type that a Type represents.
+		The zero Kind is not a valid kind.
+
+		<input type='checkbox' class="stat" id="Kind-stat-methods"><label for="Kind-stat-methods">One Exported Method</label><span id='Kind-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/reflect/type.go.html#line-589">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Kind-stat-impls"><label for="Kind-stat-impls">Implements (1+)</label><span id='Kind-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Kind-stat-results"><label for="Kind-stat-results">As Outputs Of (2+)</label><span id='Kind-stat-results-content' class="stat-content">
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-98">Kind</a>() <b>Kind</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1139">Kind</a>() <b>Kind</b></span>
+		<input type='checkbox' class="stat" id="Kind-stat-values"><label for="Kind-stat-values">As Types Of (27+)</label><span id='Kind-stat-values-content' class="stat-content">
+			const <a href="#name-Array">Array</a>
+			const <a href="#name-Bool">Bool</a>
+			const <a href="#name-Chan">Chan</a>
+			const <a href="#name-Complex128">Complex128</a>
+			const <a href="#name-Complex64">Complex64</a>
+			const <a href="#name-Float32">Float32</a>
+			const <a href="#name-Float64">Float64</a>
+			const <a href="#name-Func">Func</a>
+			const <a href="#name-Int">Int</a>
+			const <a href="#name-Int16">Int16</a>
+			const <a href="#name-Int32">Int32</a>
+			const <a href="#name-Int64">Int64</a>
+			const <a href="#name-Int8">Int8</a>
+			const <a href="#name-Interface">Interface</a>
+			const <a href="#name-Invalid">Invalid</a>
+			const <a href="#name-Map">Map</a>
+			const <a href="#name-Ptr">Ptr</a>
+			const <a href="#name-Slice">Slice</a>
+			const <a href="#name-String">String</a>
+			const <a href="#name-Struct">Struct</a>
+			const <a href="#name-Uint">Uint</a>
+			const <a href="#name-Uint16">Uint16</a>
+			const <a href="#name-Uint32">Uint32</a>
+			const <a href="#name-Uint64">Uint64</a>
+			const <a href="#name-Uint8">Uint8</a>
+			const <a href="#name-Uintptr">Uintptr</a>
+			const <a href="#name-UnsafePointer">UnsafePointer</a></span></div>
+<div class="anchor" id="name-MapIter" data-popularity="225">	 type <a href="../src/reflect/value.go.html#line-1233">MapIter</a> <i>(struct)</i>
+		A MapIter is an iterator for ranging over a map.
+		See Value.MapRange.
+
+		<input type='checkbox' class="stat" id="MapIter-stat-methods"><label for="MapIter-stat-methods">Exported Methods (3)</label><span id='MapIter-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/reflect/value.go.html#line-1239">Key</a>() <a href="#name-Value">Value</a>
+			(*T) <a href="../src/reflect/value.go.html#line-1269">Next</a>() <a href="builtin.html#name-bool">bool</a>
+			(*T) <a href="../src/reflect/value.go.html#line-1253">Value</a>() <a href="#name-Value">Value</a></span>
+		<input type='checkbox' class="stat" id="MapIter-stat-results"><label for="MapIter-stat-results">As Outputs Of (1+)</label><span id='MapIter-stat-results-content' class="stat-content">
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1297">MapRange</a>() *<b>MapIter</b></span></div>
+<div class="anchor" id="name-Method" data-popularity="150">	 type <a href="../src/reflect/type.go.html#line-567">Method</a> <i>(struct)</i>
+		Method represents a single method.
+
+		<input type='checkbox' class="stat" id="Method-stat-fields"><label for="Method-stat-fields">Exported Fields (5)</label><span id='Method-stat-fields-content' class="stat-content">
+			<a href="../src/reflect/type.go.html#line-578">Func</a> <i><a href="#name-Value">Value</a></i>
+			<a href="../src/reflect/type.go.html#line-579">Index</a> <i><a href="builtin.html#name-int">int</a></i>
+			<a href="../src/reflect/type.go.html#line-574">Name</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/reflect/type.go.html#line-575">PkgPath</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/reflect/type.go.html#line-577">Type</a> <i><a href="#name-Type">Type</a></i></span>
+		<input type='checkbox' class="stat" id="Method-stat-results"><label for="Method-stat-results">As Outputs Of (2+)</label><span id='Method-stat-results-content' class="stat-content">
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-60">Method</a>(<a href="builtin.html#name-int">int</a>) <b>Method</b>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-70">MethodByName</a>(<a href="builtin.html#name-string">string</a>) (<b>Method</b>, <a href="builtin.html#name-bool">bool</a>)</span></div>
+<div class="anchor" id="name-SelectCase" data-popularity="35">	 type <a href="../src/reflect/value.go.html#line-2155">SelectCase</a> <i>(struct)</i>
+		A SelectCase describes a single case in a select operation.
+		The kind of case depends on Dir, the communication direction.
+
+		If Dir is SelectDefault, the case represents a default case.
+		Chan and Send must be zero Values.
+
+		If Dir is SelectSend, the case represents a send operation.
+		Normally Chan's underlying value must be a channel, and Send's underlying value must be
+		assignable to the channel's element type. As a special case, if Chan is a zero Value,
+		then the case is ignored, and the field Send will also be ignored and may be either zero
+		or non-zero.
+
+		If Dir is SelectRecv, the case represents a receive operation.
+		Normally Chan's underlying value must be a channel and Send must be a zero Value.
+		If Chan is a zero Value, then the case is ignored, but Send must still be a zero Value.
+		When a receive operation is selected, the received Value is returned by Select.
+
+		<input type='checkbox' class="stat" id="SelectCase-stat-fields"><label for="SelectCase-stat-fields">Exported Fields (3)</label><span id='SelectCase-stat-fields-content' class="stat-content">
+			<a href="../src/reflect/value.go.html#line-2157">Chan</a> <i><a href="#name-Value">Value</a></i>
+			<a href="../src/reflect/value.go.html#line-2156">Dir</a> <i><a href="#name-SelectDir">SelectDir</a></i>
+			<a href="../src/reflect/value.go.html#line-2158">Send</a> <i><a href="#name-Value">Value</a></i></span>
+		<input type='checkbox' class="stat" id="SelectCase-stat-params"><label for="SelectCase-stat-params">As Inputs Of (1+)</label><span id='SelectCase-stat-params-content' class="stat-content">
+			func <a href="#name-Select">Select</a>(cases []<b>SelectCase</b>) (chosen <a href="builtin.html#name-int">int</a>, recv <a href="#name-Value">Value</a>, recvOK <a href="builtin.html#name-bool">bool</a>)</span></div>
+<div class="anchor" id="name-SelectDir" data-popularity="15">	 type <a href="../src/reflect/value.go.html#line-2127">SelectDir</a> <a href="builtin.html#name-int">int</a>
+		A SelectDir describes the communication direction of a select case.
+
+		<input type='checkbox' class="stat" id="SelectDir-stat-values"><label for="SelectDir-stat-values">As Types Of (3+)</label><span id='SelectDir-stat-values-content' class="stat-content">
+			const <a href="#name-SelectDefault">SelectDefault</a>
+			const <a href="#name-SelectRecv">SelectRecv</a>
+			const <a href="#name-SelectSend">SelectSend</a></span></div>
+<div class="anchor" id="name-SliceHeader" data-popularity="0">	 type <a href="../src/reflect/value.go.html#line-1980">SliceHeader</a> <i>(struct)</i>
+		SliceHeader is the runtime representation of a slice.
+		It cannot be used safely or portably and its representation may
+		change in a later release.
+		Moreover, the Data field is not sufficient to guarantee the data
+		it references will not be garbage collected, so programs must keep
+		a separate, correctly typed pointer to the underlying data.
+
+		<input type='checkbox' class="stat" id="SliceHeader-stat-fields"><label for="SliceHeader-stat-fields">Exported Fields (3)</label><span id='SliceHeader-stat-fields-content' class="stat-content">
+			<a href="../src/reflect/value.go.html#line-1983">Cap</a> <i><a href="builtin.html#name-int">int</a></i>
+			<a href="../src/reflect/value.go.html#line-1981">Data</a> <i><a href="builtin.html#name-uintptr">uintptr</a></i>
+			<a href="../src/reflect/value.go.html#line-1982">Len</a> <i><a href="builtin.html#name-int">int</a></i></span></div>
+<div class="anchor" id="name-StringHeader" data-popularity="0">	 type <a href="../src/reflect/value.go.html#line-1969">StringHeader</a> <i>(struct)</i>
+		StringHeader is the runtime representation of a string.
+		It cannot be used safely or portably and its representation may
+		change in a later release.
+		Moreover, the Data field is not sufficient to guarantee the data
+		it references will not be garbage collected, so programs must keep
+		a separate, correctly typed pointer to the underlying data.
+
+		<input type='checkbox' class="stat" id="StringHeader-stat-fields"><label for="StringHeader-stat-fields">Exported Fields (2)</label><span id='StringHeader-stat-fields-content' class="stat-content">
+			<a href="../src/reflect/value.go.html#line-1970">Data</a> <i><a href="builtin.html#name-uintptr">uintptr</a></i>
+			<a href="../src/reflect/value.go.html#line-1971">Len</a> <i><a href="builtin.html#name-int">int</a></i></span></div>
+<div class="anchor" id="name-StructField" data-popularity="370">	 type <a href="../src/reflect/type.go.html#line-1088">StructField</a> <i>(struct)</i>
+		A StructField describes a single field in a struct.
+
+		<input type='checkbox' class="stat" id="StructField-stat-fields"><label for="StructField-stat-fields">Exported Fields (7)</label><span id='StructField-stat-fields-content' class="stat-content">
+			<a href="../src/reflect/type.go.html#line-1100">Anonymous</a> <i><a href="builtin.html#name-bool">bool</a></i>
+			<a href="../src/reflect/type.go.html#line-1099">Index</a> <i>[]<a href="builtin.html#name-int">int</a></i>
+			<a href="../src/reflect/type.go.html#line-1090">Name</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/reflect/type.go.html#line-1098">Offset</a> <i><a href="builtin.html#name-uintptr">uintptr</a></i>
+			<a href="../src/reflect/type.go.html#line-1094">PkgPath</a> <i><a href="builtin.html#name-string">string</a></i>
+			<a href="../src/reflect/type.go.html#line-1097">Tag</a> <i><a href="#name-StructTag">StructTag</a></i>
+			<a href="../src/reflect/type.go.html#line-1096">Type</a> <i><a href="#name-Type">Type</a></i></span>
+		<input type='checkbox' class="stat" id="StructField-stat-results"><label for="StructField-stat-results">As Outputs Of (4+)</label><span id='StructField-stat-results-content' class="stat-content">
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-154">Field</a>(i <a href="builtin.html#name-int">int</a>) <b>StructField</b>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-160">FieldByIndex</a>(index []<a href="builtin.html#name-int">int</a>) <b>StructField</b>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-164">FieldByName</a>(name <a href="builtin.html#name-string">string</a>) (<b>StructField</b>, <a href="builtin.html#name-bool">bool</a>)
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-178">FieldByNameFunc</a>(match func(<a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>) (<b>StructField</b>, <a href="builtin.html#name-bool">bool</a>)</span>
+		<input type='checkbox' class="stat" id="StructField-stat-params"><label for="StructField-stat-params">As Inputs Of (2+)</label><span id='StructField-stat-params-content' class="stat-content">
+			func <a href="#name-StructOf">StructOf</a>(fields []<b>StructField</b>) <a href="#name-Type">Type</a>
+			func gorm.io/gorm/schema.(*<a href="gorm.io/gorm/schema.html#name-Schema">Schema</a>).<a href="../src/gorm.io/gorm/schema/field.go.html#line-74">ParseField</a>(fieldStruct <b>StructField</b>) *<a href="gorm.io/gorm/schema.html">schema</a>.<a href="gorm.io/gorm/schema.html#name-Field">Field</a></span></div>
+<div class="anchor" id="name-StructTag" data-popularity="100">	 type <a href="../src/reflect/type.go.html#line-1111">StructTag</a> <a href="builtin.html#name-string">string</a>
+		A StructTag is the tag string in a struct field.
+
+		By convention, tag strings are a concatenation of
+		optionally space-separated key:"value" pairs.
+		Each key is a non-empty string consisting of non-control
+		characters other than space (U+0020 ' '), quote (U+0022 '"'),
+		and colon (U+003A ':').  Each value is quoted using U+0022 '"'
+		characters and Go string literal syntax.
+
+		<input type='checkbox' class="stat" id="StructTag-stat-methods"><label for="StructTag-stat-methods">Exported Methods (2)</label><span id='StructTag-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/reflect/type.go.html#line-1118">Get</a>(key <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/reflect/type.go.html#line-1129">Lookup</a>(key <a href="builtin.html#name-string">string</a>) (value <a href="builtin.html#name-string">string</a>, ok <a href="builtin.html#name-bool">bool</a>)</span></div>
+<div class="anchor" id="name-Type" data-popularity="3260">	 type <a href="../src/reflect/type.go.html#line-38">Type</a> <b<i>(interface)</i></b>
+		Type is the representation of a Go type.
+
+		Not all methods apply to all kinds of types. Restrictions,
+		if any, are noted in the documentation for each method.
+		Use the Kind method to find out the kind of type before
+		calling kind-specific methods. Calling a method
+		inappropriate to the kind of type causes a run-time panic.
+
+		Type values are comparable, such as with the == operator,
+		so they can be used as map keys.
+		Two Type values are equal if they represent identical types.
+
+		<input type='checkbox' class="stat" id="Type-stat-methods"><label for="Type-stat-methods">Exported Methods (29)</label><span id='Type-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/reflect/type.go.html#line-43">Align</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-104">AssignableTo</a>(u <b>Type</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/type.go.html#line-127">Bits</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-131">ChanDir</a>() <a href="#name-ChanDir">ChanDir</a>
+			 (T) <a href="../src/reflect/type.go.html#line-110">Comparable</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/type.go.html#line-107">ConvertibleTo</a>(u <b>Type</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/type.go.html#line-149">Elem</a>() <b>Type</b>
+			 (T) <a href="../src/reflect/type.go.html#line-154">Field</a>(i <a href="builtin.html#name-int">int</a>) <a href="#name-StructField">StructField</a>
+			 (T) <a href="../src/reflect/type.go.html#line-47">FieldAlign</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-160">FieldByIndex</a>(index []<a href="builtin.html#name-int">int</a>) <a href="#name-StructField">StructField</a>
+			 (T) <a href="../src/reflect/type.go.html#line-164">FieldByName</a>(name <a href="builtin.html#name-string">string</a>) (<a href="#name-StructField">StructField</a>, <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/reflect/type.go.html#line-178">FieldByNameFunc</a>(match func(<a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>) (<a href="#name-StructField">StructField</a>, <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/reflect/type.go.html#line-101">Implements</a>(u <b>Type</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/type.go.html#line-183">In</a>(i <a href="builtin.html#name-int">int</a>) <b>Type</b>
+			 (T) <a href="../src/reflect/type.go.html#line-145">IsVariadic</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/type.go.html#line-187">Key</a>() <b>Type</b>
+			 (T) <a href="../src/reflect/type.go.html#line-98">Kind</a>() <a href="#name-Kind">Kind</a>
+			 (T) <a href="../src/reflect/type.go.html#line-191">Len</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-60">Method</a>(<a href="builtin.html#name-int">int</a>) <a href="#name-Method">Method</a>
+			 (T) <a href="../src/reflect/type.go.html#line-70">MethodByName</a>(<a href="builtin.html#name-string">string</a>) (<a href="#name-Method">Method</a>, <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/reflect/type.go.html#line-77">Name</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/reflect/type.go.html#line-195">NumField</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-199">NumIn</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-73">NumMethod</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-203">NumOut</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/type.go.html#line-208">Out</a>(i <a href="builtin.html#name-int">int</a>) <b>Type</b>
+			 (T) <a href="../src/reflect/type.go.html#line-84">PkgPath</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/reflect/type.go.html#line-88">Size</a>() <a href="builtin.html#name-uintptr">uintptr</a>
+			 (T) <a href="../src/reflect/type.go.html#line-95">String</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Type-stat-impls"><label for="Type-stat-impls">Implements (1+)</label><span id='Type-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Type-stat-results"><label for="Type-stat-results">As Outputs Of (15+)</label><span id='Type-stat-results-content' class="stat-content">
+			func <a href="#name-ArrayOf">ArrayOf</a>(count <a href="builtin.html#name-int">int</a>, elem <b>Type</b>) <b>Type</b>
+			func <a href="#name-ChanOf">ChanOf</a>(dir <a href="#name-ChanDir">ChanDir</a>, t <b>Type</b>) <b>Type</b>
+			func <a href="#name-FuncOf">FuncOf</a>(in, out []<b>Type</b>, variadic <a href="builtin.html#name-bool">bool</a>) <b>Type</b>
+			func <a href="#name-MapOf">MapOf</a>(key, elem <b>Type</b>) <b>Type</b>
+			func <a href="#name-PtrTo">PtrTo</a>(t <b>Type</b>) <b>Type</b>
+			func <a href="#name-SliceOf">SliceOf</a>(t <b>Type</b>) <b>Type</b>
+			func <a href="#name-StructOf">StructOf</a>(fields []<a href="#name-StructField">StructField</a>) <b>Type</b>
+			func <a href="#name-TypeOf">TypeOf</a>(i interface{}) <b>Type</b>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-149">Elem</a>() <b>Type</b>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-183">In</a>(i <a href="builtin.html#name-int">int</a>) <b>Type</b>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-187">Key</a>() <b>Type</b>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-208">Out</a>(i <a href="builtin.html#name-int">int</a>) <b>Type</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1891">Type</a>() <b>Type</b>
+			func database/sql.(*<a href="database/sql.html#name-ColumnType">ColumnType</a>).<a href="../src/database/sql/sql.go.html#line-3005">ScanType</a>() <b>Type</b>
+			func database/sql/driver.<a href="database/sql/driver.html#name-RowsColumnTypeScanType">RowsColumnTypeScanType</a>.<a href="../src/database/sql/driver/driver.go.html#line-460">ColumnTypeScanType</a>(index <a href="builtin.html#name-int">int</a>) <b>Type</b></span>
+		<input type='checkbox' class="stat" id="Type-stat-params"><label for="Type-stat-params">As Inputs Of (18+)</label><span id='Type-stat-params-content' class="stat-content">
+			func <a href="#name-ArrayOf">ArrayOf</a>(count <a href="builtin.html#name-int">int</a>, elem <b>Type</b>) <b>Type</b>
+			func <a href="#name-ChanOf">ChanOf</a>(dir <a href="#name-ChanDir">ChanDir</a>, t <b>Type</b>) <b>Type</b>
+			func <a href="#name-FuncOf">FuncOf</a>(in, out []<b>Type</b>, variadic <a href="builtin.html#name-bool">bool</a>) <b>Type</b>
+			func <a href="#name-MakeChan">MakeChan</a>(typ <b>Type</b>, buffer <a href="builtin.html#name-int">int</a>) <a href="#name-Value">Value</a>
+			func <a href="#name-MakeFunc">MakeFunc</a>(typ <b>Type</b>, fn func(args []<a href="#name-Value">Value</a>) (results []<a href="#name-Value">Value</a>)) <a href="#name-Value">Value</a>
+			func <a href="#name-MakeMap">MakeMap</a>(typ <b>Type</b>) <a href="#name-Value">Value</a>
+			func <a href="#name-MakeMapWithSize">MakeMapWithSize</a>(typ <b>Type</b>, n <a href="builtin.html#name-int">int</a>) <a href="#name-Value">Value</a>
+			func <a href="#name-MakeSlice">MakeSlice</a>(typ <b>Type</b>, len, cap <a href="builtin.html#name-int">int</a>) <a href="#name-Value">Value</a>
+			func <a href="#name-MapOf">MapOf</a>(key, elem <b>Type</b>) <b>Type</b>
+			func <a href="#name-New">New</a>(typ <b>Type</b>) <a href="#name-Value">Value</a>
+			func <a href="#name-NewAt">NewAt</a>(typ <b>Type</b>, p <a href="unsafe.html">unsafe</a>.<a href="unsafe.html#name-Pointer">Pointer</a>) <a href="#name-Value">Value</a>
+			func <a href="#name-PtrTo">PtrTo</a>(t <b>Type</b>) <b>Type</b>
+			func <a href="#name-SliceOf">SliceOf</a>(t <b>Type</b>) <b>Type</b>
+			func <a href="#name-Zero">Zero</a>(typ <b>Type</b>) <a href="#name-Value">Value</a>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-104">AssignableTo</a>(u <b>Type</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-107">ConvertibleTo</a>(u <b>Type</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Type">Type</a>.<a href="../src/reflect/type.go.html#line-101">Implements</a>(u <b>Type</b>) <a href="builtin.html#name-bool">bool</a>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-2431">Convert</a>(t <b>Type</b>) <a href="#name-Value">Value</a></span>
+		<input type='checkbox' class="stat" id="Type-stat-values"><label for="Type-stat-values">As Types Of (1+)</label><span id='Type-stat-values-content' class="stat-content">
+			  var gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-TimeReflectType">TimeReflectType</a></span></div>
+<div class="anchor" id="name-Value" data-popularity="6520">	 type <a href="../src/reflect/value.go.html#line-37">Value</a> <i>(struct)</i>
+		Value is the reflection interface to a Go value.
+
+		Not all methods apply to all kinds of values. Restrictions,
+		if any, are noted in the documentation for each method.
+		Use the Kind method to find out the kind of value before
+		calling kind-specific methods. Calling a method
+		inappropriate to the kind of type causes a run time panic.
+
+		The zero Value represents no value.
+		Its IsValid method returns false, its Kind method returns Invalid,
+		its String method returns "&lt;invalid Value&gt;", and all other methods panic.
+		Most functions and methods never return an invalid value.
+		If one does, its documentation states the conditions explicitly.
+
+		A Value can be used concurrently by multiple goroutines provided that
+		the underlying Go value can be used concurrently for the equivalent
+		direct operations.
+
+		To compare two Values, compare the results of the Interface method.
+		Using == on two Values does not compare the underlying values
+		they represent.
+
+		<input type='checkbox' class="stat" id="Value-stat-methods"><label for="Value-stat-methods">Exported Methods (61)</label><span id='Value-stat-methods-content' class="stat-content">
+			 (T) <a href="../src/reflect/value.go.html#line-268">Addr</a>() <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-280">Bool</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-287">Bytes</a>() []<a href="builtin.html#name-byte">byte</a>
+			 (T) <a href="../src/reflect/value.go.html#line-333">Call</a>(in []<b>Value</b>) []<b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-346">CallSlice</a>(in []<b>Value</b>) []<b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-312">CanAddr</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1002">CanInterface</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-321">CanSet</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-771">Cap</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/value.go.html#line-787">Close</a>()
+			 (T) <a href="../src/reflect/value.go.html#line-795">Complex</a>() <a href="builtin.html#name-complex128">complex128</a>
+			 (T) <a href="../src/reflect/value.go.html#line-2431">Convert</a>(t <a href="#name-Type">Type</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-810">Elem</a>() <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-847">Field</a>(i <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-879">FieldByIndex</a>(index []<a href="builtin.html#name-int">int</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-901">FieldByName</a>(name <a href="builtin.html#name-string">string</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-913">FieldByNameFunc</a>(match func(<a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-922">Float</a>() <a href="builtin.html#name-float64">float64</a>
+			 (T) <a href="../src/reflect/value.go.html#line-937">Index</a>(i <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-983">Int</a>() <a href="builtin.html#name-int64">int64</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1014">Interface</a>() (i interface{})
+			 (T) <a href="../src/reflect/value.go.html#line-1050">InterfaceData</a>() [2]<a href="builtin.html#name-uintptr">uintptr</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1068">IsNil</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1093">IsValid</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1099">IsZero</a>() <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1139">Kind</a>() <a href="#name-Kind">Kind</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1145">Len</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1169">MapIndex</a>(key <b>Value</b>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-1202">MapKeys</a>() []<b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-1297">MapRange</a>() *<a href="#name-MapIter">MapIter</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1319">Method</a>(i <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-1351">MethodByName</a>(name <a href="builtin.html#name-string">string</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-1367">NumField</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1336">NumMethod</a>() <a href="builtin.html#name-int">int</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1375">OverflowComplex</a>(x <a href="builtin.html#name-complex128">complex128</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1388">OverflowFloat</a>(x <a href="builtin.html#name-float64">float64</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1408">OverflowInt</a>(x <a href="builtin.html#name-int64">int64</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1421">OverflowUint</a>(x <a href="builtin.html#name-uint64">uint64</a>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1451">Pointer</a>() <a href="builtin.html#name-uintptr">uintptr</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1487">Recv</a>() (x <b>Value</b>, ok <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1520">Send</a>(x <b>Value</b>)
+			 (T) <a href="../src/reflect/value.go.html#line-1547">Set</a>(x <b>Value</b>)
+			 (T) <a href="../src/reflect/value.go.html#line-1564">SetBool</a>(x <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1572">SetBytes</a>(x []<a href="builtin.html#name-byte">byte</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1656">SetCap</a>(n <a href="builtin.html#name-int">int</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1594">SetComplex</a>(x <a href="builtin.html#name-complex128">complex128</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1608">SetFloat</a>(x <a href="builtin.html#name-float64">float64</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1622">SetInt</a>(x <a href="builtin.html#name-int64">int64</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1643">SetLen</a>(n <a href="builtin.html#name-int">int</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1672">SetMapIndex</a>(key, elem <b>Value</b>)
+			 (T) <a href="../src/reflect/value.go.html#line-1723">SetPointer</a>(x <a href="unsafe.html">unsafe</a>.<a href="unsafe.html#name-Pointer">Pointer</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1731">SetString</a>(x <a href="builtin.html#name-string">string</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1701">SetUint</a>(x <a href="builtin.html#name-uint64">uint64</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1740">Slice</a>(i, j <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-1802">Slice3</a>(i, j, k <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			 (T) <a href="../src/reflect/value.go.html#line-1857">String</a>() <a href="builtin.html#name-string">string</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1874">TryRecv</a>() (x <b>Value</b>, ok <a href="builtin.html#name-bool">bool</a>)
+			 (T) <a href="../src/reflect/value.go.html#line-1884">TrySend</a>(x <b>Value</b>) <a href="builtin.html#name-bool">bool</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1891">Type</a>() <a href="#name-Type">Type</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1924">Uint</a>() <a href="builtin.html#name-uint64">uint64</a>
+			 (T) <a href="../src/reflect/value.go.html#line-1952">UnsafeAddr</a>() <a href="builtin.html#name-uintptr">uintptr</a></span>
+		<input type='checkbox' class="stat" id="Value-stat-impls"><label for="Value-stat-impls">Implements (2+)</label><span id='Value-stat-impls-content' class="stat-content">
+			 T : database/sql/driver.<a href="database/sql/driver.html#name-Validator">Validator</a>
+			 T : fmt.<a href="fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Value-stat-results"><label for="Value-stat-results">As Outputs Of (37+)</label><span id='Value-stat-results-content' class="stat-content">
+			func <a href="#name-Append">Append</a>(s <b>Value</b>, x ...<b>Value</b>) <b>Value</b>
+			func <a href="#name-AppendSlice">AppendSlice</a>(s, t <b>Value</b>) <b>Value</b>
+			func <a href="#name-Indirect">Indirect</a>(v <b>Value</b>) <b>Value</b>
+			func <a href="#name-MakeChan">MakeChan</a>(typ <a href="#name-Type">Type</a>, buffer <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-MakeFunc">MakeFunc</a>(typ <a href="#name-Type">Type</a>, fn func(args []<b>Value</b>) (results []<b>Value</b>)) <b>Value</b>
+			func <a href="#name-MakeMap">MakeMap</a>(typ <a href="#name-Type">Type</a>) <b>Value</b>
+			func <a href="#name-MakeMapWithSize">MakeMapWithSize</a>(typ <a href="#name-Type">Type</a>, n <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-MakeSlice">MakeSlice</a>(typ <a href="#name-Type">Type</a>, len, cap <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-New">New</a>(typ <a href="#name-Type">Type</a>) <b>Value</b>
+			func <a href="#name-NewAt">NewAt</a>(typ <a href="#name-Type">Type</a>, p <a href="unsafe.html">unsafe</a>.<a href="unsafe.html#name-Pointer">Pointer</a>) <b>Value</b>
+			func <a href="#name-Select">Select</a>(cases []<a href="#name-SelectCase">SelectCase</a>) (chosen <a href="builtin.html#name-int">int</a>, recv <b>Value</b>, recvOK <a href="builtin.html#name-bool">bool</a>)
+			func <a href="#name-ValueOf">ValueOf</a>(i interface{}) <b>Value</b>
+			func <a href="#name-Zero">Zero</a>(typ <a href="#name-Type">Type</a>) <b>Value</b>
+			func (*<a href="#name-MapIter">MapIter</a>).<a href="../src/reflect/value.go.html#line-1239">Key</a>() <b>Value</b>
+			func (*<a href="#name-MapIter">MapIter</a>).<a href="../src/reflect/value.go.html#line-1253">Value</a>() <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-268">Addr</a>() <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-333">Call</a>(in []<b>Value</b>) []<b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-346">CallSlice</a>(in []<b>Value</b>) []<b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-2431">Convert</a>(t <a href="#name-Type">Type</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-810">Elem</a>() <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-847">Field</a>(i <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-879">FieldByIndex</a>(index []<a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-901">FieldByName</a>(name <a href="builtin.html#name-string">string</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-913">FieldByNameFunc</a>(match func(<a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-bool">bool</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-937">Index</a>(i <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1169">MapIndex</a>(key <b>Value</b>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1202">MapKeys</a>() []<b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1319">Method</a>(i <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1351">MethodByName</a>(name <a href="builtin.html#name-string">string</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1487">Recv</a>() (x <b>Value</b>, ok <a href="builtin.html#name-bool">bool</a>)
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1740">Slice</a>(i, j <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1802">Slice3</a>(i, j, k <a href="builtin.html#name-int">int</a>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1874">TryRecv</a>() (x <b>Value</b>, ok <a href="builtin.html#name-bool">bool</a>)
+			func gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-GetIdentityFieldValuesMap">GetIdentityFieldValuesMap</a>(reflectValue <b>Value</b>, fields []*<a href="gorm.io/gorm/schema.html">schema</a>.<a href="gorm.io/gorm/schema.html#name-Field">Field</a>) (map[<a href="builtin.html#name-string">string</a>][]<b>Value</b>, [][]interface{})
+			func gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-GetIdentityFieldValuesMapFromValues">GetIdentityFieldValuesMapFromValues</a>(values []interface{}, fields []*<a href="gorm.io/gorm/schema.html">schema</a>.<a href="gorm.io/gorm/schema.html#name-Field">Field</a>) (map[<a href="builtin.html#name-string">string</a>][]<b>Value</b>, [][]interface{})
+			func gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-GetRelationsValues">GetRelationsValues</a>(reflectValue <b>Value</b>, rels []*<a href="gorm.io/gorm/schema.html">schema</a>.<a href="gorm.io/gorm/schema.html#name-Relationship">Relationship</a>) (reflectResults <b>Value</b>)
+			func gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-Schema">Schema</a>.<a href="../src/gorm.io/gorm/schema/schema.go.html#line-52">MakeSlice</a>() <b>Value</b></span>
+		<input type='checkbox' class="stat" id="Value-stat-params"><label for="Value-stat-params">As Inputs Of (17+)</label><span id='Value-stat-params-content' class="stat-content">
+			func <a href="#name-Append">Append</a>(s <b>Value</b>, x ...<b>Value</b>) <b>Value</b>
+			func <a href="#name-Append">Append</a>(s <b>Value</b>, x ...<b>Value</b>) <b>Value</b>
+			func <a href="#name-AppendSlice">AppendSlice</a>(s, t <b>Value</b>) <b>Value</b>
+			func <a href="#name-Copy">Copy</a>(dst, src <b>Value</b>) <a href="builtin.html#name-int">int</a>
+			func <a href="#name-Indirect">Indirect</a>(v <b>Value</b>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-333">Call</a>(in []<b>Value</b>) []<b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-346">CallSlice</a>(in []<b>Value</b>) []<b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1169">MapIndex</a>(key <b>Value</b>) <b>Value</b>
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1520">Send</a>(x <b>Value</b>)
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1547">Set</a>(x <b>Value</b>)
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1672">SetMapIndex</a>(key, elem <b>Value</b>)
+			func <a href="#name-Value">Value</a>.<a href="../src/reflect/value.go.html#line-1884">TrySend</a>(x <b>Value</b>) <a href="builtin.html#name-bool">bool</a>
+			func go/ast.<a href="go/ast.html#name-NotNilFilter">NotNilFilter</a>(_ <a href="builtin.html#name-string">string</a>, v <b>Value</b>) <a href="builtin.html#name-bool">bool</a>
+			func gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-GetIdentityFieldValuesMap">GetIdentityFieldValuesMap</a>(reflectValue <b>Value</b>, fields []*<a href="gorm.io/gorm/schema.html">schema</a>.<a href="gorm.io/gorm/schema.html#name-Field">Field</a>) (map[<a href="builtin.html#name-string">string</a>][]<b>Value</b>, [][]interface{})
+			func gorm.io/gorm/schema.<a href="gorm.io/gorm/schema.html#name-GetRelationsValues">GetRelationsValues</a>(reflectValue <b>Value</b>, rels []*<a href="gorm.io/gorm/schema.html">schema</a>.<a href="gorm.io/gorm/schema.html#name-Relationship">Relationship</a>) (reflectResults <b>Value</b>)
+			func gorm.io/gorm/schema.(*<a href="gorm.io/gorm/schema.html#name-Relationship">Relationship</a>).<a href="../src/gorm.io/gorm/schema/relationship.go.html#line-521">ToQueryConditions</a>(reflectValue <b>Value</b>) (conds []<a href="gorm.io/gorm/clause.html">clause</a>.<a href="gorm.io/gorm/clause.html#name-Expression">Expression</a>)
+			func internal/fmtsort.<a href="internal/fmtsort.html#name-Sort">Sort</a>(mapValue <b>Value</b>) *<a href="internal/fmtsort.html">fmtsort</a>.<a href="internal/fmtsort.html#name-SortedMap">SortedMap</a></span></div>
+<div class="anchor" id="name-ValueError" data-popularity="100">	 type <a href="../src/reflect/value.go.html#line-158">ValueError</a> <i>(struct)</i>
+		A ValueError occurs when a Value method is invoked on
+		a Value that does not support it. Such cases are documented
+		in the description of each method.
+
+		<input type='checkbox' class="stat" id="ValueError-stat-fields"><label for="ValueError-stat-fields">Exported Fields (2)</label><span id='ValueError-stat-fields-content' class="stat-content">
+			<a href="../src/reflect/value.go.html#line-160">Kind</a> <i><a href="#name-Kind">Kind</a></i>
+			<a href="../src/reflect/value.go.html#line-159">Method</a> <i><a href="builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="ValueError-stat-methods"><label for="ValueError-stat-methods">One Exported Method</label><span id='ValueError-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/reflect/value.go.html#line-163">Error</a>() <a href="builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ValueError-stat-impls"><label for="ValueError-stat-impls">Implements (1+)</label><span id='ValueError-stat-impls-content' class="stat-content">
+			*T : <a href="builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Append">	 func <a href="../src/reflect/value.go.html#line-2033">Append</a>(s <a href="#name-Value">Value</a>, x ...<a href="#name-Value">Value</a>) <a href="#name-Value">Value</a>
+		Append appends the values x to a slice s and returns the resulting slice.
+		As in Go, each x's value must be assignable to the slice's element type.</div>
+<div class="anchor" id="name-AppendSlice">	 func <a href="../src/reflect/value.go.html#line-2044">AppendSlice</a>(s, t <a href="#name-Value">Value</a>) <a href="#name-Value">Value</a>
+		AppendSlice appends a slice t to a slice s and returns the resulting slice.
+		The slices s and t must have the same element type.</div>
+<div class="anchor" id="name-Array">	const <a href="../src/reflect/type.go.html#line-250">Array</a> <a href="#name-Kind">Kind</a> = 17</div>
+<div class="anchor" id="name-ArrayOf">	 func <a href="../src/reflect/type.go.html#line-2822">ArrayOf</a>(count <a href="builtin.html#name-int">int</a>, elem <a href="#name-Type">Type</a>) <a href="#name-Type">Type</a>
+		ArrayOf returns the array type with the given count and element type.
+		For example, if t represents int, ArrayOf(5, t) represents [5]int.
+
+		If the resulting type would be larger than the available address space,
+		ArrayOf panics.</div>
+<div class="anchor" id="name-Bool">	const <a href="../src/reflect/type.go.html#line-234">Bool</a> <a href="#name-Kind">Kind</a> = 1</div>
+<div class="anchor" id="name-BothDir">	const <a href="../src/reflect/type.go.html#line-345">BothDir</a> <a href="#name-ChanDir">ChanDir</a> = 3 // chan</div>
+<div class="anchor" id="name-Chan">	const <a href="../src/reflect/type.go.html#line-251">Chan</a> <a href="#name-Kind">Kind</a> = 18</div>
+<div class="anchor" id="name-ChanOf">	 func <a href="../src/reflect/type.go.html#line-1777">ChanOf</a>(dir <a href="#name-ChanDir">ChanDir</a>, t <a href="#name-Type">Type</a>) <a href="#name-Type">Type</a>
+		ChanOf returns the channel type with the given direction and element type.
+		For example, if t represents int, ChanOf(RecvDir, t) represents &lt;-chan int.
+
+		The gc runtime imposes a limit of 64 kB on channel element types.
+		If t's size is equal to or exceeds this limit, ChanOf panics.</div>
+<div class="anchor" id="name-Complex128">	const <a href="../src/reflect/type.go.html#line-249">Complex128</a> <a href="#name-Kind">Kind</a> = 16</div>
+<div class="anchor" id="name-Complex64">	const <a href="../src/reflect/type.go.html#line-248">Complex64</a> <a href="#name-Kind">Kind</a> = 15</div>
+<div class="anchor" id="name-Copy">	 func <a href="../src/reflect/value.go.html#line-2060">Copy</a>(dst, src <a href="#name-Value">Value</a>) <a href="builtin.html#name-int">int</a>
+		Copy copies the contents of src into dst until either
+		dst has been filled or src has been exhausted.
+		It returns the number of elements copied.
+		Dst and src each must have kind Slice or Array, and
+		dst and src must have the same element type.
+
+		As a special case, src can have kind String if the element type of dst is kind Uint8.</div>
+<div class="anchor" id="name-DeepEqual">	 func <a href="../src/reflect/deepequal.go.html#line-201">DeepEqual</a>(x, y interface{}) <a href="builtin.html#name-bool">bool</a>
+		DeepEqual reports whether x and y are ``deeply equal,'' defined as follows.
+		Two values of identical type are deeply equal if one of the following cases applies.
+		Values of distinct types are never deeply equal.
+
+		Array values are deeply equal when their corresponding elements are deeply equal.
+
+		Struct values are deeply equal if their corresponding fields,
+		both exported and unexported, are deeply equal.
+
+		Func values are deeply equal if both are nil; otherwise they are not deeply equal.
+
+		Interface values are deeply equal if they hold deeply equal concrete values.
+
+		Map values are deeply equal when all of the following are true:
+		they are both nil or both non-nil, they have the same length,
+		and either they are the same map object or their corresponding keys
+		(matched using Go equality) map to deeply equal values.
+
+		Pointer values are deeply equal if they are equal using Go's == operator
+		or if they point to deeply equal values.
+
+		Slice values are deeply equal when all of the following are true:
+		they are both nil or both non-nil, they have the same length,
+		and either they point to the same initial entry of the same underlying array
+		(that is, &amp;x[0] == &amp;y[0]) or their corresponding elements (up to length) are deeply equal.
+		Note that a non-nil empty slice and a nil slice (for example, []byte{} and []byte(nil))
+		are not deeply equal.
+
+		Other values - numbers, bools, strings, and channels - are deeply equal
+		if they are equal using Go's == operator.
+
+		In general DeepEqual is a recursive relaxation of Go's == operator.
+		However, this idea is impossible to implement without some inconsistency.
+		Specifically, it is possible for a value to be unequal to itself,
+		either because it is of func type (uncomparable in general)
+		or because it is a floating-point NaN value (not equal to itself in floating-point comparison),
+		or because it is an array, struct, or interface containing
+		such a value.
+		On the other hand, pointer values are always equal to themselves,
+		even if they point at or contain such problematic values,
+		because they compare equal using Go's == operator, and that
+		is a sufficient condition to be deeply equal, regardless of content.
+		DeepEqual has been defined so that the same short-cut applies
+		to slices and maps: if x and y are the same slice or the same map,
+		they are deeply equal regardless of content.
+
+		As DeepEqual traverses the data values it may find a cycle. The
+		second and subsequent times that DeepEqual compares two pointer
+		values that have been compared before, it treats the values as
+		equal rather than examining the values to which they point.
+		This ensures that DeepEqual terminates.</div>
+<div class="anchor" id="name-Float32">	const <a href="../src/reflect/type.go.html#line-246">Float32</a> <a href="#name-Kind">Kind</a> = 13</div>
+<div class="anchor" id="name-Float64">	const <a href="../src/reflect/type.go.html#line-247">Float64</a> <a href="#name-Kind">Kind</a> = 14</div>
+<div class="anchor" id="name-Func">	const <a href="../src/reflect/type.go.html#line-252">Func</a> <a href="#name-Kind">Kind</a> = 19</div>
+<div class="anchor" id="name-FuncOf">	 func <a href="../src/reflect/type.go.html#line-1933">FuncOf</a>(in, out []<a href="#name-Type">Type</a>, variadic <a href="builtin.html#name-bool">bool</a>) <a href="#name-Type">Type</a>
+		FuncOf returns the function type with the given argument and result types.
+		For example if k represents int and e represents string,
+		FuncOf([]Type{k}, []Type{e}, false) represents func(int) string.
+
+		The variadic argument controls whether the function is variadic. FuncOf
+		panics if the in[len(in)-1] does not represent a slice and variadic is
+		true.</div>
+<div class="anchor" id="name-Indirect">	 func <a href="../src/reflect/value.go.html#line-2328">Indirect</a>(v <a href="#name-Value">Value</a>) <a href="#name-Value">Value</a>
+		Indirect returns the value that v points to.
+		If v is a nil pointer, Indirect returns a zero Value.
+		If v is not a pointer, Indirect returns v.</div>
+<div class="anchor" id="name-Int">	const <a href="../src/reflect/type.go.html#line-235">Int</a> <a href="#name-Kind">Kind</a> = 2</div>
+<div class="anchor" id="name-Int16">	const <a href="../src/reflect/type.go.html#line-237">Int16</a> <a href="#name-Kind">Kind</a> = 4</div>
+<div class="anchor" id="name-Int32">	const <a href="../src/reflect/type.go.html#line-238">Int32</a> <a href="#name-Kind">Kind</a> = 5</div>
+<div class="anchor" id="name-Int64">	const <a href="../src/reflect/type.go.html#line-239">Int64</a> <a href="#name-Kind">Kind</a> = 6</div>
+<div class="anchor" id="name-Int8">	const <a href="../src/reflect/type.go.html#line-236">Int8</a> <a href="#name-Kind">Kind</a> = 3</div>
+<div class="anchor" id="name-Interface">	const <a href="../src/reflect/type.go.html#line-253">Interface</a> <a href="#name-Kind">Kind</a> = 20</div>
+<div class="anchor" id="name-Invalid">	const <a href="../src/reflect/type.go.html#line-233">Invalid</a> <a href="#name-Kind">Kind</a> = 0</div>
+<div class="anchor" id="name-MakeChan">	 func <a href="../src/reflect/value.go.html#line-2294">MakeChan</a>(typ <a href="#name-Type">Type</a>, buffer <a href="builtin.html#name-int">int</a>) <a href="#name-Value">Value</a>
+		MakeChan creates a new channel with the specified type and buffer size.</div>
+<div class="anchor" id="name-MakeFunc">	 func <a href="../src/reflect/makefunc.go.html#line-48">MakeFunc</a>(typ <a href="#name-Type">Type</a>, fn func(args []<a href="#name-Value">Value</a>) (results []<a href="#name-Value">Value</a>)) <a href="#name-Value">Value</a>
+		MakeFunc returns a new function of the given Type
+		that wraps the function fn. When called, that new function
+		does the following:
+
+			- converts its arguments to a slice of Values.
+			- runs results := fn(args).
+			- returns the results as a slice of Values, one per formal result.
+
+		The implementation fn can assume that the argument Value slice
+		has the number and type of arguments given by typ.
+		If typ describes a variadic function, the final Value is itself
+		a slice representing the variadic arguments, as in the
+		body of a variadic function. The result Value slice returned by fn
+		must have the number and type of results given by typ.
+
+		The Value.Call method allows the caller to invoke a typed function
+		in terms of Values; in contrast, MakeFunc allows the caller to implement
+		a typed function in terms of Values.
+
+		The Examples section of the documentation includes an illustration
+		of how to use MakeFunc to build a swap function for different types.</div>
+<div class="anchor" id="name-MakeMap">	 func <a href="../src/reflect/value.go.html#line-2310">MakeMap</a>(typ <a href="#name-Type">Type</a>) <a href="#name-Value">Value</a>
+		MakeMap creates a new map with the specified type.</div>
+<div class="anchor" id="name-MakeMapWithSize">	 func <a href="../src/reflect/value.go.html#line-2316">MakeMapWithSize</a>(typ <a href="#name-Type">Type</a>, n <a href="builtin.html#name-int">int</a>) <a href="#name-Value">Value</a>
+		MakeMapWithSize creates a new map with the specified type
+		and initial space for approximately n elements.</div>
+<div class="anchor" id="name-MakeSlice">	 func <a href="../src/reflect/value.go.html#line-2275">MakeSlice</a>(typ <a href="#name-Type">Type</a>, len, cap <a href="builtin.html#name-int">int</a>) <a href="#name-Value">Value</a>
+		MakeSlice creates a new zero-initialized slice value
+		for the specified slice type, length, and capacity.</div>
+<div class="anchor" id="name-Map">	const <a href="../src/reflect/type.go.html#line-254">Map</a> <a href="#name-Kind">Kind</a> = 21</div>
+<div class="anchor" id="name-MapOf">	 func <a href="../src/reflect/type.go.html#line-1832">MapOf</a>(key, elem <a href="#name-Type">Type</a>) <a href="#name-Type">Type</a>
+		MapOf returns the map type with the given key and element types.
+		For example, if k represents int and e represents string,
+		MapOf(k, e) represents map[int]string.
+
+		If the key type is not a valid map key type (that is, if it does
+		not implement Go's == operator), MapOf panics.</div>
+<div class="anchor" id="name-New">	 func <a href="../src/reflect/value.go.html#line-2370">New</a>(typ <a href="#name-Type">Type</a>) <a href="#name-Value">Value</a>
+		New returns a Value representing a pointer to a new zero value
+		for the specified type. That is, the returned Value's Type is PtrTo(typ).</div>
+<div class="anchor" id="name-NewAt">	 func <a href="../src/reflect/value.go.html#line-2382">NewAt</a>(typ <a href="#name-Type">Type</a>, p <a href="unsafe.html">unsafe</a>.<a href="unsafe.html#name-Pointer">Pointer</a>) <a href="#name-Value">Value</a>
+		NewAt returns a Value representing a pointer to a value of the
+		specified type, using p as that pointer.</div>
+<div class="anchor" id="name-Ptr">	const <a href="../src/reflect/type.go.html#line-255">Ptr</a> <a href="#name-Kind">Kind</a> = 22</div>
+<div class="anchor" id="name-PtrTo">	 func <a href="../src/reflect/type.go.html#line-1376">PtrTo</a>(t <a href="#name-Type">Type</a>) <a href="#name-Type">Type</a>
+		PtrTo returns the pointer type with element t.
+		For example, if t represents type Foo, PtrTo(t) represents *Foo.</div>
+<div class="anchor" id="name-RecvDir">	const <a href="../src/reflect/type.go.html#line-343">RecvDir</a> <a href="#name-ChanDir">ChanDir</a> = 1 // &lt;-chan</div>
+<div class="anchor" id="name-Select">	 func <a href="../src/reflect/value.go.html#line-2169">Select</a>(cases []<a href="#name-SelectCase">SelectCase</a>) (chosen <a href="builtin.html#name-int">int</a>, recv <a href="#name-Value">Value</a>, recvOK <a href="builtin.html#name-bool">bool</a>)
+		Select executes a select operation described by the list of cases.
+		Like the Go select statement, it blocks until at least one of the cases
+		can proceed, makes a uniform pseudo-random choice,
+		and then executes that case. It returns the index of the chosen case
+		and, if that case was a receive operation, the value received and a
+		boolean indicating whether the value corresponds to a send on the channel
+		(as opposed to a zero value received because the channel is closed).
+		Select supports a maximum of 65536 cases.</div>
+<div class="anchor" id="name-SelectDefault">	const <a href="../src/reflect/value.go.html#line-2135">SelectDefault</a> <a href="#name-SelectDir">SelectDir</a> = 3 // default</div>
+<div class="anchor" id="name-SelectRecv">	const <a href="../src/reflect/value.go.html#line-2134">SelectRecv</a> <a href="#name-SelectDir">SelectDir</a> = 2 // case &lt;-Chan:</div>
+<div class="anchor" id="name-SelectSend">	const <a href="../src/reflect/value.go.html#line-2133">SelectSend</a> <a href="#name-SelectDir">SelectDir</a> = 1 // case Chan &lt;- Send</div>
+<div class="anchor" id="name-SendDir">	const <a href="../src/reflect/type.go.html#line-344">SendDir</a> <a href="#name-ChanDir">ChanDir</a> = 2 // chan&lt;-</div>
+<div class="anchor" id="name-Slice">	const <a href="../src/reflect/type.go.html#line-256">Slice</a> <a href="#name-Kind">Kind</a> = 23</div>
+<div class="anchor" id="name-SliceOf">	 func <a href="../src/reflect/type.go.html#line-2277">SliceOf</a>(t <a href="#name-Type">Type</a>) <a href="#name-Type">Type</a>
+		SliceOf returns the slice type with element type t.
+		For example, if t represents int, SliceOf(t) represents []int.</div>
+<div class="anchor" id="name-String">	const <a href="../src/reflect/type.go.html#line-257">String</a> <a href="#name-Kind">Kind</a> = 24</div>
+<div class="anchor" id="name-Struct">	const <a href="../src/reflect/type.go.html#line-258">Struct</a> <a href="#name-Kind">Kind</a> = 25</div>
+<div class="anchor" id="name-StructOf">	 func <a href="../src/reflect/type.go.html#line-2358">StructOf</a>(fields []<a href="#name-StructField">StructField</a>) <a href="#name-Type">Type</a>
+		StructOf returns the struct type containing fields.
+		The Offset and Index fields are ignored and computed as they would be
+		by the compiler.
+
+		StructOf currently does not generate wrapper methods for embedded
+		fields and panics if passed unexported StructFields.
+		These limitations may be lifted in a future version.</div>
+<div class="anchor" id="name-Swapper">	 func <a href="../src/reflect/swapper.go.html#line-16">Swapper</a>(slice interface{}) func(i, j <a href="builtin.html#name-int">int</a>)
+		Swapper returns a function that swaps the elements in the provided
+		slice.
+
+		Swapper panics if the provided interface is not a slice.</div>
+<div class="anchor" id="name-TypeOf">	 func <a href="../src/reflect/type.go.html#line-1366">TypeOf</a>(i interface{}) <a href="#name-Type">Type</a>
+		TypeOf returns the reflection Type that represents the dynamic type of i.
+		If i is a nil interface value, TypeOf returns nil.</div>
+<div class="anchor" id="name-Uint">	const <a href="../src/reflect/type.go.html#line-240">Uint</a> <a href="#name-Kind">Kind</a> = 7</div>
+<div class="anchor" id="name-Uint16">	const <a href="../src/reflect/type.go.html#line-242">Uint16</a> <a href="#name-Kind">Kind</a> = 9</div>
+<div class="anchor" id="name-Uint32">	const <a href="../src/reflect/type.go.html#line-243">Uint32</a> <a href="#name-Kind">Kind</a> = 10</div>
+<div class="anchor" id="name-Uint64">	const <a href="../src/reflect/type.go.html#line-244">Uint64</a> <a href="#name-Kind">Kind</a> = 11</div>
+<div class="anchor" id="name-Uint8">	const <a href="../src/reflect/type.go.html#line-241">Uint8</a> <a href="#name-Kind">Kind</a> = 8</div>
+<div class="anchor" id="name-Uintptr">	const <a href="../src/reflect/type.go.html#line-245">Uintptr</a> <a href="#name-Kind">Kind</a> = 12</div>
+<div class="anchor" id="name-UnsafePointer">	const <a href="../src/reflect/type.go.html#line-259">UnsafePointer</a> <a href="#name-Kind">Kind</a> = 26</div>
+<div class="anchor" id="name-ValueOf">	 func <a href="../src/reflect/value.go.html#line-2337">ValueOf</a>(i interface{}) <a href="#name-Value">Value</a>
+		ValueOf returns a new Value initialized to the concrete value
+		stored in the interface i. ValueOf(nil) returns the zero Value.</div>
+<div class="anchor" id="name-Zero">	 func <a href="../src/reflect/value.go.html#line-2356">Zero</a>(typ <a href="#name-Type">Type</a>) <a href="#name-Value">Value</a>
+		Zero returns a Value representing the zero value for the specified type.
+		The result is different from the zero value of the Value struct,
+		which represents no value at all.
+		For example, Zero(TypeOf(42)) returns a Value with Kind Int and value 0.
+		The returned value is neither addressable nor settable.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: testcert.go in package net/http/internal</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	testcert.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/net/http/internal.html">net/http/internal</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2015 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package internal</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import "strings"</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>// LocalhostCert is a PEM-encoded TLS cert with SAN IPs</code></span>
+<span class="codeline" id="line-10"><code>// "127.0.0.1" and "[::1]", expiring at Jan 29 16:00:00 2084 GMT.</code></span>
+<span class="codeline" id="line-11"><code>// generated from src/crypto/tls:</code></span>
+<span class="codeline" id="line-12"><code>// go run generate_cert.go  --rsa-bits 1024 --host 127.0.0.1,::1,example.com --ca --start-date "Jan 1 00:00:00 1970" --duration=1000000h</code></span>
+<span class="codeline" id="line-13"><code>var LocalhostCert = []byte(`-----BEGIN CERTIFICATE-----</code></span>
+<span class="codeline" id="line-14"><code>MIICEzCCAXygAwIBAgIQMIMChMLGrR+QvmQvpwAU6zANBgkqhkiG9w0BAQsFADAS</code></span>
+<span class="codeline" id="line-15"><code>MRAwDgYDVQQKEwdBY21lIENvMCAXDTcwMDEwMTAwMDAwMFoYDzIwODQwMTI5MTYw</code></span>
+<span class="codeline" id="line-16"><code>MDAwWjASMRAwDgYDVQQKEwdBY21lIENvMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB</code></span>
+<span class="codeline" id="line-17"><code>iQKBgQDuLnQAI3mDgey3VBzWnB2L39JUU4txjeVE6myuDqkM/uGlfjb9SjY1bIw4</code></span>
+<span class="codeline" id="line-18"><code>iA5sBBZzHi3z0h1YV8QPuxEbi4nW91IJm2gsvvZhIrCHS3l6afab4pZBl2+XsDul</code></span>
+<span class="codeline" id="line-19"><code>rKBxKKtD1rGxlG4LjncdabFn9gvLZad2bSysqz/qTAUStTvqJQIDAQABo2gwZjAO</code></span>
+<span class="codeline" id="line-20"><code>BgNVHQ8BAf8EBAMCAqQwEwYDVR0lBAwwCgYIKwYBBQUHAwEwDwYDVR0TAQH/BAUw</code></span>
+<span class="codeline" id="line-21"><code>AwEB/zAuBgNVHREEJzAlggtleGFtcGxlLmNvbYcEfwAAAYcQAAAAAAAAAAAAAAAA</code></span>
+<span class="codeline" id="line-22"><code>AAAAATANBgkqhkiG9w0BAQsFAAOBgQCEcetwO59EWk7WiJsG4x8SY+UIAA+flUI9</code></span>
+<span class="codeline" id="line-23"><code>tyC4lNhbcF2Idq9greZwbYCqTTTr2XiRNSMLCOjKyI7ukPoPjo16ocHj+P3vZGfs</code></span>
+<span class="codeline" id="line-24"><code>h1fIw3cSS2OolhloGw/XM6RWPWtPAlGykKLciQrBru5NAPvCMsb/I1DAceTiotQM</code></span>
+<span class="codeline" id="line-25"><code>fblo6RBxUQ==</code></span>
+<span class="codeline" id="line-26"><code>-----END CERTIFICATE-----`)</code></span>
+<span class="codeline" id="line-27"><code></code></span>
+<span class="codeline" id="line-28"><code>// LocalhostKey is the private key for localhostCert.</code></span>
+<span class="codeline" id="line-29"><code>var LocalhostKey = []byte(testingKey(`-----BEGIN RSA TESTING KEY-----</code></span>
+<span class="codeline" id="line-30"><code>MIICXgIBAAKBgQDuLnQAI3mDgey3VBzWnB2L39JUU4txjeVE6myuDqkM/uGlfjb9</code></span>
+<span class="codeline" id="line-31"><code>SjY1bIw4iA5sBBZzHi3z0h1YV8QPuxEbi4nW91IJm2gsvvZhIrCHS3l6afab4pZB</code></span>
+<span class="codeline" id="line-32"><code>l2+XsDulrKBxKKtD1rGxlG4LjncdabFn9gvLZad2bSysqz/qTAUStTvqJQIDAQAB</code></span>
+<span class="codeline" id="line-33"><code>AoGAGRzwwir7XvBOAy5tM/uV6e+Zf6anZzus1s1Y1ClbjbE6HXbnWWF/wbZGOpet</code></span>
+<span class="codeline" id="line-34"><code>3Zm4vD6MXc7jpTLryzTQIvVdfQbRc6+MUVeLKwZatTXtdZrhu+Jk7hx0nTPy8Jcb</code></span>
+<span class="codeline" id="line-35"><code>uJqFk541aEw+mMogY/xEcfbWd6IOkp+4xqjlFLBEDytgbIECQQDvH/E6nk+hgN4H</code></span>
+<span class="codeline" id="line-36"><code>qzzVtxxr397vWrjrIgPbJpQvBsafG7b0dA4AFjwVbFLmQcj2PprIMmPcQrooz8vp</code></span>
+<span class="codeline" id="line-37"><code>jy4SHEg1AkEA/v13/5M47K9vCxmb8QeD/asydfsgS5TeuNi8DoUBEmiSJwma7FXY</code></span>
+<span class="codeline" id="line-38"><code>fFUtxuvL7XvjwjN5B30pNEbc6Iuyt7y4MQJBAIt21su4b3sjXNueLKH85Q+phy2U</code></span>
+<span class="codeline" id="line-39"><code>fQtuUE9txblTu14q3N7gHRZB4ZMhFYyDy8CKrN2cPg/Fvyt0Xlp/DoCzjA0CQQDU</code></span>
+<span class="codeline" id="line-40"><code>y2ptGsuSmgUtWj3NM9xuwYPm+Z/F84K6+ARYiZ6PYj013sovGKUFfYAqVXVlxtIX</code></span>
+<span class="codeline" id="line-41"><code>qyUBnu3X9ps8ZfjLZO7BAkEAlT4R5Yl6cGhaJQYZHOde3JEMhNRcVFMO8dJDaFeo</code></span>
+<span class="codeline" id="line-42"><code>f9Oeos0UUothgiDktdQHxdNEwLjQf7lJJBzV+5OtwswCWA==</code></span>
+<span class="codeline" id="line-43"><code>-----END RSA TESTING KEY-----`))</code></span>
+<span class="codeline" id="line-44"><code></code></span>
+<span class="codeline" id="line-45"><code>func testingKey(s string) string { return strings.ReplaceAll(s, "TESTING KEY", "PRIVATE KEY") }</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

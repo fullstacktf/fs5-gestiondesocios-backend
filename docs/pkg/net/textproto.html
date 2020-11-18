@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: net/textproto</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>textproto</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-net/textproto">net/textproto</a><i> (on <a href="https://golang.org/pkg/net/textproto/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/net/textproto" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/net/textproto.html">9 packages</a>, and imported by <a href="../../dep/net/textproto.html#imported-by">4 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/net/textproto/header.go.html">header.go</a>
+	    <a href="../../src/net/textproto/pipeline.go.html">pipeline.go</a>
+	    <a href="../../src/net/textproto/reader.go.html">reader.go</a>
+	<a href="../../src/net/textproto/textproto.go.html#doc">d-&gt;</a> <a href="../../src/net/textproto/textproto.go.html">textproto.go</a>
+	    <a href="../../src/net/textproto/writer.go.html">writer.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Conn" data-popularity="1150">	 type <a href="../../src/net/textproto/textproto.go.html#line-58">Conn</a> <i>(struct)</i>
+		A Conn represents a textual network protocol connection.
+		It consists of a Reader and Writer to manage I/O
+		and a Pipeline to sequence concurrent requests on the connection.
+		These embedded types carry methods with them;
+		see the documentation of those types for details.
+
+		<input type='checkbox' class="stat" id="Conn-stat-fields"><label for="Conn-stat-fields">Exported Fields (5)</label><span id='Conn-stat-fields-content' class="stat-content">
+			<a href="../../src/net/textproto/textproto.go.html#line-61">Pipeline</a> <i><a href="#name-Pipeline">Pipeline</a></i>
+			<a href="../../src/net/textproto/textproto.go.html#line-59">Reader</a> <i><a href="#name-Reader">Reader</a></i>
+			<a href="../../src/net/textproto/textproto.go.html#line-59" class="path-duplicate">Reader</a>.<a href="../../src/net/textproto/reader.go.html#line-21">R</a> <i>*<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a></i>
+			<a href="../../src/net/textproto/textproto.go.html#line-60">Writer</a> <i><a href="#name-Writer">Writer</a></i>
+			<a href="../../src/net/textproto/textproto.go.html#line-60" class="path-duplicate">Writer</a>.<a href="../../src/net/textproto/writer.go.html#line-16">W</a> <i>*<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Writer">Writer</a></i></span>
+		<input type='checkbox' class="stat" id="Conn-stat-methods"><label for="Conn-stat-methods">Exported Methods (19)</label><span id='Conn-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/textproto/textproto.go.html#line-75">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/textproto/textproto.go.html#line-114">Cmd</a>(format <a href="../builtin.html#name-string">string</a>, args ...interface{}) (id <a href="../builtin.html#name-uint">uint</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-312">DotReader</a>() <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>
+			(*T) <a href="../../src/net/textproto/writer.go.html#line-43">DotWriter</a>() <a href="../io.html">io</a>.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-52">EndRequest</a>(id <a href="../builtin.html#name-uint">uint</a>)
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-64">EndResponse</a>(id <a href="../builtin.html#name-uint">uint</a>)
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-36">Next</a>() <a href="../builtin.html#name-uint">uint</a>
+			(*T) <a href="../../src/net/textproto/writer.go.html#line-29">PrintfLine</a>(format <a href="../builtin.html#name-string">string</a>, args ...interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-235">ReadCodeLine</a>(expectCode <a href="../builtin.html#name-int">int</a>) (code <a href="../builtin.html#name-int">int</a>, message <a href="../builtin.html#name-string">string</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-93">ReadContinuedLine</a>() (<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-114">ReadContinuedLineBytes</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-428">ReadDotBytes</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-436">ReadDotLines</a>() ([]<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-38">ReadLine</a>() (<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-44">ReadLineBytes</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-484">ReadMIMEHeader</a>() (<a href="#name-MIMEHeader">MIMEHeader</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-270">ReadResponse</a>(expectCode <a href="../builtin.html#name-int">int</a>) (code <a href="../builtin.html#name-int">int</a>, message <a href="../builtin.html#name-string">string</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-46">StartRequest</a>(id <a href="../builtin.html#name-uint">uint</a>)
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-58">StartResponse</a>(id <a href="../builtin.html#name-uint">uint</a>)</span>
+		<input type='checkbox' class="stat" id="Conn-stat-impls"><label for="Conn-stat-impls">Implements (1+)</label><span id='Conn-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Conn-stat-results"><label for="Conn-stat-results">As Outputs Of (2+)</label><span id='Conn-stat-results-content' class="stat-content">
+			func <a href="#name-Dial">Dial</a>(network, addr <a href="../builtin.html#name-string">string</a>) (*<b>Conn</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-NewConn">NewConn</a>(conn <a href="../io.html">io</a>.<a href="../io.html#name-ReadWriteCloser">ReadWriteCloser</a>) *<b>Conn</b></span></div>
+<div class="anchor" id="name-Error" data-popularity="100">	 type <a href="../../src/net/textproto/textproto.go.html#line-36">Error</a> <i>(struct)</i>
+		An Error represents a numeric error response from a server.
+
+		<input type='checkbox' class="stat" id="Error-stat-fields"><label for="Error-stat-fields">Exported Fields (2)</label><span id='Error-stat-fields-content' class="stat-content">
+			<a href="../../src/net/textproto/textproto.go.html#line-37">Code</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/net/textproto/textproto.go.html#line-38">Msg</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Error-stat-methods"><label for="Error-stat-methods">One Exported Method</label><span id='Error-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/textproto/textproto.go.html#line-41">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Error-stat-impls"><label for="Error-stat-impls">Implements (1+)</label><span id='Error-stat-impls-content' class="stat-content">
+			*T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-MIMEHeader" data-popularity="360">	 type <a href="../../src/net/textproto/header.go.html#line-9">MIMEHeader</a> <i>(map)</i>
+		A MIMEHeader represents a MIME-style header mapping
+		keys to sets of values.
+
+		<input type='checkbox' class="stat" id="MIMEHeader-stat-methods"><label for="MIMEHeader-stat-methods">Exported Methods (5)</label><span id='MIMEHeader-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/textproto/header.go.html#line-13">Add</a>(key, value <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/textproto/header.go.html#line-54">Del</a>(key <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/textproto/header.go.html#line-30">Get</a>(key <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/net/textproto/header.go.html#line-21">Set</a>(key, value <a href="../builtin.html#name-string">string</a>)
+			 (T) <a href="../../src/net/textproto/header.go.html#line-46">Values</a>(key <a href="../builtin.html#name-string">string</a>) []<a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="MIMEHeader-stat-results"><label for="MIMEHeader-stat-results">As Outputs Of (1+)</label><span id='MIMEHeader-stat-results-content' class="stat-content">
+			func (*<a href="#name-Reader">Reader</a>).<a href="../../src/net/textproto/reader.go.html#line-484">ReadMIMEHeader</a>() (<b>MIMEHeader</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="MIMEHeader-stat-params"><label for="MIMEHeader-stat-params">As Inputs Of (1+)</label><span id='MIMEHeader-stat-params-content' class="stat-content">
+			func mime/multipart.(*<a href="../mime/multipart.html#name-Writer">Writer</a>).<a href="../../src/mime/multipart/writer.go.html#line-97">CreatePart</a>(header <b>MIMEHeader</b>) (<a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Pipeline" data-popularity="250">	 type <a href="../../src/net/textproto/pipeline.go.html#line-28">Pipeline</a> <i>(struct)</i>
+		A Pipeline manages a pipelined in-order request/response sequence.
+
+		To use a Pipeline p to manage multiple clients on a connection,
+		each client should run:
+
+			id := p.Next()	// take a number
+
+			p.StartRequest(id)	// wait for turn to send request
+			«send request»
+			p.EndRequest(id)	// notify Pipeline that request is sent
+
+			p.StartResponse(id)	// wait for turn to read response
+			«read response»
+			p.EndResponse(id)	// notify Pipeline that response is read
+
+		A pipelined server can use the same calls to ensure that
+		responses computed in parallel are written in the correct order.
+
+		<input type='checkbox' class="stat" id="Pipeline-stat-methods"><label for="Pipeline-stat-methods">Exported Methods (5)</label><span id='Pipeline-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-52">EndRequest</a>(id <a href="../builtin.html#name-uint">uint</a>)
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-64">EndResponse</a>(id <a href="../builtin.html#name-uint">uint</a>)
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-36">Next</a>() <a href="../builtin.html#name-uint">uint</a>
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-46">StartRequest</a>(id <a href="../builtin.html#name-uint">uint</a>)
+			(*T) <a href="../../src/net/textproto/pipeline.go.html#line-58">StartResponse</a>(id <a href="../builtin.html#name-uint">uint</a>)</span></div>
+<div class="anchor" id="name-ProtocolError" data-popularity="100">	 type <a href="../../src/net/textproto/textproto.go.html#line-47">ProtocolError</a> <a href="../builtin.html#name-string">string</a>
+		A ProtocolError describes a protocol violation such
+		as an invalid response or a hung-up connection.
+
+		<input type='checkbox' class="stat" id="ProtocolError-stat-methods"><label for="ProtocolError-stat-methods">One Exported Method</label><span id='ProtocolError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/net/textproto/textproto.go.html#line-49">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ProtocolError-stat-impls"><label for="ProtocolError-stat-impls">Implements (1+)</label><span id='ProtocolError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Reader" data-popularity="575">	 type <a href="../../src/net/textproto/reader.go.html#line-20">Reader</a> <i>(struct)</i>
+		A Reader implements convenience methods for reading requests
+		or responses from a text protocol network connection.
+
+		<input type='checkbox' class="stat" id="Reader-stat-fields"><label for="Reader-stat-fields">One Exported Field</label><span id='Reader-stat-fields-content' class="stat-content">
+			<a href="../../src/net/textproto/reader.go.html#line-21">R</a> <i>*<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a></i></span>
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">Exported Methods (10)</label><span id='Reader-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-312">DotReader</a>() <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-235">ReadCodeLine</a>(expectCode <a href="../builtin.html#name-int">int</a>) (code <a href="../builtin.html#name-int">int</a>, message <a href="../builtin.html#name-string">string</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-93">ReadContinuedLine</a>() (<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-114">ReadContinuedLineBytes</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-428">ReadDotBytes</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-436">ReadDotLines</a>() ([]<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-38">ReadLine</a>() (<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-44">ReadLineBytes</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-484">ReadMIMEHeader</a>() (<a href="#name-MIMEHeader">MIMEHeader</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/net/textproto/reader.go.html#line-270">ReadResponse</a>(expectCode <a href="../builtin.html#name-int">int</a>) (code <a href="../builtin.html#name-int">int</a>, message <a href="../builtin.html#name-string">string</a>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-results"><label for="Reader-stat-results">As Outputs Of (1+)</label><span id='Reader-stat-results-content' class="stat-content">
+			func <a href="#name-NewReader">NewReader</a>(r *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a>) *<b>Reader</b></span></div>
+<div class="anchor" id="name-Writer" data-popularity="175">	 type <a href="../../src/net/textproto/writer.go.html#line-15">Writer</a> <i>(struct)</i>
+		A Writer implements convenience methods for writing
+		requests or responses to a text protocol network connection.
+
+		<input type='checkbox' class="stat" id="Writer-stat-fields"><label for="Writer-stat-fields">One Exported Field</label><span id='Writer-stat-fields-content' class="stat-content">
+			<a href="../../src/net/textproto/writer.go.html#line-16">W</a> <i>*<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Writer">Writer</a></i></span>
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">Exported Methods (2)</label><span id='Writer-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/net/textproto/writer.go.html#line-43">DotWriter</a>() <a href="../io.html">io</a>.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+			(*T) <a href="../../src/net/textproto/writer.go.html#line-29">PrintfLine</a>(format <a href="../builtin.html#name-string">string</a>, args ...interface{}) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Writer-stat-results"><label for="Writer-stat-results">As Outputs Of (1+)</label><span id='Writer-stat-results-content' class="stat-content">
+			func <a href="#name-NewWriter">NewWriter</a>(w *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Writer">Writer</a>) *<b>Writer</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-CanonicalMIMEHeaderKey">	 func <a href="../../src/net/textproto/reader.go.html#line-596">CanonicalMIMEHeaderKey</a>(s <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+		CanonicalMIMEHeaderKey returns the canonical format of the
+		MIME header key s. The canonicalization converts the first
+		letter and any letter following a hyphen to upper case;
+		the rest are converted to lowercase. For example, the
+		canonical key for "accept-encoding" is "Accept-Encoding".
+		MIME header keys are assumed to be ASCII only.
+		If s contains a space or invalid header field bytes, it is
+		returned without modifications.</div>
+<div class="anchor" id="name-Dial">	 func <a href="../../src/net/textproto/textproto.go.html#line-81">Dial</a>(network, addr <a href="../builtin.html#name-string">string</a>) (*<a href="#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)
+		Dial connects to the given address on the given network using net.Dial
+		and then returns a new Conn for the connection.</div>
+<div class="anchor" id="name-NewConn">	 func <a href="../../src/net/textproto/textproto.go.html#line-66">NewConn</a>(conn <a href="../io.html">io</a>.<a href="../io.html#name-ReadWriteCloser">ReadWriteCloser</a>) *<a href="#name-Conn">Conn</a>
+		NewConn returns a new Conn using conn for I/O.</div>
+<div class="anchor" id="name-NewReader">	 func <a href="../../src/net/textproto/reader.go.html#line-31">NewReader</a>(r *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Reader">Reader</a>) *<a href="#name-Reader">Reader</a>
+		NewReader returns a new Reader reading from r.
+
+		To avoid denial of service attacks, the provided bufio.Reader
+		should be reading from an io.LimitReader or similar Reader to bound
+		the size of responses.</div>
+<div class="anchor" id="name-NewWriter">	 func <a href="../../src/net/textproto/writer.go.html#line-21">NewWriter</a>(w *<a href="../bufio.html">bufio</a>.<a href="../bufio.html#name-Writer">Writer</a>) *<a href="#name-Writer">Writer</a>
+		NewWriter returns a new Writer writing to w.</div>
+<div class="anchor" id="name-TrimBytes">	 func <a href="../../src/net/textproto/textproto.go.html#line-137">TrimBytes</a>(b []<a href="../builtin.html#name-byte">byte</a>) []<a href="../builtin.html#name-byte">byte</a>
+		TrimBytes returns b without leading and trailing ASCII space.</div>
+<div class="anchor" id="name-TrimString">	 func <a href="../../src/net/textproto/textproto.go.html#line-126">TrimString</a>(s <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-string">string</a>
+		TrimString returns s without leading and trailing ASCII space.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

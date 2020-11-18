@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/net/idna</title>
+<link href="../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>idna</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../index.html#pkg-vendor/golang.org/x/net/idna">vendor/golang.org/x/net/idna</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/net/idna/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/net/idna" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../dep/vendor/golang.org/x/net/idna.html">7 packages</a>, and imported by <a href="../../../../../dep/vendor/golang.org/x/net/idna.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#doc">d-&gt;</a> <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html">idna10.0.0.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/idna/punycode.go.html">punycode.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/idna/tables12.00.go.html">tables12.00.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/idna/trie.go.html">trie.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/net/idna/trieval.go.html">trieval.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Option" data-popularity="635">	 type <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-56">Option</a> <i>(func)</i>
+		An Option configures a Profile at creation time.
+
+		<input type='checkbox' class="stat" id="Option-stat-results"><label for="Option-stat-results">As Outputs Of (8+)</label><span id='Option-stat-results-content' class="stat-content">
+			func <a href="#name-BidiRule">BidiRule</a>() <b>Option</b>
+			func <a href="#name-MapForLookup">MapForLookup</a>() <b>Option</b>
+			func <a href="#name-RemoveLeadingDots">RemoveLeadingDots</a>(remove <a href="../../../../builtin.html#name-bool">bool</a>) <b>Option</b>
+			func <a href="#name-StrictDomainName">StrictDomainName</a>(use <a href="../../../../builtin.html#name-bool">bool</a>) <b>Option</b>
+			func <a href="#name-Transitional">Transitional</a>(transitional <a href="../../../../builtin.html#name-bool">bool</a>) <b>Option</b>
+			func <a href="#name-ValidateForRegistration">ValidateForRegistration</a>() <b>Option</b>
+			func <a href="#name-ValidateLabels">ValidateLabels</a>(enable <a href="../../../../builtin.html#name-bool">bool</a>) <b>Option</b>
+			func <a href="#name-VerifyDNSLength">VerifyDNSLength</a>(verify <a href="../../../../builtin.html#name-bool">bool</a>) <b>Option</b></span>
+		<input type='checkbox' class="stat" id="Option-stat-params"><label for="Option-stat-params">As Inputs Of (1+)</label><span id='Option-stat-params-content' class="stat-content">
+			func <a href="#name-New">New</a>(o ...<b>Option</b>) *<a href="#name-Profile">Profile</a></span></div>
+<div class="anchor" id="name-Profile" data-popularity="290">	 type <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-173">Profile</a> <i>(struct)</i>
+		A Profile defines the configuration of an IDNA mapper.
+
+		<input type='checkbox' class="stat" id="Profile-stat-methods"><label for="Profile-stat-methods">Exported Methods (3)</label><span id='Profile-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-217">String</a>() <a href="../../../../builtin.html#name-string">string</a>
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-201">ToASCII</a>(s <a href="../../../../builtin.html#name-string">string</a>) (<a href="../../../../builtin.html#name-string">string</a>, <a href="../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-209">ToUnicode</a>(s <a href="../../../../builtin.html#name-string">string</a>) (<a href="../../../../builtin.html#name-string">string</a>, <a href="../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Profile-stat-impls"><label for="Profile-stat-impls">Implements (1+)</label><span id='Profile-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Profile-stat-results"><label for="Profile-stat-results">As Outputs Of (1+)</label><span id='Profile-stat-results-content' class="stat-content">
+			func <a href="#name-New">New</a>(o ...<a href="#name-Option">Option</a>) *<b>Profile</b></span>
+		<input type='checkbox' class="stat" id="Profile-stat-values"><label for="Profile-stat-values">As Types Of (4+)</label><span id='Profile-stat-values-content' class="stat-content">
+			  var <a href="#name-Display">Display</a> *<b>Profile</b>
+			  var <a href="#name-Lookup">Lookup</a> *<b>Profile</b>
+			  var <a href="#name-Punycode">Punycode</a> *<b>Profile</b>
+			  var <a href="#name-Registration">Registration</a> *<b>Profile</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BidiRule">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-119">BidiRule</a>() <a href="#name-Option">Option</a>
+		BidiRule enables the Bidi rule as defined in RFC 5893. Any application
+		that relies on proper validation of labels should include this rule.</div>
+<div class="anchor" id="name-Display">	  var <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-248">Display</a> *<a href="#name-Profile">Profile</a>
+		Display is the recommended profile for displaying domain names.
+		The configuration of this profile may change over time.</div>
+<div class="anchor" id="name-Lookup">	  var <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-244">Lookup</a> *<a href="#name-Profile">Profile</a>
+		Lookup is the recommended profile for looking up domain names, according
+		to Section 5 of RFC 5891. The exact configuration of this profile may
+		change over time.</div>
+<div class="anchor" id="name-MapForLookup">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-143">MapForLookup</a>() <a href="#name-Option">Option</a>
+		MapForLookup sets validation and mapping options such that a given IDN is
+		transformed for domain name lookup according to the requirements set out in
+		Section 5 of RFC 5891. The mappings follow the recommendations of RFC 5894,
+		RFC 5895 and UTS 46. It does not add the Bidi Rule. Use the BidiRule option
+		to add this check.
+
+		The mappings include normalization and mapping case, width and other
+		compatibility mappings.</div>
+<div class="anchor" id="name-New">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-191">New</a>(o ...<a href="#name-Option">Option</a>) *<a href="#name-Profile">Profile</a>
+		New creates a new Profile.
+
+		With no options, the returned Profile is the most permissive and equals the
+		Punycode Profile. Options can be passed to further restrict the Profile. The
+		MapForLookup and ValidateForRegistration options set a collection of options,
+		for lookup and registration purposes respectively, which can be tailored by
+		adding more fine-grained options, where later options override earlier
+		options.</div>
+<div class="anchor" id="name-Punycode">	  var <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-239">Punycode</a> *<a href="#name-Profile">Profile</a>
+		Punycode is a Profile that does raw punycode processing with a minimum
+		of validation.</div>
+<div class="anchor" id="name-Registration">	  var <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-252">Registration</a> *<a href="#name-Profile">Profile</a>
+		Registration is the recommended profile for checking whether a given
+		IDN is valid for registration, according to Section 4 of RFC 5891.</div>
+<div class="anchor" id="name-RemoveLeadingDots">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-78">RemoveLeadingDots</a>(remove <a href="../../../../builtin.html#name-bool">bool</a>) <a href="#name-Option">Option</a>
+		RemoveLeadingDots removes leading label separators. Leading runes that map to
+		dots, such as U+3002 IDEOGRAPHIC FULL STOP, are removed as well.
+
+		This is the behavior suggested by the UTS #46 and is adopted by some
+		browsers.</div>
+<div class="anchor" id="name-StrictDomainName">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-106">StrictDomainName</a>(use <a href="../../../../builtin.html#name-bool">bool</a>) <a href="#name-Option">Option</a>
+		StrictDomainName limits the set of permissible ASCII characters to those
+		allowed in domain names as defined in RFC 1034 (A-Z, a-z, 0-9 and the
+		hyphen). This is set by default for MapForLookup and ValidateForRegistration.
+
+		This option is useful, for instance, for browsers that allow characters
+		outside this range, for example a '_' (U+005F LOW LINE). See
+		http://www.rfc-editor.org/std/std3.txt for more details This option
+		corresponds to the UseSTD3ASCIIRules option in UTS #46.</div>
+<div class="anchor" id="name-ToASCII">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-46">ToASCII</a>(s <a href="../../../../builtin.html#name-string">string</a>) (<a href="../../../../builtin.html#name-string">string</a>, <a href="../../../../builtin.html#name-error">error</a>)
+		ToASCII is a wrapper for Punycode.ToASCII.</div>
+<div class="anchor" id="name-ToUnicode">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-51">ToUnicode</a>(s <a href="../../../../builtin.html#name-string">string</a>) (<a href="../../../../builtin.html#name-string">string</a>, <a href="../../../../builtin.html#name-error">error</a>)
+		ToUnicode is a wrapper for Punycode.ToUnicode.</div>
+<div class="anchor" id="name-Transitional">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-63">Transitional</a>(transitional <a href="../../../../builtin.html#name-bool">bool</a>) <a href="#name-Option">Option</a>
+		Transitional sets a Profile to use the Transitional mapping as defined in UTS
+		#46. This will cause, for example, "ß" to be mapped to "ss". Using the
+		transitional mapping provides a compromise between IDNA2003 and IDNA2008
+		compatibility. It is used by most browsers when resolving domain names. This
+		option is only meaningful if combined with MapForLookup.</div>
+<div class="anchor" id="name-UnicodeVersion">	const <a href="../../../../../src/vendor/golang.org/x/net/idna/tables12.00.go.html#line-8">UnicodeVersion</a> = "12.0.0"
+		UnicodeVersion is the Unicode version from which the tables in this package are derived.</div>
+<div class="anchor" id="name-ValidateForRegistration">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-125">ValidateForRegistration</a>() <a href="#name-Option">Option</a>
+		ValidateForRegistration sets validation options to verify that a given IDN is
+		properly formatted for registration as defined by Section 4 of RFC 5891.</div>
+<div class="anchor" id="name-ValidateLabels">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-85">ValidateLabels</a>(enable <a href="../../../../builtin.html#name-bool">bool</a>) <a href="#name-Option">Option</a>
+		ValidateLabels sets whether to check the mandatory label validation criteria
+		as defined in Section 5.4 of RFC 5891. This includes testing for correct use
+		of hyphens ('-'), normalization, validity of runes, and the context rules.</div>
+<div class="anchor" id="name-VerifyDNSLength">	 func <a href="../../../../../src/vendor/golang.org/x/net/idna/idna10.0.0.go.html#line-69">VerifyDNSLength</a>(verify <a href="../../../../builtin.html#name-bool">bool</a>) <a href="#name-Option">Option</a>
+		VerifyDNSLength sets whether a Profile should fail if any of the IDN parts
+		are longer than allowed by the RFC.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

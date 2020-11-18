@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: math/big</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>big</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-math/big">math/big</a><i> (on <a href="https://golang.org/pkg/math/big/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/math/big" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/math/big.html">12 packages</a>, and imported by <a href="../../dep/math/big.html#imported-by">11 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/math/big/accuracy_string.go.html">accuracy_string.go</a>
+	    <a href="../../src/math/big/arith.go.html">arith.go</a>
+	    <a href="../../src/math/big/arith_amd64.go.html">arith_amd64.go</a>
+	    <a href="../../src/math/big/arith_decl.go.html">arith_decl.go</a>
+	    <a href="../../src/math/big/decimal.go.html">decimal.go</a>
+	<a href="../../src/math/big/doc.go.html#doc">d-&gt;</a> <a href="../../src/math/big/doc.go.html">doc.go</a>
+	    <a href="../../src/math/big/float.go.html">float.go</a>
+	    <a href="../../src/math/big/floatconv.go.html">floatconv.go</a>
+	    <a href="../../src/math/big/floatmarsh.go.html">floatmarsh.go</a>
+	    <a href="../../src/math/big/ftoa.go.html">ftoa.go</a>
+	    <a href="../../src/math/big/int.go.html">int.go</a>
+	    <a href="../../src/math/big/intconv.go.html">intconv.go</a>
+	    <a href="../../src/math/big/intmarsh.go.html">intmarsh.go</a>
+	    <a href="../../src/math/big/nat.go.html">nat.go</a>
+	    <a href="../../src/math/big/natconv.go.html">natconv.go</a>
+	    <a href="../../src/math/big/prime.go.html">prime.go</a>
+	    <a href="../../src/math/big/rat.go.html">rat.go</a>
+	    <a href="../../src/math/big/ratconv.go.html">ratconv.go</a>
+	    <a href="../../src/math/big/ratmarsh.go.html">ratmarsh.go</a>
+	    <a href="../../src/math/big/roundingmode_string.go.html">roundingmode_string.go</a>
+	    <a href="../../src/math/big/sqrt.go.html">sqrt.go</a>
+	    <a href="../../src/math/big/arith_amd64.s.html">arith_amd64.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Accuracy" data-popularity="640">	 type <a href="../../src/math/big/float.go.html#line-148">Accuracy</a> <a href="../builtin.html#name-int8">int8</a>
+		Accuracy describes the rounding error produced by the most recent
+		operation that generated a Float value, relative to the exact value.
+
+		<input type='checkbox' class="stat" id="Accuracy-stat-methods"><label for="Accuracy-stat-methods">One Exported Method</label><span id='Accuracy-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/math/big/accuracy_string.go.html#line-11">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Accuracy-stat-impls"><label for="Accuracy-stat-impls">Implements (1+)</label><span id='Accuracy-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Accuracy-stat-results"><label for="Accuracy-stat-results">As Outputs Of (7+)</label><span id='Accuracy-stat-results-content' class="stat-content">
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-230">Acc</a>() <b>Accuracy</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-832">Float32</a>() (<a href="../builtin.html#name-float32">float32</a>, <b>Accuracy</b>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-952">Float64</a>() (<a href="../builtin.html#name-float64">float64</a>, <b>Accuracy</b>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1073">Int</a>(z *<a href="#name-Int">Int</a>) (*<a href="#name-Int">Int</a>, <b>Accuracy</b>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-777">Int64</a>() (<a href="../builtin.html#name-int64">int64</a>, <b>Accuracy</b>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1129">Rat</a>(z *<a href="#name-Rat">Rat</a>) (*<a href="#name-Rat">Rat</a>, <b>Accuracy</b>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-732">Uint64</a>() (<a href="../builtin.html#name-uint64">uint64</a>, <b>Accuracy</b>)</span>
+		<input type='checkbox' class="stat" id="Accuracy-stat-values"><label for="Accuracy-stat-values">As Types Of (3+)</label><span id='Accuracy-stat-values-content' class="stat-content">
+			const <a href="#name-Above">Above</a>
+			const <a href="#name-Below">Below</a>
+			const <a href="#name-Exact">Exact</a></span></div>
+<div class="anchor" id="name-ErrNaN" data-popularity="100">	 type <a href="../../src/math/big/float.go.html#line-77">ErrNaN</a> <i>(struct)</i>
+		An ErrNaN panic is raised by a Float operation that would lead to
+		a NaN under IEEE-754 rules. An ErrNaN implements the error interface.
+
+		<input type='checkbox' class="stat" id="ErrNaN-stat-methods"><label for="ErrNaN-stat-methods">One Exported Method</label><span id='ErrNaN-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/math/big/float.go.html#line-81">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ErrNaN-stat-impls"><label for="ErrNaN-stat-impls">Implements (1+)</label><span id='ErrNaN-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Float" data-popularity="4570">	 type <a href="../../src/math/big/float.go.html#line-65">Float</a> <i>(struct)</i>
+		A nonzero finite Float represents a multi-precision floating point number
+
+		  sign × mantissa × 2**exponent
+
+		with 0.5 &lt;= mantissa &lt; 1.0, and MinExp &lt;= exponent &lt;= MaxExp.
+		A Float may also be zero (+0, -0) or infinite (+Inf, -Inf).
+		All Floats are ordered, and the ordering of two Floats x and y
+		is defined by x.Cmp(y).
+
+		Each Float value also has a precision, rounding mode, and accuracy.
+		The precision is the maximum number of mantissa bits available to
+		represent the value. The rounding mode specifies how a result should
+		be rounded to fit into the mantissa bits, and accuracy describes the
+		rounding error with respect to the exact result.
+
+		Unless specified otherwise, all operations (including setters) that
+		specify a *Float variable for the result (usually via the receiver
+		with the exception of MantExp), round the numeric result according
+		to the precision and rounding mode of the result variable.
+
+		If the provided result precision is 0 (see below), it is set to the
+		precision of the argument with the largest precision value before any
+		rounding takes place, and the rounding mode remains unchanged. Thus,
+		uninitialized Floats provided as result arguments will have their
+		precision set to a reasonable value determined by the operands, and
+		their mode is the zero value for RoundingMode (ToNearestEven).
+
+		By setting the desired precision to 24 or 53 and using matching rounding
+		mode (typically ToNearestEven), Float operations produce the same results
+		as the corresponding float32 or float64 IEEE-754 arithmetic for operands
+		that correspond to normal (i.e., not denormal) float32 or float64 numbers.
+		Exponent underflow and overflow lead to a 0 or an Infinity for different
+		values than IEEE-754 because Float exponents have a much larger range.
+
+		The zero (uninitialized) value for a Float is ready to use and represents
+		the number +0.0 exactly, with precision 0 and rounding mode ToNearestEven.
+
+		Operations always take pointer arguments (*Float) rather
+		than Float values, and each unique Float value requires
+		its own unique *Float pointer. To "copy" a Float value,
+		an existing (or newly allocated) Float must be set to
+		a new value using the Float.Set method; shallow copies
+		of Floats are not supported and may lead to errors.
+
+		<input type='checkbox' class="stat" id="Float-stat-methods"><label for="Float-stat-methods">Exported Methods (45)</label><span id='Float-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/math/big/float.go.html#line-1173">Abs</a>(x *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-230">Acc</a>() <a href="#name-Accuracy">Accuracy</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-1440">Add</a>(x, y *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/ftoa.go.html#line-63">Append</a>(buf []<a href="../builtin.html#name-byte">byte</a>, fmt <a href="../builtin.html#name-byte">byte</a>, prec <a href="../builtin.html#name-int">int</a>) []<a href="../builtin.html#name-byte">byte</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-1673">Cmp</a>(y *<b>Float</b>) <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-669">Copy</a>(x *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-832">Float32</a>() (<a href="../builtin.html#name-float32">float32</a>, <a href="#name-Accuracy">Accuracy</a>)
+			(*T) <a href="../../src/math/big/float.go.html#line-952">Float64</a>() (<a href="../builtin.html#name-float64">float64</a>, <a href="#name-Accuracy">Accuracy</a>)
+			(*T) <a href="../../src/math/big/ftoa.go.html#line-465">Format</a>(s <a href="../fmt.html">fmt</a>.<a href="../fmt.html#name-State">State</a>, format <a href="../builtin.html#name-rune">rune</a>)
+			(*T) <a href="../../src/math/big/floatmarsh.go.html#line-64">GobDecode</a>(buf []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/floatmarsh.go.html#line-20">GobEncode</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/float.go.html#line-1073">Int</a>(z *<a href="#name-Int">Int</a>) (*<a href="#name-Int">Int</a>, <a href="#name-Accuracy">Accuracy</a>)
+			(*T) <a href="../../src/math/big/float.go.html#line-777">Int64</a>() (<a href="../builtin.html#name-int64">int64</a>, <a href="#name-Accuracy">Accuracy</a>)
+			(*T) <a href="../../src/math/big/float.go.html#line-338">IsInf</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-344">IsInt</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-268">MantExp</a>(mant *<b>Float</b>) (exp <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/math/big/floatmarsh.go.html#line-101">MarshalText</a>() (text []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/float.go.html#line-215">MinPrec</a>() <a href="../builtin.html#name-uint">uint</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-223">Mode</a>() <a href="#name-RoundingMode">RoundingMode</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-1581">Mul</a>(x, y *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-1181">Neg</a>(x *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/floatconv.go.html#line-261">Parse</a>(s <a href="../builtin.html#name-string">string</a>, base <a href="../builtin.html#name-int">int</a>) (f *<b>Float</b>, b <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/float.go.html#line-208">Prec</a>() <a href="../builtin.html#name-uint">uint</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-1626">Quo</a>(x, y *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-1129">Rat</a>(z *<a href="#name-Rat">Rat</a>) (*<a href="#name-Rat">Rat</a>, <a href="#name-Accuracy">Accuracy</a>)
+			(*T) <a href="../../src/math/big/floatconv.go.html#line-300">Scan</a>(s <a href="../fmt.html">fmt</a>.<a href="../fmt.html#name-ScanState">ScanState</a>, ch <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-645">Set</a>(x *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-543">SetFloat64</a>(x <a href="../builtin.html#name-float64">float64</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-632">SetInf</a>(signbit <a href="../builtin.html#name-bool">bool</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-591">SetInt</a>(x *<a href="#name-Int">Int</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-530">SetInt64</a>(x <a href="../builtin.html#name-int64">int64</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-319">SetMantExp</a>(mant *<b>Float</b>, exp <a href="../builtin.html#name-int">int</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-200">SetMode</a>(mode <a href="#name-RoundingMode">RoundingMode</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-164">SetPrec</a>(prec <a href="../builtin.html#name-uint">uint</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-615">SetRat</a>(x *<a href="#name-Rat">Rat</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/floatconv.go.html#line-22">SetString</a>(s <a href="../builtin.html#name-string">string</a>) (*<b>Float</b>, <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/math/big/float.go.html#line-523">SetUint64</a>(x <a href="../builtin.html#name-uint64">uint64</a>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/float.go.html#line-240">Sign</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-333">Signbit</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/math/big/sqrt.go.html#line-33">Sqrt</a>(x *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/ftoa.go.html#line-57">String</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-1514">Sub</a>(x, y *<b>Float</b>) *<b>Float</b>
+			(*T) <a href="../../src/math/big/ftoa.go.html#line-47">Text</a>(format <a href="../builtin.html#name-byte">byte</a>, prec <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/math/big/float.go.html#line-732">Uint64</a>() (<a href="../builtin.html#name-uint64">uint64</a>, <a href="#name-Accuracy">Accuracy</a>)
+			(*T) <a href="../../src/math/big/floatmarsh.go.html#line-113">UnmarshalText</a>(text []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Float-stat-impls"><label for="Float-stat-impls">Implements (5+)</label><span id='Float-stat-impls-content' class="stat-content">
+			*T : encoding.<a href="../encoding.html#name-TextMarshaler">TextMarshaler</a>
+			*T : encoding.<a href="../encoding.html#name-TextUnmarshaler">TextUnmarshaler</a>
+			*T : fmt.<a href="../fmt.html#name-Formatter">Formatter</a>
+			*T : fmt.<a href="../fmt.html#name-Scanner">Scanner</a>
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Float-stat-results"><label for="Float-stat-results">As Outputs Of (22+)</label><span id='Float-stat-results-content' class="stat-content">
+			func <a href="#name-NewFloat">NewFloat</a>(x <a href="../builtin.html#name-float64">float64</a>) *<b>Float</b>
+			func <a href="#name-ParseFloat">ParseFloat</a>(s <a href="../builtin.html#name-string">string</a>, base <a href="../builtin.html#name-int">int</a>, prec <a href="../builtin.html#name-uint">uint</a>, mode <a href="#name-RoundingMode">RoundingMode</a>) (f *<b>Float</b>, b <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1173">Abs</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1440">Add</a>(x, y *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-669">Copy</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1581">Mul</a>(x, y *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1181">Neg</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/floatconv.go.html#line-261">Parse</a>(s <a href="../builtin.html#name-string">string</a>, base <a href="../builtin.html#name-int">int</a>) (f *<b>Float</b>, b <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1626">Quo</a>(x, y *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-645">Set</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-543">SetFloat64</a>(x <a href="../builtin.html#name-float64">float64</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-632">SetInf</a>(signbit <a href="../builtin.html#name-bool">bool</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-591">SetInt</a>(x *<a href="#name-Int">Int</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-530">SetInt64</a>(x <a href="../builtin.html#name-int64">int64</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-319">SetMantExp</a>(mant *<b>Float</b>, exp <a href="../builtin.html#name-int">int</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-200">SetMode</a>(mode <a href="#name-RoundingMode">RoundingMode</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-164">SetPrec</a>(prec <a href="../builtin.html#name-uint">uint</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-615">SetRat</a>(x *<a href="#name-Rat">Rat</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/floatconv.go.html#line-22">SetString</a>(s <a href="../builtin.html#name-string">string</a>) (*<b>Float</b>, <a href="../builtin.html#name-bool">bool</a>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-523">SetUint64</a>(x <a href="../builtin.html#name-uint64">uint64</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/sqrt.go.html#line-33">Sqrt</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1514">Sub</a>(x, y *<b>Float</b>) *<b>Float</b></span>
+		<input type='checkbox' class="stat" id="Float-stat-params"><label for="Float-stat-params">As Inputs Of (12+)</label><span id='Float-stat-params-content' class="stat-content">
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1173">Abs</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1440">Add</a>(x, y *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1673">Cmp</a>(y *<b>Float</b>) <a href="../builtin.html#name-int">int</a>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-669">Copy</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-268">MantExp</a>(mant *<b>Float</b>) (exp <a href="../builtin.html#name-int">int</a>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1581">Mul</a>(x, y *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1181">Neg</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1626">Quo</a>(x, y *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-645">Set</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-319">SetMantExp</a>(mant *<b>Float</b>, exp <a href="../builtin.html#name-int">int</a>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/sqrt.go.html#line-33">Sqrt</a>(x *<b>Float</b>) *<b>Float</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1514">Sub</a>(x, y *<b>Float</b>) *<b>Float</b></span></div>
+<div class="anchor" id="name-Int" data-popularity="9245">	 type <a href="../../src/math/big/int.go.html#line-25">Int</a> <i>(struct)</i>
+		An Int represents a signed multi-precision integer.
+		The zero value for an Int represents the value 0.
+
+		Operations always take pointer arguments (*Int) rather
+		than Int values, and each unique Int value requires
+		its own unique *Int pointer. To "copy" an Int value,
+		an existing (or newly allocated) Int must be set to
+		a new value using the Int.Set method; shallow copies
+		of Ints are not supported and may lead to errors.
+
+		<input type='checkbox' class="stat" id="Int-stat-methods"><label for="Int-stat-methods">Exported Methods (58)</label><span id='Int-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/math/big/int.go.html#line-102">Abs</a>(x *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-116">Add</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-1072">And</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-1102">AndNot</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/intconv.go.html#line-30">Append</a>(buf []<a href="../builtin.html#name-byte">byte</a>, base <a href="../builtin.html#name-int">int</a>) []<a href="../builtin.html#name-byte">byte</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-197">Binomial</a>(n, k <a href="../builtin.html#name-int64">int64</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-1032">Bit</a>(i <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-uint">uint</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-472">BitLen</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-86">Bits</a>() []<a href="#name-Word">Word</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-452">Bytes</a>() []<a href="../builtin.html#name-byte">byte</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-320">Cmp</a>(y *<b>Int</b>) (r <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/math/big/int.go.html#line-347">CmpAbs</a>(y *<b>Int</b>) <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-247">Div</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-296">DivMod</a>(x, y, m *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			(*T) <a href="../../src/math/big/int.go.html#line-488">Exp</a>(x, y, m *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-461">FillBytes</a>(buf []<a href="../builtin.html#name-byte">byte</a>) []<a href="../builtin.html#name-byte">byte</a>
+			(*T) <a href="../../src/math/big/intconv.go.html#line-67">Format</a>(s <a href="../fmt.html">fmt</a>.<a href="../fmt.html#name-State">State</a>, ch <a href="../builtin.html#name-rune">rune</a>)
+			(*T) <a href="../../src/math/big/int.go.html#line-531">GCD</a>(x, y, a, b *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/intmarsh.go.html#line-33">GobDecode</a>(buf []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/intmarsh.go.html#line-18">GobEncode</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/int.go.html#line-373">Int64</a>() <a href="../builtin.html#name-int64">int64</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-388">IsInt64</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-397">IsUint64</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-1008">Lsh</a>(x *<b>Int</b>, n <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/intmarsh.go.html#line-69">MarshalJSON</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/intmarsh.go.html#line-49">MarshalText</a>() (text []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/int.go.html#line-264">Mod</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-808">ModInverse</a>(g, n *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-981">ModSqrt</a>(x, p *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-158">Mul</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-176">MulRange</a>(a, b <a href="../builtin.html#name-int64">int64</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-109">Neg</a>(x *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-1195">Not</a>(x *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-1135">Or</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/prime.go.html#line-26">ProbablyPrime</a>(n <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-211">Quo</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-238">QuoRem</a>(x, y, r *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			(*T) <a href="../../src/math/big/int.go.html#line-794">Rand</a>(rnd *<a href="rand.html">rand</a>.<a href="rand.html#name-Rand">Rand</a>, n *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-220">Rem</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-1015">Rsh</a>(x *<b>Int</b>, n <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/intconv.go.html#line-238">Scan</a>(s <a href="../fmt.html">fmt</a>.<a href="../fmt.html#name-ScanState">ScanState</a>, ch <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-73">Set</a>(x *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-1055">SetBit</a>(x *<b>Int</b>, i <a href="../builtin.html#name-int">int</a>, b <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-95">SetBits</a>(abs []<a href="#name-Word">Word</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-443">SetBytes</a>(buf []<a href="../builtin.html#name-byte">byte</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-49">SetInt64</a>(x <a href="../builtin.html#name-int64">int64</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-424">SetString</a>(s <a href="../builtin.html#name-string">string</a>, base <a href="../builtin.html#name-int">int</a>) (*<b>Int</b>, <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/math/big/int.go.html#line-61">SetUint64</a>(x <a href="../builtin.html#name-uint64">uint64</a>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/int.go.html#line-38">Sign</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-1211">Sqrt</a>(x *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/intconv.go.html#line-39">String</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-137">Sub</a>(x, y *<b>Int</b>) *<b>Int</b>
+			(*T) <a href="../../src/math/big/intconv.go.html#line-21">Text</a>(base <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-478">TrailingZeroBits</a>() <a href="../builtin.html#name-uint">uint</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-383">Uint64</a>() <a href="../builtin.html#name-uint64">uint64</a>
+			(*T) <a href="../../src/math/big/intmarsh.go.html#line-74">UnmarshalJSON</a>(text []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/intmarsh.go.html#line-57">UnmarshalText</a>(text []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/int.go.html#line-1165">Xor</a>(x, y *<b>Int</b>) *<b>Int</b></span>
+		<input type='checkbox' class="stat" id="Int-stat-impls"><label for="Int-stat-impls">Implements (7+)</label><span id='Int-stat-impls-content' class="stat-content">
+			*T : encoding.<a href="../encoding.html#name-TextMarshaler">TextMarshaler</a>
+			*T : encoding.<a href="../encoding.html#name-TextUnmarshaler">TextUnmarshaler</a>
+			*T : encoding/json.<a href="../encoding/json.html#name-Marshaler">Marshaler</a>
+			*T : encoding/json.<a href="../encoding/json.html#name-Unmarshaler">Unmarshaler</a>
+			*T : fmt.<a href="../fmt.html#name-Formatter">Formatter</a>
+			*T : fmt.<a href="../fmt.html#name-Scanner">Scanner</a>
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Int-stat-results"><label for="Int-stat-results">As Outputs Of (58+)</label><span id='Int-stat-results-content' class="stat-content">
+			func <a href="#name-NewInt">NewInt</a>(x <a href="../builtin.html#name-int64">int64</a>) *<b>Int</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1073">Int</a>(z *<b>Int</b>) (*<b>Int</b>, <a href="#name-Accuracy">Accuracy</a>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-102">Abs</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-116">Add</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1072">And</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1102">AndNot</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-197">Binomial</a>(n, k <a href="../builtin.html#name-int64">int64</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-247">Div</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-296">DivMod</a>(x, y, m *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-296">DivMod</a>(x, y, m *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-488">Exp</a>(x, y, m *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-531">GCD</a>(x, y, a, b *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1008">Lsh</a>(x *<b>Int</b>, n <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-264">Mod</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-808">ModInverse</a>(g, n *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-981">ModSqrt</a>(x, p *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-158">Mul</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-176">MulRange</a>(a, b <a href="../builtin.html#name-int64">int64</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-109">Neg</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1195">Not</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1135">Or</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-211">Quo</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-238">QuoRem</a>(x, y, r *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-238">QuoRem</a>(x, y, r *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-794">Rand</a>(rnd *<a href="rand.html">rand</a>.<a href="rand.html#name-Rand">Rand</a>, n *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-220">Rem</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1015">Rsh</a>(x *<b>Int</b>, n <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-73">Set</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1055">SetBit</a>(x *<b>Int</b>, i <a href="../builtin.html#name-int">int</a>, b <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-95">SetBits</a>(abs []<a href="#name-Word">Word</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-443">SetBytes</a>(buf []<a href="../builtin.html#name-byte">byte</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-49">SetInt64</a>(x <a href="../builtin.html#name-int64">int64</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-424">SetString</a>(s <a href="../builtin.html#name-string">string</a>, base <a href="../builtin.html#name-int">int</a>) (*<b>Int</b>, <a href="../builtin.html#name-bool">bool</a>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-61">SetUint64</a>(x <a href="../builtin.html#name-uint64">uint64</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1211">Sqrt</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-137">Sub</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1165">Xor</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-420">Denom</a>() *<b>Int</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-409">Num</a>() *<b>Int</b>
+			func crypto/dsa.<a href="../crypto/dsa.html#name-Sign">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="../crypto/dsa.html">dsa</a>.<a href="../crypto/dsa.html#name-PrivateKey">PrivateKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>) (r, s *<b>Int</b>, err <a href="../builtin.html#name-error">error</a>)
+			func crypto/ecdsa.<a href="../crypto/ecdsa.html#name-Sign">Sign</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv *<a href="../crypto/ecdsa.html">ecdsa</a>.<a href="../crypto/ecdsa.html#name-PrivateKey">PrivateKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>) (r, s *<b>Int</b>, err <a href="../builtin.html#name-error">error</a>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-GenerateKey">GenerateKey</a>(curve <a href="../crypto/elliptic.html">elliptic</a>.<a href="../crypto/elliptic.html#name-Curve">Curve</a>, rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) (priv []<a href="../builtin.html#name-byte">byte</a>, x, y *<b>Int</b>, err <a href="../builtin.html#name-error">error</a>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Unmarshal">Unmarshal</a>(curve <a href="../crypto/elliptic.html">elliptic</a>.<a href="../crypto/elliptic.html#name-Curve">Curve</a>, data []<a href="../builtin.html#name-byte">byte</a>) (x, y *<b>Int</b>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-UnmarshalCompressed">UnmarshalCompressed</a>(curve <a href="../crypto/elliptic.html">elliptic</a>.<a href="../crypto/elliptic.html#name-Curve">Curve</a>, data []<a href="../builtin.html#name-byte">byte</a>) (x, y *<b>Int</b>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-33">Add</a>(x1, y1, x2, y2 *<b>Int</b>) (x, y *<b>Int</b>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-35">Double</a>(x1, y1 *<b>Int</b>) (x, y *<b>Int</b>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-40">ScalarBaseMult</a>(k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<b>Int</b>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-37">ScalarMult</a>(x1, y1 *<b>Int</b>, k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-110">Add</a>(x1, y1, x2, y2 *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-110">Add</a>(x1, y1, x2, y2 *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-194">Double</a>(x1, y1 *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-194">Double</a>(x1, y1 *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-277">ScalarBaseMult</a>(k []<a href="../builtin.html#name-byte">byte</a>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-277">ScalarBaseMult</a>(k []<a href="../builtin.html#name-byte">byte</a>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-260">ScalarMult</a>(Bx, By *<b>Int</b>, k []<a href="../builtin.html#name-byte">byte</a>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-260">ScalarMult</a>(Bx, By *<b>Int</b>, k []<a href="../builtin.html#name-byte">byte</a>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/rand.<a href="../crypto/rand.html#name-Int">Int</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, max *<b>Int</b>) (n *<b>Int</b>, err <a href="../builtin.html#name-error">error</a>)
+			func crypto/rand.<a href="../crypto/rand.html#name-Prime">Prime</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, bits <a href="../builtin.html#name-int">int</a>) (p *<b>Int</b>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Int-stat-params"><label for="Int-stat-params">As Inputs Of (47+)</label><span id='Int-stat-params-content' class="stat-content">
+			func <a href="#name-Jacobi">Jacobi</a>(x, y *<b>Int</b>) <a href="../builtin.html#name-int">int</a>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1073">Int</a>(z *<b>Int</b>) (*<b>Int</b>, <a href="#name-Accuracy">Accuracy</a>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-591">SetInt</a>(x *<b>Int</b>) *<a href="#name-Float">Float</a>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-102">Abs</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-116">Add</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1072">And</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1102">AndNot</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-320">Cmp</a>(y *<b>Int</b>) (r <a href="../builtin.html#name-int">int</a>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-347">CmpAbs</a>(y *<b>Int</b>) <a href="../builtin.html#name-int">int</a>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-247">Div</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-296">DivMod</a>(x, y, m *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-488">Exp</a>(x, y, m *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-531">GCD</a>(x, y, a, b *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1008">Lsh</a>(x *<b>Int</b>, n <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-264">Mod</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-808">ModInverse</a>(g, n *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-981">ModSqrt</a>(x, p *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-158">Mul</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-109">Neg</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1195">Not</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1135">Or</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-211">Quo</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-238">QuoRem</a>(x, y, r *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-794">Rand</a>(rnd *<a href="rand.html">rand</a>.<a href="rand.html#name-Rand">Rand</a>, n *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-220">Rem</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1015">Rsh</a>(x *<b>Int</b>, n <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-73">Set</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1055">SetBit</a>(x *<b>Int</b>, i <a href="../builtin.html#name-int">int</a>, b <a href="../builtin.html#name-uint">uint</a>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1211">Sqrt</a>(x *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-137">Sub</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-1165">Xor</a>(x, y *<b>Int</b>) *<b>Int</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-303">SetFrac</a>(a, b *<b>Int</b>) *<a href="#name-Rat">Rat</a>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-333">SetInt</a>(x *<b>Int</b>) *<a href="#name-Rat">Rat</a>
+			func crypto/dsa.<a href="../crypto/dsa.html#name-Verify">Verify</a>(pub *<a href="../crypto/dsa.html">dsa</a>.<a href="../crypto/dsa.html#name-PublicKey">PublicKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>, r, s *<b>Int</b>) <a href="../builtin.html#name-bool">bool</a>
+			func crypto/ecdsa.<a href="../crypto/ecdsa.html#name-Verify">Verify</a>(pub *<a href="../crypto/ecdsa.html">ecdsa</a>.<a href="../crypto/ecdsa.html#name-PublicKey">PublicKey</a>, hash []<a href="../builtin.html#name-byte">byte</a>, r, s *<b>Int</b>) <a href="../builtin.html#name-bool">bool</a>
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Marshal">Marshal</a>(curve <a href="../crypto/elliptic.html">elliptic</a>.<a href="../crypto/elliptic.html#name-Curve">Curve</a>, x, y *<b>Int</b>) []<a href="../builtin.html#name-byte">byte</a>
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-MarshalCompressed">MarshalCompressed</a>(curve <a href="../crypto/elliptic.html">elliptic</a>.<a href="../crypto/elliptic.html#name-Curve">Curve</a>, x, y *<b>Int</b>) []<a href="../builtin.html#name-byte">byte</a>
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-33">Add</a>(x1, y1, x2, y2 *<b>Int</b>) (x, y *<b>Int</b>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-35">Double</a>(x1, y1 *<b>Int</b>) (x, y *<b>Int</b>)
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-31">IsOnCurve</a>(x, y *<b>Int</b>) <a href="../builtin.html#name-bool">bool</a>
+			func crypto/elliptic.<a href="../crypto/elliptic.html#name-Curve">Curve</a>.<a href="../../src/crypto/elliptic/elliptic.go.html#line-37">ScalarMult</a>(x1, y1 *<b>Int</b>, k []<a href="../builtin.html#name-byte">byte</a>) (x, y *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-110">Add</a>(x1, y1, x2, y2 *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-194">Double</a>(x1, y1 *<b>Int</b>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-73">IsOnCurve</a>(x, y *<b>Int</b>) <a href="../builtin.html#name-bool">bool</a>
+			func crypto/elliptic.(*<a href="../crypto/elliptic.html#name-CurveParams">CurveParams</a>).<a href="../../src/crypto/elliptic/elliptic.go.html#line-260">ScalarMult</a>(Bx, By *<b>Int</b>, k []<a href="../builtin.html#name-byte">byte</a>) (*<b>Int</b>, *<b>Int</b>)
+			func crypto/rand.<a href="../crypto/rand.html#name-Int">Int</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, max *<b>Int</b>) (n *<b>Int</b>, err <a href="../builtin.html#name-error">error</a>)
+			func vendor/golang.org/x/crypto/cryptobyte.(*<a href="../vendor/golang.org/x/crypto/cryptobyte.html#name-Builder">Builder</a>).<a href="../../src/vendor/golang.org/x/crypto/cryptobyte/asn1.go.html#line-67">AddASN1BigInt</a>(n *<b>Int</b>)</span></div>
+<div class="anchor" id="name-Rat" data-popularity="3360">	 type <a href="../../src/math/big/rat.go.html#line-23">Rat</a> <i>(struct)</i>
+		A Rat represents a quotient a/b of arbitrary precision.
+		The zero value for a Rat represents the value 0.
+
+		Operations always take pointer arguments (*Rat) rather
+		than Rat values, and each unique Rat value requires
+		its own unique *Rat pointer. To "copy" a Rat value,
+		an existing (or newly allocated) Rat must be set to
+		a new value using the Rat.Set method; shallow copies
+		of Rats are not supported and may lead to errors.
+
+		<input type='checkbox' class="stat" id="Rat-stat-methods"><label for="Rat-stat-methods">Exported Methods (30)</label><span id='Rat-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/math/big/rat.go.html#line-366">Abs</a>(x *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-494">Add</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-486">Cmp</a>(y *<b>Rat</b>) <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/big/rat.go.html#line-420">Denom</a>() *<a href="#name-Int">Int</a>
+			(*T) <a href="../../src/math/big/rat.go.html#line-273">Float32</a>() (f <a href="../builtin.html#name-float32">float32</a>, exact <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/math/big/rat.go.html#line-289">Float64</a>() (f <a href="../builtin.html#name-float64">float64</a>, exact <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/math/big/ratconv.go.html#line-324">FloatString</a>(prec <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/math/big/ratmarsh.go.html#line-42">GobDecode</a>(buf []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/ratmarsh.go.html#line-19">GobEncode</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/rat.go.html#line-381">Inv</a>(x *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-401">IsInt</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/math/big/ratmarsh.go.html#line-61">MarshalText</a>() (text []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/math/big/rat.go.html#line-514">Mul</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-373">Neg</a>(x *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-409">Num</a>() *<a href="#name-Int">Int</a>
+			(*T) <a href="../../src/math/big/rat.go.html#line-533">Quo</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/ratconv.go.html#line-314">RatString</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/math/big/ratconv.go.html#line-26">Scan</a>(s <a href="../fmt.html">fmt</a>.<a href="../fmt.html#name-ScanState">ScanState</a>, ch <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/math/big/rat.go.html#line-354">Set</a>(x *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-39">SetFloat64</a>(f <a href="../builtin.html#name-float64">float64</a>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-303">SetFrac</a>(a, b *<a href="#name-Int">Int</a>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-319">SetFrac64</a>(a, b <a href="../builtin.html#name-int64">int64</a>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-333">SetInt</a>(x *<a href="#name-Int">Int</a>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-340">SetInt64</a>(x <a href="../builtin.html#name-int64">int64</a>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/ratconv.go.html#line-57">SetString</a>(s <a href="../builtin.html#name-string">string</a>) (*<b>Rat</b>, <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/math/big/rat.go.html#line-347">SetUint64</a>(x <a href="../builtin.html#name-uint64">uint64</a>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/rat.go.html#line-396">Sign</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/math/big/ratconv.go.html#line-295">String</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/math/big/rat.go.html#line-504">Sub</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			(*T) <a href="../../src/math/big/ratmarsh.go.html#line-69">UnmarshalText</a>(text []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Rat-stat-impls"><label for="Rat-stat-impls">Implements (4+)</label><span id='Rat-stat-impls-content' class="stat-content">
+			*T : encoding.<a href="../encoding.html#name-TextMarshaler">TextMarshaler</a>
+			*T : encoding.<a href="../encoding.html#name-TextUnmarshaler">TextUnmarshaler</a>
+			*T : fmt.<a href="../fmt.html#name-Scanner">Scanner</a>
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Rat-stat-results"><label for="Rat-stat-results">As Outputs Of (17+)</label><span id='Rat-stat-results-content' class="stat-content">
+			func <a href="#name-NewRat">NewRat</a>(a, b <a href="../builtin.html#name-int64">int64</a>) *<b>Rat</b>
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1129">Rat</a>(z *<b>Rat</b>) (*<b>Rat</b>, <a href="#name-Accuracy">Accuracy</a>)
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-366">Abs</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-494">Add</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-381">Inv</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-514">Mul</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-373">Neg</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-533">Quo</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-354">Set</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-39">SetFloat64</a>(f <a href="../builtin.html#name-float64">float64</a>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-303">SetFrac</a>(a, b *<a href="#name-Int">Int</a>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-319">SetFrac64</a>(a, b <a href="../builtin.html#name-int64">int64</a>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-333">SetInt</a>(x *<a href="#name-Int">Int</a>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-340">SetInt64</a>(x <a href="../builtin.html#name-int64">int64</a>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/ratconv.go.html#line-57">SetString</a>(s <a href="../builtin.html#name-string">string</a>) (*<b>Rat</b>, <a href="../builtin.html#name-bool">bool</a>)
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-347">SetUint64</a>(x <a href="../builtin.html#name-uint64">uint64</a>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-504">Sub</a>(x, y *<b>Rat</b>) *<b>Rat</b></span>
+		<input type='checkbox' class="stat" id="Rat-stat-params"><label for="Rat-stat-params">As Inputs Of (11+)</label><span id='Rat-stat-params-content' class="stat-content">
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-1129">Rat</a>(z *<b>Rat</b>) (*<b>Rat</b>, <a href="#name-Accuracy">Accuracy</a>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-615">SetRat</a>(x *<b>Rat</b>) *<a href="#name-Float">Float</a>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-366">Abs</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-494">Add</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-486">Cmp</a>(y *<b>Rat</b>) <a href="../builtin.html#name-int">int</a>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-381">Inv</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-514">Mul</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-373">Neg</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-533">Quo</a>(x, y *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-354">Set</a>(x *<b>Rat</b>) *<b>Rat</b>
+			func (*<a href="#name-Rat">Rat</a>).<a href="../../src/math/big/rat.go.html#line-504">Sub</a>(x, y *<b>Rat</b>) *<b>Rat</b></span></div>
+<div class="anchor" id="name-RoundingMode" data-popularity="260">	 type <a href="../../src/math/big/float.go.html#line-132">RoundingMode</a> <a href="../builtin.html#name-byte">byte</a>
+		RoundingMode determines how a Float value is rounded to the
+		desired precision. Rounding may change the Float value; the
+		rounding error is described by the Float's Accuracy.
+
+		<input type='checkbox' class="stat" id="RoundingMode-stat-methods"><label for="RoundingMode-stat-methods">One Exported Method</label><span id='RoundingMode-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/math/big/roundingmode_string.go.html#line-11">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="RoundingMode-stat-impls"><label for="RoundingMode-stat-impls">Implements (1+)</label><span id='RoundingMode-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="RoundingMode-stat-results"><label for="RoundingMode-stat-results">As Outputs Of (1+)</label><span id='RoundingMode-stat-results-content' class="stat-content">
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-223">Mode</a>() <b>RoundingMode</b></span>
+		<input type='checkbox' class="stat" id="RoundingMode-stat-params"><label for="RoundingMode-stat-params">As Inputs Of (2+)</label><span id='RoundingMode-stat-params-content' class="stat-content">
+			func <a href="#name-ParseFloat">ParseFloat</a>(s <a href="../builtin.html#name-string">string</a>, base <a href="../builtin.html#name-int">int</a>, prec <a href="../builtin.html#name-uint">uint</a>, mode <b>RoundingMode</b>) (f *<a href="#name-Float">Float</a>, b <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Float">Float</a>).<a href="../../src/math/big/float.go.html#line-200">SetMode</a>(mode <b>RoundingMode</b>) *<a href="#name-Float">Float</a></span>
+		<input type='checkbox' class="stat" id="RoundingMode-stat-values"><label for="RoundingMode-stat-values">As Types Of (6+)</label><span id='RoundingMode-stat-values-content' class="stat-content">
+			const <a href="#name-AwayFromZero">AwayFromZero</a>
+			const <a href="#name-ToNearestAway">ToNearestAway</a>
+			const <a href="#name-ToNearestEven">ToNearestEven</a>
+			const <a href="#name-ToNegativeInf">ToNegativeInf</a>
+			const <a href="#name-ToPositiveInf">ToPositiveInf</a>
+			const <a href="#name-ToZero">ToZero</a></span></div>
+<div class="anchor" id="name-Word" data-popularity="110">	 type <a href="../../src/math/big/arith.go.html#line-16">Word</a> <a href="../builtin.html#name-uint">uint</a>
+		A Word represents a single digit of a multi-precision unsigned integer.
+
+		<input type='checkbox' class="stat" id="Word-stat-results"><label for="Word-stat-results">As Outputs Of (1+)</label><span id='Word-stat-results-content' class="stat-content">
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-86">Bits</a>() []<b>Word</b></span>
+		<input type='checkbox' class="stat" id="Word-stat-params"><label for="Word-stat-params">As Inputs Of (1+)</label><span id='Word-stat-params-content' class="stat-content">
+			func (*<a href="#name-Int">Int</a>).<a href="../../src/math/big/int.go.html#line-95">SetBits</a>(abs []<b>Word</b>) *<a href="#name-Int">Int</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Above">	const <a href="../../src/math/big/float.go.html#line-154">Above</a> <a href="#name-Accuracy">Accuracy</a> = 1
+		Constants describing the Accuracy of a Float.</div>
+<div class="anchor" id="name-AwayFromZero">	const <a href="../../src/math/big/float.go.html#line-139">AwayFromZero</a> <a href="#name-RoundingMode">RoundingMode</a> = 3 // no IEEE 754-2008 equivalent
+		These constants define supported rounding modes.</div>
+<div class="anchor" id="name-Below">	const <a href="../../src/math/big/float.go.html#line-152">Below</a> <a href="#name-Accuracy">Accuracy</a> = -1
+		Constants describing the Accuracy of a Float.</div>
+<div class="anchor" id="name-Exact">	const <a href="../../src/math/big/float.go.html#line-153">Exact</a> <a href="#name-Accuracy">Accuracy</a> = 0
+		Constants describing the Accuracy of a Float.</div>
+<div class="anchor" id="name-Jacobi">	 func <a href="../../src/math/big/int.go.html#line-838">Jacobi</a>(x, y *<a href="#name-Int">Int</a>) <a href="../builtin.html#name-int">int</a>
+		Jacobi returns the Jacobi symbol (x/y), either +1, -1, or 0.
+		The y argument must be an odd integer.</div>
+<div class="anchor" id="name-MaxBase">	const <a href="../../src/math/big/natconv.go.html#line-24">MaxBase</a> = 62
+		MaxBase is the largest number base accepted for string conversions.</div>
+<div class="anchor" id="name-MaxExp">	const <a href="../../src/math/big/float.go.html#line-97">MaxExp</a> = 2147483647 // largest supported exponent
+		Exponent and precision limits.</div>
+<div class="anchor" id="name-MaxPrec">	const <a href="../../src/math/big/float.go.html#line-99">MaxPrec</a> = 4294967295 // largest (theoretically) supported precision; likely memory-limited
+		Exponent and precision limits.</div>
+<div class="anchor" id="name-MinExp">	const <a href="../../src/math/big/float.go.html#line-98">MinExp</a> = -2147483648 // smallest supported exponent
+		Exponent and precision limits.</div>
+<div class="anchor" id="name-NewFloat">	 func <a href="../../src/math/big/float.go.html#line-88">NewFloat</a>(x <a href="../builtin.html#name-float64">float64</a>) *<a href="#name-Float">Float</a>
+		NewFloat allocates and returns a new Float set to x,
+		with precision 53 and rounding mode ToNearestEven.
+		NewFloat panics with ErrNaN if x is a NaN.</div>
+<div class="anchor" id="name-NewInt">	 func <a href="../../src/math/big/int.go.html#line-68">NewInt</a>(x <a href="../builtin.html#name-int64">int64</a>) *<a href="#name-Int">Int</a>
+		NewInt allocates and returns a new Int set to x.</div>
+<div class="anchor" id="name-NewRat">	 func <a href="../../src/math/big/rat.go.html#line-33">NewRat</a>(a, b <a href="../builtin.html#name-int64">int64</a>) *<a href="#name-Rat">Rat</a>
+		NewRat creates a new Rat with numerator a and denominator b.</div>
+<div class="anchor" id="name-ParseFloat">	 func <a href="../../src/math/big/floatconv.go.html#line-289">ParseFloat</a>(s <a href="../builtin.html#name-string">string</a>, base <a href="../builtin.html#name-int">int</a>, prec <a href="../builtin.html#name-uint">uint</a>, mode <a href="#name-RoundingMode">RoundingMode</a>) (f *<a href="#name-Float">Float</a>, b <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+		ParseFloat is like f.Parse(s, base) with f set to the given precision
+		and rounding mode.</div>
+<div class="anchor" id="name-ToNearestAway">	const <a href="../../src/math/big/float.go.html#line-137">ToNearestAway</a> <a href="#name-RoundingMode">RoundingMode</a> = 1 // == IEEE 754-2008 roundTiesToAway
+		These constants define supported rounding modes.</div>
+<div class="anchor" id="name-ToNearestEven">	const <a href="../../src/math/big/float.go.html#line-136">ToNearestEven</a> <a href="#name-RoundingMode">RoundingMode</a> = 0 // == IEEE 754-2008 roundTiesToEven
+		These constants define supported rounding modes.</div>
+<div class="anchor" id="name-ToNegativeInf">	const <a href="../../src/math/big/float.go.html#line-140">ToNegativeInf</a> <a href="#name-RoundingMode">RoundingMode</a> = 4 // == IEEE 754-2008 roundTowardNegative
+		These constants define supported rounding modes.</div>
+<div class="anchor" id="name-ToPositiveInf">	const <a href="../../src/math/big/float.go.html#line-141">ToPositiveInf</a> <a href="#name-RoundingMode">RoundingMode</a> = 5 // == IEEE 754-2008 roundTowardPositive
+		These constants define supported rounding modes.</div>
+<div class="anchor" id="name-ToZero">	const <a href="../../src/math/big/float.go.html#line-138">ToZero</a> <a href="#name-RoundingMode">RoundingMode</a> = 2 // == IEEE 754-2008 roundTowardZero
+		These constants define supported rounding modes.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

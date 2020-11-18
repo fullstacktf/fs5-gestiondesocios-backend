@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: gorm.io/gorm/schema</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>schema</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-gorm.io/gorm/schema">gorm.io/gorm/schema</a><i> (on <a href="https://pkg.go.dev/gorm.io/gorm/schema" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/gorm.io/gorm/schema.html">20 packages</a>, and imported by <a href="../../../dep/gorm.io/gorm/schema.html#imported-by">4 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../src/gorm.io/gorm/schema/check.go.html">check.go</a>
+	    <a href="../../../src/gorm.io/gorm/schema/field.go.html">field.go</a>
+	    <a href="../../../src/gorm.io/gorm/schema/index.go.html">index.go</a>
+	    <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html">interfaces.go</a>
+	    <a href="../../../src/gorm.io/gorm/schema/naming.go.html">naming.go</a>
+	    <a href="../../../src/gorm.io/gorm/schema/relationship.go.html">relationship.go</a>
+	    <a href="../../../src/gorm.io/gorm/schema/schema.go.html">schema.go</a>
+	    <a href="../../../src/gorm.io/gorm/schema/utils.go.html">utils.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Check" data-popularity="75">	 type <a href="../../../src/gorm.io/gorm/schema/check.go.html#line-8">Check</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Check-stat-fields"><label for="Check-stat-fields">Exported Fields (34)</label><span id='Check-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-10">Constraint</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11">Field</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-51">AutoCreateTime</a> <i><a href="#name-TimeType">TimeType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-46">AutoIncrement</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-52">AutoUpdateTime</a> <i><a href="#name-TimeType">TimeType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-42">BindNames</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-57">Comment</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-47">Creatable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-41">DBName</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-43">DataType</a> <i><a href="#name-DataType">DataType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-53">DefaultValue</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-54">DefaultValueInterface</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-67">EmbeddedSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-61">FieldType</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-44">GORMDataType</a> <i><a href="#name-DataType">DataType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-50">HasDefaultValue</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-62">IndirectFieldType</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-55">NotNull</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-68">OwnerSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-59">Precision</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-45">PrimaryKey</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-49">Readable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-69">ReflectValueOf</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-60">Scale</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-66">Schema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-71">Set</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, interface{}) <a href="../../builtin.html#name-error">error</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-58">Size</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-63">StructField</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructField">StructField</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-64">Tag</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructTag">StructTag</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-65">TagSettings</a> <i>map[<a href="../../builtin.html#name-string">string</a>]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-56">Unique</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-48">Updatable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-11" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-70">ValueOf</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) (value interface{}, zero <a href="../../builtin.html#name-bool">bool</a>)</i>
+			<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-9">Name</a> <i><a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Check-stat-results"><label for="Check-stat-results">As Outputs Of (1+)</label><span id='Check-stat-results-content' class="stat-content">
+			func (*<a href="#name-Schema">Schema</a>).<a href="../../../src/gorm.io/gorm/schema/check.go.html#line-15">ParseCheckConstraints</a>() map[<a href="../../builtin.html#name-string">string</a>]<b>Check</b></span></div>
+<div class="anchor" id="name-Constraint" data-popularity="75">	 type <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-463">Constraint</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Constraint-stat-fields"><label for="Constraint-stat-fields">Exported Fields (8)</label><span id='Constraint-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-465">Field</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-467">ForeignKeys</a> <i>[]*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-464">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-470">OnDelete</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-471">OnUpdate</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-468">ReferenceSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-469">References</a> <i>[]*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-466">Schema</a> <i>*<a href="#name-Schema">Schema</a></i></span>
+		<input type='checkbox' class="stat" id="Constraint-stat-results"><label for="Constraint-stat-results">As Outputs Of (1+)</label><span id='Constraint-stat-results-content' class="stat-content">
+			func (*<a href="#name-Relationship">Relationship</a>).<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-474">ParseConstraint</a>() *<b>Constraint</b></span></div>
+<div class="anchor" id="name-CreateClausesInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-11">CreateClausesInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="CreateClausesInterface-stat-methods"><label for="CreateClausesInterface-stat-methods">One Exported Method</label><span id='CreateClausesInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-12">CreateClauses</a>(*<a href="#name-Field">Field</a>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-DataType" data-popularity="15">	 type <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-17">DataType</a> <a href="../../builtin.html#name-string">string</a>
+
+		<input type='checkbox' class="stat" id="DataType-stat-values"><label for="DataType-stat-values">As Types Of (7+)</label><span id='DataType-stat-values-content' class="stat-content">
+			const <a href="#name-Bool">Bool</a>
+			const <a href="#name-Bytes">Bytes</a>
+			const <a href="#name-Float">Float</a>
+			const <a href="#name-Int">Int</a>
+			const <a href="#name-String">String</a>
+			const <a href="#name-Time">Time</a>
+			const <a href="#name-Uint">Uint</a></span></div>
+<div class="anchor" id="name-DeleteClausesInterface" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-23">DeleteClausesInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="DeleteClausesInterface-stat-methods"><label for="DeleteClausesInterface-stat-methods">One Exported Method</label><span id='DeleteClausesInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-24">DeleteClauses</a>(*<a href="#name-Field">Field</a>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></span>
+		<input type='checkbox' class="stat" id="DeleteClausesInterface-stat-impledby"><label for="DeleteClausesInterface-stat-impledby">Implemented By (1+)</label><span id='DeleteClausesInterface-stat-impledby-content' class="stat-content">
+			gorm.io/gorm.<a href="../gorm.html#name-DeletedAt">DeletedAt</a></span></div>
+<div class="anchor" id="name-Field" data-popularity="815">	 type <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-39">Field</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Field-stat-fields"><label for="Field-stat-fields">Exported Fields (32)</label><span id='Field-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-51">AutoCreateTime</a> <i><a href="#name-TimeType">TimeType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-46">AutoIncrement</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-52">AutoUpdateTime</a> <i><a href="#name-TimeType">TimeType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-42">BindNames</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-57">Comment</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-47">Creatable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-41">DBName</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-43">DataType</a> <i><a href="#name-DataType">DataType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-53">DefaultValue</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-54">DefaultValueInterface</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-67">EmbeddedSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-61">FieldType</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-44">GORMDataType</a> <i><a href="#name-DataType">DataType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-50">HasDefaultValue</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-62">IndirectFieldType</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-40">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-55">NotNull</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-68">OwnerSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-59">Precision</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-45">PrimaryKey</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-49">Readable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-69">ReflectValueOf</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-60">Scale</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-66">Schema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-71">Set</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, interface{}) <a href="../../builtin.html#name-error">error</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-58">Size</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-63">StructField</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructField">StructField</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-64">Tag</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructTag">StructTag</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-65">TagSettings</a> <i>map[<a href="../../builtin.html#name-string">string</a>]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-56">Unique</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-48">Updatable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-70">ValueOf</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) (value interface{}, zero <a href="../../builtin.html#name-bool">bool</a>)</i></span>
+		<input type='checkbox' class="stat" id="Field-stat-results"><label for="Field-stat-results">As Outputs Of (2+)</label><span id='Field-stat-results-content' class="stat-content">
+			func <a href="#name-Schema">Schema</a>.<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-59">LookUpField</a>(name <a href="../../builtin.html#name-string">string</a>) *<b>Field</b>
+			func (*<a href="#name-Schema">Schema</a>).<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-74">ParseField</a>(fieldStruct <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructField">StructField</a>) *<b>Field</b></span>
+		<input type='checkbox' class="stat" id="Field-stat-params"><label for="Field-stat-params">As Inputs Of (19+)</label><span id='Field-stat-params-content' class="stat-content">
+			func <a href="#name-GetIdentityFieldValuesMap">GetIdentityFieldValuesMap</a>(reflectValue <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, fields []*<b>Field</b>) (map[<a href="../../builtin.html#name-string">string</a>][]<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, [][]interface{})
+			func <a href="#name-GetIdentityFieldValuesMapFromValues">GetIdentityFieldValuesMapFromValues</a>(values []interface{}, fields []*<b>Field</b>) (map[<a href="../../builtin.html#name-string">string</a>][]<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, [][]interface{})
+			func <a href="#name-CreateClausesInterface">CreateClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-12">CreateClauses</a>(*<b>Field</b>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a>
+			func <a href="#name-DeleteClausesInterface">DeleteClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-24">DeleteClauses</a>(*<b>Field</b>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a>
+			func <a href="#name-QueryClausesInterface">QueryClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-16">QueryClauses</a>(*<b>Field</b>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a>
+			func <a href="#name-UpdateClausesInterface">UpdateClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-20">UpdateClauses</a>(*<b>Field</b>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a>
+			func gorm.io/gorm.<a href="../gorm.html#name-DeletedAt">DeletedAt</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-87">DeleteClauses</a>(f *<b>Field</b>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a>
+			func gorm.io/gorm.<a href="../gorm.html#name-DeletedAt">DeletedAt</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-47">QueryClauses</a>(f *<b>Field</b>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a>
+			func gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/gorm/interfaces.go.html#line-16">DataTypeOf</a>(*<b>Field</b>) <a href="../../builtin.html#name-string">string</a>
+			func gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<b>Field</b>) <a href="clause.html">clause</a>.<a href="clause.html#name-Expression">Expression</a>
+			func gorm.io/gorm.<a href="../gorm.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator.go.html#line-39">FullDataTypeOf</a>(*<b>Field</b>) <a href="clause.html">clause</a>.<a href="clause.html#name-Expr">Expr</a>
+			func gorm.io/gorm.<a href="../gorm.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator.go.html#line-51">MigrateColumn</a>(dst interface{}, field *<b>Field</b>, columnType <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ColumnType">ColumnType</a>) <a href="../../builtin.html#name-error">error</a>
+			func gorm.io/gorm/migrator.<a href="migrator.html#name-GormDataTypeInterface">GormDataTypeInterface</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-28">GormDBDataType</a>(*<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>, *<b>Field</b>) <a href="../../builtin.html#name-string">string</a>
+			func gorm.io/gorm/migrator.<a href="migrator.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-47">DataTypeOf</a>(field *<b>Field</b>) <a href="../../builtin.html#name-string">string</a>
+			func gorm.io/gorm/migrator.<a href="migrator.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-58">FullDataTypeOf</a>(field *<b>Field</b>) (expr <a href="clause.html">clause</a>.<a href="clause.html#name-Expr">Expr</a>)
+			func gorm.io/gorm/migrator.<a href="migrator.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-361">MigrateColumn</a>(value interface{}, field *<b>Field</b>, columnType <a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-ColumnType">ColumnType</a>) <a href="../../builtin.html#name-error">error</a>
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-187">DataTypeOf</a>(field *<b>Field</b>) <a href="../../builtin.html#name-string">string</a>
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-147">DefaultValueOf</a>(field *<b>Field</b>) <a href="clause.html">clause</a>.<a href="clause.html#name-Expression">Expression</a>
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-70">FullDataTypeOf</a>(field *<b>Field</b>) <a href="clause.html">clause</a>.<a href="clause.html#name-Expr">Expr</a></span></div>
+<div class="anchor" id="name-GormDataTypeInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-7">GormDataTypeInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="GormDataTypeInterface-stat-methods"><label for="GormDataTypeInterface-stat-methods">One Exported Method</label><span id='GormDataTypeInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-8">GormDataType</a>() <a href="../../builtin.html#name-string">string</a></span></div>
+<div class="anchor" id="name-Index" data-popularity="150">	 type <a href="../../../src/gorm.io/gorm/schema/index.go.html#line-9">Index</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Index-stat-fields"><label for="Index-stat-fields">Exported Fields (7)</label><span id='Index-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-11">Class</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-14">Comment</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-16">Fields</a> <i>[]<a href="#name-IndexOption">IndexOption</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-10">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-15">Option</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-12">Type</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-13">Where</a> <i><a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Index-stat-results"><label for="Index-stat-results">As Outputs Of (2+)</label><span id='Index-stat-results-content' class="stat-content">
+			func (*<a href="#name-Schema">Schema</a>).<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-66">LookIndex</a>(name <a href="../../builtin.html#name-string">string</a>) *<b>Index</b>
+			func (*<a href="#name-Schema">Schema</a>).<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-29">ParseIndexes</a>() map[<a href="../../builtin.html#name-string">string</a>]<b>Index</b></span></div>
+<div class="anchor" id="name-IndexOption" data-popularity="70">	 type <a href="../../../src/gorm.io/gorm/schema/index.go.html#line-19">IndexOption</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="IndexOption-stat-fields"><label for="IndexOption-stat-fields">Exported Fields (37)</label><span id='IndexOption-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-23">Collate</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-21">Expression</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20">Field</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-51">AutoCreateTime</a> <i><a href="#name-TimeType">TimeType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-46">AutoIncrement</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-52">AutoUpdateTime</a> <i><a href="#name-TimeType">TimeType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-42">BindNames</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-57">Comment</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-47">Creatable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-41">DBName</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-43">DataType</a> <i><a href="#name-DataType">DataType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-53">DefaultValue</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-54">DefaultValueInterface</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-67">EmbeddedSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-61">FieldType</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-44">GORMDataType</a> <i><a href="#name-DataType">DataType</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-50">HasDefaultValue</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-62">IndirectFieldType</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-40">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-55">NotNull</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-68">OwnerSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-59">Precision</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-45">PrimaryKey</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-49">Readable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-69">ReflectValueOf</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-60">Scale</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-66">Schema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-71">Set</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, interface{}) <a href="../../builtin.html#name-error">error</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-58">Size</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-63">StructField</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructField">StructField</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-64">Tag</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructTag">StructTag</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-65">TagSettings</a> <i>map[<a href="../../builtin.html#name-string">string</a>]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-56">Unique</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-48">Updatable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-20" class="path-duplicate">Field</a>.<a href="../../../src/gorm.io/gorm/schema/field.go.html#line-70">ValueOf</a> <i>func(<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) (value interface{}, zero <a href="../../builtin.html#name-bool">bool</a>)</i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-24">Length</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/index.go.html#line-22">Sort</a> <i><a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="IndexOption-stat-params"><label for="IndexOption-stat-params">As Inputs Of (2+)</label><span id='IndexOption-stat-params-content' class="stat-content">
+			func gorm.io/gorm/migrator.<a href="migrator.html#name-BuildIndexOptionsInterface">BuildIndexOptionsInterface</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-534">BuildIndexOptions</a>([]<b>IndexOption</b>, *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) []interface{}
+			func gorm.io/gorm/migrator.<a href="migrator.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-512">BuildIndexOptions</a>(opts []<b>IndexOption</b>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) (results []interface{})</span></div>
+<div class="anchor" id="name-Namer" data-popularity="485">	 type <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-14">Namer</a> <b<i>(interface)</i></b>
+		Namer namer interface
+
+		<input type='checkbox' class="stat" id="Namer-stat-methods"><label for="Namer-stat-methods">Exported Methods (6)</label><span id='Namer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-19">CheckerName</a>(table, column <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-16">ColumnName</a>(table, column <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-20">IndexName</a>(table, column <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-17">JoinTableName</a>(joinTable <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-18">RelationshipFKName</a>(<a href="#name-Relationship">Relationship</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-15">TableName</a>(table <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Namer-stat-impledby"><label for="Namer-stat-impledby">Implemented By (1+)</label><span id='Namer-stat-impledby-content' class="stat-content">
+			<a href="#name-NamingStrategy">NamingStrategy</a></span>
+		<input type='checkbox' class="stat" id="Namer-stat-params"><label for="Namer-stat-params">As Inputs Of (1+)</label><span id='Namer-stat-params-content' class="stat-content">
+			func <a href="#name-Parse">Parse</a>(dest interface{}, cacheStore *<a href="../../sync.html">sync</a>.<a href="../../sync.html#name-Map">Map</a>, namer <b>Namer</b>) (*<a href="#name-Schema">Schema</a>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-NamingStrategy" data-popularity="350">	 type <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-24">NamingStrategy</a> <i>(struct)</i>
+		NamingStrategy tables, columns naming strategy
+
+		<input type='checkbox' class="stat" id="NamingStrategy-stat-fields"><label for="NamingStrategy-stat-fields">Exported Fields (2)</label><span id='NamingStrategy-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-26">SingularTable</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-25">TablePrefix</a> <i><a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="NamingStrategy-stat-methods"><label for="NamingStrategy-stat-methods">Exported Methods (6)</label><span id='NamingStrategy-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-60">CheckerName</a>(table, column <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-38">ColumnName</a>(table, column <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-65">IndexName</a>(table, column <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-43">JoinTableName</a>(str <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-55">RelationshipFKName</a>(rel <a href="#name-Relationship">Relationship</a>) <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-30">TableName</a>(str <a href="../../builtin.html#name-string">string</a>) <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="NamingStrategy-stat-impls"><label for="NamingStrategy-stat-impls">Implements (1+)</label><span id='NamingStrategy-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Namer">Namer</a></span></div>
+<div class="anchor" id="name-Polymorphic" data-popularity="0">	 type <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-43">Polymorphic</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Polymorphic-stat-fields"><label for="Polymorphic-stat-fields">Exported Fields (3)</label><span id='Polymorphic-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-44">PolymorphicID</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-45">PolymorphicType</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-46">Value</a> <i><a href="../../builtin.html#name-string">string</a></i></span></div>
+<div class="anchor" id="name-QueryClausesInterface" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-15">QueryClausesInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="QueryClausesInterface-stat-methods"><label for="QueryClausesInterface-stat-methods">One Exported Method</label><span id='QueryClausesInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-16">QueryClauses</a>(*<a href="#name-Field">Field</a>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></span>
+		<input type='checkbox' class="stat" id="QueryClausesInterface-stat-impledby"><label for="QueryClausesInterface-stat-impledby">Implemented By (1+)</label><span id='QueryClausesInterface-stat-impledby-content' class="stat-content">
+			gorm.io/gorm.<a href="../gorm.html#name-DeletedAt">DeletedAt</a></span></div>
+<div class="anchor" id="name-Reference" data-popularity="0">	 type <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-49">Reference</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Reference-stat-fields"><label for="Reference-stat-fields">Exported Fields (4)</label><span id='Reference-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-52">ForeignKey</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-53">OwnPrimaryKey</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-50">PrimaryKey</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-51">PrimaryValue</a> <i><a href="../../builtin.html#name-string">string</a></i></span></div>
+<div class="anchor" id="name-Relationship" data-popularity="205">	 type <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-31">Relationship</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Relationship-stat-fields"><label for="Relationship-stat-fields">Exported Fields (8)</label><span id='Relationship-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-34">Field</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-38">FieldSchema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-39">JoinTable</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-32">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-35">Polymorphic</a> <i>*<a href="#name-Polymorphic">Polymorphic</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-36">References</a> <i>[]*<a href="#name-Reference">Reference</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-37">Schema</a> <i>*<a href="#name-Schema">Schema</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-33">Type</a> <i><a href="#name-RelationshipType">RelationshipType</a></i></span>
+		<input type='checkbox' class="stat" id="Relationship-stat-methods"><label for="Relationship-stat-methods">Exported Methods (2)</label><span id='Relationship-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-474">ParseConstraint</a>() *<a href="#name-Constraint">Constraint</a>
+			(*T) <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-521">ToQueryConditions</a>(reflectValue <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) (conds []<a href="clause.html">clause</a>.<a href="clause.html#name-Expression">Expression</a>)</span>
+		<input type='checkbox' class="stat" id="Relationship-stat-params"><label for="Relationship-stat-params">As Inputs Of (3+)</label><span id='Relationship-stat-params-content' class="stat-content">
+			func <a href="#name-GetRelationsValues">GetRelationsValues</a>(reflectValue <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, rels []*<b>Relationship</b>) (reflectResults <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>)
+			func <a href="#name-Namer">Namer</a>.<a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-18">RelationshipFKName</a>(<b>Relationship</b>) <a href="../../builtin.html#name-string">string</a>
+			func <a href="#name-NamingStrategy">NamingStrategy</a>.<a href="../../../src/gorm.io/gorm/schema/naming.go.html#line-55">RelationshipFKName</a>(rel <b>Relationship</b>) <a href="../../builtin.html#name-string">string</a></span></div>
+<div class="anchor" id="name-Relationships" data-popularity="0">	 type <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-23">Relationships</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Relationships-stat-fields"><label for="Relationships-stat-fields">Exported Fields (5)</label><span id='Relationships-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-25">BelongsTo</a> <i>[]*<a href="#name-Relationship">Relationship</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-26">HasMany</a> <i>[]*<a href="#name-Relationship">Relationship</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-24">HasOne</a> <i>[]*<a href="#name-Relationship">Relationship</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-27">Many2Many</a> <i>[]*<a href="#name-Relationship">Relationship</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-28">Relations</a> <i>map[<a href="../../builtin.html#name-string">string</a>]*<a href="#name-Relationship">Relationship</a></i></span></div>
+<div class="anchor" id="name-RelationshipType" data-popularity="15">	 type <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-14">RelationshipType</a> <a href="../../builtin.html#name-string">string</a>
+		RelationshipType relationship type
+
+		<input type='checkbox' class="stat" id="RelationshipType-stat-values"><label for="RelationshipType-stat-values">As Types Of (4+)</label><span id='RelationshipType-stat-values-content' class="stat-content">
+			const <a href="#name-BelongsTo">BelongsTo</a>
+			const <a href="#name-HasMany">HasMany</a>
+			const <a href="#name-HasOne">HasOne</a>
+			const <a href="#name-Many2Many">Many2Many</a></span></div>
+<div class="anchor" id="name-Schema" data-popularity="475">	 type <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-18">Schema</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Schema-stat-fields"><label for="Schema-stat-fields">Exported Fields (25)</label><span id='Schema-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-35">AfterCreate</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-37">AfterDelete</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-39">AfterFind</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-38">AfterSave</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-36">AfterUpdate</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-35">BeforeCreate</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-37">BeforeDelete</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-38">BeforeSave</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-36">BeforeUpdate</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-31">CreateClauses</a> <i>[]<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-23">DBNames</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-34">DeleteClauses</a> <i>[]<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-26">Fields</a> <i>[]*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-28">FieldsByDBName</a> <i>map[<a href="../../builtin.html#name-string">string</a>]*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-27">FieldsByName</a> <i>map[<a href="../../builtin.html#name-string">string</a>]*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-29">FieldsWithDefaultDBValue</a> <i>[]*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-20">ModelType</a> <i><a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-19">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-25">PrimaryFieldDBNames</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-24">PrimaryFields</a> <i>[]*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-22">PrioritizedPrimaryField</a> <i>*<a href="#name-Field">Field</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-32">QueryClauses</a> <i>[]<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-30">Relationships</a> <i><a href="#name-Relationships">Relationships</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-21">Table</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-33">UpdateClauses</a> <i>[]<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></i></span>
+		<input type='checkbox' class="stat" id="Schema-stat-methods"><label for="Schema-stat-methods">Exported Methods (7)</label><span id='Schema-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../src/gorm.io/gorm/schema/index.go.html#line-66">LookIndex</a>(name <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Index">Index</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-59">LookUpField</a>(name <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Field">Field</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-52">MakeSlice</a>() <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>
+			(*T) <a href="../../../src/gorm.io/gorm/schema/check.go.html#line-15">ParseCheckConstraints</a>() map[<a href="../../builtin.html#name-string">string</a>]<a href="#name-Check">Check</a>
+			(*T) <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-74">ParseField</a>(fieldStruct <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-StructField">StructField</a>) *<a href="#name-Field">Field</a>
+			(*T) <a href="../../../src/gorm.io/gorm/schema/index.go.html#line-29">ParseIndexes</a>() map[<a href="../../builtin.html#name-string">string</a>]<a href="#name-Index">Index</a>
+			 (T) <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-45">String</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Schema-stat-impls"><label for="Schema-stat-impls">Implements (1+)</label><span id='Schema-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Schema-stat-results"><label for="Schema-stat-results">As Outputs Of (1+)</label><span id='Schema-stat-results-content' class="stat-content">
+			func <a href="#name-Parse">Parse</a>(dest interface{}, cacheStore *<a href="../../sync.html">sync</a>.<a href="../../sync.html#name-Map">Map</a>, namer <a href="#name-Namer">Namer</a>) (*<b>Schema</b>, <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Tabler" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-69">Tabler</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="Tabler-stat-methods"><label for="Tabler-stat-methods">One Exported Method</label><span id='Tabler-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-70">TableName</a>() <a href="../../builtin.html#name-string">string</a></span></div>
+<div class="anchor" id="name-TimeType" data-popularity="15">	 type <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-19">TimeType</a> <a href="../../builtin.html#name-int64">int64</a>
+
+		<input type='checkbox' class="stat" id="TimeType-stat-values"><label for="TimeType-stat-values">As Types Of (3+)</label><span id='TimeType-stat-values-content' class="stat-content">
+			const <a href="#name-UnixMillisecond">UnixMillisecond</a>
+			const <a href="#name-UnixNanosecond">UnixNanosecond</a>
+			const <a href="#name-UnixSecond">UnixSecond</a></span></div>
+<div class="anchor" id="name-UpdateClausesInterface" data-popularity="50">	 type <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-19">UpdateClausesInterface</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="UpdateClausesInterface-stat-methods"><label for="UpdateClausesInterface-stat-methods">One Exported Method</label><span id='UpdateClausesInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-20">UpdateClauses</a>(*<a href="#name-Field">Field</a>) []<a href="clause.html">clause</a>.<a href="clause.html#name-Interface">Interface</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BelongsTo">	const <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-19">BelongsTo</a> <a href="#name-RelationshipType">RelationshipType</a> = "belongs_to" // BelongsToRel belongs to relationship</div>
+<div class="anchor" id="name-Bool">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-30">Bool</a> <a href="#name-DataType">DataType</a> = "bool"</div>
+<div class="anchor" id="name-Bytes">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-36">Bytes</a> <a href="#name-DataType">DataType</a> = "bytes"</div>
+<div class="anchor" id="name-ErrUnsupportedDataType">	  var <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-16">ErrUnsupportedDataType</a> <a href="../../builtin.html#name-error">error</a>
+		ErrUnsupportedDataType unsupported data type</div>
+<div class="anchor" id="name-Float">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-33">Float</a> <a href="#name-DataType">DataType</a> = "float"</div>
+<div class="anchor" id="name-GetIdentityFieldValuesMap">	 func <a href="../../../src/gorm.io/gorm/schema/utils.go.html#line-100">GetIdentityFieldValuesMap</a>(reflectValue <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, fields []*<a href="#name-Field">Field</a>) (map[<a href="../../builtin.html#name-string">string</a>][]<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, [][]interface{})
+		GetIdentityFieldValuesMap get identity map from fields</div>
+<div class="anchor" id="name-GetIdentityFieldValuesMapFromValues">	 func <a href="../../../src/gorm.io/gorm/schema/utils.go.html#line-158">GetIdentityFieldValuesMapFromValues</a>(values []interface{}, fields []*<a href="#name-Field">Field</a>) (map[<a href="../../builtin.html#name-string">string</a>][]<a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, [][]interface{})
+		GetIdentityFieldValuesMapFromValues get identity map from fields</div>
+<div class="anchor" id="name-GetRelationsValues">	 func <a href="../../../src/gorm.io/gorm/schema/utils.go.html#line-62">GetRelationsValues</a>(reflectValue <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>, rels []*<a href="#name-Relationship">Relationship</a>) (reflectResults <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>)
+		GetRelationsValues get relations's values from a reflect value</div>
+<div class="anchor" id="name-HasMany">	const <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-18">HasMany</a> <a href="#name-RelationshipType">RelationshipType</a> = "has_many" // HasManyRel has many relationship</div>
+<div class="anchor" id="name-HasOne">	const <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-17">HasOne</a> <a href="#name-RelationshipType">RelationshipType</a> = "has_one" // HasOneRel has one relationship</div>
+<div class="anchor" id="name-Int">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-31">Int</a> <a href="#name-DataType">DataType</a> = "int"</div>
+<div class="anchor" id="name-Many2Many">	const <a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-20">Many2Many</a> <a href="#name-RelationshipType">RelationshipType</a> = "many_to_many" // Many2ManyRel many to many relationship</div>
+<div class="anchor" id="name-Parse">	 func <a href="../../../src/gorm.io/gorm/schema/schema.go.html#line-74">Parse</a>(dest interface{}, cacheStore *<a href="../../sync.html">sync</a>.<a href="../../sync.html#name-Map">Map</a>, namer <a href="#name-Namer">Namer</a>) (*<a href="#name-Schema">Schema</a>, <a href="../../builtin.html#name-error">error</a>)
+		get data type from dialector</div>
+<div class="anchor" id="name-ParseTagSetting">	 func <a href="../../../src/gorm.io/gorm/schema/utils.go.html#line-14">ParseTagSetting</a>(str <a href="../../builtin.html#name-string">string</a>, sep <a href="../../builtin.html#name-string">string</a>) map[<a href="../../builtin.html#name-string">string</a>]<a href="../../builtin.html#name-string">string</a></div>
+<div class="anchor" id="name-String">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-34">String</a> <a href="#name-DataType">DataType</a> = "string"</div>
+<div class="anchor" id="name-Time">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-35">Time</a> <a href="#name-DataType">DataType</a> = "time"</div>
+<div class="anchor" id="name-TimeReflectType">	  var <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-21">TimeReflectType</a> <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Type">Type</a></div>
+<div class="anchor" id="name-ToQueryValues">	 func <a href="../../../src/gorm.io/gorm/schema/utils.go.html#line-173">ToQueryValues</a>(table <a href="../../builtin.html#name-string">string</a>, foreignKeys []<a href="../../builtin.html#name-string">string</a>, foreignValues [][]interface{}) (interface{}, []interface{})
+		ToQueryValues to query values</div>
+<div class="anchor" id="name-Uint">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-32">Uint</a> <a href="#name-DataType">DataType</a> = "uint"</div>
+<div class="anchor" id="name-UnixMillisecond">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-25">UnixMillisecond</a> <a href="#name-TimeType">TimeType</a> = 2</div>
+<div class="anchor" id="name-UnixNanosecond">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-26">UnixNanosecond</a> <a href="#name-TimeType">TimeType</a> = 3</div>
+<div class="anchor" id="name-UnixSecond">	const <a href="../../../src/gorm.io/gorm/schema/field.go.html#line-24">UnixSecond</a> <a href="#name-TimeType">TimeType</a> = 1</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/net/dns/dnsmessage</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>dnsmessage</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../../index.html#pkg-vendor/golang.org/x/net/dns/dnsmessage">vendor/golang.org/x/net/dns/dnsmessage</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/net/dns/dnsmessage/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/net/dns/dnsmessage" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../../dep/vendor/golang.org/x/net/dns/dnsmessage.html">one package</a>, and imported by <a href="../../../../../../dep/vendor/golang.org/x/net/dns/dnsmessage.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#doc">d-&gt;</a> <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html">message.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-AAAAResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2487">AAAAResource</a> <i>(struct)</i>
+		An AAAAResource is an AAAA Resource record.
+
+		<input type='checkbox' class="stat" id="AAAAResource-stat-fields"><label for="AAAAResource-stat-fields">One Exported Field</label><span id='AAAAResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2488">AAAA</a> <i>[16]<a href="../../../../../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="AAAAResource-stat-methods"><label for="AAAAResource-stat-methods">One Exported Method</label><span id='AAAAResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2496">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="AAAAResource-stat-impls"><label for="AAAAResource-stat-impls">Implements (2+)</label><span id='AAAAResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="AAAAResource-stat-results"><label for="AAAAResource-stat-results">As Outputs Of (1+)</label><span id='AAAAResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-994">AAAAResource</a>() (<b>AAAAResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="AAAAResource-stat-params"><label for="AAAAResource-stat-params">As Inputs Of (1+)</label><span id='AAAAResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1513">AAAAResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>AAAAResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-AResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2459">AResource</a> <i>(struct)</i>
+		An AResource is an A Resource record.
+
+		<input type='checkbox' class="stat" id="AResource-stat-fields"><label for="AResource-stat-fields">One Exported Field</label><span id='AResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2460">A</a> <i>[4]<a href="../../../../../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="AResource-stat-methods"><label for="AResource-stat-methods">One Exported Method</label><span id='AResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2473">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="AResource-stat-impls"><label for="AResource-stat-impls">Implements (2+)</label><span id='AResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="AResource-stat-results"><label for="AResource-stat-results">As Outputs Of (1+)</label><span id='AResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-976">AResource</a>() (<b>AResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="AResource-stat-params"><label for="AResource-stat-params">As Inputs Of (1+)</label><span id='AResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1489">AResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>AResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Builder" data-popularity="925">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1165">Builder</a> <i>(struct)</i>
+		A Builder allows incrementally packing a DNS message.
+
+		Example usage:
+			buf := make([]byte, 2, 514)
+			b := NewBuilder(buf, Header{...})
+			b.EnableCompression()
+			// Optionally start a section and add things to that section.
+			// Repeat adding sections as necessary.
+			buf, err := b.Finish()
+			// If err is nil, buf[2:] will contain the built bytes.
+
+		<input type='checkbox' class="stat" id="Builder-stat-methods"><label for="Builder-stat-methods">Exported Methods (17)</label><span id='Builder-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1513">AAAAResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-AAAAResource">AAAAResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1489">AResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-AResource">AResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1321">CNAMEResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-CNAMEResource">CNAMEResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1217">EnableCompression</a>()
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1561">Finish</a>() ([]<a href="../../../../../builtin.html#name-byte">byte</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1345">MXResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-MXResource">MXResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1369">NSResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-NSResource">NSResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1537">OPTResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-OPTResource">OPTResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1393">PTRResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-PTRResource">PTRResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1292">Question</a>(q <a href="#name-Question">Question</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1417">SOAResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-SOAResource">SOAResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1465">SRVResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-SRVResource">SRVResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1259">StartAdditionals</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1241">StartAnswers</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1250">StartAuthorities</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1232">StartQuestions</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1441">TXTResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <a href="#name-TXTResource">TXTResource</a>) <a href="../../../../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Builder-stat-results"><label for="Builder-stat-results">As Outputs Of (1+)</label><span id='Builder-stat-results-content' class="stat-content">
+			func <a href="#name-NewBuilder">NewBuilder</a>(buf []<a href="../../../../../builtin.html#name-byte">byte</a>, h <a href="#name-Header">Header</a>) <b>Builder</b></span></div>
+<div class="anchor" id="name-Class" data-popularity="215">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-80">Class</a> <a href="../../../../../builtin.html#name-uint16">uint16</a>
+		A Class is a type of network.
+
+		<input type='checkbox' class="stat" id="Class-stat-methods"><label for="Class-stat-methods">Exported Methods (2)</label><span id='Class-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-110">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-102">String</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Class-stat-impls"><label for="Class-stat-impls">Implements (2+)</label><span id='Class-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a>
+			 T : fmt.<a href="../../../../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Class-stat-values"><label for="Class-stat-values">As Types Of (5+)</label><span id='Class-stat-values-content' class="stat-content">
+			const <a href="#name-ClassANY">ClassANY</a>
+			const <a href="#name-ClassCHAOS">ClassCHAOS</a>
+			const <a href="#name-ClassCSNET">ClassCSNET</a>
+			const <a href="#name-ClassHESIOD">ClassHESIOD</a>
+			const <a href="#name-ClassINET">ClassINET</a></span></div>
+<div class="anchor" id="name-CNAMEResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2149">CNAMEResource</a> <i>(struct)</i>
+		A CNAMEResource is a CNAME Resource record.
+
+		<input type='checkbox' class="stat" id="CNAMEResource-stat-fields"><label for="CNAMEResource-stat-fields">One Exported Field</label><span id='CNAMEResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2150">CNAME</a> <i><a href="#name-Name">Name</a></i></span>
+		<input type='checkbox' class="stat" id="CNAMEResource-stat-methods"><label for="CNAMEResource-stat-methods">One Exported Method</label><span id='CNAMEResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2163">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="CNAMEResource-stat-impls"><label for="CNAMEResource-stat-impls">Implements (2+)</label><span id='CNAMEResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="CNAMEResource-stat-results"><label for="CNAMEResource-stat-results">As Outputs Of (1+)</label><span id='CNAMEResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-850">CNAMEResource</a>() (<b>CNAMEResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="CNAMEResource-stat-params"><label for="CNAMEResource-stat-params">As Inputs Of (1+)</label><span id='CNAMEResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1321">CNAMEResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>CNAMEResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Header" data-popularity="210">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-312">Header</a> <i>(struct)</i>
+		Header is a representation of a DNS message header.
+
+		<input type='checkbox' class="stat" id="Header-stat-fields"><label for="Header-stat-fields">Exported Fields (8)</label><span id='Header-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-316">Authoritative</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-313">ID</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-315">OpCode</a> <i><a href="#name-OpCode">OpCode</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-320">RCode</a> <i><a href="#name-RCode">RCode</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-319">RecursionAvailable</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-318">RecursionDesired</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-314">Response</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-317">Truncated</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Header-stat-methods"><label for="Header-stat-methods">One Exported Method</label><span id='Header-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-345">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Header-stat-impls"><label for="Header-stat-impls">Implements (1+)</label><span id='Header-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="Header-stat-results"><label for="Header-stat-results">As Outputs Of (1+)</label><span id='Header-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-535">Start</a>(msg []<a href="../../../../../builtin.html#name-byte">byte</a>) (<b>Header</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Header-stat-params"><label for="Header-stat-params">As Inputs Of (1+)</label><span id='Header-stat-params-content' class="stat-content">
+			func <a href="#name-NewBuilder">NewBuilder</a>(buf []<a href="../../../../../builtin.html#name-byte">byte</a>, h <b>Header</b>) <a href="#name-Builder">Builder</a></span></div>
+<div class="anchor" id="name-Message" data-popularity="250">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-358">Message</a> <i>(struct)</i>
+		Message is a representation of a DNS message.
+
+		<input type='checkbox' class="stat" id="Message-stat-fields"><label for="Message-stat-fields">Exported Fields (13)</label><span id='Message-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-363">Additionals</a> <i>[]<a href="#name-Resource">Resource</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-361">Answers</a> <i>[]<a href="#name-Resource">Resource</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-362">Authorities</a> <i>[]<a href="#name-Resource">Resource</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359">Header</a> <i><a href="#name-Header">Header</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-316">Authoritative</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-313">ID</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-315">OpCode</a> <i><a href="#name-OpCode">OpCode</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-320">RCode</a> <i><a href="#name-RCode">RCode</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-319">RecursionAvailable</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-318">RecursionDesired</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-314">Response</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-359" class="path-duplicate">Header</a>.<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-317">Truncated</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-360">Questions</a> <i>[]<a href="#name-Question">Question</a></i></span>
+		<input type='checkbox' class="stat" id="Message-stat-methods"><label for="Message-stat-methods">Exported Methods (4)</label><span id='Message-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1055">AppendPack</a>(b []<a href="../../../../../builtin.html#name-byte">byte</a>) ([]<a href="../../../../../builtin.html#name-byte">byte</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1122">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1049">Pack</a>() ([]<a href="../../../../../builtin.html#name-byte">byte</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1027">Unpack</a>(msg []<a href="../../../../../builtin.html#name-byte">byte</a>) <a href="../../../../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Message-stat-impls"><label for="Message-stat-impls">Implements (1+)</label><span id='Message-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span></div>
+<div class="anchor" id="name-MXResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2176">MXResource</a> <i>(struct)</i>
+		An MXResource is an MX Resource record.
+
+		<input type='checkbox' class="stat" id="MXResource-stat-fields"><label for="MXResource-stat-fields">Exported Fields (2)</label><span id='MXResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2178">MX</a> <i><a href="#name-Name">Name</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2177">Pref</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="MXResource-stat-methods"><label for="MXResource-stat-methods">One Exported Method</label><span id='MXResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2197">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="MXResource-stat-impls"><label for="MXResource-stat-impls">Implements (2+)</label><span id='MXResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="MXResource-stat-results"><label for="MXResource-stat-results">As Outputs Of (1+)</label><span id='MXResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-868">MXResource</a>() (<b>MXResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="MXResource-stat-params"><label for="MXResource-stat-params">As Inputs Of (1+)</label><span id='MXResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1345">MXResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>MXResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Name" data-popularity="350">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1840">Name</a> <i>(struct)</i>
+		A Name is a non-encoded domain name. It is used instead of strings to avoid
+		allocations.
+
+		<input type='checkbox' class="stat" id="Name-stat-fields"><label for="Name-stat-fields">Exported Fields (2)</label><span id='Name-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1841">Data</a> <i>[255]<a href="../../../../../builtin.html#name-byte">byte</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1842">Length</a> <i><a href="../../../../../builtin.html#name-uint8">uint8</a></i></span>
+		<input type='checkbox' class="stat" id="Name-stat-methods"><label for="Name-stat-methods">Exported Methods (2)</label><span id='Name-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1870">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1865">String</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Name-stat-impls"><label for="Name-stat-impls">Implements (2+)</label><span id='Name-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a>
+			 T : fmt.<a href="../../../../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Name-stat-results"><label for="Name-stat-results">As Outputs Of (2+)</label><span id='Name-stat-results-content' class="stat-content">
+			func <a href="#name-MustNewName">MustNewName</a>(name <a href="../../../../../builtin.html#name-string">string</a>) <b>Name</b>
+			func <a href="#name-NewName">NewName</a>(name <a href="../../../../../builtin.html#name-string">string</a>) (<b>Name</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-NSResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2216">NSResource</a> <i>(struct)</i>
+		An NSResource is an NS Resource record.
+
+		<input type='checkbox' class="stat" id="NSResource-stat-fields"><label for="NSResource-stat-fields">One Exported Field</label><span id='NSResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2217">NS</a> <i><a href="#name-Name">Name</a></i></span>
+		<input type='checkbox' class="stat" id="NSResource-stat-methods"><label for="NSResource-stat-methods">One Exported Method</label><span id='NSResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2230">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="NSResource-stat-impls"><label for="NSResource-stat-impls">Implements (2+)</label><span id='NSResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="NSResource-stat-results"><label for="NSResource-stat-results">As Outputs Of (1+)</label><span id='NSResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-886">NSResource</a>() (<b>NSResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NSResource-stat-params"><label for="NSResource-stat-params">As Inputs Of (1+)</label><span id='NSResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1369">NSResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>NSResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-OpCode" data-popularity="100">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-118">OpCode</a> <a href="../../../../../builtin.html#name-uint16">uint16</a>
+		An OpCode is a DNS operation code.
+
+		<input type='checkbox' class="stat" id="OpCode-stat-methods"><label for="OpCode-stat-methods">One Exported Method</label><span id='OpCode-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-121">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="OpCode-stat-impls"><label for="OpCode-stat-impls">Implements (1+)</label><span id='OpCode-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span></div>
+<div class="anchor" id="name-Option" data-popularity="100">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2526">Option</a> <i>(struct)</i>
+		An Option represents a DNS message option within OPTResource.
+
+		The message option is part of the extension mechanisms for DNS as
+		defined in RFC 6891.
+
+		<input type='checkbox' class="stat" id="Option-stat-fields"><label for="Option-stat-fields">Exported Fields (2)</label><span id='Option-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2527">Code</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2528">Data</a> <i>[]<a href="../../../../../builtin.html#name-byte">byte</a></i></span>
+		<input type='checkbox' class="stat" id="Option-stat-methods"><label for="Option-stat-methods">One Exported Method</label><span id='Option-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2532">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Option-stat-impls"><label for="Option-stat-impls">Implements (1+)</label><span id='Option-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span></div>
+<div class="anchor" id="name-OPTResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2518">OPTResource</a> <i>(struct)</i>
+		An OPTResource is an OPT pseudo Resource record.
+
+		The pseudo resource record is part of the extension mechanisms for DNS
+		as defined in RFC 6891.
+
+		<input type='checkbox' class="stat" id="OPTResource-stat-fields"><label for="OPTResource-stat-fields">One Exported Field</label><span id='OPTResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2519">Options</a> <i>[]<a href="#name-Option">Option</a></i></span>
+		<input type='checkbox' class="stat" id="OPTResource-stat-methods"><label for="OPTResource-stat-methods">One Exported Method</label><span id='OPTResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2553">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="OPTResource-stat-impls"><label for="OPTResource-stat-impls">Implements (2+)</label><span id='OPTResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="OPTResource-stat-results"><label for="OPTResource-stat-results">As Outputs Of (1+)</label><span id='OPTResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1012">OPTResource</a>() (<b>OPTResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="OPTResource-stat-params"><label for="OPTResource-stat-params">As Inputs Of (1+)</label><span id='OPTResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1537">OPTResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>OPTResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Parser" data-popularity="1500">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-523">Parser</a> <i>(struct)</i>
+		A Parser allows incrementally parsing a DNS message.
+
+		When parsing is started, the Header is parsed. Next, each Question can be
+		either parsed or skipped. Alternatively, all Questions can be skipped at
+		once. When all Questions have been parsed, attempting to parse Questions
+		will return (nil, nil) and attempting to skip Questions will return
+		(true, nil). After all Questions have been either parsed or skipped, all
+		Answers, Authorities and Additionals can be either parsed or skipped in the
+		same way, and each type of Resource must be fully parsed or skipped before
+		proceeding to the next type of Resource.
+
+		Note that there is no requirement to fully skip or parse the message.
+
+		<input type='checkbox' class="stat" id="Parser-stat-methods"><label for="Parser-stat-methods">Exported Methods (30)</label><span id='Parser-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-994">AAAAResource</a>() (<a href="#name-AAAAResource">AAAAResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-976">AResource</a>() (<a href="#name-AResource">AResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-802">Additional</a>() (<a href="#name-Resource">Resource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-797">AdditionalHeader</a>() (<a href="#name-ResourceHeader">ResourceHeader</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-807">AllAdditionals</a>() ([]<a href="#name-Resource">Resource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-707">AllAnswers</a>() ([]<a href="#name-Resource">Resource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-757">AllAuthorities</a>() ([]<a href="#name-Resource">Resource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-645">AllQuestions</a>() ([]<a href="#name-Question">Question</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-702">Answer</a>() (<a href="#name-Resource">Resource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-697">AnswerHeader</a>() (<a href="#name-ResourceHeader">ResourceHeader</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-752">Authority</a>() (<a href="#name-Resource">Resource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-747">AuthorityHeader</a>() (<a href="#name-ResourceHeader">ResourceHeader</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-850">CNAMEResource</a>() (<a href="#name-CNAMEResource">CNAMEResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-868">MXResource</a>() (<a href="#name-MXResource">MXResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-886">NSResource</a>() (<a href="#name-NSResource">NSResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1012">OPTResource</a>() (<a href="#name-OPTResource">OPTResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-904">PTRResource</a>() (<a href="#name-PTRResource">PTRResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-622">Question</a>() (<a href="#name-Question">Question</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-922">SOAResource</a>() (<a href="#name-SOAResource">SOAResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-958">SRVResource</a>() (<a href="#name-SRVResource">SRVResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-831">SkipAdditional</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-836">SkipAllAdditionals</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-736">SkipAllAnswers</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-786">SkipAllAuthorities</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-686">SkipAllQuestions</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-731">SkipAnswer</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-781">SkipAuthority</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-666">SkipQuestion</a>() <a href="../../../../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-535">Start</a>(msg []<a href="../../../../../builtin.html#name-byte">byte</a>) (<a href="#name-Header">Header</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-940">TXTResource</a>() (<a href="#name-TXTResource">TXTResource</a>, <a href="../../../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-PTRResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2243">PTRResource</a> <i>(struct)</i>
+		A PTRResource is a PTR Resource record.
+
+		<input type='checkbox' class="stat" id="PTRResource-stat-fields"><label for="PTRResource-stat-fields">One Exported Field</label><span id='PTRResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2244">PTR</a> <i><a href="#name-Name">Name</a></i></span>
+		<input type='checkbox' class="stat" id="PTRResource-stat-methods"><label for="PTRResource-stat-methods">One Exported Method</label><span id='PTRResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2257">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="PTRResource-stat-impls"><label for="PTRResource-stat-impls">Implements (2+)</label><span id='PTRResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="PTRResource-stat-results"><label for="PTRResource-stat-results">As Outputs Of (1+)</label><span id='PTRResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-904">PTRResource</a>() (<b>PTRResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PTRResource-stat-params"><label for="PTRResource-stat-params">As Inputs Of (1+)</label><span id='PTRResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1393">PTRResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>PTRResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Question" data-popularity="285">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2057">Question</a> <i>(struct)</i>
+		A Question is a DNS query.
+
+		<input type='checkbox' class="stat" id="Question-stat-fields"><label for="Question-stat-fields">Exported Fields (3)</label><span id='Question-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2060">Class</a> <i><a href="#name-Class">Class</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2058">Name</a> <i><a href="#name-Name">Name</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2059">Type</a> <i><a href="#name-Type">Type</a></i></span>
+		<input type='checkbox' class="stat" id="Question-stat-methods"><label for="Question-stat-methods">One Exported Method</label><span id='Question-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2074">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Question-stat-impls"><label for="Question-stat-impls">Implements (1+)</label><span id='Question-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="Question-stat-results"><label for="Question-stat-results">As Outputs Of (2+)</label><span id='Question-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-645">AllQuestions</a>() ([]<b>Question</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-622">Question</a>() (<b>Question</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Question-stat-params"><label for="Question-stat-params">As Inputs Of (1+)</label><span id='Question-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1292">Question</a>(q <b>Question</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-RCode" data-popularity="360">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-126">RCode</a> <a href="../../../../../builtin.html#name-uint16">uint16</a>
+		An RCode is a DNS response status code.
+
+		<input type='checkbox' class="stat" id="RCode-stat-methods"><label for="RCode-stat-methods">Exported Methods (2)</label><span id='RCode-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-156">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-148">String</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="RCode-stat-impls"><label for="RCode-stat-impls">Implements (2+)</label><span id='RCode-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a>
+			 T : fmt.<a href="../../../../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="RCode-stat-results"><label for="RCode-stat-results">As Outputs Of (1+)</label><span id='RCode-stat-results-content' class="stat-content">
+			func (*<a href="#name-ResourceHeader">ResourceHeader</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1694">ExtendedRCode</a>(rcode <b>RCode</b>) <b>RCode</b></span>
+		<input type='checkbox' class="stat" id="RCode-stat-params"><label for="RCode-stat-params">As Inputs Of (2+)</label><span id='RCode-stat-params-content' class="stat-content">
+			func (*<a href="#name-ResourceHeader">ResourceHeader</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1694">ExtendedRCode</a>(rcode <b>RCode</b>) <b>RCode</b>
+			func (*<a href="#name-ResourceHeader">ResourceHeader</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1675">SetEDNS0</a>(udpPayloadLen <a href="../../../../../builtin.html#name-int">int</a>, extRCode <b>RCode</b>, dnssecOK <a href="../../../../../builtin.html#name-bool">bool</a>) <a href="../../../../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="RCode-stat-values"><label for="RCode-stat-values">As Types Of (6+)</label><span id='RCode-stat-values-content' class="stat-content">
+			const <a href="#name-RCodeFormatError">RCodeFormatError</a>
+			const <a href="#name-RCodeNameError">RCodeNameError</a>
+			const <a href="#name-RCodeNotImplemented">RCodeNotImplemented</a>
+			const <a href="#name-RCodeRefused">RCodeRefused</a>
+			const <a href="#name-RCodeServerFailure">RCodeServerFailure</a>
+			const <a href="#name-RCodeSuccess">RCodeSuccess</a></span></div>
+<div class="anchor" id="name-Resource" data-popularity="550">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-464">Resource</a> <i>(struct)</i>
+		A Resource is a DNS resource record.
+
+		<input type='checkbox' class="stat" id="Resource-stat-fields"><label for="Resource-stat-fields">Exported Fields (2)</label><span id='Resource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-466">Body</a> <i><a href="#name-ResourceBody">ResourceBody</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-465">Header</a> <i><a href="#name-ResourceHeader">ResourceHeader</a></i></span>
+		<input type='checkbox' class="stat" id="Resource-stat-methods"><label for="Resource-stat-methods">One Exported Method</label><span id='Resource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-469">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Resource-stat-impls"><label for="Resource-stat-impls">Implements (1+)</label><span id='Resource-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="Resource-stat-results"><label for="Resource-stat-results">As Outputs Of (6+)</label><span id='Resource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-802">Additional</a>() (<b>Resource</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-807">AllAdditionals</a>() ([]<b>Resource</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-707">AllAnswers</a>() ([]<b>Resource</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-757">AllAuthorities</a>() ([]<b>Resource</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-702">Answer</a>() (<b>Resource</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-752">Authority</a>() (<b>Resource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ResourceBody" data-popularity="1600">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-477">ResourceBody</a> <b<i>(interface)</i></b>
+		A ResourceBody is a DNS resource record minus the header.
+
+		<input type='checkbox' class="stat" id="ResourceBody-stat-methods"><label for="ResourceBody-stat-methods">One Exported Method</label><span id='ResourceBody-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-486">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ResourceBody-stat-impledby"><label for="ResourceBody-stat-impledby">Implemented By (10+)</label><span id='ResourceBody-stat-impledby-content' class="stat-content">
+			*<a href="#name-AAAAResource">AAAAResource</a>
+			*<a href="#name-AResource">AResource</a>
+			*<a href="#name-CNAMEResource">CNAMEResource</a>
+			*<a href="#name-MXResource">MXResource</a>
+			*<a href="#name-NSResource">NSResource</a>
+			*<a href="#name-OPTResource">OPTResource</a>
+			*<a href="#name-PTRResource">PTRResource</a>
+			*<a href="#name-SOAResource">SOAResource</a>
+			*<a href="#name-SRVResource">SRVResource</a>
+			*<a href="#name-TXTResource">TXTResource</a></span>
+		<input type='checkbox' class="stat" id="ResourceBody-stat-impls"><label for="ResourceBody-stat-impls">Implements (1+)</label><span id='ResourceBody-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span></div>
+<div class="anchor" id="name-ResourceHeader" data-popularity="825">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1573">ResourceHeader</a> <i>(struct)</i>
+		A ResourceHeader is the header of a DNS resource record. There are
+		many types of DNS resource records, but they all share the same header.
+
+		<input type='checkbox' class="stat" id="ResourceHeader-stat-fields"><label for="ResourceHeader-stat-fields">Exported Fields (5)</label><span id='ResourceHeader-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1584">Class</a> <i><a href="#name-Class">Class</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1594">Length</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1575">Name</a> <i><a href="#name-Name">Name</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1589">TTL</a> <i><a href="../../../../../builtin.html#name-uint32">uint32</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1580">Type</a> <i><a href="#name-Type">Type</a></i></span>
+		<input type='checkbox' class="stat" id="ResourceHeader-stat-methods"><label for="ResourceHeader-stat-methods">Exported Methods (4)</label><span id='ResourceHeader-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1687">DNSSECAllowed</a>() <a href="../../../../../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1694">ExtendedRCode</a>(rcode <a href="#name-RCode">RCode</a>) <a href="#name-RCode">RCode</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1598">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a>
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1675">SetEDNS0</a>(udpPayloadLen <a href="../../../../../builtin.html#name-int">int</a>, extRCode <a href="#name-RCode">RCode</a>, dnssecOK <a href="../../../../../builtin.html#name-bool">bool</a>) <a href="../../../../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="ResourceHeader-stat-impls"><label for="ResourceHeader-stat-impls">Implements (1+)</label><span id='ResourceHeader-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="ResourceHeader-stat-results"><label for="ResourceHeader-stat-results">As Outputs Of (3+)</label><span id='ResourceHeader-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-797">AdditionalHeader</a>() (<b>ResourceHeader</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-697">AnswerHeader</a>() (<b>ResourceHeader</b>, <a href="../../../../../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-747">AuthorityHeader</a>() (<b>ResourceHeader</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="ResourceHeader-stat-params"><label for="ResourceHeader-stat-params">As Inputs Of (10+)</label><span id='ResourceHeader-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1513">AAAAResource</a>(h <b>ResourceHeader</b>, r <a href="#name-AAAAResource">AAAAResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1489">AResource</a>(h <b>ResourceHeader</b>, r <a href="#name-AResource">AResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1321">CNAMEResource</a>(h <b>ResourceHeader</b>, r <a href="#name-CNAMEResource">CNAMEResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1345">MXResource</a>(h <b>ResourceHeader</b>, r <a href="#name-MXResource">MXResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1369">NSResource</a>(h <b>ResourceHeader</b>, r <a href="#name-NSResource">NSResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1537">OPTResource</a>(h <b>ResourceHeader</b>, r <a href="#name-OPTResource">OPTResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1393">PTRResource</a>(h <b>ResourceHeader</b>, r <a href="#name-PTRResource">PTRResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1417">SOAResource</a>(h <b>ResourceHeader</b>, r <a href="#name-SOAResource">SOAResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1465">SRVResource</a>(h <b>ResourceHeader</b>, r <a href="#name-SRVResource">SRVResource</a>) <a href="../../../../../builtin.html#name-error">error</a>
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1441">TXTResource</a>(h <b>ResourceHeader</b>, r <a href="#name-TXTResource">TXTResource</a>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-SOAResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2270">SOAResource</a> <i>(struct)</i>
+		An SOAResource is an SOA Resource record.
+
+		<input type='checkbox' class="stat" id="SOAResource-stat-fields"><label for="SOAResource-stat-fields">Exported Fields (7)</label><span id='SOAResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2276">Expire</a> <i><a href="../../../../../builtin.html#name-uint32">uint32</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2272">MBox</a> <i><a href="#name-Name">Name</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2281">MinTTL</a> <i><a href="../../../../../builtin.html#name-uint32">uint32</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2271">NS</a> <i><a href="#name-Name">Name</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2274">Refresh</a> <i><a href="../../../../../builtin.html#name-uint32">uint32</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2275">Retry</a> <i><a href="../../../../../builtin.html#name-uint32">uint32</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2273">Serial</a> <i><a href="../../../../../builtin.html#name-uint32">uint32</a></i></span>
+		<input type='checkbox' class="stat" id="SOAResource-stat-methods"><label for="SOAResource-stat-methods">One Exported Method</label><span id='SOAResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2307">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SOAResource-stat-impls"><label for="SOAResource-stat-impls">Implements (2+)</label><span id='SOAResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="SOAResource-stat-results"><label for="SOAResource-stat-results">As Outputs Of (1+)</label><span id='SOAResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-922">SOAResource</a>() (<b>SOAResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="SOAResource-stat-params"><label for="SOAResource-stat-params">As Inputs Of (1+)</label><span id='SOAResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1417">SOAResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>SOAResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-SRVResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2405">SRVResource</a> <i>(struct)</i>
+		An SRVResource is an SRV Resource record.
+
+		<input type='checkbox' class="stat" id="SRVResource-stat-fields"><label for="SRVResource-stat-fields">Exported Fields (4)</label><span id='SRVResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2408">Port</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2406">Priority</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2409">Target</a> <i><a href="#name-Name">Name</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2407">Weight</a> <i><a href="../../../../../builtin.html#name-uint16">uint16</a></i></span>
+		<input type='checkbox' class="stat" id="SRVResource-stat-methods"><label for="SRVResource-stat-methods">One Exported Method</label><span id='SRVResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2430">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SRVResource-stat-impls"><label for="SRVResource-stat-impls">Implements (2+)</label><span id='SRVResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="SRVResource-stat-results"><label for="SRVResource-stat-results">As Outputs Of (1+)</label><span id='SRVResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-958">SRVResource</a>() (<b>SRVResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="SRVResource-stat-params"><label for="SRVResource-stat-params">As Inputs Of (1+)</label><span id='SRVResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1465">SRVResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>SRVResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-TXTResource" data-popularity="260">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2352">TXTResource</a> <i>(struct)</i>
+		A TXTResource is a TXT Resource record.
+
+		<input type='checkbox' class="stat" id="TXTResource-stat-fields"><label for="TXTResource-stat-fields">One Exported Field</label><span id='TXTResource-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2353">TXT</a> <i>[]<a href="../../../../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="TXTResource-stat-methods"><label for="TXTResource-stat-methods">One Exported Method</label><span id='TXTResource-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-2374">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="TXTResource-stat-impls"><label for="TXTResource-stat-impls">Implements (2+)</label><span id='TXTResource-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ResourceBody">ResourceBody</a>
+			*T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a></span>
+		<input type='checkbox' class="stat" id="TXTResource-stat-results"><label for="TXTResource-stat-results">As Outputs Of (1+)</label><span id='TXTResource-stat-results-content' class="stat-content">
+			func (*<a href="#name-Parser">Parser</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-940">TXTResource</a>() (<b>TXTResource</b>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="TXTResource-stat-params"><label for="TXTResource-stat-params">As Inputs Of (1+)</label><span id='TXTResource-stat-params-content' class="stat-content">
+			func (*<a href="#name-Builder">Builder</a>).<a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1441">TXTResource</a>(h <a href="#name-ResourceHeader">ResourceHeader</a>, r <b>TXTResource</b>) <a href="../../../../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Type" data-popularity="215">	 type <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-22">Type</a> <a href="../../../../../builtin.html#name-uint16">uint16</a>
+		A Type is a type of DNS request and response.
+
+		<input type='checkbox' class="stat" id="Type-stat-methods"><label for="Type-stat-methods">Exported Methods (2)</label><span id='Type-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-72">GoString</a>() <a href="../../../../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-64">String</a>() <a href="../../../../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Type-stat-impls"><label for="Type-stat-impls">Implements (2+)</label><span id='Type-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../../../../fmt.html#name-GoStringer">GoStringer</a>
+			 T : fmt.<a href="../../../../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Type-stat-values"><label for="Type-stat-values">As Types Of (15+)</label><span id='Type-stat-values-content' class="stat-content">
+			const <a href="#name-TypeA">TypeA</a>
+			const <a href="#name-TypeAAAA">TypeAAAA</a>
+			const <a href="#name-TypeALL">TypeALL</a>
+			const <a href="#name-TypeAXFR">TypeAXFR</a>
+			const <a href="#name-TypeCNAME">TypeCNAME</a>
+			const <a href="#name-TypeHINFO">TypeHINFO</a>
+			const <a href="#name-TypeMINFO">TypeMINFO</a>
+			const <a href="#name-TypeMX">TypeMX</a>
+			const <a href="#name-TypeNS">TypeNS</a>
+			const <a href="#name-TypeOPT">TypeOPT</a>
+			const <a href="#name-TypePTR">TypePTR</a>
+			const <a href="#name-TypeSOA">TypeSOA</a>
+			const <a href="#name-TypeSRV">TypeSRV</a>
+			const <a href="#name-TypeTXT">TypeTXT</a>
+			const <a href="#name-TypeWKS">TypeWKS</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ClassANY">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-90">ClassANY</a> <a href="#name-Class">Class</a> = 255
+		Question.Class</div>
+<div class="anchor" id="name-ClassCHAOS">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-86">ClassCHAOS</a> <a href="#name-Class">Class</a> = 3</div>
+<div class="anchor" id="name-ClassCSNET">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-85">ClassCSNET</a> <a href="#name-Class">Class</a> = 2</div>
+<div class="anchor" id="name-ClassHESIOD">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-87">ClassHESIOD</a> <a href="#name-Class">Class</a> = 4</div>
+<div class="anchor" id="name-ClassINET">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-84">ClassINET</a> <a href="#name-Class">Class</a> = 1
+		ResourceHeader.Class and Question.Class</div>
+<div class="anchor" id="name-ErrNotStarted">	  var <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-252">ErrNotStarted</a> <a href="../../../../../builtin.html#name-error">error</a>
+		ErrNotStarted indicates that the prerequisite information isn't
+		available yet because the previous records haven't been appropriately
+		parsed, skipped or finished.</div>
+<div class="anchor" id="name-ErrSectionDone">	  var <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-256">ErrSectionDone</a> <a href="../../../../../builtin.html#name-error">error</a>
+		ErrSectionDone indicated that all records in the section have been
+		parsed or finished.</div>
+<div class="anchor" id="name-MustNewName">	 func <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1856">MustNewName</a>(name <a href="../../../../../builtin.html#name-string">string</a>) <a href="#name-Name">Name</a>
+		MustNewName creates a new Name from a string and panics on error.</div>
+<div class="anchor" id="name-NewBuilder">	 func <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1194">NewBuilder</a>(buf []<a href="../../../../../builtin.html#name-byte">byte</a>, h <a href="#name-Header">Header</a>) <a href="#name-Builder">Builder</a>
+		NewBuilder creates a new builder with compression disabled.
+
+		Note: Most users will want to immediately enable compression with the
+		EnableCompression method. See that method's comment for why you may or may
+		not want to enable compression.
+
+		The DNS message is appended to the provided initial buffer buf (which may be
+		nil) as it is built. The final message is returned by the (*Builder).Finish
+		method, which may return the same underlying array if there was sufficient
+		capacity in the slice.</div>
+<div class="anchor" id="name-NewName">	 func <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-1846">NewName</a>(name <a href="../../../../../builtin.html#name-string">string</a>) (<a href="#name-Name">Name</a>, <a href="../../../../../builtin.html#name-error">error</a>)
+		NewName creates a new Name from a string.</div>
+<div class="anchor" id="name-RCodeFormatError">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-131">RCodeFormatError</a> <a href="#name-RCode">RCode</a> = 1</div>
+<div class="anchor" id="name-RCodeNameError">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-133">RCodeNameError</a> <a href="#name-RCode">RCode</a> = 3</div>
+<div class="anchor" id="name-RCodeNotImplemented">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-134">RCodeNotImplemented</a> <a href="#name-RCode">RCode</a> = 4</div>
+<div class="anchor" id="name-RCodeRefused">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-135">RCodeRefused</a> <a href="#name-RCode">RCode</a> = 5</div>
+<div class="anchor" id="name-RCodeServerFailure">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-132">RCodeServerFailure</a> <a href="#name-RCode">RCode</a> = 2</div>
+<div class="anchor" id="name-RCodeSuccess">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-130">RCodeSuccess</a> <a href="#name-RCode">RCode</a> = 0
+		Message.Rcode</div>
+<div class="anchor" id="name-TypeA">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-26">TypeA</a> <a href="#name-Type">Type</a> = 1
+		ResourceHeader.Type and Question.Type</div>
+<div class="anchor" id="name-TypeAAAA">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-33">TypeAAAA</a> <a href="#name-Type">Type</a> = 28</div>
+<div class="anchor" id="name-TypeALL">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-42">TypeALL</a> <a href="#name-Type">Type</a> = 255</div>
+<div class="anchor" id="name-TypeAXFR">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-41">TypeAXFR</a> <a href="#name-Type">Type</a> = 252</div>
+<div class="anchor" id="name-TypeCNAME">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-28">TypeCNAME</a> <a href="#name-Type">Type</a> = 5</div>
+<div class="anchor" id="name-TypeHINFO">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-39">TypeHINFO</a> <a href="#name-Type">Type</a> = 13</div>
+<div class="anchor" id="name-TypeMINFO">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-40">TypeMINFO</a> <a href="#name-Type">Type</a> = 14</div>
+<div class="anchor" id="name-TypeMX">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-31">TypeMX</a> <a href="#name-Type">Type</a> = 15</div>
+<div class="anchor" id="name-TypeNS">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-27">TypeNS</a> <a href="#name-Type">Type</a> = 2</div>
+<div class="anchor" id="name-TypeOPT">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-35">TypeOPT</a> <a href="#name-Type">Type</a> = 41</div>
+<div class="anchor" id="name-TypePTR">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-30">TypePTR</a> <a href="#name-Type">Type</a> = 12</div>
+<div class="anchor" id="name-TypeSOA">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-29">TypeSOA</a> <a href="#name-Type">Type</a> = 6</div>
+<div class="anchor" id="name-TypeSRV">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-34">TypeSRV</a> <a href="#name-Type">Type</a> = 33</div>
+<div class="anchor" id="name-TypeTXT">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-32">TypeTXT</a> <a href="#name-Type">Type</a> = 16</div>
+<div class="anchor" id="name-TypeWKS">	const <a href="../../../../../../src/vendor/golang.org/x/net/dns/dnsmessage/message.go.html#line-38">TypeWKS</a> <a href="#name-Type">Type</a> = 11
+		Question.Type</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

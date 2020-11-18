@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/net/http/httpproxy</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>httpproxy</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../../index.html#pkg-vendor/golang.org/x/net/http/httpproxy">vendor/golang.org/x/net/http/httpproxy</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/net/http/httpproxy/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/net/http/httpproxy" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../../dep/vendor/golang.org/x/net/http/httpproxy.html">8 packages</a>, and imported by <a href="../../../../../../dep/vendor/golang.org/x/net/http/httpproxy.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#doc">d-&gt;</a> <a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html">proxy.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Config" data-popularity="125">	 type <a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#line-27">Config</a> <i>(struct)</i>
+		Config holds configuration for HTTP proxy settings. See
+		FromEnvironment for details.
+
+		<input type='checkbox' class="stat" id="Config-stat-fields"><label for="Config-stat-fields">Exported Fields (4)</label><span id='Config-stat-fields-content' class="stat-content">
+			<a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#line-60">CGI</a> <i><a href="../../../../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#line-32">HTTPProxy</a> <i><a href="../../../../../builtin.html#name-string">string</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#line-37">HTTPSProxy</a> <i><a href="../../../../../builtin.html#name-string">string</a></i>
+			<a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#line-52">NoProxy</a> <i><a href="../../../../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Config-stat-methods"><label for="Config-stat-methods">One Exported Method</label><span id='Config-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#line-119">ProxyFunc</a>() func(reqURL *<a href="../../../../../net/url.html">url</a>.<a href="../../../../../net/url.html#name-URL">URL</a>) (*<a href="../../../../../net/url.html">url</a>.<a href="../../../../../net/url.html#name-URL">URL</a>, <a href="../../../../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Config-stat-results"><label for="Config-stat-results">As Outputs Of (1+)</label><span id='Config-stat-results-content' class="stat-content">
+			func <a href="#name-FromEnvironment">FromEnvironment</a>() *<b>Config</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-FromEnvironment">	 func <a href="../../../../../../src/vendor/golang.org/x/net/http/httpproxy/proxy.go.html#line-91">FromEnvironment</a>() *<a href="#name-Config">Config</a>
+		FromEnvironment returns a Config instance populated from the
+		environment variables HTTP_PROXY, HTTPS_PROXY and NO_PROXY (or the
+		lowercase versions thereof). HTTPS_PROXY takes precedence over
+		HTTP_PROXY for https requests.
+
+		The environment values may be either a complete URL or a
+		"host[:port]", in which case the "http" scheme is assumed. An error
+		is returned if the value is a different form.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

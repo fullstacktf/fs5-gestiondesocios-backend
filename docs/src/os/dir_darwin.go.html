@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: dir_darwin.go in package os</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	dir_darwin.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/os.html">os</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package os</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"io"</code></span>
+<span class="codeline" id="line-9"><code>	"runtime"</code></span>
+<span class="codeline" id="line-10"><code>	"syscall"</code></span>
+<span class="codeline" id="line-11"><code>	"unsafe"</code></span>
+<span class="codeline" id="line-12"><code>)</code></span>
+<span class="codeline" id="line-13"><code></code></span>
+<span class="codeline" id="line-14"><code>// Auxiliary information if the File describes a directory</code></span>
+<span class="codeline" id="line-15"><code>type dirInfo struct {</code></span>
+<span class="codeline" id="line-16"><code>	dir uintptr // Pointer to DIR structure from dirent.h</code></span>
+<span class="codeline" id="line-17"><code>}</code></span>
+<span class="codeline" id="line-18"><code></code></span>
+<span class="codeline" id="line-19"><code>func (d *dirInfo) close() {</code></span>
+<span class="codeline" id="line-20"><code>	if d.dir == 0 {</code></span>
+<span class="codeline" id="line-21"><code>		return</code></span>
+<span class="codeline" id="line-22"><code>	}</code></span>
+<span class="codeline" id="line-23"><code>	closedir(d.dir)</code></span>
+<span class="codeline" id="line-24"><code>	d.dir = 0</code></span>
+<span class="codeline" id="line-25"><code>}</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>func (f *File) readdirnames(n int) (names []string, err error) {</code></span>
+<span class="codeline" id="line-28"><code>	if f.dirinfo == nil {</code></span>
+<span class="codeline" id="line-29"><code>		dir, call, errno := f.pfd.OpenDir()</code></span>
+<span class="codeline" id="line-30"><code>		if errno != nil {</code></span>
+<span class="codeline" id="line-31"><code>			return nil, wrapSyscallError(call, errno)</code></span>
+<span class="codeline" id="line-32"><code>		}</code></span>
+<span class="codeline" id="line-33"><code>		f.dirinfo = &amp;dirInfo{</code></span>
+<span class="codeline" id="line-34"><code>			dir: dir,</code></span>
+<span class="codeline" id="line-35"><code>		}</code></span>
+<span class="codeline" id="line-36"><code>	}</code></span>
+<span class="codeline" id="line-37"><code>	d := f.dirinfo</code></span>
+<span class="codeline" id="line-38"><code></code></span>
+<span class="codeline" id="line-39"><code>	size := n</code></span>
+<span class="codeline" id="line-40"><code>	if size &lt;= 0 {</code></span>
+<span class="codeline" id="line-41"><code>		size = 100</code></span>
+<span class="codeline" id="line-42"><code>		n = -1</code></span>
+<span class="codeline" id="line-43"><code>	}</code></span>
+<span class="codeline" id="line-44"><code></code></span>
+<span class="codeline" id="line-45"><code>	names = make([]string, 0, size)</code></span>
+<span class="codeline" id="line-46"><code>	var dirent syscall.Dirent</code></span>
+<span class="codeline" id="line-47"><code>	var entptr *syscall.Dirent</code></span>
+<span class="codeline" id="line-48"><code>	for len(names) &lt; size || n == -1 {</code></span>
+<span class="codeline" id="line-49"><code>		if res := readdir_r(d.dir, &amp;dirent, &amp;entptr); res != 0 {</code></span>
+<span class="codeline" id="line-50"><code>			return names, wrapSyscallError("readdir", syscall.Errno(res))</code></span>
+<span class="codeline" id="line-51"><code>		}</code></span>
+<span class="codeline" id="line-52"><code>		if entptr == nil { // EOF</code></span>
+<span class="codeline" id="line-53"><code>			break</code></span>
+<span class="codeline" id="line-54"><code>		}</code></span>
+<span class="codeline" id="line-55"><code>		if dirent.Ino == 0 {</code></span>
+<span class="codeline" id="line-56"><code>			continue</code></span>
+<span class="codeline" id="line-57"><code>		}</code></span>
+<span class="codeline" id="line-58"><code>		name := (*[len(syscall.Dirent{}.Name)]byte)(unsafe.Pointer(&amp;dirent.Name))[:]</code></span>
+<span class="codeline" id="line-59"><code>		for i, c := range name {</code></span>
+<span class="codeline" id="line-60"><code>			if c == 0 {</code></span>
+<span class="codeline" id="line-61"><code>				name = name[:i]</code></span>
+<span class="codeline" id="line-62"><code>				break</code></span>
+<span class="codeline" id="line-63"><code>			}</code></span>
+<span class="codeline" id="line-64"><code>		}</code></span>
+<span class="codeline" id="line-65"><code>		// Check for useless names before allocating a string.</code></span>
+<span class="codeline" id="line-66"><code>		if string(name) == "." || string(name) == ".." {</code></span>
+<span class="codeline" id="line-67"><code>			continue</code></span>
+<span class="codeline" id="line-68"><code>		}</code></span>
+<span class="codeline" id="line-69"><code>		names = append(names, string(name))</code></span>
+<span class="codeline" id="line-70"><code>		runtime.KeepAlive(f)</code></span>
+<span class="codeline" id="line-71"><code>	}</code></span>
+<span class="codeline" id="line-72"><code>	if n &gt;= 0 &amp;&amp; len(names) == 0 {</code></span>
+<span class="codeline" id="line-73"><code>		return names, io.EOF</code></span>
+<span class="codeline" id="line-74"><code>	}</code></span>
+<span class="codeline" id="line-75"><code>	return names, nil</code></span>
+<span class="codeline" id="line-76"><code>}</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>// Implemented in syscall/syscall_darwin.go.</code></span>
+<span class="codeline" id="line-79"><code></code></span>
+<span class="codeline" id="line-80"><code>//go:linkname closedir syscall.closedir</code></span>
+<span class="codeline" id="line-81"><code>func closedir(dir uintptr) (err error)</code></span>
+<span class="codeline" id="line-82"><code></code></span>
+<span class="codeline" id="line-83"><code>//go:linkname readdir_r syscall.readdir_r</code></span>
+<span class="codeline" id="line-84"><code>func readdir_r(dir uintptr, entry *syscall.Dirent, result **syscall.Dirent) (res int)</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

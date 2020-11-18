@@ -1,0 +1,1937 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: parse.go in package regexp/syntax</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	parse.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/regexp/syntax.html">regexp/syntax</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package syntax</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>import (</code></span>
+<span class="codeline" id="line-8"><code>	"sort"</code></span>
+<span class="codeline" id="line-9"><code>	"strings"</code></span>
+<span class="codeline" id="line-10"><code>	"unicode"</code></span>
+<span class="codeline" id="line-11"><code>	"unicode/utf8"</code></span>
+<span class="codeline" id="line-12"><code>)</code></span>
+<span class="codeline" id="line-13"><code></code></span>
+<span class="codeline" id="line-14"><code>// An Error describes a failure to parse a regular expression</code></span>
+<span class="codeline" id="line-15"><code>// and gives the offending expression.</code></span>
+<span class="codeline" id="line-16"><code>type Error struct {</code></span>
+<span class="codeline" id="line-17"><code>	Code ErrorCode</code></span>
+<span class="codeline" id="line-18"><code>	Expr string</code></span>
+<span class="codeline" id="line-19"><code>}</code></span>
+<span class="codeline" id="line-20"><code></code></span>
+<span class="codeline" id="line-21"><code>func (e *Error) Error() string {</code></span>
+<span class="codeline" id="line-22"><code>	return "error parsing regexp: " + e.Code.String() + ": `" + e.Expr + "`"</code></span>
+<span class="codeline" id="line-23"><code>}</code></span>
+<span class="codeline" id="line-24"><code></code></span>
+<span class="codeline" id="line-25"><code>// An ErrorCode describes a failure to parse a regular expression.</code></span>
+<span class="codeline" id="line-26"><code>type ErrorCode string</code></span>
+<span class="codeline" id="line-27"><code></code></span>
+<span class="codeline" id="line-28"><code>const (</code></span>
+<span class="codeline" id="line-29"><code>	// Unexpected error</code></span>
+<span class="codeline" id="line-30"><code>	ErrInternalError ErrorCode = "regexp/syntax: internal error"</code></span>
+<span class="codeline" id="line-31"><code></code></span>
+<span class="codeline" id="line-32"><code>	// Parse errors</code></span>
+<span class="codeline" id="line-33"><code>	ErrInvalidCharClass      ErrorCode = "invalid character class"</code></span>
+<span class="codeline" id="line-34"><code>	ErrInvalidCharRange      ErrorCode = "invalid character class range"</code></span>
+<span class="codeline" id="line-35"><code>	ErrInvalidEscape         ErrorCode = "invalid escape sequence"</code></span>
+<span class="codeline" id="line-36"><code>	ErrInvalidNamedCapture   ErrorCode = "invalid named capture"</code></span>
+<span class="codeline" id="line-37"><code>	ErrInvalidPerlOp         ErrorCode = "invalid or unsupported Perl syntax"</code></span>
+<span class="codeline" id="line-38"><code>	ErrInvalidRepeatOp       ErrorCode = "invalid nested repetition operator"</code></span>
+<span class="codeline" id="line-39"><code>	ErrInvalidRepeatSize     ErrorCode = "invalid repeat count"</code></span>
+<span class="codeline" id="line-40"><code>	ErrInvalidUTF8           ErrorCode = "invalid UTF-8"</code></span>
+<span class="codeline" id="line-41"><code>	ErrMissingBracket        ErrorCode = "missing closing ]"</code></span>
+<span class="codeline" id="line-42"><code>	ErrMissingParen          ErrorCode = "missing closing )"</code></span>
+<span class="codeline" id="line-43"><code>	ErrMissingRepeatArgument ErrorCode = "missing argument to repetition operator"</code></span>
+<span class="codeline" id="line-44"><code>	ErrTrailingBackslash     ErrorCode = "trailing backslash at end of expression"</code></span>
+<span class="codeline" id="line-45"><code>	ErrUnexpectedParen       ErrorCode = "unexpected )"</code></span>
+<span class="codeline" id="line-46"><code>)</code></span>
+<span class="codeline" id="line-47"><code></code></span>
+<span class="codeline" id="line-48"><code>func (e ErrorCode) String() string {</code></span>
+<span class="codeline" id="line-49"><code>	return string(e)</code></span>
+<span class="codeline" id="line-50"><code>}</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>// Flags control the behavior of the parser and record information about regexp context.</code></span>
+<span class="codeline" id="line-53"><code>type Flags uint16</code></span>
+<span class="codeline" id="line-54"><code></code></span>
+<span class="codeline" id="line-55"><code>const (</code></span>
+<span class="codeline" id="line-56"><code>	FoldCase      Flags = 1 &lt;&lt; iota // case-insensitive match</code></span>
+<span class="codeline" id="line-57"><code>	Literal                         // treat pattern as literal string</code></span>
+<span class="codeline" id="line-58"><code>	ClassNL                         // allow character classes like [^a-z] and [[:space:]] to match newline</code></span>
+<span class="codeline" id="line-59"><code>	DotNL                           // allow . to match newline</code></span>
+<span class="codeline" id="line-60"><code>	OneLine                         // treat ^ and $ as only matching at beginning and end of text</code></span>
+<span class="codeline" id="line-61"><code>	NonGreedy                       // make repetition operators default to non-greedy</code></span>
+<span class="codeline" id="line-62"><code>	PerlX                           // allow Perl extensions</code></span>
+<span class="codeline" id="line-63"><code>	UnicodeGroups                   // allow \p{Han}, \P{Han} for Unicode group and negation</code></span>
+<span class="codeline" id="line-64"><code>	WasDollar                       // regexp OpEndText was $, not \z</code></span>
+<span class="codeline" id="line-65"><code>	Simple                          // regexp contains no counted repetition</code></span>
+<span class="codeline" id="line-66"><code></code></span>
+<span class="codeline" id="line-67"><code>	MatchNL = ClassNL | DotNL</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>	Perl        = ClassNL | OneLine | PerlX | UnicodeGroups // as close to Perl as possible</code></span>
+<span class="codeline" id="line-70"><code>	POSIX Flags = 0                                         // POSIX syntax</code></span>
+<span class="codeline" id="line-71"><code>)</code></span>
+<span class="codeline" id="line-72"><code></code></span>
+<span class="codeline" id="line-73"><code>// Pseudo-ops for parsing stack.</code></span>
+<span class="codeline" id="line-74"><code>const (</code></span>
+<span class="codeline" id="line-75"><code>	opLeftParen = opPseudo + iota</code></span>
+<span class="codeline" id="line-76"><code>	opVerticalBar</code></span>
+<span class="codeline" id="line-77"><code>)</code></span>
+<span class="codeline" id="line-78"><code></code></span>
+<span class="codeline" id="line-79"><code>type parser struct {</code></span>
+<span class="codeline" id="line-80"><code>	flags       Flags     // parse mode flags</code></span>
+<span class="codeline" id="line-81"><code>	stack       []*Regexp // stack of parsed expressions</code></span>
+<span class="codeline" id="line-82"><code>	free        *Regexp</code></span>
+<span class="codeline" id="line-83"><code>	numCap      int // number of capturing groups seen</code></span>
+<span class="codeline" id="line-84"><code>	wholeRegexp string</code></span>
+<span class="codeline" id="line-85"><code>	tmpClass    []rune // temporary char class work space</code></span>
+<span class="codeline" id="line-86"><code>}</code></span>
+<span class="codeline" id="line-87"><code></code></span>
+<span class="codeline" id="line-88"><code>func (p *parser) newRegexp(op Op) *Regexp {</code></span>
+<span class="codeline" id="line-89"><code>	re := p.free</code></span>
+<span class="codeline" id="line-90"><code>	if re != nil {</code></span>
+<span class="codeline" id="line-91"><code>		p.free = re.Sub0[0]</code></span>
+<span class="codeline" id="line-92"><code>		*re = Regexp{}</code></span>
+<span class="codeline" id="line-93"><code>	} else {</code></span>
+<span class="codeline" id="line-94"><code>		re = new(Regexp)</code></span>
+<span class="codeline" id="line-95"><code>	}</code></span>
+<span class="codeline" id="line-96"><code>	re.Op = op</code></span>
+<span class="codeline" id="line-97"><code>	return re</code></span>
+<span class="codeline" id="line-98"><code>}</code></span>
+<span class="codeline" id="line-99"><code></code></span>
+<span class="codeline" id="line-100"><code>func (p *parser) reuse(re *Regexp) {</code></span>
+<span class="codeline" id="line-101"><code>	re.Sub0[0] = p.free</code></span>
+<span class="codeline" id="line-102"><code>	p.free = re</code></span>
+<span class="codeline" id="line-103"><code>}</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>// Parse stack manipulation.</code></span>
+<span class="codeline" id="line-106"><code></code></span>
+<span class="codeline" id="line-107"><code>// push pushes the regexp re onto the parse stack and returns the regexp.</code></span>
+<span class="codeline" id="line-108"><code>func (p *parser) push(re *Regexp) *Regexp {</code></span>
+<span class="codeline" id="line-109"><code>	if re.Op == OpCharClass &amp;&amp; len(re.Rune) == 2 &amp;&amp; re.Rune[0] == re.Rune[1] {</code></span>
+<span class="codeline" id="line-110"><code>		// Single rune.</code></span>
+<span class="codeline" id="line-111"><code>		if p.maybeConcat(re.Rune[0], p.flags&amp;^FoldCase) {</code></span>
+<span class="codeline" id="line-112"><code>			return nil</code></span>
+<span class="codeline" id="line-113"><code>		}</code></span>
+<span class="codeline" id="line-114"><code>		re.Op = OpLiteral</code></span>
+<span class="codeline" id="line-115"><code>		re.Rune = re.Rune[:1]</code></span>
+<span class="codeline" id="line-116"><code>		re.Flags = p.flags &amp;^ FoldCase</code></span>
+<span class="codeline" id="line-117"><code>	} else if re.Op == OpCharClass &amp;&amp; len(re.Rune) == 4 &amp;&amp;</code></span>
+<span class="codeline" id="line-118"><code>		re.Rune[0] == re.Rune[1] &amp;&amp; re.Rune[2] == re.Rune[3] &amp;&amp;</code></span>
+<span class="codeline" id="line-119"><code>		unicode.SimpleFold(re.Rune[0]) == re.Rune[2] &amp;&amp;</code></span>
+<span class="codeline" id="line-120"><code>		unicode.SimpleFold(re.Rune[2]) == re.Rune[0] ||</code></span>
+<span class="codeline" id="line-121"><code>		re.Op == OpCharClass &amp;&amp; len(re.Rune) == 2 &amp;&amp;</code></span>
+<span class="codeline" id="line-122"><code>			re.Rune[0]+1 == re.Rune[1] &amp;&amp;</code></span>
+<span class="codeline" id="line-123"><code>			unicode.SimpleFold(re.Rune[0]) == re.Rune[1] &amp;&amp;</code></span>
+<span class="codeline" id="line-124"><code>			unicode.SimpleFold(re.Rune[1]) == re.Rune[0] {</code></span>
+<span class="codeline" id="line-125"><code>		// Case-insensitive rune like [Aa] or [Δδ].</code></span>
+<span class="codeline" id="line-126"><code>		if p.maybeConcat(re.Rune[0], p.flags|FoldCase) {</code></span>
+<span class="codeline" id="line-127"><code>			return nil</code></span>
+<span class="codeline" id="line-128"><code>		}</code></span>
+<span class="codeline" id="line-129"><code></code></span>
+<span class="codeline" id="line-130"><code>		// Rewrite as (case-insensitive) literal.</code></span>
+<span class="codeline" id="line-131"><code>		re.Op = OpLiteral</code></span>
+<span class="codeline" id="line-132"><code>		re.Rune = re.Rune[:1]</code></span>
+<span class="codeline" id="line-133"><code>		re.Flags = p.flags | FoldCase</code></span>
+<span class="codeline" id="line-134"><code>	} else {</code></span>
+<span class="codeline" id="line-135"><code>		// Incremental concatenation.</code></span>
+<span class="codeline" id="line-136"><code>		p.maybeConcat(-1, 0)</code></span>
+<span class="codeline" id="line-137"><code>	}</code></span>
+<span class="codeline" id="line-138"><code></code></span>
+<span class="codeline" id="line-139"><code>	p.stack = append(p.stack, re)</code></span>
+<span class="codeline" id="line-140"><code>	return re</code></span>
+<span class="codeline" id="line-141"><code>}</code></span>
+<span class="codeline" id="line-142"><code></code></span>
+<span class="codeline" id="line-143"><code>// maybeConcat implements incremental concatenation</code></span>
+<span class="codeline" id="line-144"><code>// of literal runes into string nodes. The parser calls this</code></span>
+<span class="codeline" id="line-145"><code>// before each push, so only the top fragment of the stack</code></span>
+<span class="codeline" id="line-146"><code>// might need processing. Since this is called before a push,</code></span>
+<span class="codeline" id="line-147"><code>// the topmost literal is no longer subject to operators like *</code></span>
+<span class="codeline" id="line-148"><code>// (Otherwise ab* would turn into (ab)*.)</code></span>
+<span class="codeline" id="line-149"><code>// If r &gt;= 0 and there's a node left over, maybeConcat uses it</code></span>
+<span class="codeline" id="line-150"><code>// to push r with the given flags.</code></span>
+<span class="codeline" id="line-151"><code>// maybeConcat reports whether r was pushed.</code></span>
+<span class="codeline" id="line-152"><code>func (p *parser) maybeConcat(r rune, flags Flags) bool {</code></span>
+<span class="codeline" id="line-153"><code>	n := len(p.stack)</code></span>
+<span class="codeline" id="line-154"><code>	if n &lt; 2 {</code></span>
+<span class="codeline" id="line-155"><code>		return false</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code></code></span>
+<span class="codeline" id="line-158"><code>	re1 := p.stack[n-1]</code></span>
+<span class="codeline" id="line-159"><code>	re2 := p.stack[n-2]</code></span>
+<span class="codeline" id="line-160"><code>	if re1.Op != OpLiteral || re2.Op != OpLiteral || re1.Flags&amp;FoldCase != re2.Flags&amp;FoldCase {</code></span>
+<span class="codeline" id="line-161"><code>		return false</code></span>
+<span class="codeline" id="line-162"><code>	}</code></span>
+<span class="codeline" id="line-163"><code></code></span>
+<span class="codeline" id="line-164"><code>	// Push re1 into re2.</code></span>
+<span class="codeline" id="line-165"><code>	re2.Rune = append(re2.Rune, re1.Rune...)</code></span>
+<span class="codeline" id="line-166"><code></code></span>
+<span class="codeline" id="line-167"><code>	// Reuse re1 if possible.</code></span>
+<span class="codeline" id="line-168"><code>	if r &gt;= 0 {</code></span>
+<span class="codeline" id="line-169"><code>		re1.Rune = re1.Rune0[:1]</code></span>
+<span class="codeline" id="line-170"><code>		re1.Rune[0] = r</code></span>
+<span class="codeline" id="line-171"><code>		re1.Flags = flags</code></span>
+<span class="codeline" id="line-172"><code>		return true</code></span>
+<span class="codeline" id="line-173"><code>	}</code></span>
+<span class="codeline" id="line-174"><code></code></span>
+<span class="codeline" id="line-175"><code>	p.stack = p.stack[:n-1]</code></span>
+<span class="codeline" id="line-176"><code>	p.reuse(re1)</code></span>
+<span class="codeline" id="line-177"><code>	return false // did not push r</code></span>
+<span class="codeline" id="line-178"><code>}</code></span>
+<span class="codeline" id="line-179"><code></code></span>
+<span class="codeline" id="line-180"><code>// literal pushes a literal regexp for the rune r on the stack.</code></span>
+<span class="codeline" id="line-181"><code>func (p *parser) literal(r rune) {</code></span>
+<span class="codeline" id="line-182"><code>	re := p.newRegexp(OpLiteral)</code></span>
+<span class="codeline" id="line-183"><code>	re.Flags = p.flags</code></span>
+<span class="codeline" id="line-184"><code>	if p.flags&amp;FoldCase != 0 {</code></span>
+<span class="codeline" id="line-185"><code>		r = minFoldRune(r)</code></span>
+<span class="codeline" id="line-186"><code>	}</code></span>
+<span class="codeline" id="line-187"><code>	re.Rune0[0] = r</code></span>
+<span class="codeline" id="line-188"><code>	re.Rune = re.Rune0[:1]</code></span>
+<span class="codeline" id="line-189"><code>	p.push(re)</code></span>
+<span class="codeline" id="line-190"><code>}</code></span>
+<span class="codeline" id="line-191"><code></code></span>
+<span class="codeline" id="line-192"><code>// minFoldRune returns the minimum rune fold-equivalent to r.</code></span>
+<span class="codeline" id="line-193"><code>func minFoldRune(r rune) rune {</code></span>
+<span class="codeline" id="line-194"><code>	if r &lt; minFold || r &gt; maxFold {</code></span>
+<span class="codeline" id="line-195"><code>		return r</code></span>
+<span class="codeline" id="line-196"><code>	}</code></span>
+<span class="codeline" id="line-197"><code>	min := r</code></span>
+<span class="codeline" id="line-198"><code>	r0 := r</code></span>
+<span class="codeline" id="line-199"><code>	for r = unicode.SimpleFold(r); r != r0; r = unicode.SimpleFold(r) {</code></span>
+<span class="codeline" id="line-200"><code>		if min &gt; r {</code></span>
+<span class="codeline" id="line-201"><code>			min = r</code></span>
+<span class="codeline" id="line-202"><code>		}</code></span>
+<span class="codeline" id="line-203"><code>	}</code></span>
+<span class="codeline" id="line-204"><code>	return min</code></span>
+<span class="codeline" id="line-205"><code>}</code></span>
+<span class="codeline" id="line-206"><code></code></span>
+<span class="codeline" id="line-207"><code>// op pushes a regexp with the given op onto the stack</code></span>
+<span class="codeline" id="line-208"><code>// and returns that regexp.</code></span>
+<span class="codeline" id="line-209"><code>func (p *parser) op(op Op) *Regexp {</code></span>
+<span class="codeline" id="line-210"><code>	re := p.newRegexp(op)</code></span>
+<span class="codeline" id="line-211"><code>	re.Flags = p.flags</code></span>
+<span class="codeline" id="line-212"><code>	return p.push(re)</code></span>
+<span class="codeline" id="line-213"><code>}</code></span>
+<span class="codeline" id="line-214"><code></code></span>
+<span class="codeline" id="line-215"><code>// repeat replaces the top stack element with itself repeated according to op, min, max.</code></span>
+<span class="codeline" id="line-216"><code>// before is the regexp suffix starting at the repetition operator.</code></span>
+<span class="codeline" id="line-217"><code>// after is the regexp suffix following after the repetition operator.</code></span>
+<span class="codeline" id="line-218"><code>// repeat returns an updated 'after' and an error, if any.</code></span>
+<span class="codeline" id="line-219"><code>func (p *parser) repeat(op Op, min, max int, before, after, lastRepeat string) (string, error) {</code></span>
+<span class="codeline" id="line-220"><code>	flags := p.flags</code></span>
+<span class="codeline" id="line-221"><code>	if p.flags&amp;PerlX != 0 {</code></span>
+<span class="codeline" id="line-222"><code>		if len(after) &gt; 0 &amp;&amp; after[0] == '?' {</code></span>
+<span class="codeline" id="line-223"><code>			after = after[1:]</code></span>
+<span class="codeline" id="line-224"><code>			flags ^= NonGreedy</code></span>
+<span class="codeline" id="line-225"><code>		}</code></span>
+<span class="codeline" id="line-226"><code>		if lastRepeat != "" {</code></span>
+<span class="codeline" id="line-227"><code>			// In Perl it is not allowed to stack repetition operators:</code></span>
+<span class="codeline" id="line-228"><code>			// a** is a syntax error, not a doubled star, and a++ means</code></span>
+<span class="codeline" id="line-229"><code>			// something else entirely, which we don't support!</code></span>
+<span class="codeline" id="line-230"><code>			return "", &amp;Error{ErrInvalidRepeatOp, lastRepeat[:len(lastRepeat)-len(after)]}</code></span>
+<span class="codeline" id="line-231"><code>		}</code></span>
+<span class="codeline" id="line-232"><code>	}</code></span>
+<span class="codeline" id="line-233"><code>	n := len(p.stack)</code></span>
+<span class="codeline" id="line-234"><code>	if n == 0 {</code></span>
+<span class="codeline" id="line-235"><code>		return "", &amp;Error{ErrMissingRepeatArgument, before[:len(before)-len(after)]}</code></span>
+<span class="codeline" id="line-236"><code>	}</code></span>
+<span class="codeline" id="line-237"><code>	sub := p.stack[n-1]</code></span>
+<span class="codeline" id="line-238"><code>	if sub.Op &gt;= opPseudo {</code></span>
+<span class="codeline" id="line-239"><code>		return "", &amp;Error{ErrMissingRepeatArgument, before[:len(before)-len(after)]}</code></span>
+<span class="codeline" id="line-240"><code>	}</code></span>
+<span class="codeline" id="line-241"><code></code></span>
+<span class="codeline" id="line-242"><code>	re := p.newRegexp(op)</code></span>
+<span class="codeline" id="line-243"><code>	re.Min = min</code></span>
+<span class="codeline" id="line-244"><code>	re.Max = max</code></span>
+<span class="codeline" id="line-245"><code>	re.Flags = flags</code></span>
+<span class="codeline" id="line-246"><code>	re.Sub = re.Sub0[:1]</code></span>
+<span class="codeline" id="line-247"><code>	re.Sub[0] = sub</code></span>
+<span class="codeline" id="line-248"><code>	p.stack[n-1] = re</code></span>
+<span class="codeline" id="line-249"><code></code></span>
+<span class="codeline" id="line-250"><code>	if op == OpRepeat &amp;&amp; (min &gt;= 2 || max &gt;= 2) &amp;&amp; !repeatIsValid(re, 1000) {</code></span>
+<span class="codeline" id="line-251"><code>		return "", &amp;Error{ErrInvalidRepeatSize, before[:len(before)-len(after)]}</code></span>
+<span class="codeline" id="line-252"><code>	}</code></span>
+<span class="codeline" id="line-253"><code></code></span>
+<span class="codeline" id="line-254"><code>	return after, nil</code></span>
+<span class="codeline" id="line-255"><code>}</code></span>
+<span class="codeline" id="line-256"><code></code></span>
+<span class="codeline" id="line-257"><code>// repeatIsValid reports whether the repetition re is valid.</code></span>
+<span class="codeline" id="line-258"><code>// Valid means that the combination of the top-level repetition</code></span>
+<span class="codeline" id="line-259"><code>// and any inner repetitions does not exceed n copies of the</code></span>
+<span class="codeline" id="line-260"><code>// innermost thing.</code></span>
+<span class="codeline" id="line-261"><code>// This function rewalks the regexp tree and is called for every repetition,</code></span>
+<span class="codeline" id="line-262"><code>// so we have to worry about inducing quadratic behavior in the parser.</code></span>
+<span class="codeline" id="line-263"><code>// We avoid this by only calling repeatIsValid when min or max &gt;= 2.</code></span>
+<span class="codeline" id="line-264"><code>// In that case the depth of any &gt;= 2 nesting can only get to 9 without</code></span>
+<span class="codeline" id="line-265"><code>// triggering a parse error, so each subtree can only be rewalked 9 times.</code></span>
+<span class="codeline" id="line-266"><code>func repeatIsValid(re *Regexp, n int) bool {</code></span>
+<span class="codeline" id="line-267"><code>	if re.Op == OpRepeat {</code></span>
+<span class="codeline" id="line-268"><code>		m := re.Max</code></span>
+<span class="codeline" id="line-269"><code>		if m == 0 {</code></span>
+<span class="codeline" id="line-270"><code>			return true</code></span>
+<span class="codeline" id="line-271"><code>		}</code></span>
+<span class="codeline" id="line-272"><code>		if m &lt; 0 {</code></span>
+<span class="codeline" id="line-273"><code>			m = re.Min</code></span>
+<span class="codeline" id="line-274"><code>		}</code></span>
+<span class="codeline" id="line-275"><code>		if m &gt; n {</code></span>
+<span class="codeline" id="line-276"><code>			return false</code></span>
+<span class="codeline" id="line-277"><code>		}</code></span>
+<span class="codeline" id="line-278"><code>		if m &gt; 0 {</code></span>
+<span class="codeline" id="line-279"><code>			n /= m</code></span>
+<span class="codeline" id="line-280"><code>		}</code></span>
+<span class="codeline" id="line-281"><code>	}</code></span>
+<span class="codeline" id="line-282"><code>	for _, sub := range re.Sub {</code></span>
+<span class="codeline" id="line-283"><code>		if !repeatIsValid(sub, n) {</code></span>
+<span class="codeline" id="line-284"><code>			return false</code></span>
+<span class="codeline" id="line-285"><code>		}</code></span>
+<span class="codeline" id="line-286"><code>	}</code></span>
+<span class="codeline" id="line-287"><code>	return true</code></span>
+<span class="codeline" id="line-288"><code>}</code></span>
+<span class="codeline" id="line-289"><code></code></span>
+<span class="codeline" id="line-290"><code>// concat replaces the top of the stack (above the topmost '|' or '(') with its concatenation.</code></span>
+<span class="codeline" id="line-291"><code>func (p *parser) concat() *Regexp {</code></span>
+<span class="codeline" id="line-292"><code>	p.maybeConcat(-1, 0)</code></span>
+<span class="codeline" id="line-293"><code></code></span>
+<span class="codeline" id="line-294"><code>	// Scan down to find pseudo-operator | or (.</code></span>
+<span class="codeline" id="line-295"><code>	i := len(p.stack)</code></span>
+<span class="codeline" id="line-296"><code>	for i &gt; 0 &amp;&amp; p.stack[i-1].Op &lt; opPseudo {</code></span>
+<span class="codeline" id="line-297"><code>		i--</code></span>
+<span class="codeline" id="line-298"><code>	}</code></span>
+<span class="codeline" id="line-299"><code>	subs := p.stack[i:]</code></span>
+<span class="codeline" id="line-300"><code>	p.stack = p.stack[:i]</code></span>
+<span class="codeline" id="line-301"><code></code></span>
+<span class="codeline" id="line-302"><code>	// Empty concatenation is special case.</code></span>
+<span class="codeline" id="line-303"><code>	if len(subs) == 0 {</code></span>
+<span class="codeline" id="line-304"><code>		return p.push(p.newRegexp(OpEmptyMatch))</code></span>
+<span class="codeline" id="line-305"><code>	}</code></span>
+<span class="codeline" id="line-306"><code></code></span>
+<span class="codeline" id="line-307"><code>	return p.push(p.collapse(subs, OpConcat))</code></span>
+<span class="codeline" id="line-308"><code>}</code></span>
+<span class="codeline" id="line-309"><code></code></span>
+<span class="codeline" id="line-310"><code>// alternate replaces the top of the stack (above the topmost '(') with its alternation.</code></span>
+<span class="codeline" id="line-311"><code>func (p *parser) alternate() *Regexp {</code></span>
+<span class="codeline" id="line-312"><code>	// Scan down to find pseudo-operator (.</code></span>
+<span class="codeline" id="line-313"><code>	// There are no | above (.</code></span>
+<span class="codeline" id="line-314"><code>	i := len(p.stack)</code></span>
+<span class="codeline" id="line-315"><code>	for i &gt; 0 &amp;&amp; p.stack[i-1].Op &lt; opPseudo {</code></span>
+<span class="codeline" id="line-316"><code>		i--</code></span>
+<span class="codeline" id="line-317"><code>	}</code></span>
+<span class="codeline" id="line-318"><code>	subs := p.stack[i:]</code></span>
+<span class="codeline" id="line-319"><code>	p.stack = p.stack[:i]</code></span>
+<span class="codeline" id="line-320"><code></code></span>
+<span class="codeline" id="line-321"><code>	// Make sure top class is clean.</code></span>
+<span class="codeline" id="line-322"><code>	// All the others already are (see swapVerticalBar).</code></span>
+<span class="codeline" id="line-323"><code>	if len(subs) &gt; 0 {</code></span>
+<span class="codeline" id="line-324"><code>		cleanAlt(subs[len(subs)-1])</code></span>
+<span class="codeline" id="line-325"><code>	}</code></span>
+<span class="codeline" id="line-326"><code></code></span>
+<span class="codeline" id="line-327"><code>	// Empty alternate is special case</code></span>
+<span class="codeline" id="line-328"><code>	// (shouldn't happen but easy to handle).</code></span>
+<span class="codeline" id="line-329"><code>	if len(subs) == 0 {</code></span>
+<span class="codeline" id="line-330"><code>		return p.push(p.newRegexp(OpNoMatch))</code></span>
+<span class="codeline" id="line-331"><code>	}</code></span>
+<span class="codeline" id="line-332"><code></code></span>
+<span class="codeline" id="line-333"><code>	return p.push(p.collapse(subs, OpAlternate))</code></span>
+<span class="codeline" id="line-334"><code>}</code></span>
+<span class="codeline" id="line-335"><code></code></span>
+<span class="codeline" id="line-336"><code>// cleanAlt cleans re for eventual inclusion in an alternation.</code></span>
+<span class="codeline" id="line-337"><code>func cleanAlt(re *Regexp) {</code></span>
+<span class="codeline" id="line-338"><code>	switch re.Op {</code></span>
+<span class="codeline" id="line-339"><code>	case OpCharClass:</code></span>
+<span class="codeline" id="line-340"><code>		re.Rune = cleanClass(&amp;re.Rune)</code></span>
+<span class="codeline" id="line-341"><code>		if len(re.Rune) == 2 &amp;&amp; re.Rune[0] == 0 &amp;&amp; re.Rune[1] == unicode.MaxRune {</code></span>
+<span class="codeline" id="line-342"><code>			re.Rune = nil</code></span>
+<span class="codeline" id="line-343"><code>			re.Op = OpAnyChar</code></span>
+<span class="codeline" id="line-344"><code>			return</code></span>
+<span class="codeline" id="line-345"><code>		}</code></span>
+<span class="codeline" id="line-346"><code>		if len(re.Rune) == 4 &amp;&amp; re.Rune[0] == 0 &amp;&amp; re.Rune[1] == '\n'-1 &amp;&amp; re.Rune[2] == '\n'+1 &amp;&amp; re.Rune[3] == unicode.MaxRune {</code></span>
+<span class="codeline" id="line-347"><code>			re.Rune = nil</code></span>
+<span class="codeline" id="line-348"><code>			re.Op = OpAnyCharNotNL</code></span>
+<span class="codeline" id="line-349"><code>			return</code></span>
+<span class="codeline" id="line-350"><code>		}</code></span>
+<span class="codeline" id="line-351"><code>		if cap(re.Rune)-len(re.Rune) &gt; 100 {</code></span>
+<span class="codeline" id="line-352"><code>			// re.Rune will not grow any more.</code></span>
+<span class="codeline" id="line-353"><code>			// Make a copy or inline to reclaim storage.</code></span>
+<span class="codeline" id="line-354"><code>			re.Rune = append(re.Rune0[:0], re.Rune...)</code></span>
+<span class="codeline" id="line-355"><code>		}</code></span>
+<span class="codeline" id="line-356"><code>	}</code></span>
+<span class="codeline" id="line-357"><code>}</code></span>
+<span class="codeline" id="line-358"><code></code></span>
+<span class="codeline" id="line-359"><code>// collapse returns the result of applying op to sub.</code></span>
+<span class="codeline" id="line-360"><code>// If sub contains op nodes, they all get hoisted up</code></span>
+<span class="codeline" id="line-361"><code>// so that there is never a concat of a concat or an</code></span>
+<span class="codeline" id="line-362"><code>// alternate of an alternate.</code></span>
+<span class="codeline" id="line-363"><code>func (p *parser) collapse(subs []*Regexp, op Op) *Regexp {</code></span>
+<span class="codeline" id="line-364"><code>	if len(subs) == 1 {</code></span>
+<span class="codeline" id="line-365"><code>		return subs[0]</code></span>
+<span class="codeline" id="line-366"><code>	}</code></span>
+<span class="codeline" id="line-367"><code>	re := p.newRegexp(op)</code></span>
+<span class="codeline" id="line-368"><code>	re.Sub = re.Sub0[:0]</code></span>
+<span class="codeline" id="line-369"><code>	for _, sub := range subs {</code></span>
+<span class="codeline" id="line-370"><code>		if sub.Op == op {</code></span>
+<span class="codeline" id="line-371"><code>			re.Sub = append(re.Sub, sub.Sub...)</code></span>
+<span class="codeline" id="line-372"><code>			p.reuse(sub)</code></span>
+<span class="codeline" id="line-373"><code>		} else {</code></span>
+<span class="codeline" id="line-374"><code>			re.Sub = append(re.Sub, sub)</code></span>
+<span class="codeline" id="line-375"><code>		}</code></span>
+<span class="codeline" id="line-376"><code>	}</code></span>
+<span class="codeline" id="line-377"><code>	if op == OpAlternate {</code></span>
+<span class="codeline" id="line-378"><code>		re.Sub = p.factor(re.Sub)</code></span>
+<span class="codeline" id="line-379"><code>		if len(re.Sub) == 1 {</code></span>
+<span class="codeline" id="line-380"><code>			old := re</code></span>
+<span class="codeline" id="line-381"><code>			re = re.Sub[0]</code></span>
+<span class="codeline" id="line-382"><code>			p.reuse(old)</code></span>
+<span class="codeline" id="line-383"><code>		}</code></span>
+<span class="codeline" id="line-384"><code>	}</code></span>
+<span class="codeline" id="line-385"><code>	return re</code></span>
+<span class="codeline" id="line-386"><code>}</code></span>
+<span class="codeline" id="line-387"><code></code></span>
+<span class="codeline" id="line-388"><code>// factor factors common prefixes from the alternation list sub.</code></span>
+<span class="codeline" id="line-389"><code>// It returns a replacement list that reuses the same storage and</code></span>
+<span class="codeline" id="line-390"><code>// frees (passes to p.reuse) any removed *Regexps.</code></span>
+<span class="codeline" id="line-391"><code>//</code></span>
+<span class="codeline" id="line-392"><code>// For example,</code></span>
+<span class="codeline" id="line-393"><code>//     ABC|ABD|AEF|BCX|BCY</code></span>
+<span class="codeline" id="line-394"><code>// simplifies by literal prefix extraction to</code></span>
+<span class="codeline" id="line-395"><code>//     A(B(C|D)|EF)|BC(X|Y)</code></span>
+<span class="codeline" id="line-396"><code>// which simplifies by character class introduction to</code></span>
+<span class="codeline" id="line-397"><code>//     A(B[CD]|EF)|BC[XY]</code></span>
+<span class="codeline" id="line-398"><code>//</code></span>
+<span class="codeline" id="line-399"><code>func (p *parser) factor(sub []*Regexp) []*Regexp {</code></span>
+<span class="codeline" id="line-400"><code>	if len(sub) &lt; 2 {</code></span>
+<span class="codeline" id="line-401"><code>		return sub</code></span>
+<span class="codeline" id="line-402"><code>	}</code></span>
+<span class="codeline" id="line-403"><code></code></span>
+<span class="codeline" id="line-404"><code>	// Round 1: Factor out common literal prefixes.</code></span>
+<span class="codeline" id="line-405"><code>	var str []rune</code></span>
+<span class="codeline" id="line-406"><code>	var strflags Flags</code></span>
+<span class="codeline" id="line-407"><code>	start := 0</code></span>
+<span class="codeline" id="line-408"><code>	out := sub[:0]</code></span>
+<span class="codeline" id="line-409"><code>	for i := 0; i &lt;= len(sub); i++ {</code></span>
+<span class="codeline" id="line-410"><code>		// Invariant: the Regexps that were in sub[0:start] have been</code></span>
+<span class="codeline" id="line-411"><code>		// used or marked for reuse, and the slice space has been reused</code></span>
+<span class="codeline" id="line-412"><code>		// for out (len(out) &lt;= start).</code></span>
+<span class="codeline" id="line-413"><code>		//</code></span>
+<span class="codeline" id="line-414"><code>		// Invariant: sub[start:i] consists of regexps that all begin</code></span>
+<span class="codeline" id="line-415"><code>		// with str as modified by strflags.</code></span>
+<span class="codeline" id="line-416"><code>		var istr []rune</code></span>
+<span class="codeline" id="line-417"><code>		var iflags Flags</code></span>
+<span class="codeline" id="line-418"><code>		if i &lt; len(sub) {</code></span>
+<span class="codeline" id="line-419"><code>			istr, iflags = p.leadingString(sub[i])</code></span>
+<span class="codeline" id="line-420"><code>			if iflags == strflags {</code></span>
+<span class="codeline" id="line-421"><code>				same := 0</code></span>
+<span class="codeline" id="line-422"><code>				for same &lt; len(str) &amp;&amp; same &lt; len(istr) &amp;&amp; str[same] == istr[same] {</code></span>
+<span class="codeline" id="line-423"><code>					same++</code></span>
+<span class="codeline" id="line-424"><code>				}</code></span>
+<span class="codeline" id="line-425"><code>				if same &gt; 0 {</code></span>
+<span class="codeline" id="line-426"><code>					// Matches at least one rune in current range.</code></span>
+<span class="codeline" id="line-427"><code>					// Keep going around.</code></span>
+<span class="codeline" id="line-428"><code>					str = str[:same]</code></span>
+<span class="codeline" id="line-429"><code>					continue</code></span>
+<span class="codeline" id="line-430"><code>				}</code></span>
+<span class="codeline" id="line-431"><code>			}</code></span>
+<span class="codeline" id="line-432"><code>		}</code></span>
+<span class="codeline" id="line-433"><code></code></span>
+<span class="codeline" id="line-434"><code>		// Found end of a run with common leading literal string:</code></span>
+<span class="codeline" id="line-435"><code>		// sub[start:i] all begin with str[0:len(str)], but sub[i]</code></span>
+<span class="codeline" id="line-436"><code>		// does not even begin with str[0].</code></span>
+<span class="codeline" id="line-437"><code>		//</code></span>
+<span class="codeline" id="line-438"><code>		// Factor out common string and append factored expression to out.</code></span>
+<span class="codeline" id="line-439"><code>		if i == start {</code></span>
+<span class="codeline" id="line-440"><code>			// Nothing to do - run of length 0.</code></span>
+<span class="codeline" id="line-441"><code>		} else if i == start+1 {</code></span>
+<span class="codeline" id="line-442"><code>			// Just one: don't bother factoring.</code></span>
+<span class="codeline" id="line-443"><code>			out = append(out, sub[start])</code></span>
+<span class="codeline" id="line-444"><code>		} else {</code></span>
+<span class="codeline" id="line-445"><code>			// Construct factored form: prefix(suffix1|suffix2|...)</code></span>
+<span class="codeline" id="line-446"><code>			prefix := p.newRegexp(OpLiteral)</code></span>
+<span class="codeline" id="line-447"><code>			prefix.Flags = strflags</code></span>
+<span class="codeline" id="line-448"><code>			prefix.Rune = append(prefix.Rune[:0], str...)</code></span>
+<span class="codeline" id="line-449"><code></code></span>
+<span class="codeline" id="line-450"><code>			for j := start; j &lt; i; j++ {</code></span>
+<span class="codeline" id="line-451"><code>				sub[j] = p.removeLeadingString(sub[j], len(str))</code></span>
+<span class="codeline" id="line-452"><code>			}</code></span>
+<span class="codeline" id="line-453"><code>			suffix := p.collapse(sub[start:i], OpAlternate) // recurse</code></span>
+<span class="codeline" id="line-454"><code></code></span>
+<span class="codeline" id="line-455"><code>			re := p.newRegexp(OpConcat)</code></span>
+<span class="codeline" id="line-456"><code>			re.Sub = append(re.Sub[:0], prefix, suffix)</code></span>
+<span class="codeline" id="line-457"><code>			out = append(out, re)</code></span>
+<span class="codeline" id="line-458"><code>		}</code></span>
+<span class="codeline" id="line-459"><code></code></span>
+<span class="codeline" id="line-460"><code>		// Prepare for next iteration.</code></span>
+<span class="codeline" id="line-461"><code>		start = i</code></span>
+<span class="codeline" id="line-462"><code>		str = istr</code></span>
+<span class="codeline" id="line-463"><code>		strflags = iflags</code></span>
+<span class="codeline" id="line-464"><code>	}</code></span>
+<span class="codeline" id="line-465"><code>	sub = out</code></span>
+<span class="codeline" id="line-466"><code></code></span>
+<span class="codeline" id="line-467"><code>	// Round 2: Factor out common simple prefixes,</code></span>
+<span class="codeline" id="line-468"><code>	// just the first piece of each concatenation.</code></span>
+<span class="codeline" id="line-469"><code>	// This will be good enough a lot of the time.</code></span>
+<span class="codeline" id="line-470"><code>	//</code></span>
+<span class="codeline" id="line-471"><code>	// Complex subexpressions (e.g. involving quantifiers)</code></span>
+<span class="codeline" id="line-472"><code>	// are not safe to factor because that collapses their</code></span>
+<span class="codeline" id="line-473"><code>	// distinct paths through the automaton, which affects</code></span>
+<span class="codeline" id="line-474"><code>	// correctness in some cases.</code></span>
+<span class="codeline" id="line-475"><code>	start = 0</code></span>
+<span class="codeline" id="line-476"><code>	out = sub[:0]</code></span>
+<span class="codeline" id="line-477"><code>	var first *Regexp</code></span>
+<span class="codeline" id="line-478"><code>	for i := 0; i &lt;= len(sub); i++ {</code></span>
+<span class="codeline" id="line-479"><code>		// Invariant: the Regexps that were in sub[0:start] have been</code></span>
+<span class="codeline" id="line-480"><code>		// used or marked for reuse, and the slice space has been reused</code></span>
+<span class="codeline" id="line-481"><code>		// for out (len(out) &lt;= start).</code></span>
+<span class="codeline" id="line-482"><code>		//</code></span>
+<span class="codeline" id="line-483"><code>		// Invariant: sub[start:i] consists of regexps that all begin with ifirst.</code></span>
+<span class="codeline" id="line-484"><code>		var ifirst *Regexp</code></span>
+<span class="codeline" id="line-485"><code>		if i &lt; len(sub) {</code></span>
+<span class="codeline" id="line-486"><code>			ifirst = p.leadingRegexp(sub[i])</code></span>
+<span class="codeline" id="line-487"><code>			if first != nil &amp;&amp; first.Equal(ifirst) &amp;&amp;</code></span>
+<span class="codeline" id="line-488"><code>				// first must be a character class OR a fixed repeat of a character class.</code></span>
+<span class="codeline" id="line-489"><code>				(isCharClass(first) || (first.Op == OpRepeat &amp;&amp; first.Min == first.Max &amp;&amp; isCharClass(first.Sub[0]))) {</code></span>
+<span class="codeline" id="line-490"><code>				continue</code></span>
+<span class="codeline" id="line-491"><code>			}</code></span>
+<span class="codeline" id="line-492"><code>		}</code></span>
+<span class="codeline" id="line-493"><code></code></span>
+<span class="codeline" id="line-494"><code>		// Found end of a run with common leading regexp:</code></span>
+<span class="codeline" id="line-495"><code>		// sub[start:i] all begin with first but sub[i] does not.</code></span>
+<span class="codeline" id="line-496"><code>		//</code></span>
+<span class="codeline" id="line-497"><code>		// Factor out common regexp and append factored expression to out.</code></span>
+<span class="codeline" id="line-498"><code>		if i == start {</code></span>
+<span class="codeline" id="line-499"><code>			// Nothing to do - run of length 0.</code></span>
+<span class="codeline" id="line-500"><code>		} else if i == start+1 {</code></span>
+<span class="codeline" id="line-501"><code>			// Just one: don't bother factoring.</code></span>
+<span class="codeline" id="line-502"><code>			out = append(out, sub[start])</code></span>
+<span class="codeline" id="line-503"><code>		} else {</code></span>
+<span class="codeline" id="line-504"><code>			// Construct factored form: prefix(suffix1|suffix2|...)</code></span>
+<span class="codeline" id="line-505"><code>			prefix := first</code></span>
+<span class="codeline" id="line-506"><code>			for j := start; j &lt; i; j++ {</code></span>
+<span class="codeline" id="line-507"><code>				reuse := j != start // prefix came from sub[start]</code></span>
+<span class="codeline" id="line-508"><code>				sub[j] = p.removeLeadingRegexp(sub[j], reuse)</code></span>
+<span class="codeline" id="line-509"><code>			}</code></span>
+<span class="codeline" id="line-510"><code>			suffix := p.collapse(sub[start:i], OpAlternate) // recurse</code></span>
+<span class="codeline" id="line-511"><code></code></span>
+<span class="codeline" id="line-512"><code>			re := p.newRegexp(OpConcat)</code></span>
+<span class="codeline" id="line-513"><code>			re.Sub = append(re.Sub[:0], prefix, suffix)</code></span>
+<span class="codeline" id="line-514"><code>			out = append(out, re)</code></span>
+<span class="codeline" id="line-515"><code>		}</code></span>
+<span class="codeline" id="line-516"><code></code></span>
+<span class="codeline" id="line-517"><code>		// Prepare for next iteration.</code></span>
+<span class="codeline" id="line-518"><code>		start = i</code></span>
+<span class="codeline" id="line-519"><code>		first = ifirst</code></span>
+<span class="codeline" id="line-520"><code>	}</code></span>
+<span class="codeline" id="line-521"><code>	sub = out</code></span>
+<span class="codeline" id="line-522"><code></code></span>
+<span class="codeline" id="line-523"><code>	// Round 3: Collapse runs of single literals into character classes.</code></span>
+<span class="codeline" id="line-524"><code>	start = 0</code></span>
+<span class="codeline" id="line-525"><code>	out = sub[:0]</code></span>
+<span class="codeline" id="line-526"><code>	for i := 0; i &lt;= len(sub); i++ {</code></span>
+<span class="codeline" id="line-527"><code>		// Invariant: the Regexps that were in sub[0:start] have been</code></span>
+<span class="codeline" id="line-528"><code>		// used or marked for reuse, and the slice space has been reused</code></span>
+<span class="codeline" id="line-529"><code>		// for out (len(out) &lt;= start).</code></span>
+<span class="codeline" id="line-530"><code>		//</code></span>
+<span class="codeline" id="line-531"><code>		// Invariant: sub[start:i] consists of regexps that are either</code></span>
+<span class="codeline" id="line-532"><code>		// literal runes or character classes.</code></span>
+<span class="codeline" id="line-533"><code>		if i &lt; len(sub) &amp;&amp; isCharClass(sub[i]) {</code></span>
+<span class="codeline" id="line-534"><code>			continue</code></span>
+<span class="codeline" id="line-535"><code>		}</code></span>
+<span class="codeline" id="line-536"><code></code></span>
+<span class="codeline" id="line-537"><code>		// sub[i] is not a char or char class;</code></span>
+<span class="codeline" id="line-538"><code>		// emit char class for sub[start:i]...</code></span>
+<span class="codeline" id="line-539"><code>		if i == start {</code></span>
+<span class="codeline" id="line-540"><code>			// Nothing to do - run of length 0.</code></span>
+<span class="codeline" id="line-541"><code>		} else if i == start+1 {</code></span>
+<span class="codeline" id="line-542"><code>			out = append(out, sub[start])</code></span>
+<span class="codeline" id="line-543"><code>		} else {</code></span>
+<span class="codeline" id="line-544"><code>			// Make new char class.</code></span>
+<span class="codeline" id="line-545"><code>			// Start with most complex regexp in sub[start].</code></span>
+<span class="codeline" id="line-546"><code>			max := start</code></span>
+<span class="codeline" id="line-547"><code>			for j := start + 1; j &lt; i; j++ {</code></span>
+<span class="codeline" id="line-548"><code>				if sub[max].Op &lt; sub[j].Op || sub[max].Op == sub[j].Op &amp;&amp; len(sub[max].Rune) &lt; len(sub[j].Rune) {</code></span>
+<span class="codeline" id="line-549"><code>					max = j</code></span>
+<span class="codeline" id="line-550"><code>				}</code></span>
+<span class="codeline" id="line-551"><code>			}</code></span>
+<span class="codeline" id="line-552"><code>			sub[start], sub[max] = sub[max], sub[start]</code></span>
+<span class="codeline" id="line-553"><code></code></span>
+<span class="codeline" id="line-554"><code>			for j := start + 1; j &lt; i; j++ {</code></span>
+<span class="codeline" id="line-555"><code>				mergeCharClass(sub[start], sub[j])</code></span>
+<span class="codeline" id="line-556"><code>				p.reuse(sub[j])</code></span>
+<span class="codeline" id="line-557"><code>			}</code></span>
+<span class="codeline" id="line-558"><code>			cleanAlt(sub[start])</code></span>
+<span class="codeline" id="line-559"><code>			out = append(out, sub[start])</code></span>
+<span class="codeline" id="line-560"><code>		}</code></span>
+<span class="codeline" id="line-561"><code></code></span>
+<span class="codeline" id="line-562"><code>		// ... and then emit sub[i].</code></span>
+<span class="codeline" id="line-563"><code>		if i &lt; len(sub) {</code></span>
+<span class="codeline" id="line-564"><code>			out = append(out, sub[i])</code></span>
+<span class="codeline" id="line-565"><code>		}</code></span>
+<span class="codeline" id="line-566"><code>		start = i + 1</code></span>
+<span class="codeline" id="line-567"><code>	}</code></span>
+<span class="codeline" id="line-568"><code>	sub = out</code></span>
+<span class="codeline" id="line-569"><code></code></span>
+<span class="codeline" id="line-570"><code>	// Round 4: Collapse runs of empty matches into a single empty match.</code></span>
+<span class="codeline" id="line-571"><code>	start = 0</code></span>
+<span class="codeline" id="line-572"><code>	out = sub[:0]</code></span>
+<span class="codeline" id="line-573"><code>	for i := range sub {</code></span>
+<span class="codeline" id="line-574"><code>		if i+1 &lt; len(sub) &amp;&amp; sub[i].Op == OpEmptyMatch &amp;&amp; sub[i+1].Op == OpEmptyMatch {</code></span>
+<span class="codeline" id="line-575"><code>			continue</code></span>
+<span class="codeline" id="line-576"><code>		}</code></span>
+<span class="codeline" id="line-577"><code>		out = append(out, sub[i])</code></span>
+<span class="codeline" id="line-578"><code>	}</code></span>
+<span class="codeline" id="line-579"><code>	sub = out</code></span>
+<span class="codeline" id="line-580"><code></code></span>
+<span class="codeline" id="line-581"><code>	return sub</code></span>
+<span class="codeline" id="line-582"><code>}</code></span>
+<span class="codeline" id="line-583"><code></code></span>
+<span class="codeline" id="line-584"><code>// leadingString returns the leading literal string that re begins with.</code></span>
+<span class="codeline" id="line-585"><code>// The string refers to storage in re or its children.</code></span>
+<span class="codeline" id="line-586"><code>func (p *parser) leadingString(re *Regexp) ([]rune, Flags) {</code></span>
+<span class="codeline" id="line-587"><code>	if re.Op == OpConcat &amp;&amp; len(re.Sub) &gt; 0 {</code></span>
+<span class="codeline" id="line-588"><code>		re = re.Sub[0]</code></span>
+<span class="codeline" id="line-589"><code>	}</code></span>
+<span class="codeline" id="line-590"><code>	if re.Op != OpLiteral {</code></span>
+<span class="codeline" id="line-591"><code>		return nil, 0</code></span>
+<span class="codeline" id="line-592"><code>	}</code></span>
+<span class="codeline" id="line-593"><code>	return re.Rune, re.Flags &amp; FoldCase</code></span>
+<span class="codeline" id="line-594"><code>}</code></span>
+<span class="codeline" id="line-595"><code></code></span>
+<span class="codeline" id="line-596"><code>// removeLeadingString removes the first n leading runes</code></span>
+<span class="codeline" id="line-597"><code>// from the beginning of re. It returns the replacement for re.</code></span>
+<span class="codeline" id="line-598"><code>func (p *parser) removeLeadingString(re *Regexp, n int) *Regexp {</code></span>
+<span class="codeline" id="line-599"><code>	if re.Op == OpConcat &amp;&amp; len(re.Sub) &gt; 0 {</code></span>
+<span class="codeline" id="line-600"><code>		// Removing a leading string in a concatenation</code></span>
+<span class="codeline" id="line-601"><code>		// might simplify the concatenation.</code></span>
+<span class="codeline" id="line-602"><code>		sub := re.Sub[0]</code></span>
+<span class="codeline" id="line-603"><code>		sub = p.removeLeadingString(sub, n)</code></span>
+<span class="codeline" id="line-604"><code>		re.Sub[0] = sub</code></span>
+<span class="codeline" id="line-605"><code>		if sub.Op == OpEmptyMatch {</code></span>
+<span class="codeline" id="line-606"><code>			p.reuse(sub)</code></span>
+<span class="codeline" id="line-607"><code>			switch len(re.Sub) {</code></span>
+<span class="codeline" id="line-608"><code>			case 0, 1:</code></span>
+<span class="codeline" id="line-609"><code>				// Impossible but handle.</code></span>
+<span class="codeline" id="line-610"><code>				re.Op = OpEmptyMatch</code></span>
+<span class="codeline" id="line-611"><code>				re.Sub = nil</code></span>
+<span class="codeline" id="line-612"><code>			case 2:</code></span>
+<span class="codeline" id="line-613"><code>				old := re</code></span>
+<span class="codeline" id="line-614"><code>				re = re.Sub[1]</code></span>
+<span class="codeline" id="line-615"><code>				p.reuse(old)</code></span>
+<span class="codeline" id="line-616"><code>			default:</code></span>
+<span class="codeline" id="line-617"><code>				copy(re.Sub, re.Sub[1:])</code></span>
+<span class="codeline" id="line-618"><code>				re.Sub = re.Sub[:len(re.Sub)-1]</code></span>
+<span class="codeline" id="line-619"><code>			}</code></span>
+<span class="codeline" id="line-620"><code>		}</code></span>
+<span class="codeline" id="line-621"><code>		return re</code></span>
+<span class="codeline" id="line-622"><code>	}</code></span>
+<span class="codeline" id="line-623"><code></code></span>
+<span class="codeline" id="line-624"><code>	if re.Op == OpLiteral {</code></span>
+<span class="codeline" id="line-625"><code>		re.Rune = re.Rune[:copy(re.Rune, re.Rune[n:])]</code></span>
+<span class="codeline" id="line-626"><code>		if len(re.Rune) == 0 {</code></span>
+<span class="codeline" id="line-627"><code>			re.Op = OpEmptyMatch</code></span>
+<span class="codeline" id="line-628"><code>		}</code></span>
+<span class="codeline" id="line-629"><code>	}</code></span>
+<span class="codeline" id="line-630"><code>	return re</code></span>
+<span class="codeline" id="line-631"><code>}</code></span>
+<span class="codeline" id="line-632"><code></code></span>
+<span class="codeline" id="line-633"><code>// leadingRegexp returns the leading regexp that re begins with.</code></span>
+<span class="codeline" id="line-634"><code>// The regexp refers to storage in re or its children.</code></span>
+<span class="codeline" id="line-635"><code>func (p *parser) leadingRegexp(re *Regexp) *Regexp {</code></span>
+<span class="codeline" id="line-636"><code>	if re.Op == OpEmptyMatch {</code></span>
+<span class="codeline" id="line-637"><code>		return nil</code></span>
+<span class="codeline" id="line-638"><code>	}</code></span>
+<span class="codeline" id="line-639"><code>	if re.Op == OpConcat &amp;&amp; len(re.Sub) &gt; 0 {</code></span>
+<span class="codeline" id="line-640"><code>		sub := re.Sub[0]</code></span>
+<span class="codeline" id="line-641"><code>		if sub.Op == OpEmptyMatch {</code></span>
+<span class="codeline" id="line-642"><code>			return nil</code></span>
+<span class="codeline" id="line-643"><code>		}</code></span>
+<span class="codeline" id="line-644"><code>		return sub</code></span>
+<span class="codeline" id="line-645"><code>	}</code></span>
+<span class="codeline" id="line-646"><code>	return re</code></span>
+<span class="codeline" id="line-647"><code>}</code></span>
+<span class="codeline" id="line-648"><code></code></span>
+<span class="codeline" id="line-649"><code>// removeLeadingRegexp removes the leading regexp in re.</code></span>
+<span class="codeline" id="line-650"><code>// It returns the replacement for re.</code></span>
+<span class="codeline" id="line-651"><code>// If reuse is true, it passes the removed regexp (if no longer needed) to p.reuse.</code></span>
+<span class="codeline" id="line-652"><code>func (p *parser) removeLeadingRegexp(re *Regexp, reuse bool) *Regexp {</code></span>
+<span class="codeline" id="line-653"><code>	if re.Op == OpConcat &amp;&amp; len(re.Sub) &gt; 0 {</code></span>
+<span class="codeline" id="line-654"><code>		if reuse {</code></span>
+<span class="codeline" id="line-655"><code>			p.reuse(re.Sub[0])</code></span>
+<span class="codeline" id="line-656"><code>		}</code></span>
+<span class="codeline" id="line-657"><code>		re.Sub = re.Sub[:copy(re.Sub, re.Sub[1:])]</code></span>
+<span class="codeline" id="line-658"><code>		switch len(re.Sub) {</code></span>
+<span class="codeline" id="line-659"><code>		case 0:</code></span>
+<span class="codeline" id="line-660"><code>			re.Op = OpEmptyMatch</code></span>
+<span class="codeline" id="line-661"><code>			re.Sub = nil</code></span>
+<span class="codeline" id="line-662"><code>		case 1:</code></span>
+<span class="codeline" id="line-663"><code>			old := re</code></span>
+<span class="codeline" id="line-664"><code>			re = re.Sub[0]</code></span>
+<span class="codeline" id="line-665"><code>			p.reuse(old)</code></span>
+<span class="codeline" id="line-666"><code>		}</code></span>
+<span class="codeline" id="line-667"><code>		return re</code></span>
+<span class="codeline" id="line-668"><code>	}</code></span>
+<span class="codeline" id="line-669"><code>	if reuse {</code></span>
+<span class="codeline" id="line-670"><code>		p.reuse(re)</code></span>
+<span class="codeline" id="line-671"><code>	}</code></span>
+<span class="codeline" id="line-672"><code>	return p.newRegexp(OpEmptyMatch)</code></span>
+<span class="codeline" id="line-673"><code>}</code></span>
+<span class="codeline" id="line-674"><code></code></span>
+<span class="codeline" id="line-675"><code>func literalRegexp(s string, flags Flags) *Regexp {</code></span>
+<span class="codeline" id="line-676"><code>	re := &amp;Regexp{Op: OpLiteral}</code></span>
+<span class="codeline" id="line-677"><code>	re.Flags = flags</code></span>
+<span class="codeline" id="line-678"><code>	re.Rune = re.Rune0[:0] // use local storage for small strings</code></span>
+<span class="codeline" id="line-679"><code>	for _, c := range s {</code></span>
+<span class="codeline" id="line-680"><code>		if len(re.Rune) &gt;= cap(re.Rune) {</code></span>
+<span class="codeline" id="line-681"><code>			// string is too long to fit in Rune0.  let Go handle it</code></span>
+<span class="codeline" id="line-682"><code>			re.Rune = []rune(s)</code></span>
+<span class="codeline" id="line-683"><code>			break</code></span>
+<span class="codeline" id="line-684"><code>		}</code></span>
+<span class="codeline" id="line-685"><code>		re.Rune = append(re.Rune, c)</code></span>
+<span class="codeline" id="line-686"><code>	}</code></span>
+<span class="codeline" id="line-687"><code>	return re</code></span>
+<span class="codeline" id="line-688"><code>}</code></span>
+<span class="codeline" id="line-689"><code></code></span>
+<span class="codeline" id="line-690"><code>// Parsing.</code></span>
+<span class="codeline" id="line-691"><code></code></span>
+<span class="codeline" id="line-692"><code>// Parse parses a regular expression string s, controlled by the specified</code></span>
+<span class="codeline" id="line-693"><code>// Flags, and returns a regular expression parse tree. The syntax is</code></span>
+<span class="codeline" id="line-694"><code>// described in the top-level comment.</code></span>
+<span class="codeline" id="line-695"><code>func Parse(s string, flags Flags) (*Regexp, error) {</code></span>
+<span class="codeline" id="line-696"><code>	if flags&amp;Literal != 0 {</code></span>
+<span class="codeline" id="line-697"><code>		// Trivial parser for literal string.</code></span>
+<span class="codeline" id="line-698"><code>		if err := checkUTF8(s); err != nil {</code></span>
+<span class="codeline" id="line-699"><code>			return nil, err</code></span>
+<span class="codeline" id="line-700"><code>		}</code></span>
+<span class="codeline" id="line-701"><code>		return literalRegexp(s, flags), nil</code></span>
+<span class="codeline" id="line-702"><code>	}</code></span>
+<span class="codeline" id="line-703"><code></code></span>
+<span class="codeline" id="line-704"><code>	// Otherwise, must do real work.</code></span>
+<span class="codeline" id="line-705"><code>	var (</code></span>
+<span class="codeline" id="line-706"><code>		p          parser</code></span>
+<span class="codeline" id="line-707"><code>		err        error</code></span>
+<span class="codeline" id="line-708"><code>		c          rune</code></span>
+<span class="codeline" id="line-709"><code>		op         Op</code></span>
+<span class="codeline" id="line-710"><code>		lastRepeat string</code></span>
+<span class="codeline" id="line-711"><code>	)</code></span>
+<span class="codeline" id="line-712"><code>	p.flags = flags</code></span>
+<span class="codeline" id="line-713"><code>	p.wholeRegexp = s</code></span>
+<span class="codeline" id="line-714"><code>	t := s</code></span>
+<span class="codeline" id="line-715"><code>	for t != "" {</code></span>
+<span class="codeline" id="line-716"><code>		repeat := ""</code></span>
+<span class="codeline" id="line-717"><code>	BigSwitch:</code></span>
+<span class="codeline" id="line-718"><code>		switch t[0] {</code></span>
+<span class="codeline" id="line-719"><code>		default:</code></span>
+<span class="codeline" id="line-720"><code>			if c, t, err = nextRune(t); err != nil {</code></span>
+<span class="codeline" id="line-721"><code>				return nil, err</code></span>
+<span class="codeline" id="line-722"><code>			}</code></span>
+<span class="codeline" id="line-723"><code>			p.literal(c)</code></span>
+<span class="codeline" id="line-724"><code></code></span>
+<span class="codeline" id="line-725"><code>		case '(':</code></span>
+<span class="codeline" id="line-726"><code>			if p.flags&amp;PerlX != 0 &amp;&amp; len(t) &gt;= 2 &amp;&amp; t[1] == '?' {</code></span>
+<span class="codeline" id="line-727"><code>				// Flag changes and non-capturing groups.</code></span>
+<span class="codeline" id="line-728"><code>				if t, err = p.parsePerlFlags(t); err != nil {</code></span>
+<span class="codeline" id="line-729"><code>					return nil, err</code></span>
+<span class="codeline" id="line-730"><code>				}</code></span>
+<span class="codeline" id="line-731"><code>				break</code></span>
+<span class="codeline" id="line-732"><code>			}</code></span>
+<span class="codeline" id="line-733"><code>			p.numCap++</code></span>
+<span class="codeline" id="line-734"><code>			p.op(opLeftParen).Cap = p.numCap</code></span>
+<span class="codeline" id="line-735"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-736"><code>		case '|':</code></span>
+<span class="codeline" id="line-737"><code>			if err = p.parseVerticalBar(); err != nil {</code></span>
+<span class="codeline" id="line-738"><code>				return nil, err</code></span>
+<span class="codeline" id="line-739"><code>			}</code></span>
+<span class="codeline" id="line-740"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-741"><code>		case ')':</code></span>
+<span class="codeline" id="line-742"><code>			if err = p.parseRightParen(); err != nil {</code></span>
+<span class="codeline" id="line-743"><code>				return nil, err</code></span>
+<span class="codeline" id="line-744"><code>			}</code></span>
+<span class="codeline" id="line-745"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-746"><code>		case '^':</code></span>
+<span class="codeline" id="line-747"><code>			if p.flags&amp;OneLine != 0 {</code></span>
+<span class="codeline" id="line-748"><code>				p.op(OpBeginText)</code></span>
+<span class="codeline" id="line-749"><code>			} else {</code></span>
+<span class="codeline" id="line-750"><code>				p.op(OpBeginLine)</code></span>
+<span class="codeline" id="line-751"><code>			}</code></span>
+<span class="codeline" id="line-752"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-753"><code>		case '$':</code></span>
+<span class="codeline" id="line-754"><code>			if p.flags&amp;OneLine != 0 {</code></span>
+<span class="codeline" id="line-755"><code>				p.op(OpEndText).Flags |= WasDollar</code></span>
+<span class="codeline" id="line-756"><code>			} else {</code></span>
+<span class="codeline" id="line-757"><code>				p.op(OpEndLine)</code></span>
+<span class="codeline" id="line-758"><code>			}</code></span>
+<span class="codeline" id="line-759"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-760"><code>		case '.':</code></span>
+<span class="codeline" id="line-761"><code>			if p.flags&amp;DotNL != 0 {</code></span>
+<span class="codeline" id="line-762"><code>				p.op(OpAnyChar)</code></span>
+<span class="codeline" id="line-763"><code>			} else {</code></span>
+<span class="codeline" id="line-764"><code>				p.op(OpAnyCharNotNL)</code></span>
+<span class="codeline" id="line-765"><code>			}</code></span>
+<span class="codeline" id="line-766"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-767"><code>		case '[':</code></span>
+<span class="codeline" id="line-768"><code>			if t, err = p.parseClass(t); err != nil {</code></span>
+<span class="codeline" id="line-769"><code>				return nil, err</code></span>
+<span class="codeline" id="line-770"><code>			}</code></span>
+<span class="codeline" id="line-771"><code>		case '*', '+', '?':</code></span>
+<span class="codeline" id="line-772"><code>			before := t</code></span>
+<span class="codeline" id="line-773"><code>			switch t[0] {</code></span>
+<span class="codeline" id="line-774"><code>			case '*':</code></span>
+<span class="codeline" id="line-775"><code>				op = OpStar</code></span>
+<span class="codeline" id="line-776"><code>			case '+':</code></span>
+<span class="codeline" id="line-777"><code>				op = OpPlus</code></span>
+<span class="codeline" id="line-778"><code>			case '?':</code></span>
+<span class="codeline" id="line-779"><code>				op = OpQuest</code></span>
+<span class="codeline" id="line-780"><code>			}</code></span>
+<span class="codeline" id="line-781"><code>			after := t[1:]</code></span>
+<span class="codeline" id="line-782"><code>			if after, err = p.repeat(op, 0, 0, before, after, lastRepeat); err != nil {</code></span>
+<span class="codeline" id="line-783"><code>				return nil, err</code></span>
+<span class="codeline" id="line-784"><code>			}</code></span>
+<span class="codeline" id="line-785"><code>			repeat = before</code></span>
+<span class="codeline" id="line-786"><code>			t = after</code></span>
+<span class="codeline" id="line-787"><code>		case '{':</code></span>
+<span class="codeline" id="line-788"><code>			op = OpRepeat</code></span>
+<span class="codeline" id="line-789"><code>			before := t</code></span>
+<span class="codeline" id="line-790"><code>			min, max, after, ok := p.parseRepeat(t)</code></span>
+<span class="codeline" id="line-791"><code>			if !ok {</code></span>
+<span class="codeline" id="line-792"><code>				// If the repeat cannot be parsed, { is a literal.</code></span>
+<span class="codeline" id="line-793"><code>				p.literal('{')</code></span>
+<span class="codeline" id="line-794"><code>				t = t[1:]</code></span>
+<span class="codeline" id="line-795"><code>				break</code></span>
+<span class="codeline" id="line-796"><code>			}</code></span>
+<span class="codeline" id="line-797"><code>			if min &lt; 0 || min &gt; 1000 || max &gt; 1000 || max &gt;= 0 &amp;&amp; min &gt; max {</code></span>
+<span class="codeline" id="line-798"><code>				// Numbers were too big, or max is present and min &gt; max.</code></span>
+<span class="codeline" id="line-799"><code>				return nil, &amp;Error{ErrInvalidRepeatSize, before[:len(before)-len(after)]}</code></span>
+<span class="codeline" id="line-800"><code>			}</code></span>
+<span class="codeline" id="line-801"><code>			if after, err = p.repeat(op, min, max, before, after, lastRepeat); err != nil {</code></span>
+<span class="codeline" id="line-802"><code>				return nil, err</code></span>
+<span class="codeline" id="line-803"><code>			}</code></span>
+<span class="codeline" id="line-804"><code>			repeat = before</code></span>
+<span class="codeline" id="line-805"><code>			t = after</code></span>
+<span class="codeline" id="line-806"><code>		case '\\':</code></span>
+<span class="codeline" id="line-807"><code>			if p.flags&amp;PerlX != 0 &amp;&amp; len(t) &gt;= 2 {</code></span>
+<span class="codeline" id="line-808"><code>				switch t[1] {</code></span>
+<span class="codeline" id="line-809"><code>				case 'A':</code></span>
+<span class="codeline" id="line-810"><code>					p.op(OpBeginText)</code></span>
+<span class="codeline" id="line-811"><code>					t = t[2:]</code></span>
+<span class="codeline" id="line-812"><code>					break BigSwitch</code></span>
+<span class="codeline" id="line-813"><code>				case 'b':</code></span>
+<span class="codeline" id="line-814"><code>					p.op(OpWordBoundary)</code></span>
+<span class="codeline" id="line-815"><code>					t = t[2:]</code></span>
+<span class="codeline" id="line-816"><code>					break BigSwitch</code></span>
+<span class="codeline" id="line-817"><code>				case 'B':</code></span>
+<span class="codeline" id="line-818"><code>					p.op(OpNoWordBoundary)</code></span>
+<span class="codeline" id="line-819"><code>					t = t[2:]</code></span>
+<span class="codeline" id="line-820"><code>					break BigSwitch</code></span>
+<span class="codeline" id="line-821"><code>				case 'C':</code></span>
+<span class="codeline" id="line-822"><code>					// any byte; not supported</code></span>
+<span class="codeline" id="line-823"><code>					return nil, &amp;Error{ErrInvalidEscape, t[:2]}</code></span>
+<span class="codeline" id="line-824"><code>				case 'Q':</code></span>
+<span class="codeline" id="line-825"><code>					// \Q ... \E: the ... is always literals</code></span>
+<span class="codeline" id="line-826"><code>					var lit string</code></span>
+<span class="codeline" id="line-827"><code>					if i := strings.Index(t, `\E`); i &lt; 0 {</code></span>
+<span class="codeline" id="line-828"><code>						lit = t[2:]</code></span>
+<span class="codeline" id="line-829"><code>						t = ""</code></span>
+<span class="codeline" id="line-830"><code>					} else {</code></span>
+<span class="codeline" id="line-831"><code>						lit = t[2:i]</code></span>
+<span class="codeline" id="line-832"><code>						t = t[i+2:]</code></span>
+<span class="codeline" id="line-833"><code>					}</code></span>
+<span class="codeline" id="line-834"><code>					for lit != "" {</code></span>
+<span class="codeline" id="line-835"><code>						c, rest, err := nextRune(lit)</code></span>
+<span class="codeline" id="line-836"><code>						if err != nil {</code></span>
+<span class="codeline" id="line-837"><code>							return nil, err</code></span>
+<span class="codeline" id="line-838"><code>						}</code></span>
+<span class="codeline" id="line-839"><code>						p.literal(c)</code></span>
+<span class="codeline" id="line-840"><code>						lit = rest</code></span>
+<span class="codeline" id="line-841"><code>					}</code></span>
+<span class="codeline" id="line-842"><code>					break BigSwitch</code></span>
+<span class="codeline" id="line-843"><code>				case 'z':</code></span>
+<span class="codeline" id="line-844"><code>					p.op(OpEndText)</code></span>
+<span class="codeline" id="line-845"><code>					t = t[2:]</code></span>
+<span class="codeline" id="line-846"><code>					break BigSwitch</code></span>
+<span class="codeline" id="line-847"><code>				}</code></span>
+<span class="codeline" id="line-848"><code>			}</code></span>
+<span class="codeline" id="line-849"><code></code></span>
+<span class="codeline" id="line-850"><code>			re := p.newRegexp(OpCharClass)</code></span>
+<span class="codeline" id="line-851"><code>			re.Flags = p.flags</code></span>
+<span class="codeline" id="line-852"><code></code></span>
+<span class="codeline" id="line-853"><code>			// Look for Unicode character group like \p{Han}</code></span>
+<span class="codeline" id="line-854"><code>			if len(t) &gt;= 2 &amp;&amp; (t[1] == 'p' || t[1] == 'P') {</code></span>
+<span class="codeline" id="line-855"><code>				r, rest, err := p.parseUnicodeClass(t, re.Rune0[:0])</code></span>
+<span class="codeline" id="line-856"><code>				if err != nil {</code></span>
+<span class="codeline" id="line-857"><code>					return nil, err</code></span>
+<span class="codeline" id="line-858"><code>				}</code></span>
+<span class="codeline" id="line-859"><code>				if r != nil {</code></span>
+<span class="codeline" id="line-860"><code>					re.Rune = r</code></span>
+<span class="codeline" id="line-861"><code>					t = rest</code></span>
+<span class="codeline" id="line-862"><code>					p.push(re)</code></span>
+<span class="codeline" id="line-863"><code>					break BigSwitch</code></span>
+<span class="codeline" id="line-864"><code>				}</code></span>
+<span class="codeline" id="line-865"><code>			}</code></span>
+<span class="codeline" id="line-866"><code></code></span>
+<span class="codeline" id="line-867"><code>			// Perl character class escape.</code></span>
+<span class="codeline" id="line-868"><code>			if r, rest := p.parsePerlClassEscape(t, re.Rune0[:0]); r != nil {</code></span>
+<span class="codeline" id="line-869"><code>				re.Rune = r</code></span>
+<span class="codeline" id="line-870"><code>				t = rest</code></span>
+<span class="codeline" id="line-871"><code>				p.push(re)</code></span>
+<span class="codeline" id="line-872"><code>				break BigSwitch</code></span>
+<span class="codeline" id="line-873"><code>			}</code></span>
+<span class="codeline" id="line-874"><code>			p.reuse(re)</code></span>
+<span class="codeline" id="line-875"><code></code></span>
+<span class="codeline" id="line-876"><code>			// Ordinary single-character escape.</code></span>
+<span class="codeline" id="line-877"><code>			if c, t, err = p.parseEscape(t); err != nil {</code></span>
+<span class="codeline" id="line-878"><code>				return nil, err</code></span>
+<span class="codeline" id="line-879"><code>			}</code></span>
+<span class="codeline" id="line-880"><code>			p.literal(c)</code></span>
+<span class="codeline" id="line-881"><code>		}</code></span>
+<span class="codeline" id="line-882"><code>		lastRepeat = repeat</code></span>
+<span class="codeline" id="line-883"><code>	}</code></span>
+<span class="codeline" id="line-884"><code></code></span>
+<span class="codeline" id="line-885"><code>	p.concat()</code></span>
+<span class="codeline" id="line-886"><code>	if p.swapVerticalBar() {</code></span>
+<span class="codeline" id="line-887"><code>		// pop vertical bar</code></span>
+<span class="codeline" id="line-888"><code>		p.stack = p.stack[:len(p.stack)-1]</code></span>
+<span class="codeline" id="line-889"><code>	}</code></span>
+<span class="codeline" id="line-890"><code>	p.alternate()</code></span>
+<span class="codeline" id="line-891"><code></code></span>
+<span class="codeline" id="line-892"><code>	n := len(p.stack)</code></span>
+<span class="codeline" id="line-893"><code>	if n != 1 {</code></span>
+<span class="codeline" id="line-894"><code>		return nil, &amp;Error{ErrMissingParen, s}</code></span>
+<span class="codeline" id="line-895"><code>	}</code></span>
+<span class="codeline" id="line-896"><code>	return p.stack[0], nil</code></span>
+<span class="codeline" id="line-897"><code>}</code></span>
+<span class="codeline" id="line-898"><code></code></span>
+<span class="codeline" id="line-899"><code>// parseRepeat parses {min} (max=min) or {min,} (max=-1) or {min,max}.</code></span>
+<span class="codeline" id="line-900"><code>// If s is not of that form, it returns ok == false.</code></span>
+<span class="codeline" id="line-901"><code>// If s has the right form but the values are too big, it returns min == -1, ok == true.</code></span>
+<span class="codeline" id="line-902"><code>func (p *parser) parseRepeat(s string) (min, max int, rest string, ok bool) {</code></span>
+<span class="codeline" id="line-903"><code>	if s == "" || s[0] != '{' {</code></span>
+<span class="codeline" id="line-904"><code>		return</code></span>
+<span class="codeline" id="line-905"><code>	}</code></span>
+<span class="codeline" id="line-906"><code>	s = s[1:]</code></span>
+<span class="codeline" id="line-907"><code>	var ok1 bool</code></span>
+<span class="codeline" id="line-908"><code>	if min, s, ok1 = p.parseInt(s); !ok1 {</code></span>
+<span class="codeline" id="line-909"><code>		return</code></span>
+<span class="codeline" id="line-910"><code>	}</code></span>
+<span class="codeline" id="line-911"><code>	if s == "" {</code></span>
+<span class="codeline" id="line-912"><code>		return</code></span>
+<span class="codeline" id="line-913"><code>	}</code></span>
+<span class="codeline" id="line-914"><code>	if s[0] != ',' {</code></span>
+<span class="codeline" id="line-915"><code>		max = min</code></span>
+<span class="codeline" id="line-916"><code>	} else {</code></span>
+<span class="codeline" id="line-917"><code>		s = s[1:]</code></span>
+<span class="codeline" id="line-918"><code>		if s == "" {</code></span>
+<span class="codeline" id="line-919"><code>			return</code></span>
+<span class="codeline" id="line-920"><code>		}</code></span>
+<span class="codeline" id="line-921"><code>		if s[0] == '}' {</code></span>
+<span class="codeline" id="line-922"><code>			max = -1</code></span>
+<span class="codeline" id="line-923"><code>		} else if max, s, ok1 = p.parseInt(s); !ok1 {</code></span>
+<span class="codeline" id="line-924"><code>			return</code></span>
+<span class="codeline" id="line-925"><code>		} else if max &lt; 0 {</code></span>
+<span class="codeline" id="line-926"><code>			// parseInt found too big a number</code></span>
+<span class="codeline" id="line-927"><code>			min = -1</code></span>
+<span class="codeline" id="line-928"><code>		}</code></span>
+<span class="codeline" id="line-929"><code>	}</code></span>
+<span class="codeline" id="line-930"><code>	if s == "" || s[0] != '}' {</code></span>
+<span class="codeline" id="line-931"><code>		return</code></span>
+<span class="codeline" id="line-932"><code>	}</code></span>
+<span class="codeline" id="line-933"><code>	rest = s[1:]</code></span>
+<span class="codeline" id="line-934"><code>	ok = true</code></span>
+<span class="codeline" id="line-935"><code>	return</code></span>
+<span class="codeline" id="line-936"><code>}</code></span>
+<span class="codeline" id="line-937"><code></code></span>
+<span class="codeline" id="line-938"><code>// parsePerlFlags parses a Perl flag setting or non-capturing group or both,</code></span>
+<span class="codeline" id="line-939"><code>// like (?i) or (?: or (?i:.  It removes the prefix from s and updates the parse state.</code></span>
+<span class="codeline" id="line-940"><code>// The caller must have ensured that s begins with "(?".</code></span>
+<span class="codeline" id="line-941"><code>func (p *parser) parsePerlFlags(s string) (rest string, err error) {</code></span>
+<span class="codeline" id="line-942"><code>	t := s</code></span>
+<span class="codeline" id="line-943"><code></code></span>
+<span class="codeline" id="line-944"><code>	// Check for named captures, first introduced in Python's regexp library.</code></span>
+<span class="codeline" id="line-945"><code>	// As usual, there are three slightly different syntaxes:</code></span>
+<span class="codeline" id="line-946"><code>	//</code></span>
+<span class="codeline" id="line-947"><code>	//   (?P&lt;name&gt;expr)   the original, introduced by Python</code></span>
+<span class="codeline" id="line-948"><code>	//   (?&lt;name&gt;expr)    the .NET alteration, adopted by Perl 5.10</code></span>
+<span class="codeline" id="line-949"><code>	//   (?'name'expr)    another .NET alteration, adopted by Perl 5.10</code></span>
+<span class="codeline" id="line-950"><code>	//</code></span>
+<span class="codeline" id="line-951"><code>	// Perl 5.10 gave in and implemented the Python version too,</code></span>
+<span class="codeline" id="line-952"><code>	// but they claim that the last two are the preferred forms.</code></span>
+<span class="codeline" id="line-953"><code>	// PCRE and languages based on it (specifically, PHP and Ruby)</code></span>
+<span class="codeline" id="line-954"><code>	// support all three as well. EcmaScript 4 uses only the Python form.</code></span>
+<span class="codeline" id="line-955"><code>	//</code></span>
+<span class="codeline" id="line-956"><code>	// In both the open source world (via Code Search) and the</code></span>
+<span class="codeline" id="line-957"><code>	// Google source tree, (?P&lt;expr&gt;name) is the dominant form,</code></span>
+<span class="codeline" id="line-958"><code>	// so that's the one we implement. One is enough.</code></span>
+<span class="codeline" id="line-959"><code>	if len(t) &gt; 4 &amp;&amp; t[2] == 'P' &amp;&amp; t[3] == '&lt;' {</code></span>
+<span class="codeline" id="line-960"><code>		// Pull out name.</code></span>
+<span class="codeline" id="line-961"><code>		end := strings.IndexRune(t, '&gt;')</code></span>
+<span class="codeline" id="line-962"><code>		if end &lt; 0 {</code></span>
+<span class="codeline" id="line-963"><code>			if err = checkUTF8(t); err != nil {</code></span>
+<span class="codeline" id="line-964"><code>				return "", err</code></span>
+<span class="codeline" id="line-965"><code>			}</code></span>
+<span class="codeline" id="line-966"><code>			return "", &amp;Error{ErrInvalidNamedCapture, s}</code></span>
+<span class="codeline" id="line-967"><code>		}</code></span>
+<span class="codeline" id="line-968"><code></code></span>
+<span class="codeline" id="line-969"><code>		capture := t[:end+1] // "(?P&lt;name&gt;"</code></span>
+<span class="codeline" id="line-970"><code>		name := t[4:end]     // "name"</code></span>
+<span class="codeline" id="line-971"><code>		if err = checkUTF8(name); err != nil {</code></span>
+<span class="codeline" id="line-972"><code>			return "", err</code></span>
+<span class="codeline" id="line-973"><code>		}</code></span>
+<span class="codeline" id="line-974"><code>		if !isValidCaptureName(name) {</code></span>
+<span class="codeline" id="line-975"><code>			return "", &amp;Error{ErrInvalidNamedCapture, capture}</code></span>
+<span class="codeline" id="line-976"><code>		}</code></span>
+<span class="codeline" id="line-977"><code></code></span>
+<span class="codeline" id="line-978"><code>		// Like ordinary capture, but named.</code></span>
+<span class="codeline" id="line-979"><code>		p.numCap++</code></span>
+<span class="codeline" id="line-980"><code>		re := p.op(opLeftParen)</code></span>
+<span class="codeline" id="line-981"><code>		re.Cap = p.numCap</code></span>
+<span class="codeline" id="line-982"><code>		re.Name = name</code></span>
+<span class="codeline" id="line-983"><code>		return t[end+1:], nil</code></span>
+<span class="codeline" id="line-984"><code>	}</code></span>
+<span class="codeline" id="line-985"><code></code></span>
+<span class="codeline" id="line-986"><code>	// Non-capturing group. Might also twiddle Perl flags.</code></span>
+<span class="codeline" id="line-987"><code>	var c rune</code></span>
+<span class="codeline" id="line-988"><code>	t = t[2:] // skip (?</code></span>
+<span class="codeline" id="line-989"><code>	flags := p.flags</code></span>
+<span class="codeline" id="line-990"><code>	sign := +1</code></span>
+<span class="codeline" id="line-991"><code>	sawFlag := false</code></span>
+<span class="codeline" id="line-992"><code>Loop:</code></span>
+<span class="codeline" id="line-993"><code>	for t != "" {</code></span>
+<span class="codeline" id="line-994"><code>		if c, t, err = nextRune(t); err != nil {</code></span>
+<span class="codeline" id="line-995"><code>			return "", err</code></span>
+<span class="codeline" id="line-996"><code>		}</code></span>
+<span class="codeline" id="line-997"><code>		switch c {</code></span>
+<span class="codeline" id="line-998"><code>		default:</code></span>
+<span class="codeline" id="line-999"><code>			break Loop</code></span>
+<span class="codeline" id="line-1000"><code></code></span>
+<span class="codeline" id="line-1001"><code>		// Flags.</code></span>
+<span class="codeline" id="line-1002"><code>		case 'i':</code></span>
+<span class="codeline" id="line-1003"><code>			flags |= FoldCase</code></span>
+<span class="codeline" id="line-1004"><code>			sawFlag = true</code></span>
+<span class="codeline" id="line-1005"><code>		case 'm':</code></span>
+<span class="codeline" id="line-1006"><code>			flags &amp;^= OneLine</code></span>
+<span class="codeline" id="line-1007"><code>			sawFlag = true</code></span>
+<span class="codeline" id="line-1008"><code>		case 's':</code></span>
+<span class="codeline" id="line-1009"><code>			flags |= DotNL</code></span>
+<span class="codeline" id="line-1010"><code>			sawFlag = true</code></span>
+<span class="codeline" id="line-1011"><code>		case 'U':</code></span>
+<span class="codeline" id="line-1012"><code>			flags |= NonGreedy</code></span>
+<span class="codeline" id="line-1013"><code>			sawFlag = true</code></span>
+<span class="codeline" id="line-1014"><code></code></span>
+<span class="codeline" id="line-1015"><code>		// Switch to negation.</code></span>
+<span class="codeline" id="line-1016"><code>		case '-':</code></span>
+<span class="codeline" id="line-1017"><code>			if sign &lt; 0 {</code></span>
+<span class="codeline" id="line-1018"><code>				break Loop</code></span>
+<span class="codeline" id="line-1019"><code>			}</code></span>
+<span class="codeline" id="line-1020"><code>			sign = -1</code></span>
+<span class="codeline" id="line-1021"><code>			// Invert flags so that | above turn into &amp;^ and vice versa.</code></span>
+<span class="codeline" id="line-1022"><code>			// We'll invert flags again before using it below.</code></span>
+<span class="codeline" id="line-1023"><code>			flags = ^flags</code></span>
+<span class="codeline" id="line-1024"><code>			sawFlag = false</code></span>
+<span class="codeline" id="line-1025"><code></code></span>
+<span class="codeline" id="line-1026"><code>		// End of flags, starting group or not.</code></span>
+<span class="codeline" id="line-1027"><code>		case ':', ')':</code></span>
+<span class="codeline" id="line-1028"><code>			if sign &lt; 0 {</code></span>
+<span class="codeline" id="line-1029"><code>				if !sawFlag {</code></span>
+<span class="codeline" id="line-1030"><code>					break Loop</code></span>
+<span class="codeline" id="line-1031"><code>				}</code></span>
+<span class="codeline" id="line-1032"><code>				flags = ^flags</code></span>
+<span class="codeline" id="line-1033"><code>			}</code></span>
+<span class="codeline" id="line-1034"><code>			if c == ':' {</code></span>
+<span class="codeline" id="line-1035"><code>				// Open new group</code></span>
+<span class="codeline" id="line-1036"><code>				p.op(opLeftParen)</code></span>
+<span class="codeline" id="line-1037"><code>			}</code></span>
+<span class="codeline" id="line-1038"><code>			p.flags = flags</code></span>
+<span class="codeline" id="line-1039"><code>			return t, nil</code></span>
+<span class="codeline" id="line-1040"><code>		}</code></span>
+<span class="codeline" id="line-1041"><code>	}</code></span>
+<span class="codeline" id="line-1042"><code></code></span>
+<span class="codeline" id="line-1043"><code>	return "", &amp;Error{ErrInvalidPerlOp, s[:len(s)-len(t)]}</code></span>
+<span class="codeline" id="line-1044"><code>}</code></span>
+<span class="codeline" id="line-1045"><code></code></span>
+<span class="codeline" id="line-1046"><code>// isValidCaptureName reports whether name</code></span>
+<span class="codeline" id="line-1047"><code>// is a valid capture name: [A-Za-z0-9_]+.</code></span>
+<span class="codeline" id="line-1048"><code>// PCRE limits names to 32 bytes.</code></span>
+<span class="codeline" id="line-1049"><code>// Python rejects names starting with digits.</code></span>
+<span class="codeline" id="line-1050"><code>// We don't enforce either of those.</code></span>
+<span class="codeline" id="line-1051"><code>func isValidCaptureName(name string) bool {</code></span>
+<span class="codeline" id="line-1052"><code>	if name == "" {</code></span>
+<span class="codeline" id="line-1053"><code>		return false</code></span>
+<span class="codeline" id="line-1054"><code>	}</code></span>
+<span class="codeline" id="line-1055"><code>	for _, c := range name {</code></span>
+<span class="codeline" id="line-1056"><code>		if c != '_' &amp;&amp; !isalnum(c) {</code></span>
+<span class="codeline" id="line-1057"><code>			return false</code></span>
+<span class="codeline" id="line-1058"><code>		}</code></span>
+<span class="codeline" id="line-1059"><code>	}</code></span>
+<span class="codeline" id="line-1060"><code>	return true</code></span>
+<span class="codeline" id="line-1061"><code>}</code></span>
+<span class="codeline" id="line-1062"><code></code></span>
+<span class="codeline" id="line-1063"><code>// parseInt parses a decimal integer.</code></span>
+<span class="codeline" id="line-1064"><code>func (p *parser) parseInt(s string) (n int, rest string, ok bool) {</code></span>
+<span class="codeline" id="line-1065"><code>	if s == "" || s[0] &lt; '0' || '9' &lt; s[0] {</code></span>
+<span class="codeline" id="line-1066"><code>		return</code></span>
+<span class="codeline" id="line-1067"><code>	}</code></span>
+<span class="codeline" id="line-1068"><code>	// Disallow leading zeros.</code></span>
+<span class="codeline" id="line-1069"><code>	if len(s) &gt;= 2 &amp;&amp; s[0] == '0' &amp;&amp; '0' &lt;= s[1] &amp;&amp; s[1] &lt;= '9' {</code></span>
+<span class="codeline" id="line-1070"><code>		return</code></span>
+<span class="codeline" id="line-1071"><code>	}</code></span>
+<span class="codeline" id="line-1072"><code>	t := s</code></span>
+<span class="codeline" id="line-1073"><code>	for s != "" &amp;&amp; '0' &lt;= s[0] &amp;&amp; s[0] &lt;= '9' {</code></span>
+<span class="codeline" id="line-1074"><code>		s = s[1:]</code></span>
+<span class="codeline" id="line-1075"><code>	}</code></span>
+<span class="codeline" id="line-1076"><code>	rest = s</code></span>
+<span class="codeline" id="line-1077"><code>	ok = true</code></span>
+<span class="codeline" id="line-1078"><code>	// Have digits, compute value.</code></span>
+<span class="codeline" id="line-1079"><code>	t = t[:len(t)-len(s)]</code></span>
+<span class="codeline" id="line-1080"><code>	for i := 0; i &lt; len(t); i++ {</code></span>
+<span class="codeline" id="line-1081"><code>		// Avoid overflow.</code></span>
+<span class="codeline" id="line-1082"><code>		if n &gt;= 1e8 {</code></span>
+<span class="codeline" id="line-1083"><code>			n = -1</code></span>
+<span class="codeline" id="line-1084"><code>			break</code></span>
+<span class="codeline" id="line-1085"><code>		}</code></span>
+<span class="codeline" id="line-1086"><code>		n = n*10 + int(t[i]) - '0'</code></span>
+<span class="codeline" id="line-1087"><code>	}</code></span>
+<span class="codeline" id="line-1088"><code>	return</code></span>
+<span class="codeline" id="line-1089"><code>}</code></span>
+<span class="codeline" id="line-1090"><code></code></span>
+<span class="codeline" id="line-1091"><code>// can this be represented as a character class?</code></span>
+<span class="codeline" id="line-1092"><code>// single-rune literal string, char class, ., and .|\n.</code></span>
+<span class="codeline" id="line-1093"><code>func isCharClass(re *Regexp) bool {</code></span>
+<span class="codeline" id="line-1094"><code>	return re.Op == OpLiteral &amp;&amp; len(re.Rune) == 1 ||</code></span>
+<span class="codeline" id="line-1095"><code>		re.Op == OpCharClass ||</code></span>
+<span class="codeline" id="line-1096"><code>		re.Op == OpAnyCharNotNL ||</code></span>
+<span class="codeline" id="line-1097"><code>		re.Op == OpAnyChar</code></span>
+<span class="codeline" id="line-1098"><code>}</code></span>
+<span class="codeline" id="line-1099"><code></code></span>
+<span class="codeline" id="line-1100"><code>// does re match r?</code></span>
+<span class="codeline" id="line-1101"><code>func matchRune(re *Regexp, r rune) bool {</code></span>
+<span class="codeline" id="line-1102"><code>	switch re.Op {</code></span>
+<span class="codeline" id="line-1103"><code>	case OpLiteral:</code></span>
+<span class="codeline" id="line-1104"><code>		return len(re.Rune) == 1 &amp;&amp; re.Rune[0] == r</code></span>
+<span class="codeline" id="line-1105"><code>	case OpCharClass:</code></span>
+<span class="codeline" id="line-1106"><code>		for i := 0; i &lt; len(re.Rune); i += 2 {</code></span>
+<span class="codeline" id="line-1107"><code>			if re.Rune[i] &lt;= r &amp;&amp; r &lt;= re.Rune[i+1] {</code></span>
+<span class="codeline" id="line-1108"><code>				return true</code></span>
+<span class="codeline" id="line-1109"><code>			}</code></span>
+<span class="codeline" id="line-1110"><code>		}</code></span>
+<span class="codeline" id="line-1111"><code>		return false</code></span>
+<span class="codeline" id="line-1112"><code>	case OpAnyCharNotNL:</code></span>
+<span class="codeline" id="line-1113"><code>		return r != '\n'</code></span>
+<span class="codeline" id="line-1114"><code>	case OpAnyChar:</code></span>
+<span class="codeline" id="line-1115"><code>		return true</code></span>
+<span class="codeline" id="line-1116"><code>	}</code></span>
+<span class="codeline" id="line-1117"><code>	return false</code></span>
+<span class="codeline" id="line-1118"><code>}</code></span>
+<span class="codeline" id="line-1119"><code></code></span>
+<span class="codeline" id="line-1120"><code>// parseVerticalBar handles a | in the input.</code></span>
+<span class="codeline" id="line-1121"><code>func (p *parser) parseVerticalBar() error {</code></span>
+<span class="codeline" id="line-1122"><code>	p.concat()</code></span>
+<span class="codeline" id="line-1123"><code></code></span>
+<span class="codeline" id="line-1124"><code>	// The concatenation we just parsed is on top of the stack.</code></span>
+<span class="codeline" id="line-1125"><code>	// If it sits above an opVerticalBar, swap it below</code></span>
+<span class="codeline" id="line-1126"><code>	// (things below an opVerticalBar become an alternation).</code></span>
+<span class="codeline" id="line-1127"><code>	// Otherwise, push a new vertical bar.</code></span>
+<span class="codeline" id="line-1128"><code>	if !p.swapVerticalBar() {</code></span>
+<span class="codeline" id="line-1129"><code>		p.op(opVerticalBar)</code></span>
+<span class="codeline" id="line-1130"><code>	}</code></span>
+<span class="codeline" id="line-1131"><code></code></span>
+<span class="codeline" id="line-1132"><code>	return nil</code></span>
+<span class="codeline" id="line-1133"><code>}</code></span>
+<span class="codeline" id="line-1134"><code></code></span>
+<span class="codeline" id="line-1135"><code>// mergeCharClass makes dst = dst|src.</code></span>
+<span class="codeline" id="line-1136"><code>// The caller must ensure that dst.Op &gt;= src.Op,</code></span>
+<span class="codeline" id="line-1137"><code>// to reduce the amount of copying.</code></span>
+<span class="codeline" id="line-1138"><code>func mergeCharClass(dst, src *Regexp) {</code></span>
+<span class="codeline" id="line-1139"><code>	switch dst.Op {</code></span>
+<span class="codeline" id="line-1140"><code>	case OpAnyChar:</code></span>
+<span class="codeline" id="line-1141"><code>		// src doesn't add anything.</code></span>
+<span class="codeline" id="line-1142"><code>	case OpAnyCharNotNL:</code></span>
+<span class="codeline" id="line-1143"><code>		// src might add \n</code></span>
+<span class="codeline" id="line-1144"><code>		if matchRune(src, '\n') {</code></span>
+<span class="codeline" id="line-1145"><code>			dst.Op = OpAnyChar</code></span>
+<span class="codeline" id="line-1146"><code>		}</code></span>
+<span class="codeline" id="line-1147"><code>	case OpCharClass:</code></span>
+<span class="codeline" id="line-1148"><code>		// src is simpler, so either literal or char class</code></span>
+<span class="codeline" id="line-1149"><code>		if src.Op == OpLiteral {</code></span>
+<span class="codeline" id="line-1150"><code>			dst.Rune = appendLiteral(dst.Rune, src.Rune[0], src.Flags)</code></span>
+<span class="codeline" id="line-1151"><code>		} else {</code></span>
+<span class="codeline" id="line-1152"><code>			dst.Rune = appendClass(dst.Rune, src.Rune)</code></span>
+<span class="codeline" id="line-1153"><code>		}</code></span>
+<span class="codeline" id="line-1154"><code>	case OpLiteral:</code></span>
+<span class="codeline" id="line-1155"><code>		// both literal</code></span>
+<span class="codeline" id="line-1156"><code>		if src.Rune[0] == dst.Rune[0] &amp;&amp; src.Flags == dst.Flags {</code></span>
+<span class="codeline" id="line-1157"><code>			break</code></span>
+<span class="codeline" id="line-1158"><code>		}</code></span>
+<span class="codeline" id="line-1159"><code>		dst.Op = OpCharClass</code></span>
+<span class="codeline" id="line-1160"><code>		dst.Rune = appendLiteral(dst.Rune[:0], dst.Rune[0], dst.Flags)</code></span>
+<span class="codeline" id="line-1161"><code>		dst.Rune = appendLiteral(dst.Rune, src.Rune[0], src.Flags)</code></span>
+<span class="codeline" id="line-1162"><code>	}</code></span>
+<span class="codeline" id="line-1163"><code>}</code></span>
+<span class="codeline" id="line-1164"><code></code></span>
+<span class="codeline" id="line-1165"><code>// If the top of the stack is an element followed by an opVerticalBar</code></span>
+<span class="codeline" id="line-1166"><code>// swapVerticalBar swaps the two and returns true.</code></span>
+<span class="codeline" id="line-1167"><code>// Otherwise it returns false.</code></span>
+<span class="codeline" id="line-1168"><code>func (p *parser) swapVerticalBar() bool {</code></span>
+<span class="codeline" id="line-1169"><code>	// If above and below vertical bar are literal or char class,</code></span>
+<span class="codeline" id="line-1170"><code>	// can merge into a single char class.</code></span>
+<span class="codeline" id="line-1171"><code>	n := len(p.stack)</code></span>
+<span class="codeline" id="line-1172"><code>	if n &gt;= 3 &amp;&amp; p.stack[n-2].Op == opVerticalBar &amp;&amp; isCharClass(p.stack[n-1]) &amp;&amp; isCharClass(p.stack[n-3]) {</code></span>
+<span class="codeline" id="line-1173"><code>		re1 := p.stack[n-1]</code></span>
+<span class="codeline" id="line-1174"><code>		re3 := p.stack[n-3]</code></span>
+<span class="codeline" id="line-1175"><code>		// Make re3 the more complex of the two.</code></span>
+<span class="codeline" id="line-1176"><code>		if re1.Op &gt; re3.Op {</code></span>
+<span class="codeline" id="line-1177"><code>			re1, re3 = re3, re1</code></span>
+<span class="codeline" id="line-1178"><code>			p.stack[n-3] = re3</code></span>
+<span class="codeline" id="line-1179"><code>		}</code></span>
+<span class="codeline" id="line-1180"><code>		mergeCharClass(re3, re1)</code></span>
+<span class="codeline" id="line-1181"><code>		p.reuse(re1)</code></span>
+<span class="codeline" id="line-1182"><code>		p.stack = p.stack[:n-1]</code></span>
+<span class="codeline" id="line-1183"><code>		return true</code></span>
+<span class="codeline" id="line-1184"><code>	}</code></span>
+<span class="codeline" id="line-1185"><code></code></span>
+<span class="codeline" id="line-1186"><code>	if n &gt;= 2 {</code></span>
+<span class="codeline" id="line-1187"><code>		re1 := p.stack[n-1]</code></span>
+<span class="codeline" id="line-1188"><code>		re2 := p.stack[n-2]</code></span>
+<span class="codeline" id="line-1189"><code>		if re2.Op == opVerticalBar {</code></span>
+<span class="codeline" id="line-1190"><code>			if n &gt;= 3 {</code></span>
+<span class="codeline" id="line-1191"><code>				// Now out of reach.</code></span>
+<span class="codeline" id="line-1192"><code>				// Clean opportunistically.</code></span>
+<span class="codeline" id="line-1193"><code>				cleanAlt(p.stack[n-3])</code></span>
+<span class="codeline" id="line-1194"><code>			}</code></span>
+<span class="codeline" id="line-1195"><code>			p.stack[n-2] = re1</code></span>
+<span class="codeline" id="line-1196"><code>			p.stack[n-1] = re2</code></span>
+<span class="codeline" id="line-1197"><code>			return true</code></span>
+<span class="codeline" id="line-1198"><code>		}</code></span>
+<span class="codeline" id="line-1199"><code>	}</code></span>
+<span class="codeline" id="line-1200"><code>	return false</code></span>
+<span class="codeline" id="line-1201"><code>}</code></span>
+<span class="codeline" id="line-1202"><code></code></span>
+<span class="codeline" id="line-1203"><code>// parseRightParen handles a ) in the input.</code></span>
+<span class="codeline" id="line-1204"><code>func (p *parser) parseRightParen() error {</code></span>
+<span class="codeline" id="line-1205"><code>	p.concat()</code></span>
+<span class="codeline" id="line-1206"><code>	if p.swapVerticalBar() {</code></span>
+<span class="codeline" id="line-1207"><code>		// pop vertical bar</code></span>
+<span class="codeline" id="line-1208"><code>		p.stack = p.stack[:len(p.stack)-1]</code></span>
+<span class="codeline" id="line-1209"><code>	}</code></span>
+<span class="codeline" id="line-1210"><code>	p.alternate()</code></span>
+<span class="codeline" id="line-1211"><code></code></span>
+<span class="codeline" id="line-1212"><code>	n := len(p.stack)</code></span>
+<span class="codeline" id="line-1213"><code>	if n &lt; 2 {</code></span>
+<span class="codeline" id="line-1214"><code>		return &amp;Error{ErrUnexpectedParen, p.wholeRegexp}</code></span>
+<span class="codeline" id="line-1215"><code>	}</code></span>
+<span class="codeline" id="line-1216"><code>	re1 := p.stack[n-1]</code></span>
+<span class="codeline" id="line-1217"><code>	re2 := p.stack[n-2]</code></span>
+<span class="codeline" id="line-1218"><code>	p.stack = p.stack[:n-2]</code></span>
+<span class="codeline" id="line-1219"><code>	if re2.Op != opLeftParen {</code></span>
+<span class="codeline" id="line-1220"><code>		return &amp;Error{ErrUnexpectedParen, p.wholeRegexp}</code></span>
+<span class="codeline" id="line-1221"><code>	}</code></span>
+<span class="codeline" id="line-1222"><code>	// Restore flags at time of paren.</code></span>
+<span class="codeline" id="line-1223"><code>	p.flags = re2.Flags</code></span>
+<span class="codeline" id="line-1224"><code>	if re2.Cap == 0 {</code></span>
+<span class="codeline" id="line-1225"><code>		// Just for grouping.</code></span>
+<span class="codeline" id="line-1226"><code>		p.push(re1)</code></span>
+<span class="codeline" id="line-1227"><code>	} else {</code></span>
+<span class="codeline" id="line-1228"><code>		re2.Op = OpCapture</code></span>
+<span class="codeline" id="line-1229"><code>		re2.Sub = re2.Sub0[:1]</code></span>
+<span class="codeline" id="line-1230"><code>		re2.Sub[0] = re1</code></span>
+<span class="codeline" id="line-1231"><code>		p.push(re2)</code></span>
+<span class="codeline" id="line-1232"><code>	}</code></span>
+<span class="codeline" id="line-1233"><code>	return nil</code></span>
+<span class="codeline" id="line-1234"><code>}</code></span>
+<span class="codeline" id="line-1235"><code></code></span>
+<span class="codeline" id="line-1236"><code>// parseEscape parses an escape sequence at the beginning of s</code></span>
+<span class="codeline" id="line-1237"><code>// and returns the rune.</code></span>
+<span class="codeline" id="line-1238"><code>func (p *parser) parseEscape(s string) (r rune, rest string, err error) {</code></span>
+<span class="codeline" id="line-1239"><code>	t := s[1:]</code></span>
+<span class="codeline" id="line-1240"><code>	if t == "" {</code></span>
+<span class="codeline" id="line-1241"><code>		return 0, "", &amp;Error{ErrTrailingBackslash, ""}</code></span>
+<span class="codeline" id="line-1242"><code>	}</code></span>
+<span class="codeline" id="line-1243"><code>	c, t, err := nextRune(t)</code></span>
+<span class="codeline" id="line-1244"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-1245"><code>		return 0, "", err</code></span>
+<span class="codeline" id="line-1246"><code>	}</code></span>
+<span class="codeline" id="line-1247"><code></code></span>
+<span class="codeline" id="line-1248"><code>Switch:</code></span>
+<span class="codeline" id="line-1249"><code>	switch c {</code></span>
+<span class="codeline" id="line-1250"><code>	default:</code></span>
+<span class="codeline" id="line-1251"><code>		if c &lt; utf8.RuneSelf &amp;&amp; !isalnum(c) {</code></span>
+<span class="codeline" id="line-1252"><code>			// Escaped non-word characters are always themselves.</code></span>
+<span class="codeline" id="line-1253"><code>			// PCRE is not quite so rigorous: it accepts things like</code></span>
+<span class="codeline" id="line-1254"><code>			// \q, but we don't. We once rejected \_, but too many</code></span>
+<span class="codeline" id="line-1255"><code>			// programs and people insist on using it, so allow \_.</code></span>
+<span class="codeline" id="line-1256"><code>			return c, t, nil</code></span>
+<span class="codeline" id="line-1257"><code>		}</code></span>
+<span class="codeline" id="line-1258"><code></code></span>
+<span class="codeline" id="line-1259"><code>	// Octal escapes.</code></span>
+<span class="codeline" id="line-1260"><code>	case '1', '2', '3', '4', '5', '6', '7':</code></span>
+<span class="codeline" id="line-1261"><code>		// Single non-zero digit is a backreference; not supported</code></span>
+<span class="codeline" id="line-1262"><code>		if t == "" || t[0] &lt; '0' || t[0] &gt; '7' {</code></span>
+<span class="codeline" id="line-1263"><code>			break</code></span>
+<span class="codeline" id="line-1264"><code>		}</code></span>
+<span class="codeline" id="line-1265"><code>		fallthrough</code></span>
+<span class="codeline" id="line-1266"><code>	case '0':</code></span>
+<span class="codeline" id="line-1267"><code>		// Consume up to three octal digits; already have one.</code></span>
+<span class="codeline" id="line-1268"><code>		r = c - '0'</code></span>
+<span class="codeline" id="line-1269"><code>		for i := 1; i &lt; 3; i++ {</code></span>
+<span class="codeline" id="line-1270"><code>			if t == "" || t[0] &lt; '0' || t[0] &gt; '7' {</code></span>
+<span class="codeline" id="line-1271"><code>				break</code></span>
+<span class="codeline" id="line-1272"><code>			}</code></span>
+<span class="codeline" id="line-1273"><code>			r = r*8 + rune(t[0]) - '0'</code></span>
+<span class="codeline" id="line-1274"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-1275"><code>		}</code></span>
+<span class="codeline" id="line-1276"><code>		return r, t, nil</code></span>
+<span class="codeline" id="line-1277"><code></code></span>
+<span class="codeline" id="line-1278"><code>	// Hexadecimal escapes.</code></span>
+<span class="codeline" id="line-1279"><code>	case 'x':</code></span>
+<span class="codeline" id="line-1280"><code>		if t == "" {</code></span>
+<span class="codeline" id="line-1281"><code>			break</code></span>
+<span class="codeline" id="line-1282"><code>		}</code></span>
+<span class="codeline" id="line-1283"><code>		if c, t, err = nextRune(t); err != nil {</code></span>
+<span class="codeline" id="line-1284"><code>			return 0, "", err</code></span>
+<span class="codeline" id="line-1285"><code>		}</code></span>
+<span class="codeline" id="line-1286"><code>		if c == '{' {</code></span>
+<span class="codeline" id="line-1287"><code>			// Any number of digits in braces.</code></span>
+<span class="codeline" id="line-1288"><code>			// Perl accepts any text at all; it ignores all text</code></span>
+<span class="codeline" id="line-1289"><code>			// after the first non-hex digit. We require only hex digits,</code></span>
+<span class="codeline" id="line-1290"><code>			// and at least one.</code></span>
+<span class="codeline" id="line-1291"><code>			nhex := 0</code></span>
+<span class="codeline" id="line-1292"><code>			r = 0</code></span>
+<span class="codeline" id="line-1293"><code>			for {</code></span>
+<span class="codeline" id="line-1294"><code>				if t == "" {</code></span>
+<span class="codeline" id="line-1295"><code>					break Switch</code></span>
+<span class="codeline" id="line-1296"><code>				}</code></span>
+<span class="codeline" id="line-1297"><code>				if c, t, err = nextRune(t); err != nil {</code></span>
+<span class="codeline" id="line-1298"><code>					return 0, "", err</code></span>
+<span class="codeline" id="line-1299"><code>				}</code></span>
+<span class="codeline" id="line-1300"><code>				if c == '}' {</code></span>
+<span class="codeline" id="line-1301"><code>					break</code></span>
+<span class="codeline" id="line-1302"><code>				}</code></span>
+<span class="codeline" id="line-1303"><code>				v := unhex(c)</code></span>
+<span class="codeline" id="line-1304"><code>				if v &lt; 0 {</code></span>
+<span class="codeline" id="line-1305"><code>					break Switch</code></span>
+<span class="codeline" id="line-1306"><code>				}</code></span>
+<span class="codeline" id="line-1307"><code>				r = r*16 + v</code></span>
+<span class="codeline" id="line-1308"><code>				if r &gt; unicode.MaxRune {</code></span>
+<span class="codeline" id="line-1309"><code>					break Switch</code></span>
+<span class="codeline" id="line-1310"><code>				}</code></span>
+<span class="codeline" id="line-1311"><code>				nhex++</code></span>
+<span class="codeline" id="line-1312"><code>			}</code></span>
+<span class="codeline" id="line-1313"><code>			if nhex == 0 {</code></span>
+<span class="codeline" id="line-1314"><code>				break Switch</code></span>
+<span class="codeline" id="line-1315"><code>			}</code></span>
+<span class="codeline" id="line-1316"><code>			return r, t, nil</code></span>
+<span class="codeline" id="line-1317"><code>		}</code></span>
+<span class="codeline" id="line-1318"><code></code></span>
+<span class="codeline" id="line-1319"><code>		// Easy case: two hex digits.</code></span>
+<span class="codeline" id="line-1320"><code>		x := unhex(c)</code></span>
+<span class="codeline" id="line-1321"><code>		if c, t, err = nextRune(t); err != nil {</code></span>
+<span class="codeline" id="line-1322"><code>			return 0, "", err</code></span>
+<span class="codeline" id="line-1323"><code>		}</code></span>
+<span class="codeline" id="line-1324"><code>		y := unhex(c)</code></span>
+<span class="codeline" id="line-1325"><code>		if x &lt; 0 || y &lt; 0 {</code></span>
+<span class="codeline" id="line-1326"><code>			break</code></span>
+<span class="codeline" id="line-1327"><code>		}</code></span>
+<span class="codeline" id="line-1328"><code>		return x*16 + y, t, nil</code></span>
+<span class="codeline" id="line-1329"><code></code></span>
+<span class="codeline" id="line-1330"><code>	// C escapes. There is no case 'b', to avoid misparsing</code></span>
+<span class="codeline" id="line-1331"><code>	// the Perl word-boundary \b as the C backspace \b</code></span>
+<span class="codeline" id="line-1332"><code>	// when in POSIX mode. In Perl, /\b/ means word-boundary</code></span>
+<span class="codeline" id="line-1333"><code>	// but /[\b]/ means backspace. We don't support that.</code></span>
+<span class="codeline" id="line-1334"><code>	// If you want a backspace, embed a literal backspace</code></span>
+<span class="codeline" id="line-1335"><code>	// character or use \x08.</code></span>
+<span class="codeline" id="line-1336"><code>	case 'a':</code></span>
+<span class="codeline" id="line-1337"><code>		return '\a', t, err</code></span>
+<span class="codeline" id="line-1338"><code>	case 'f':</code></span>
+<span class="codeline" id="line-1339"><code>		return '\f', t, err</code></span>
+<span class="codeline" id="line-1340"><code>	case 'n':</code></span>
+<span class="codeline" id="line-1341"><code>		return '\n', t, err</code></span>
+<span class="codeline" id="line-1342"><code>	case 'r':</code></span>
+<span class="codeline" id="line-1343"><code>		return '\r', t, err</code></span>
+<span class="codeline" id="line-1344"><code>	case 't':</code></span>
+<span class="codeline" id="line-1345"><code>		return '\t', t, err</code></span>
+<span class="codeline" id="line-1346"><code>	case 'v':</code></span>
+<span class="codeline" id="line-1347"><code>		return '\v', t, err</code></span>
+<span class="codeline" id="line-1348"><code>	}</code></span>
+<span class="codeline" id="line-1349"><code>	return 0, "", &amp;Error{ErrInvalidEscape, s[:len(s)-len(t)]}</code></span>
+<span class="codeline" id="line-1350"><code>}</code></span>
+<span class="codeline" id="line-1351"><code></code></span>
+<span class="codeline" id="line-1352"><code>// parseClassChar parses a character class character at the beginning of s</code></span>
+<span class="codeline" id="line-1353"><code>// and returns it.</code></span>
+<span class="codeline" id="line-1354"><code>func (p *parser) parseClassChar(s, wholeClass string) (r rune, rest string, err error) {</code></span>
+<span class="codeline" id="line-1355"><code>	if s == "" {</code></span>
+<span class="codeline" id="line-1356"><code>		return 0, "", &amp;Error{Code: ErrMissingBracket, Expr: wholeClass}</code></span>
+<span class="codeline" id="line-1357"><code>	}</code></span>
+<span class="codeline" id="line-1358"><code></code></span>
+<span class="codeline" id="line-1359"><code>	// Allow regular escape sequences even though</code></span>
+<span class="codeline" id="line-1360"><code>	// many need not be escaped in this context.</code></span>
+<span class="codeline" id="line-1361"><code>	if s[0] == '\\' {</code></span>
+<span class="codeline" id="line-1362"><code>		return p.parseEscape(s)</code></span>
+<span class="codeline" id="line-1363"><code>	}</code></span>
+<span class="codeline" id="line-1364"><code></code></span>
+<span class="codeline" id="line-1365"><code>	return nextRune(s)</code></span>
+<span class="codeline" id="line-1366"><code>}</code></span>
+<span class="codeline" id="line-1367"><code></code></span>
+<span class="codeline" id="line-1368"><code>type charGroup struct {</code></span>
+<span class="codeline" id="line-1369"><code>	sign  int</code></span>
+<span class="codeline" id="line-1370"><code>	class []rune</code></span>
+<span class="codeline" id="line-1371"><code>}</code></span>
+<span class="codeline" id="line-1372"><code></code></span>
+<span class="codeline" id="line-1373"><code>// parsePerlClassEscape parses a leading Perl character class escape like \d</code></span>
+<span class="codeline" id="line-1374"><code>// from the beginning of s. If one is present, it appends the characters to r</code></span>
+<span class="codeline" id="line-1375"><code>// and returns the new slice r and the remainder of the string.</code></span>
+<span class="codeline" id="line-1376"><code>func (p *parser) parsePerlClassEscape(s string, r []rune) (out []rune, rest string) {</code></span>
+<span class="codeline" id="line-1377"><code>	if p.flags&amp;PerlX == 0 || len(s) &lt; 2 || s[0] != '\\' {</code></span>
+<span class="codeline" id="line-1378"><code>		return</code></span>
+<span class="codeline" id="line-1379"><code>	}</code></span>
+<span class="codeline" id="line-1380"><code>	g := perlGroup[s[0:2]]</code></span>
+<span class="codeline" id="line-1381"><code>	if g.sign == 0 {</code></span>
+<span class="codeline" id="line-1382"><code>		return</code></span>
+<span class="codeline" id="line-1383"><code>	}</code></span>
+<span class="codeline" id="line-1384"><code>	return p.appendGroup(r, g), s[2:]</code></span>
+<span class="codeline" id="line-1385"><code>}</code></span>
+<span class="codeline" id="line-1386"><code></code></span>
+<span class="codeline" id="line-1387"><code>// parseNamedClass parses a leading POSIX named character class like [:alnum:]</code></span>
+<span class="codeline" id="line-1388"><code>// from the beginning of s. If one is present, it appends the characters to r</code></span>
+<span class="codeline" id="line-1389"><code>// and returns the new slice r and the remainder of the string.</code></span>
+<span class="codeline" id="line-1390"><code>func (p *parser) parseNamedClass(s string, r []rune) (out []rune, rest string, err error) {</code></span>
+<span class="codeline" id="line-1391"><code>	if len(s) &lt; 2 || s[0] != '[' || s[1] != ':' {</code></span>
+<span class="codeline" id="line-1392"><code>		return</code></span>
+<span class="codeline" id="line-1393"><code>	}</code></span>
+<span class="codeline" id="line-1394"><code></code></span>
+<span class="codeline" id="line-1395"><code>	i := strings.Index(s[2:], ":]")</code></span>
+<span class="codeline" id="line-1396"><code>	if i &lt; 0 {</code></span>
+<span class="codeline" id="line-1397"><code>		return</code></span>
+<span class="codeline" id="line-1398"><code>	}</code></span>
+<span class="codeline" id="line-1399"><code>	i += 2</code></span>
+<span class="codeline" id="line-1400"><code>	name, s := s[0:i+2], s[i+2:]</code></span>
+<span class="codeline" id="line-1401"><code>	g := posixGroup[name]</code></span>
+<span class="codeline" id="line-1402"><code>	if g.sign == 0 {</code></span>
+<span class="codeline" id="line-1403"><code>		return nil, "", &amp;Error{ErrInvalidCharRange, name}</code></span>
+<span class="codeline" id="line-1404"><code>	}</code></span>
+<span class="codeline" id="line-1405"><code>	return p.appendGroup(r, g), s, nil</code></span>
+<span class="codeline" id="line-1406"><code>}</code></span>
+<span class="codeline" id="line-1407"><code></code></span>
+<span class="codeline" id="line-1408"><code>func (p *parser) appendGroup(r []rune, g charGroup) []rune {</code></span>
+<span class="codeline" id="line-1409"><code>	if p.flags&amp;FoldCase == 0 {</code></span>
+<span class="codeline" id="line-1410"><code>		if g.sign &lt; 0 {</code></span>
+<span class="codeline" id="line-1411"><code>			r = appendNegatedClass(r, g.class)</code></span>
+<span class="codeline" id="line-1412"><code>		} else {</code></span>
+<span class="codeline" id="line-1413"><code>			r = appendClass(r, g.class)</code></span>
+<span class="codeline" id="line-1414"><code>		}</code></span>
+<span class="codeline" id="line-1415"><code>	} else {</code></span>
+<span class="codeline" id="line-1416"><code>		tmp := p.tmpClass[:0]</code></span>
+<span class="codeline" id="line-1417"><code>		tmp = appendFoldedClass(tmp, g.class)</code></span>
+<span class="codeline" id="line-1418"><code>		p.tmpClass = tmp</code></span>
+<span class="codeline" id="line-1419"><code>		tmp = cleanClass(&amp;p.tmpClass)</code></span>
+<span class="codeline" id="line-1420"><code>		if g.sign &lt; 0 {</code></span>
+<span class="codeline" id="line-1421"><code>			r = appendNegatedClass(r, tmp)</code></span>
+<span class="codeline" id="line-1422"><code>		} else {</code></span>
+<span class="codeline" id="line-1423"><code>			r = appendClass(r, tmp)</code></span>
+<span class="codeline" id="line-1424"><code>		}</code></span>
+<span class="codeline" id="line-1425"><code>	}</code></span>
+<span class="codeline" id="line-1426"><code>	return r</code></span>
+<span class="codeline" id="line-1427"><code>}</code></span>
+<span class="codeline" id="line-1428"><code></code></span>
+<span class="codeline" id="line-1429"><code>var anyTable = &amp;unicode.RangeTable{</code></span>
+<span class="codeline" id="line-1430"><code>	R16: []unicode.Range16{{Lo: 0, Hi: 1&lt;&lt;16 - 1, Stride: 1}},</code></span>
+<span class="codeline" id="line-1431"><code>	R32: []unicode.Range32{{Lo: 1 &lt;&lt; 16, Hi: unicode.MaxRune, Stride: 1}},</code></span>
+<span class="codeline" id="line-1432"><code>}</code></span>
+<span class="codeline" id="line-1433"><code></code></span>
+<span class="codeline" id="line-1434"><code>// unicodeTable returns the unicode.RangeTable identified by name</code></span>
+<span class="codeline" id="line-1435"><code>// and the table of additional fold-equivalent code points.</code></span>
+<span class="codeline" id="line-1436"><code>func unicodeTable(name string) (*unicode.RangeTable, *unicode.RangeTable) {</code></span>
+<span class="codeline" id="line-1437"><code>	// Special case: "Any" means any.</code></span>
+<span class="codeline" id="line-1438"><code>	if name == "Any" {</code></span>
+<span class="codeline" id="line-1439"><code>		return anyTable, anyTable</code></span>
+<span class="codeline" id="line-1440"><code>	}</code></span>
+<span class="codeline" id="line-1441"><code>	if t := unicode.Categories[name]; t != nil {</code></span>
+<span class="codeline" id="line-1442"><code>		return t, unicode.FoldCategory[name]</code></span>
+<span class="codeline" id="line-1443"><code>	}</code></span>
+<span class="codeline" id="line-1444"><code>	if t := unicode.Scripts[name]; t != nil {</code></span>
+<span class="codeline" id="line-1445"><code>		return t, unicode.FoldScript[name]</code></span>
+<span class="codeline" id="line-1446"><code>	}</code></span>
+<span class="codeline" id="line-1447"><code>	return nil, nil</code></span>
+<span class="codeline" id="line-1448"><code>}</code></span>
+<span class="codeline" id="line-1449"><code></code></span>
+<span class="codeline" id="line-1450"><code>// parseUnicodeClass parses a leading Unicode character class like \p{Han}</code></span>
+<span class="codeline" id="line-1451"><code>// from the beginning of s. If one is present, it appends the characters to r</code></span>
+<span class="codeline" id="line-1452"><code>// and returns the new slice r and the remainder of the string.</code></span>
+<span class="codeline" id="line-1453"><code>func (p *parser) parseUnicodeClass(s string, r []rune) (out []rune, rest string, err error) {</code></span>
+<span class="codeline" id="line-1454"><code>	if p.flags&amp;UnicodeGroups == 0 || len(s) &lt; 2 || s[0] != '\\' || s[1] != 'p' &amp;&amp; s[1] != 'P' {</code></span>
+<span class="codeline" id="line-1455"><code>		return</code></span>
+<span class="codeline" id="line-1456"><code>	}</code></span>
+<span class="codeline" id="line-1457"><code></code></span>
+<span class="codeline" id="line-1458"><code>	// Committed to parse or return error.</code></span>
+<span class="codeline" id="line-1459"><code>	sign := +1</code></span>
+<span class="codeline" id="line-1460"><code>	if s[1] == 'P' {</code></span>
+<span class="codeline" id="line-1461"><code>		sign = -1</code></span>
+<span class="codeline" id="line-1462"><code>	}</code></span>
+<span class="codeline" id="line-1463"><code>	t := s[2:]</code></span>
+<span class="codeline" id="line-1464"><code>	c, t, err := nextRune(t)</code></span>
+<span class="codeline" id="line-1465"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-1466"><code>		return</code></span>
+<span class="codeline" id="line-1467"><code>	}</code></span>
+<span class="codeline" id="line-1468"><code>	var seq, name string</code></span>
+<span class="codeline" id="line-1469"><code>	if c != '{' {</code></span>
+<span class="codeline" id="line-1470"><code>		// Single-letter name.</code></span>
+<span class="codeline" id="line-1471"><code>		seq = s[:len(s)-len(t)]</code></span>
+<span class="codeline" id="line-1472"><code>		name = seq[2:]</code></span>
+<span class="codeline" id="line-1473"><code>	} else {</code></span>
+<span class="codeline" id="line-1474"><code>		// Name is in braces.</code></span>
+<span class="codeline" id="line-1475"><code>		end := strings.IndexRune(s, '}')</code></span>
+<span class="codeline" id="line-1476"><code>		if end &lt; 0 {</code></span>
+<span class="codeline" id="line-1477"><code>			if err = checkUTF8(s); err != nil {</code></span>
+<span class="codeline" id="line-1478"><code>				return</code></span>
+<span class="codeline" id="line-1479"><code>			}</code></span>
+<span class="codeline" id="line-1480"><code>			return nil, "", &amp;Error{ErrInvalidCharRange, s}</code></span>
+<span class="codeline" id="line-1481"><code>		}</code></span>
+<span class="codeline" id="line-1482"><code>		seq, t = s[:end+1], s[end+1:]</code></span>
+<span class="codeline" id="line-1483"><code>		name = s[3:end]</code></span>
+<span class="codeline" id="line-1484"><code>		if err = checkUTF8(name); err != nil {</code></span>
+<span class="codeline" id="line-1485"><code>			return</code></span>
+<span class="codeline" id="line-1486"><code>		}</code></span>
+<span class="codeline" id="line-1487"><code>	}</code></span>
+<span class="codeline" id="line-1488"><code></code></span>
+<span class="codeline" id="line-1489"><code>	// Group can have leading negation too.  \p{^Han} == \P{Han}, \P{^Han} == \p{Han}.</code></span>
+<span class="codeline" id="line-1490"><code>	if name != "" &amp;&amp; name[0] == '^' {</code></span>
+<span class="codeline" id="line-1491"><code>		sign = -sign</code></span>
+<span class="codeline" id="line-1492"><code>		name = name[1:]</code></span>
+<span class="codeline" id="line-1493"><code>	}</code></span>
+<span class="codeline" id="line-1494"><code></code></span>
+<span class="codeline" id="line-1495"><code>	tab, fold := unicodeTable(name)</code></span>
+<span class="codeline" id="line-1496"><code>	if tab == nil {</code></span>
+<span class="codeline" id="line-1497"><code>		return nil, "", &amp;Error{ErrInvalidCharRange, seq}</code></span>
+<span class="codeline" id="line-1498"><code>	}</code></span>
+<span class="codeline" id="line-1499"><code></code></span>
+<span class="codeline" id="line-1500"><code>	if p.flags&amp;FoldCase == 0 || fold == nil {</code></span>
+<span class="codeline" id="line-1501"><code>		if sign &gt; 0 {</code></span>
+<span class="codeline" id="line-1502"><code>			r = appendTable(r, tab)</code></span>
+<span class="codeline" id="line-1503"><code>		} else {</code></span>
+<span class="codeline" id="line-1504"><code>			r = appendNegatedTable(r, tab)</code></span>
+<span class="codeline" id="line-1505"><code>		}</code></span>
+<span class="codeline" id="line-1506"><code>	} else {</code></span>
+<span class="codeline" id="line-1507"><code>		// Merge and clean tab and fold in a temporary buffer.</code></span>
+<span class="codeline" id="line-1508"><code>		// This is necessary for the negative case and just tidy</code></span>
+<span class="codeline" id="line-1509"><code>		// for the positive case.</code></span>
+<span class="codeline" id="line-1510"><code>		tmp := p.tmpClass[:0]</code></span>
+<span class="codeline" id="line-1511"><code>		tmp = appendTable(tmp, tab)</code></span>
+<span class="codeline" id="line-1512"><code>		tmp = appendTable(tmp, fold)</code></span>
+<span class="codeline" id="line-1513"><code>		p.tmpClass = tmp</code></span>
+<span class="codeline" id="line-1514"><code>		tmp = cleanClass(&amp;p.tmpClass)</code></span>
+<span class="codeline" id="line-1515"><code>		if sign &gt; 0 {</code></span>
+<span class="codeline" id="line-1516"><code>			r = appendClass(r, tmp)</code></span>
+<span class="codeline" id="line-1517"><code>		} else {</code></span>
+<span class="codeline" id="line-1518"><code>			r = appendNegatedClass(r, tmp)</code></span>
+<span class="codeline" id="line-1519"><code>		}</code></span>
+<span class="codeline" id="line-1520"><code>	}</code></span>
+<span class="codeline" id="line-1521"><code>	return r, t, nil</code></span>
+<span class="codeline" id="line-1522"><code>}</code></span>
+<span class="codeline" id="line-1523"><code></code></span>
+<span class="codeline" id="line-1524"><code>// parseClass parses a character class at the beginning of s</code></span>
+<span class="codeline" id="line-1525"><code>// and pushes it onto the parse stack.</code></span>
+<span class="codeline" id="line-1526"><code>func (p *parser) parseClass(s string) (rest string, err error) {</code></span>
+<span class="codeline" id="line-1527"><code>	t := s[1:] // chop [</code></span>
+<span class="codeline" id="line-1528"><code>	re := p.newRegexp(OpCharClass)</code></span>
+<span class="codeline" id="line-1529"><code>	re.Flags = p.flags</code></span>
+<span class="codeline" id="line-1530"><code>	re.Rune = re.Rune0[:0]</code></span>
+<span class="codeline" id="line-1531"><code></code></span>
+<span class="codeline" id="line-1532"><code>	sign := +1</code></span>
+<span class="codeline" id="line-1533"><code>	if t != "" &amp;&amp; t[0] == '^' {</code></span>
+<span class="codeline" id="line-1534"><code>		sign = -1</code></span>
+<span class="codeline" id="line-1535"><code>		t = t[1:]</code></span>
+<span class="codeline" id="line-1536"><code></code></span>
+<span class="codeline" id="line-1537"><code>		// If character class does not match \n, add it here,</code></span>
+<span class="codeline" id="line-1538"><code>		// so that negation later will do the right thing.</code></span>
+<span class="codeline" id="line-1539"><code>		if p.flags&amp;ClassNL == 0 {</code></span>
+<span class="codeline" id="line-1540"><code>			re.Rune = append(re.Rune, '\n', '\n')</code></span>
+<span class="codeline" id="line-1541"><code>		}</code></span>
+<span class="codeline" id="line-1542"><code>	}</code></span>
+<span class="codeline" id="line-1543"><code></code></span>
+<span class="codeline" id="line-1544"><code>	class := re.Rune</code></span>
+<span class="codeline" id="line-1545"><code>	first := true // ] and - are okay as first char in class</code></span>
+<span class="codeline" id="line-1546"><code>	for t == "" || t[0] != ']' || first {</code></span>
+<span class="codeline" id="line-1547"><code>		// POSIX: - is only okay unescaped as first or last in class.</code></span>
+<span class="codeline" id="line-1548"><code>		// Perl: - is okay anywhere.</code></span>
+<span class="codeline" id="line-1549"><code>		if t != "" &amp;&amp; t[0] == '-' &amp;&amp; p.flags&amp;PerlX == 0 &amp;&amp; !first &amp;&amp; (len(t) == 1 || t[1] != ']') {</code></span>
+<span class="codeline" id="line-1550"><code>			_, size := utf8.DecodeRuneInString(t[1:])</code></span>
+<span class="codeline" id="line-1551"><code>			return "", &amp;Error{Code: ErrInvalidCharRange, Expr: t[:1+size]}</code></span>
+<span class="codeline" id="line-1552"><code>		}</code></span>
+<span class="codeline" id="line-1553"><code>		first = false</code></span>
+<span class="codeline" id="line-1554"><code></code></span>
+<span class="codeline" id="line-1555"><code>		// Look for POSIX [:alnum:] etc.</code></span>
+<span class="codeline" id="line-1556"><code>		if len(t) &gt; 2 &amp;&amp; t[0] == '[' &amp;&amp; t[1] == ':' {</code></span>
+<span class="codeline" id="line-1557"><code>			nclass, nt, err := p.parseNamedClass(t, class)</code></span>
+<span class="codeline" id="line-1558"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-1559"><code>				return "", err</code></span>
+<span class="codeline" id="line-1560"><code>			}</code></span>
+<span class="codeline" id="line-1561"><code>			if nclass != nil {</code></span>
+<span class="codeline" id="line-1562"><code>				class, t = nclass, nt</code></span>
+<span class="codeline" id="line-1563"><code>				continue</code></span>
+<span class="codeline" id="line-1564"><code>			}</code></span>
+<span class="codeline" id="line-1565"><code>		}</code></span>
+<span class="codeline" id="line-1566"><code></code></span>
+<span class="codeline" id="line-1567"><code>		// Look for Unicode character group like \p{Han}.</code></span>
+<span class="codeline" id="line-1568"><code>		nclass, nt, err := p.parseUnicodeClass(t, class)</code></span>
+<span class="codeline" id="line-1569"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-1570"><code>			return "", err</code></span>
+<span class="codeline" id="line-1571"><code>		}</code></span>
+<span class="codeline" id="line-1572"><code>		if nclass != nil {</code></span>
+<span class="codeline" id="line-1573"><code>			class, t = nclass, nt</code></span>
+<span class="codeline" id="line-1574"><code>			continue</code></span>
+<span class="codeline" id="line-1575"><code>		}</code></span>
+<span class="codeline" id="line-1576"><code></code></span>
+<span class="codeline" id="line-1577"><code>		// Look for Perl character class symbols (extension).</code></span>
+<span class="codeline" id="line-1578"><code>		if nclass, nt := p.parsePerlClassEscape(t, class); nclass != nil {</code></span>
+<span class="codeline" id="line-1579"><code>			class, t = nclass, nt</code></span>
+<span class="codeline" id="line-1580"><code>			continue</code></span>
+<span class="codeline" id="line-1581"><code>		}</code></span>
+<span class="codeline" id="line-1582"><code></code></span>
+<span class="codeline" id="line-1583"><code>		// Single character or simple range.</code></span>
+<span class="codeline" id="line-1584"><code>		rng := t</code></span>
+<span class="codeline" id="line-1585"><code>		var lo, hi rune</code></span>
+<span class="codeline" id="line-1586"><code>		if lo, t, err = p.parseClassChar(t, s); err != nil {</code></span>
+<span class="codeline" id="line-1587"><code>			return "", err</code></span>
+<span class="codeline" id="line-1588"><code>		}</code></span>
+<span class="codeline" id="line-1589"><code>		hi = lo</code></span>
+<span class="codeline" id="line-1590"><code>		// [a-] means (a|-) so check for final ].</code></span>
+<span class="codeline" id="line-1591"><code>		if len(t) &gt;= 2 &amp;&amp; t[0] == '-' &amp;&amp; t[1] != ']' {</code></span>
+<span class="codeline" id="line-1592"><code>			t = t[1:]</code></span>
+<span class="codeline" id="line-1593"><code>			if hi, t, err = p.parseClassChar(t, s); err != nil {</code></span>
+<span class="codeline" id="line-1594"><code>				return "", err</code></span>
+<span class="codeline" id="line-1595"><code>			}</code></span>
+<span class="codeline" id="line-1596"><code>			if hi &lt; lo {</code></span>
+<span class="codeline" id="line-1597"><code>				rng = rng[:len(rng)-len(t)]</code></span>
+<span class="codeline" id="line-1598"><code>				return "", &amp;Error{Code: ErrInvalidCharRange, Expr: rng}</code></span>
+<span class="codeline" id="line-1599"><code>			}</code></span>
+<span class="codeline" id="line-1600"><code>		}</code></span>
+<span class="codeline" id="line-1601"><code>		if p.flags&amp;FoldCase == 0 {</code></span>
+<span class="codeline" id="line-1602"><code>			class = appendRange(class, lo, hi)</code></span>
+<span class="codeline" id="line-1603"><code>		} else {</code></span>
+<span class="codeline" id="line-1604"><code>			class = appendFoldedRange(class, lo, hi)</code></span>
+<span class="codeline" id="line-1605"><code>		}</code></span>
+<span class="codeline" id="line-1606"><code>	}</code></span>
+<span class="codeline" id="line-1607"><code>	t = t[1:] // chop ]</code></span>
+<span class="codeline" id="line-1608"><code></code></span>
+<span class="codeline" id="line-1609"><code>	// Use &amp;re.Rune instead of &amp;class to avoid allocation.</code></span>
+<span class="codeline" id="line-1610"><code>	re.Rune = class</code></span>
+<span class="codeline" id="line-1611"><code>	class = cleanClass(&amp;re.Rune)</code></span>
+<span class="codeline" id="line-1612"><code>	if sign &lt; 0 {</code></span>
+<span class="codeline" id="line-1613"><code>		class = negateClass(class)</code></span>
+<span class="codeline" id="line-1614"><code>	}</code></span>
+<span class="codeline" id="line-1615"><code>	re.Rune = class</code></span>
+<span class="codeline" id="line-1616"><code>	p.push(re)</code></span>
+<span class="codeline" id="line-1617"><code>	return t, nil</code></span>
+<span class="codeline" id="line-1618"><code>}</code></span>
+<span class="codeline" id="line-1619"><code></code></span>
+<span class="codeline" id="line-1620"><code>// cleanClass sorts the ranges (pairs of elements of r),</code></span>
+<span class="codeline" id="line-1621"><code>// merges them, and eliminates duplicates.</code></span>
+<span class="codeline" id="line-1622"><code>func cleanClass(rp *[]rune) []rune {</code></span>
+<span class="codeline" id="line-1623"><code></code></span>
+<span class="codeline" id="line-1624"><code>	// Sort by lo increasing, hi decreasing to break ties.</code></span>
+<span class="codeline" id="line-1625"><code>	sort.Sort(ranges{rp})</code></span>
+<span class="codeline" id="line-1626"><code></code></span>
+<span class="codeline" id="line-1627"><code>	r := *rp</code></span>
+<span class="codeline" id="line-1628"><code>	if len(r) &lt; 2 {</code></span>
+<span class="codeline" id="line-1629"><code>		return r</code></span>
+<span class="codeline" id="line-1630"><code>	}</code></span>
+<span class="codeline" id="line-1631"><code></code></span>
+<span class="codeline" id="line-1632"><code>	// Merge abutting, overlapping.</code></span>
+<span class="codeline" id="line-1633"><code>	w := 2 // write index</code></span>
+<span class="codeline" id="line-1634"><code>	for i := 2; i &lt; len(r); i += 2 {</code></span>
+<span class="codeline" id="line-1635"><code>		lo, hi := r[i], r[i+1]</code></span>
+<span class="codeline" id="line-1636"><code>		if lo &lt;= r[w-1]+1 {</code></span>
+<span class="codeline" id="line-1637"><code>			// merge with previous range</code></span>
+<span class="codeline" id="line-1638"><code>			if hi &gt; r[w-1] {</code></span>
+<span class="codeline" id="line-1639"><code>				r[w-1] = hi</code></span>
+<span class="codeline" id="line-1640"><code>			}</code></span>
+<span class="codeline" id="line-1641"><code>			continue</code></span>
+<span class="codeline" id="line-1642"><code>		}</code></span>
+<span class="codeline" id="line-1643"><code>		// new disjoint range</code></span>
+<span class="codeline" id="line-1644"><code>		r[w] = lo</code></span>
+<span class="codeline" id="line-1645"><code>		r[w+1] = hi</code></span>
+<span class="codeline" id="line-1646"><code>		w += 2</code></span>
+<span class="codeline" id="line-1647"><code>	}</code></span>
+<span class="codeline" id="line-1648"><code></code></span>
+<span class="codeline" id="line-1649"><code>	return r[:w]</code></span>
+<span class="codeline" id="line-1650"><code>}</code></span>
+<span class="codeline" id="line-1651"><code></code></span>
+<span class="codeline" id="line-1652"><code>// appendLiteral returns the result of appending the literal x to the class r.</code></span>
+<span class="codeline" id="line-1653"><code>func appendLiteral(r []rune, x rune, flags Flags) []rune {</code></span>
+<span class="codeline" id="line-1654"><code>	if flags&amp;FoldCase != 0 {</code></span>
+<span class="codeline" id="line-1655"><code>		return appendFoldedRange(r, x, x)</code></span>
+<span class="codeline" id="line-1656"><code>	}</code></span>
+<span class="codeline" id="line-1657"><code>	return appendRange(r, x, x)</code></span>
+<span class="codeline" id="line-1658"><code>}</code></span>
+<span class="codeline" id="line-1659"><code></code></span>
+<span class="codeline" id="line-1660"><code>// appendRange returns the result of appending the range lo-hi to the class r.</code></span>
+<span class="codeline" id="line-1661"><code>func appendRange(r []rune, lo, hi rune) []rune {</code></span>
+<span class="codeline" id="line-1662"><code>	// Expand last range or next to last range if it overlaps or abuts.</code></span>
+<span class="codeline" id="line-1663"><code>	// Checking two ranges helps when appending case-folded</code></span>
+<span class="codeline" id="line-1664"><code>	// alphabets, so that one range can be expanding A-Z and the</code></span>
+<span class="codeline" id="line-1665"><code>	// other expanding a-z.</code></span>
+<span class="codeline" id="line-1666"><code>	n := len(r)</code></span>
+<span class="codeline" id="line-1667"><code>	for i := 2; i &lt;= 4; i += 2 { // twice, using i=2, i=4</code></span>
+<span class="codeline" id="line-1668"><code>		if n &gt;= i {</code></span>
+<span class="codeline" id="line-1669"><code>			rlo, rhi := r[n-i], r[n-i+1]</code></span>
+<span class="codeline" id="line-1670"><code>			if lo &lt;= rhi+1 &amp;&amp; rlo &lt;= hi+1 {</code></span>
+<span class="codeline" id="line-1671"><code>				if lo &lt; rlo {</code></span>
+<span class="codeline" id="line-1672"><code>					r[n-i] = lo</code></span>
+<span class="codeline" id="line-1673"><code>				}</code></span>
+<span class="codeline" id="line-1674"><code>				if hi &gt; rhi {</code></span>
+<span class="codeline" id="line-1675"><code>					r[n-i+1] = hi</code></span>
+<span class="codeline" id="line-1676"><code>				}</code></span>
+<span class="codeline" id="line-1677"><code>				return r</code></span>
+<span class="codeline" id="line-1678"><code>			}</code></span>
+<span class="codeline" id="line-1679"><code>		}</code></span>
+<span class="codeline" id="line-1680"><code>	}</code></span>
+<span class="codeline" id="line-1681"><code></code></span>
+<span class="codeline" id="line-1682"><code>	return append(r, lo, hi)</code></span>
+<span class="codeline" id="line-1683"><code>}</code></span>
+<span class="codeline" id="line-1684"><code></code></span>
+<span class="codeline" id="line-1685"><code>const (</code></span>
+<span class="codeline" id="line-1686"><code>	// minimum and maximum runes involved in folding.</code></span>
+<span class="codeline" id="line-1687"><code>	// checked during test.</code></span>
+<span class="codeline" id="line-1688"><code>	minFold = 0x0041</code></span>
+<span class="codeline" id="line-1689"><code>	maxFold = 0x1e943</code></span>
+<span class="codeline" id="line-1690"><code>)</code></span>
+<span class="codeline" id="line-1691"><code></code></span>
+<span class="codeline" id="line-1692"><code>// appendFoldedRange returns the result of appending the range lo-hi</code></span>
+<span class="codeline" id="line-1693"><code>// and its case folding-equivalent runes to the class r.</code></span>
+<span class="codeline" id="line-1694"><code>func appendFoldedRange(r []rune, lo, hi rune) []rune {</code></span>
+<span class="codeline" id="line-1695"><code>	// Optimizations.</code></span>
+<span class="codeline" id="line-1696"><code>	if lo &lt;= minFold &amp;&amp; hi &gt;= maxFold {</code></span>
+<span class="codeline" id="line-1697"><code>		// Range is full: folding can't add more.</code></span>
+<span class="codeline" id="line-1698"><code>		return appendRange(r, lo, hi)</code></span>
+<span class="codeline" id="line-1699"><code>	}</code></span>
+<span class="codeline" id="line-1700"><code>	if hi &lt; minFold || lo &gt; maxFold {</code></span>
+<span class="codeline" id="line-1701"><code>		// Range is outside folding possibilities.</code></span>
+<span class="codeline" id="line-1702"><code>		return appendRange(r, lo, hi)</code></span>
+<span class="codeline" id="line-1703"><code>	}</code></span>
+<span class="codeline" id="line-1704"><code>	if lo &lt; minFold {</code></span>
+<span class="codeline" id="line-1705"><code>		// [lo, minFold-1] needs no folding.</code></span>
+<span class="codeline" id="line-1706"><code>		r = appendRange(r, lo, minFold-1)</code></span>
+<span class="codeline" id="line-1707"><code>		lo = minFold</code></span>
+<span class="codeline" id="line-1708"><code>	}</code></span>
+<span class="codeline" id="line-1709"><code>	if hi &gt; maxFold {</code></span>
+<span class="codeline" id="line-1710"><code>		// [maxFold+1, hi] needs no folding.</code></span>
+<span class="codeline" id="line-1711"><code>		r = appendRange(r, maxFold+1, hi)</code></span>
+<span class="codeline" id="line-1712"><code>		hi = maxFold</code></span>
+<span class="codeline" id="line-1713"><code>	}</code></span>
+<span class="codeline" id="line-1714"><code></code></span>
+<span class="codeline" id="line-1715"><code>	// Brute force. Depend on appendRange to coalesce ranges on the fly.</code></span>
+<span class="codeline" id="line-1716"><code>	for c := lo; c &lt;= hi; c++ {</code></span>
+<span class="codeline" id="line-1717"><code>		r = appendRange(r, c, c)</code></span>
+<span class="codeline" id="line-1718"><code>		f := unicode.SimpleFold(c)</code></span>
+<span class="codeline" id="line-1719"><code>		for f != c {</code></span>
+<span class="codeline" id="line-1720"><code>			r = appendRange(r, f, f)</code></span>
+<span class="codeline" id="line-1721"><code>			f = unicode.SimpleFold(f)</code></span>
+<span class="codeline" id="line-1722"><code>		}</code></span>
+<span class="codeline" id="line-1723"><code>	}</code></span>
+<span class="codeline" id="line-1724"><code>	return r</code></span>
+<span class="codeline" id="line-1725"><code>}</code></span>
+<span class="codeline" id="line-1726"><code></code></span>
+<span class="codeline" id="line-1727"><code>// appendClass returns the result of appending the class x to the class r.</code></span>
+<span class="codeline" id="line-1728"><code>// It assume x is clean.</code></span>
+<span class="codeline" id="line-1729"><code>func appendClass(r []rune, x []rune) []rune {</code></span>
+<span class="codeline" id="line-1730"><code>	for i := 0; i &lt; len(x); i += 2 {</code></span>
+<span class="codeline" id="line-1731"><code>		r = appendRange(r, x[i], x[i+1])</code></span>
+<span class="codeline" id="line-1732"><code>	}</code></span>
+<span class="codeline" id="line-1733"><code>	return r</code></span>
+<span class="codeline" id="line-1734"><code>}</code></span>
+<span class="codeline" id="line-1735"><code></code></span>
+<span class="codeline" id="line-1736"><code>// appendFolded returns the result of appending the case folding of the class x to the class r.</code></span>
+<span class="codeline" id="line-1737"><code>func appendFoldedClass(r []rune, x []rune) []rune {</code></span>
+<span class="codeline" id="line-1738"><code>	for i := 0; i &lt; len(x); i += 2 {</code></span>
+<span class="codeline" id="line-1739"><code>		r = appendFoldedRange(r, x[i], x[i+1])</code></span>
+<span class="codeline" id="line-1740"><code>	}</code></span>
+<span class="codeline" id="line-1741"><code>	return r</code></span>
+<span class="codeline" id="line-1742"><code>}</code></span>
+<span class="codeline" id="line-1743"><code></code></span>
+<span class="codeline" id="line-1744"><code>// appendNegatedClass returns the result of appending the negation of the class x to the class r.</code></span>
+<span class="codeline" id="line-1745"><code>// It assumes x is clean.</code></span>
+<span class="codeline" id="line-1746"><code>func appendNegatedClass(r []rune, x []rune) []rune {</code></span>
+<span class="codeline" id="line-1747"><code>	nextLo := '\u0000'</code></span>
+<span class="codeline" id="line-1748"><code>	for i := 0; i &lt; len(x); i += 2 {</code></span>
+<span class="codeline" id="line-1749"><code>		lo, hi := x[i], x[i+1]</code></span>
+<span class="codeline" id="line-1750"><code>		if nextLo &lt;= lo-1 {</code></span>
+<span class="codeline" id="line-1751"><code>			r = appendRange(r, nextLo, lo-1)</code></span>
+<span class="codeline" id="line-1752"><code>		}</code></span>
+<span class="codeline" id="line-1753"><code>		nextLo = hi + 1</code></span>
+<span class="codeline" id="line-1754"><code>	}</code></span>
+<span class="codeline" id="line-1755"><code>	if nextLo &lt;= unicode.MaxRune {</code></span>
+<span class="codeline" id="line-1756"><code>		r = appendRange(r, nextLo, unicode.MaxRune)</code></span>
+<span class="codeline" id="line-1757"><code>	}</code></span>
+<span class="codeline" id="line-1758"><code>	return r</code></span>
+<span class="codeline" id="line-1759"><code>}</code></span>
+<span class="codeline" id="line-1760"><code></code></span>
+<span class="codeline" id="line-1761"><code>// appendTable returns the result of appending x to the class r.</code></span>
+<span class="codeline" id="line-1762"><code>func appendTable(r []rune, x *unicode.RangeTable) []rune {</code></span>
+<span class="codeline" id="line-1763"><code>	for _, xr := range x.R16 {</code></span>
+<span class="codeline" id="line-1764"><code>		lo, hi, stride := rune(xr.Lo), rune(xr.Hi), rune(xr.Stride)</code></span>
+<span class="codeline" id="line-1765"><code>		if stride == 1 {</code></span>
+<span class="codeline" id="line-1766"><code>			r = appendRange(r, lo, hi)</code></span>
+<span class="codeline" id="line-1767"><code>			continue</code></span>
+<span class="codeline" id="line-1768"><code>		}</code></span>
+<span class="codeline" id="line-1769"><code>		for c := lo; c &lt;= hi; c += stride {</code></span>
+<span class="codeline" id="line-1770"><code>			r = appendRange(r, c, c)</code></span>
+<span class="codeline" id="line-1771"><code>		}</code></span>
+<span class="codeline" id="line-1772"><code>	}</code></span>
+<span class="codeline" id="line-1773"><code>	for _, xr := range x.R32 {</code></span>
+<span class="codeline" id="line-1774"><code>		lo, hi, stride := rune(xr.Lo), rune(xr.Hi), rune(xr.Stride)</code></span>
+<span class="codeline" id="line-1775"><code>		if stride == 1 {</code></span>
+<span class="codeline" id="line-1776"><code>			r = appendRange(r, lo, hi)</code></span>
+<span class="codeline" id="line-1777"><code>			continue</code></span>
+<span class="codeline" id="line-1778"><code>		}</code></span>
+<span class="codeline" id="line-1779"><code>		for c := lo; c &lt;= hi; c += stride {</code></span>
+<span class="codeline" id="line-1780"><code>			r = appendRange(r, c, c)</code></span>
+<span class="codeline" id="line-1781"><code>		}</code></span>
+<span class="codeline" id="line-1782"><code>	}</code></span>
+<span class="codeline" id="line-1783"><code>	return r</code></span>
+<span class="codeline" id="line-1784"><code>}</code></span>
+<span class="codeline" id="line-1785"><code></code></span>
+<span class="codeline" id="line-1786"><code>// appendNegatedTable returns the result of appending the negation of x to the class r.</code></span>
+<span class="codeline" id="line-1787"><code>func appendNegatedTable(r []rune, x *unicode.RangeTable) []rune {</code></span>
+<span class="codeline" id="line-1788"><code>	nextLo := '\u0000' // lo end of next class to add</code></span>
+<span class="codeline" id="line-1789"><code>	for _, xr := range x.R16 {</code></span>
+<span class="codeline" id="line-1790"><code>		lo, hi, stride := rune(xr.Lo), rune(xr.Hi), rune(xr.Stride)</code></span>
+<span class="codeline" id="line-1791"><code>		if stride == 1 {</code></span>
+<span class="codeline" id="line-1792"><code>			if nextLo &lt;= lo-1 {</code></span>
+<span class="codeline" id="line-1793"><code>				r = appendRange(r, nextLo, lo-1)</code></span>
+<span class="codeline" id="line-1794"><code>			}</code></span>
+<span class="codeline" id="line-1795"><code>			nextLo = hi + 1</code></span>
+<span class="codeline" id="line-1796"><code>			continue</code></span>
+<span class="codeline" id="line-1797"><code>		}</code></span>
+<span class="codeline" id="line-1798"><code>		for c := lo; c &lt;= hi; c += stride {</code></span>
+<span class="codeline" id="line-1799"><code>			if nextLo &lt;= c-1 {</code></span>
+<span class="codeline" id="line-1800"><code>				r = appendRange(r, nextLo, c-1)</code></span>
+<span class="codeline" id="line-1801"><code>			}</code></span>
+<span class="codeline" id="line-1802"><code>			nextLo = c + 1</code></span>
+<span class="codeline" id="line-1803"><code>		}</code></span>
+<span class="codeline" id="line-1804"><code>	}</code></span>
+<span class="codeline" id="line-1805"><code>	for _, xr := range x.R32 {</code></span>
+<span class="codeline" id="line-1806"><code>		lo, hi, stride := rune(xr.Lo), rune(xr.Hi), rune(xr.Stride)</code></span>
+<span class="codeline" id="line-1807"><code>		if stride == 1 {</code></span>
+<span class="codeline" id="line-1808"><code>			if nextLo &lt;= lo-1 {</code></span>
+<span class="codeline" id="line-1809"><code>				r = appendRange(r, nextLo, lo-1)</code></span>
+<span class="codeline" id="line-1810"><code>			}</code></span>
+<span class="codeline" id="line-1811"><code>			nextLo = hi + 1</code></span>
+<span class="codeline" id="line-1812"><code>			continue</code></span>
+<span class="codeline" id="line-1813"><code>		}</code></span>
+<span class="codeline" id="line-1814"><code>		for c := lo; c &lt;= hi; c += stride {</code></span>
+<span class="codeline" id="line-1815"><code>			if nextLo &lt;= c-1 {</code></span>
+<span class="codeline" id="line-1816"><code>				r = appendRange(r, nextLo, c-1)</code></span>
+<span class="codeline" id="line-1817"><code>			}</code></span>
+<span class="codeline" id="line-1818"><code>			nextLo = c + 1</code></span>
+<span class="codeline" id="line-1819"><code>		}</code></span>
+<span class="codeline" id="line-1820"><code>	}</code></span>
+<span class="codeline" id="line-1821"><code>	if nextLo &lt;= unicode.MaxRune {</code></span>
+<span class="codeline" id="line-1822"><code>		r = appendRange(r, nextLo, unicode.MaxRune)</code></span>
+<span class="codeline" id="line-1823"><code>	}</code></span>
+<span class="codeline" id="line-1824"><code>	return r</code></span>
+<span class="codeline" id="line-1825"><code>}</code></span>
+<span class="codeline" id="line-1826"><code></code></span>
+<span class="codeline" id="line-1827"><code>// negateClass overwrites r and returns r's negation.</code></span>
+<span class="codeline" id="line-1828"><code>// It assumes the class r is already clean.</code></span>
+<span class="codeline" id="line-1829"><code>func negateClass(r []rune) []rune {</code></span>
+<span class="codeline" id="line-1830"><code>	nextLo := '\u0000' // lo end of next class to add</code></span>
+<span class="codeline" id="line-1831"><code>	w := 0             // write index</code></span>
+<span class="codeline" id="line-1832"><code>	for i := 0; i &lt; len(r); i += 2 {</code></span>
+<span class="codeline" id="line-1833"><code>		lo, hi := r[i], r[i+1]</code></span>
+<span class="codeline" id="line-1834"><code>		if nextLo &lt;= lo-1 {</code></span>
+<span class="codeline" id="line-1835"><code>			r[w] = nextLo</code></span>
+<span class="codeline" id="line-1836"><code>			r[w+1] = lo - 1</code></span>
+<span class="codeline" id="line-1837"><code>			w += 2</code></span>
+<span class="codeline" id="line-1838"><code>		}</code></span>
+<span class="codeline" id="line-1839"><code>		nextLo = hi + 1</code></span>
+<span class="codeline" id="line-1840"><code>	}</code></span>
+<span class="codeline" id="line-1841"><code>	r = r[:w]</code></span>
+<span class="codeline" id="line-1842"><code>	if nextLo &lt;= unicode.MaxRune {</code></span>
+<span class="codeline" id="line-1843"><code>		// It's possible for the negation to have one more</code></span>
+<span class="codeline" id="line-1844"><code>		// range - this one - than the original class, so use append.</code></span>
+<span class="codeline" id="line-1845"><code>		r = append(r, nextLo, unicode.MaxRune)</code></span>
+<span class="codeline" id="line-1846"><code>	}</code></span>
+<span class="codeline" id="line-1847"><code>	return r</code></span>
+<span class="codeline" id="line-1848"><code>}</code></span>
+<span class="codeline" id="line-1849"><code></code></span>
+<span class="codeline" id="line-1850"><code>// ranges implements sort.Interface on a []rune.</code></span>
+<span class="codeline" id="line-1851"><code>// The choice of receiver type definition is strange</code></span>
+<span class="codeline" id="line-1852"><code>// but avoids an allocation since we already have</code></span>
+<span class="codeline" id="line-1853"><code>// a *[]rune.</code></span>
+<span class="codeline" id="line-1854"><code>type ranges struct {</code></span>
+<span class="codeline" id="line-1855"><code>	p *[]rune</code></span>
+<span class="codeline" id="line-1856"><code>}</code></span>
+<span class="codeline" id="line-1857"><code></code></span>
+<span class="codeline" id="line-1858"><code>func (ra ranges) Less(i, j int) bool {</code></span>
+<span class="codeline" id="line-1859"><code>	p := *ra.p</code></span>
+<span class="codeline" id="line-1860"><code>	i *= 2</code></span>
+<span class="codeline" id="line-1861"><code>	j *= 2</code></span>
+<span class="codeline" id="line-1862"><code>	return p[i] &lt; p[j] || p[i] == p[j] &amp;&amp; p[i+1] &gt; p[j+1]</code></span>
+<span class="codeline" id="line-1863"><code>}</code></span>
+<span class="codeline" id="line-1864"><code></code></span>
+<span class="codeline" id="line-1865"><code>func (ra ranges) Len() int {</code></span>
+<span class="codeline" id="line-1866"><code>	return len(*ra.p) / 2</code></span>
+<span class="codeline" id="line-1867"><code>}</code></span>
+<span class="codeline" id="line-1868"><code></code></span>
+<span class="codeline" id="line-1869"><code>func (ra ranges) Swap(i, j int) {</code></span>
+<span class="codeline" id="line-1870"><code>	p := *ra.p</code></span>
+<span class="codeline" id="line-1871"><code>	i *= 2</code></span>
+<span class="codeline" id="line-1872"><code>	j *= 2</code></span>
+<span class="codeline" id="line-1873"><code>	p[i], p[i+1], p[j], p[j+1] = p[j], p[j+1], p[i], p[i+1]</code></span>
+<span class="codeline" id="line-1874"><code>}</code></span>
+<span class="codeline" id="line-1875"><code></code></span>
+<span class="codeline" id="line-1876"><code>func checkUTF8(s string) error {</code></span>
+<span class="codeline" id="line-1877"><code>	for s != "" {</code></span>
+<span class="codeline" id="line-1878"><code>		rune, size := utf8.DecodeRuneInString(s)</code></span>
+<span class="codeline" id="line-1879"><code>		if rune == utf8.RuneError &amp;&amp; size == 1 {</code></span>
+<span class="codeline" id="line-1880"><code>			return &amp;Error{Code: ErrInvalidUTF8, Expr: s}</code></span>
+<span class="codeline" id="line-1881"><code>		}</code></span>
+<span class="codeline" id="line-1882"><code>		s = s[size:]</code></span>
+<span class="codeline" id="line-1883"><code>	}</code></span>
+<span class="codeline" id="line-1884"><code>	return nil</code></span>
+<span class="codeline" id="line-1885"><code>}</code></span>
+<span class="codeline" id="line-1886"><code></code></span>
+<span class="codeline" id="line-1887"><code>func nextRune(s string) (c rune, t string, err error) {</code></span>
+<span class="codeline" id="line-1888"><code>	c, size := utf8.DecodeRuneInString(s)</code></span>
+<span class="codeline" id="line-1889"><code>	if c == utf8.RuneError &amp;&amp; size == 1 {</code></span>
+<span class="codeline" id="line-1890"><code>		return 0, "", &amp;Error{Code: ErrInvalidUTF8, Expr: s}</code></span>
+<span class="codeline" id="line-1891"><code>	}</code></span>
+<span class="codeline" id="line-1892"><code>	return c, s[size:], nil</code></span>
+<span class="codeline" id="line-1893"><code>}</code></span>
+<span class="codeline" id="line-1894"><code></code></span>
+<span class="codeline" id="line-1895"><code>func isalnum(c rune) bool {</code></span>
+<span class="codeline" id="line-1896"><code>	return '0' &lt;= c &amp;&amp; c &lt;= '9' || 'A' &lt;= c &amp;&amp; c &lt;= 'Z' || 'a' &lt;= c &amp;&amp; c &lt;= 'z'</code></span>
+<span class="codeline" id="line-1897"><code>}</code></span>
+<span class="codeline" id="line-1898"><code></code></span>
+<span class="codeline" id="line-1899"><code>func unhex(c rune) rune {</code></span>
+<span class="codeline" id="line-1900"><code>	if '0' &lt;= c &amp;&amp; c &lt;= '9' {</code></span>
+<span class="codeline" id="line-1901"><code>		return c - '0'</code></span>
+<span class="codeline" id="line-1902"><code>	}</code></span>
+<span class="codeline" id="line-1903"><code>	if 'a' &lt;= c &amp;&amp; c &lt;= 'f' {</code></span>
+<span class="codeline" id="line-1904"><code>		return c - 'a' + 10</code></span>
+<span class="codeline" id="line-1905"><code>	}</code></span>
+<span class="codeline" id="line-1906"><code>	if 'A' &lt;= c &amp;&amp; c &lt;= 'F' {</code></span>
+<span class="codeline" id="line-1907"><code>		return c - 'A' + 10</code></span>
+<span class="codeline" id="line-1908"><code>	}</code></span>
+<span class="codeline" id="line-1909"><code>	return -1</code></span>
+<span class="codeline" id="line-1910"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

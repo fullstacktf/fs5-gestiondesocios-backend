@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: syscall_darwin.go in package syscall</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	syscall_darwin.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/syscall.html">syscall</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009,2010 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// Darwin system calls.</code></span>
+<span class="codeline" id="line-6"><code>// This file is compiled as ordinary Go code,</code></span>
+<span class="codeline" id="line-7"><code>// but it is also input to mksyscall,</code></span>
+<span class="codeline" id="line-8"><code>// which parses the //sys lines and generates system call stubs.</code></span>
+<span class="codeline" id="line-9"><code>// Note that sometimes we use a lowercase //sys name and wrap</code></span>
+<span class="codeline" id="line-10"><code>// it in our own nicer implementation, either here or in</code></span>
+<span class="codeline" id="line-11"><code>// syscall_bsd.go or syscall_unix.go.</code></span>
+<span class="codeline" id="line-12"><code></code></span>
+<span class="codeline" id="line-13"><code>package syscall</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>import (</code></span>
+<span class="codeline" id="line-16"><code>	errorspkg "errors"</code></span>
+<span class="codeline" id="line-17"><code>	"unsafe"</code></span>
+<span class="codeline" id="line-18"><code>)</code></span>
+<span class="codeline" id="line-19"><code></code></span>
+<span class="codeline" id="line-20"><code>const ImplementsGetwd = true</code></span>
+<span class="codeline" id="line-21"><code></code></span>
+<span class="codeline" id="line-22"><code>func Getwd() (string, error) {</code></span>
+<span class="codeline" id="line-23"><code>	buf := make([]byte, 2048)</code></span>
+<span class="codeline" id="line-24"><code>	attrs, err := getAttrList(".", attrList{CommonAttr: attrCmnFullpath}, buf, 0)</code></span>
+<span class="codeline" id="line-25"><code>	if err == nil &amp;&amp; len(attrs) == 1 &amp;&amp; len(attrs[0]) &gt;= 2 {</code></span>
+<span class="codeline" id="line-26"><code>		wd := string(attrs[0])</code></span>
+<span class="codeline" id="line-27"><code>		// Sanity check that it's an absolute path and ends</code></span>
+<span class="codeline" id="line-28"><code>		// in a null byte, which we then strip.</code></span>
+<span class="codeline" id="line-29"><code>		if wd[0] == '/' &amp;&amp; wd[len(wd)-1] == 0 {</code></span>
+<span class="codeline" id="line-30"><code>			return wd[:len(wd)-1], nil</code></span>
+<span class="codeline" id="line-31"><code>		}</code></span>
+<span class="codeline" id="line-32"><code>	}</code></span>
+<span class="codeline" id="line-33"><code>	// If pkg/os/getwd.go gets ENOTSUP, it will fall back to the</code></span>
+<span class="codeline" id="line-34"><code>	// slow algorithm.</code></span>
+<span class="codeline" id="line-35"><code>	return "", ENOTSUP</code></span>
+<span class="codeline" id="line-36"><code>}</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>type SockaddrDatalink struct {</code></span>
+<span class="codeline" id="line-39"><code>	Len    uint8</code></span>
+<span class="codeline" id="line-40"><code>	Family uint8</code></span>
+<span class="codeline" id="line-41"><code>	Index  uint16</code></span>
+<span class="codeline" id="line-42"><code>	Type   uint8</code></span>
+<span class="codeline" id="line-43"><code>	Nlen   uint8</code></span>
+<span class="codeline" id="line-44"><code>	Alen   uint8</code></span>
+<span class="codeline" id="line-45"><code>	Slen   uint8</code></span>
+<span class="codeline" id="line-46"><code>	Data   [12]int8</code></span>
+<span class="codeline" id="line-47"><code>	raw    RawSockaddrDatalink</code></span>
+<span class="codeline" id="line-48"><code>}</code></span>
+<span class="codeline" id="line-49"><code></code></span>
+<span class="codeline" id="line-50"><code>// Translate "kern.hostname" to []_C_int{0,1,2,3}.</code></span>
+<span class="codeline" id="line-51"><code>func nametomib(name string) (mib []_C_int, err error) {</code></span>
+<span class="codeline" id="line-52"><code>	const siz = unsafe.Sizeof(mib[0])</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>	// NOTE(rsc): It seems strange to set the buffer to have</code></span>
+<span class="codeline" id="line-55"><code>	// size CTL_MAXNAME+2 but use only CTL_MAXNAME</code></span>
+<span class="codeline" id="line-56"><code>	// as the size. I don't know why the +2 is here, but the</code></span>
+<span class="codeline" id="line-57"><code>	// kernel uses +2 for its own implementation of this function.</code></span>
+<span class="codeline" id="line-58"><code>	// I am scared that if we don't include the +2 here, the kernel</code></span>
+<span class="codeline" id="line-59"><code>	// will silently write 2 words farther than we specify</code></span>
+<span class="codeline" id="line-60"><code>	// and we'll get memory corruption.</code></span>
+<span class="codeline" id="line-61"><code>	var buf [CTL_MAXNAME + 2]_C_int</code></span>
+<span class="codeline" id="line-62"><code>	n := uintptr(CTL_MAXNAME) * siz</code></span>
+<span class="codeline" id="line-63"><code></code></span>
+<span class="codeline" id="line-64"><code>	p := (*byte)(unsafe.Pointer(&amp;buf[0]))</code></span>
+<span class="codeline" id="line-65"><code>	bytes, err := ByteSliceFromString(name)</code></span>
+<span class="codeline" id="line-66"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-67"><code>		return nil, err</code></span>
+<span class="codeline" id="line-68"><code>	}</code></span>
+<span class="codeline" id="line-69"><code></code></span>
+<span class="codeline" id="line-70"><code>	// Magic sysctl: "setting" 0.3 to a string name</code></span>
+<span class="codeline" id="line-71"><code>	// lets you read back the array of integers form.</code></span>
+<span class="codeline" id="line-72"><code>	if err = sysctl([]_C_int{0, 3}, p, &amp;n, &amp;bytes[0], uintptr(len(name))); err != nil {</code></span>
+<span class="codeline" id="line-73"><code>		return nil, err</code></span>
+<span class="codeline" id="line-74"><code>	}</code></span>
+<span class="codeline" id="line-75"><code>	return buf[0 : n/siz], nil</code></span>
+<span class="codeline" id="line-76"><code>}</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>func direntIno(buf []byte) (uint64, bool) {</code></span>
+<span class="codeline" id="line-79"><code>	return readInt(buf, unsafe.Offsetof(Dirent{}.Ino), unsafe.Sizeof(Dirent{}.Ino))</code></span>
+<span class="codeline" id="line-80"><code>}</code></span>
+<span class="codeline" id="line-81"><code></code></span>
+<span class="codeline" id="line-82"><code>func direntReclen(buf []byte) (uint64, bool) {</code></span>
+<span class="codeline" id="line-83"><code>	return readInt(buf, unsafe.Offsetof(Dirent{}.Reclen), unsafe.Sizeof(Dirent{}.Reclen))</code></span>
+<span class="codeline" id="line-84"><code>}</code></span>
+<span class="codeline" id="line-85"><code></code></span>
+<span class="codeline" id="line-86"><code>func direntNamlen(buf []byte) (uint64, bool) {</code></span>
+<span class="codeline" id="line-87"><code>	return readInt(buf, unsafe.Offsetof(Dirent{}.Namlen), unsafe.Sizeof(Dirent{}.Namlen))</code></span>
+<span class="codeline" id="line-88"><code>}</code></span>
+<span class="codeline" id="line-89"><code></code></span>
+<span class="codeline" id="line-90"><code>func PtraceAttach(pid int) (err error) { return ptrace(PT_ATTACH, pid, 0, 0) }</code></span>
+<span class="codeline" id="line-91"><code>func PtraceDetach(pid int) (err error) { return ptrace(PT_DETACH, pid, 0, 0) }</code></span>
+<span class="codeline" id="line-92"><code></code></span>
+<span class="codeline" id="line-93"><code>const (</code></span>
+<span class="codeline" id="line-94"><code>	attrBitMapCount = 5</code></span>
+<span class="codeline" id="line-95"><code>	attrCmnModtime  = 0x00000400</code></span>
+<span class="codeline" id="line-96"><code>	attrCmnAcctime  = 0x00001000</code></span>
+<span class="codeline" id="line-97"><code>	attrCmnFullpath = 0x08000000</code></span>
+<span class="codeline" id="line-98"><code>)</code></span>
+<span class="codeline" id="line-99"><code></code></span>
+<span class="codeline" id="line-100"><code>type attrList struct {</code></span>
+<span class="codeline" id="line-101"><code>	bitmapCount uint16</code></span>
+<span class="codeline" id="line-102"><code>	_           uint16</code></span>
+<span class="codeline" id="line-103"><code>	CommonAttr  uint32</code></span>
+<span class="codeline" id="line-104"><code>	VolAttr     uint32</code></span>
+<span class="codeline" id="line-105"><code>	DirAttr     uint32</code></span>
+<span class="codeline" id="line-106"><code>	FileAttr    uint32</code></span>
+<span class="codeline" id="line-107"><code>	Forkattr    uint32</code></span>
+<span class="codeline" id="line-108"><code>}</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>func getAttrList(path string, attrList attrList, attrBuf []byte, options uint) (attrs [][]byte, err error) {</code></span>
+<span class="codeline" id="line-111"><code>	if len(attrBuf) &lt; 4 {</code></span>
+<span class="codeline" id="line-112"><code>		return nil, errorspkg.New("attrBuf too small")</code></span>
+<span class="codeline" id="line-113"><code>	}</code></span>
+<span class="codeline" id="line-114"><code>	attrList.bitmapCount = attrBitMapCount</code></span>
+<span class="codeline" id="line-115"><code></code></span>
+<span class="codeline" id="line-116"><code>	var _p0 *byte</code></span>
+<span class="codeline" id="line-117"><code>	_p0, err = BytePtrFromString(path)</code></span>
+<span class="codeline" id="line-118"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-119"><code>		return nil, err</code></span>
+<span class="codeline" id="line-120"><code>	}</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>	_, _, e1 := syscall6(</code></span>
+<span class="codeline" id="line-123"><code>		funcPC(libc_getattrlist_trampoline),</code></span>
+<span class="codeline" id="line-124"><code>		uintptr(unsafe.Pointer(_p0)),</code></span>
+<span class="codeline" id="line-125"><code>		uintptr(unsafe.Pointer(&amp;attrList)),</code></span>
+<span class="codeline" id="line-126"><code>		uintptr(unsafe.Pointer(&amp;attrBuf[0])),</code></span>
+<span class="codeline" id="line-127"><code>		uintptr(len(attrBuf)),</code></span>
+<span class="codeline" id="line-128"><code>		uintptr(options),</code></span>
+<span class="codeline" id="line-129"><code>		0,</code></span>
+<span class="codeline" id="line-130"><code>	)</code></span>
+<span class="codeline" id="line-131"><code>	if e1 != 0 {</code></span>
+<span class="codeline" id="line-132"><code>		return nil, e1</code></span>
+<span class="codeline" id="line-133"><code>	}</code></span>
+<span class="codeline" id="line-134"><code>	size := *(*uint32)(unsafe.Pointer(&amp;attrBuf[0]))</code></span>
+<span class="codeline" id="line-135"><code></code></span>
+<span class="codeline" id="line-136"><code>	// dat is the section of attrBuf that contains valid data,</code></span>
+<span class="codeline" id="line-137"><code>	// without the 4 byte length header. All attribute offsets</code></span>
+<span class="codeline" id="line-138"><code>	// are relative to dat.</code></span>
+<span class="codeline" id="line-139"><code>	dat := attrBuf</code></span>
+<span class="codeline" id="line-140"><code>	if int(size) &lt; len(attrBuf) {</code></span>
+<span class="codeline" id="line-141"><code>		dat = dat[:size]</code></span>
+<span class="codeline" id="line-142"><code>	}</code></span>
+<span class="codeline" id="line-143"><code>	dat = dat[4:] // remove length prefix</code></span>
+<span class="codeline" id="line-144"><code></code></span>
+<span class="codeline" id="line-145"><code>	for i := uint32(0); int(i) &lt; len(dat); {</code></span>
+<span class="codeline" id="line-146"><code>		header := dat[i:]</code></span>
+<span class="codeline" id="line-147"><code>		if len(header) &lt; 8 {</code></span>
+<span class="codeline" id="line-148"><code>			return attrs, errorspkg.New("truncated attribute header")</code></span>
+<span class="codeline" id="line-149"><code>		}</code></span>
+<span class="codeline" id="line-150"><code>		datOff := *(*int32)(unsafe.Pointer(&amp;header[0]))</code></span>
+<span class="codeline" id="line-151"><code>		attrLen := *(*uint32)(unsafe.Pointer(&amp;header[4]))</code></span>
+<span class="codeline" id="line-152"><code>		if datOff &lt; 0 || uint32(datOff)+attrLen &gt; uint32(len(dat)) {</code></span>
+<span class="codeline" id="line-153"><code>			return attrs, errorspkg.New("truncated results; attrBuf too small")</code></span>
+<span class="codeline" id="line-154"><code>		}</code></span>
+<span class="codeline" id="line-155"><code>		end := uint32(datOff) + attrLen</code></span>
+<span class="codeline" id="line-156"><code>		attrs = append(attrs, dat[datOff:end])</code></span>
+<span class="codeline" id="line-157"><code>		i = end</code></span>
+<span class="codeline" id="line-158"><code>		if r := i % 4; r != 0 {</code></span>
+<span class="codeline" id="line-159"><code>			i += (4 - r)</code></span>
+<span class="codeline" id="line-160"><code>		}</code></span>
+<span class="codeline" id="line-161"><code>	}</code></span>
+<span class="codeline" id="line-162"><code>	return</code></span>
+<span class="codeline" id="line-163"><code>}</code></span>
+<span class="codeline" id="line-164"><code></code></span>
+<span class="codeline" id="line-165"><code>func libc_getattrlist_trampoline()</code></span>
+<span class="codeline" id="line-166"><code></code></span>
+<span class="codeline" id="line-167"><code>//go:linkname libc_getattrlist libc_getattrlist</code></span>
+<span class="codeline" id="line-168"><code>//go:cgo_import_dynamic libc_getattrlist getattrlist "/usr/lib/libSystem.B.dylib"</code></span>
+<span class="codeline" id="line-169"><code></code></span>
+<span class="codeline" id="line-170"><code>//sysnb pipe(p *[2]int32) (err error)</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>func Pipe(p []int) (err error) {</code></span>
+<span class="codeline" id="line-173"><code>	if len(p) != 2 {</code></span>
+<span class="codeline" id="line-174"><code>		return EINVAL</code></span>
+<span class="codeline" id="line-175"><code>	}</code></span>
+<span class="codeline" id="line-176"><code>	var q [2]int32</code></span>
+<span class="codeline" id="line-177"><code>	err = pipe(&amp;q)</code></span>
+<span class="codeline" id="line-178"><code>	p[0] = int(q[0])</code></span>
+<span class="codeline" id="line-179"><code>	p[1] = int(q[1])</code></span>
+<span class="codeline" id="line-180"><code>	return</code></span>
+<span class="codeline" id="line-181"><code>}</code></span>
+<span class="codeline" id="line-182"><code></code></span>
+<span class="codeline" id="line-183"><code>func Getfsstat(buf []Statfs_t, flags int) (n int, err error) {</code></span>
+<span class="codeline" id="line-184"><code>	var _p0 unsafe.Pointer</code></span>
+<span class="codeline" id="line-185"><code>	var bufsize uintptr</code></span>
+<span class="codeline" id="line-186"><code>	if len(buf) &gt; 0 {</code></span>
+<span class="codeline" id="line-187"><code>		_p0 = unsafe.Pointer(&amp;buf[0])</code></span>
+<span class="codeline" id="line-188"><code>		bufsize = unsafe.Sizeof(Statfs_t{}) * uintptr(len(buf))</code></span>
+<span class="codeline" id="line-189"><code>	}</code></span>
+<span class="codeline" id="line-190"><code>	r0, _, e1 := syscall(funcPC(libc_getfsstat_trampoline), uintptr(_p0), bufsize, uintptr(flags))</code></span>
+<span class="codeline" id="line-191"><code>	n = int(r0)</code></span>
+<span class="codeline" id="line-192"><code>	if e1 != 0 {</code></span>
+<span class="codeline" id="line-193"><code>		err = e1</code></span>
+<span class="codeline" id="line-194"><code>	}</code></span>
+<span class="codeline" id="line-195"><code>	return</code></span>
+<span class="codeline" id="line-196"><code>}</code></span>
+<span class="codeline" id="line-197"><code></code></span>
+<span class="codeline" id="line-198"><code>func libc_getfsstat_trampoline()</code></span>
+<span class="codeline" id="line-199"><code></code></span>
+<span class="codeline" id="line-200"><code>//go:linkname libc_getfsstat libc_getfsstat</code></span>
+<span class="codeline" id="line-201"><code>//go:cgo_import_dynamic libc_getfsstat getfsstat "/usr/lib/libSystem.B.dylib"</code></span>
+<span class="codeline" id="line-202"><code></code></span>
+<span class="codeline" id="line-203"><code>func setattrlistTimes(path string, times []Timespec) error {</code></span>
+<span class="codeline" id="line-204"><code>	_p0, err := BytePtrFromString(path)</code></span>
+<span class="codeline" id="line-205"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-206"><code>		return err</code></span>
+<span class="codeline" id="line-207"><code>	}</code></span>
+<span class="codeline" id="line-208"><code></code></span>
+<span class="codeline" id="line-209"><code>	var attrList attrList</code></span>
+<span class="codeline" id="line-210"><code>	attrList.bitmapCount = attrBitMapCount</code></span>
+<span class="codeline" id="line-211"><code>	attrList.CommonAttr = attrCmnModtime | attrCmnAcctime</code></span>
+<span class="codeline" id="line-212"><code></code></span>
+<span class="codeline" id="line-213"><code>	// order is mtime, atime: the opposite of Chtimes</code></span>
+<span class="codeline" id="line-214"><code>	attributes := [2]Timespec{times[1], times[0]}</code></span>
+<span class="codeline" id="line-215"><code>	const options = 0</code></span>
+<span class="codeline" id="line-216"><code>	_, _, e1 := syscall6(</code></span>
+<span class="codeline" id="line-217"><code>		funcPC(libc_setattrlist_trampoline),</code></span>
+<span class="codeline" id="line-218"><code>		uintptr(unsafe.Pointer(_p0)),</code></span>
+<span class="codeline" id="line-219"><code>		uintptr(unsafe.Pointer(&amp;attrList)),</code></span>
+<span class="codeline" id="line-220"><code>		uintptr(unsafe.Pointer(&amp;attributes)),</code></span>
+<span class="codeline" id="line-221"><code>		uintptr(unsafe.Sizeof(attributes)),</code></span>
+<span class="codeline" id="line-222"><code>		uintptr(options),</code></span>
+<span class="codeline" id="line-223"><code>		0,</code></span>
+<span class="codeline" id="line-224"><code>	)</code></span>
+<span class="codeline" id="line-225"><code>	if e1 != 0 {</code></span>
+<span class="codeline" id="line-226"><code>		return e1</code></span>
+<span class="codeline" id="line-227"><code>	}</code></span>
+<span class="codeline" id="line-228"><code>	return nil</code></span>
+<span class="codeline" id="line-229"><code>}</code></span>
+<span class="codeline" id="line-230"><code></code></span>
+<span class="codeline" id="line-231"><code>func libc_setattrlist_trampoline()</code></span>
+<span class="codeline" id="line-232"><code></code></span>
+<span class="codeline" id="line-233"><code>//go:linkname libc_setattrlist libc_setattrlist</code></span>
+<span class="codeline" id="line-234"><code>//go:cgo_import_dynamic libc_setattrlist setattrlist "/usr/lib/libSystem.B.dylib"</code></span>
+<span class="codeline" id="line-235"><code></code></span>
+<span class="codeline" id="line-236"><code>func utimensat(dirfd int, path string, times *[2]Timespec, flag int) error {</code></span>
+<span class="codeline" id="line-237"><code>	// Darwin doesn't support SYS_UTIMENSAT</code></span>
+<span class="codeline" id="line-238"><code>	return ENOSYS</code></span>
+<span class="codeline" id="line-239"><code>}</code></span>
+<span class="codeline" id="line-240"><code></code></span>
+<span class="codeline" id="line-241"><code>/*</code></span>
+<span class="codeline" id="line-242"><code> * Wrapped</code></span>
+<span class="codeline" id="line-243"><code> */</code></span>
+<span class="codeline" id="line-244"><code></code></span>
+<span class="codeline" id="line-245"><code>//sys	kill(pid int, signum int, posix int) (err error)</code></span>
+<span class="codeline" id="line-246"><code></code></span>
+<span class="codeline" id="line-247"><code>func Kill(pid int, signum Signal) (err error) { return kill(pid, int(signum), 1) }</code></span>
+<span class="codeline" id="line-248"><code></code></span>
+<span class="codeline" id="line-249"><code>/*</code></span>
+<span class="codeline" id="line-250"><code> * Exposed directly</code></span>
+<span class="codeline" id="line-251"><code> */</code></span>
+<span class="codeline" id="line-252"><code>//sys	Access(path string, mode uint32) (err error)</code></span>
+<span class="codeline" id="line-253"><code>//sys	Adjtime(delta *Timeval, olddelta *Timeval) (err error)</code></span>
+<span class="codeline" id="line-254"><code>//sys	Chdir(path string) (err error)</code></span>
+<span class="codeline" id="line-255"><code>//sys	Chflags(path string, flags int) (err error)</code></span>
+<span class="codeline" id="line-256"><code>//sys	Chmod(path string, mode uint32) (err error)</code></span>
+<span class="codeline" id="line-257"><code>//sys	Chown(path string, uid int, gid int) (err error)</code></span>
+<span class="codeline" id="line-258"><code>//sys	Chroot(path string) (err error)</code></span>
+<span class="codeline" id="line-259"><code>//sys	Close(fd int) (err error)</code></span>
+<span class="codeline" id="line-260"><code>//sys	closedir(dir uintptr) (err error)</code></span>
+<span class="codeline" id="line-261"><code>//sys	Dup(fd int) (nfd int, err error)</code></span>
+<span class="codeline" id="line-262"><code>//sys	Dup2(from int, to int) (err error)</code></span>
+<span class="codeline" id="line-263"><code>//sys	Exchangedata(path1 string, path2 string, options int) (err error)</code></span>
+<span class="codeline" id="line-264"><code>//sys	Fchdir(fd int) (err error)</code></span>
+<span class="codeline" id="line-265"><code>//sys	Fchflags(fd int, flags int) (err error)</code></span>
+<span class="codeline" id="line-266"><code>//sys	Fchmod(fd int, mode uint32) (err error)</code></span>
+<span class="codeline" id="line-267"><code>//sys	Fchown(fd int, uid int, gid int) (err error)</code></span>
+<span class="codeline" id="line-268"><code>//sys	Flock(fd int, how int) (err error)</code></span>
+<span class="codeline" id="line-269"><code>//sys	Fpathconf(fd int, name int) (val int, err error)</code></span>
+<span class="codeline" id="line-270"><code>//sys	Fsync(fd int) (err error)</code></span>
+<span class="codeline" id="line-271"><code>//  Fsync is not called for os.File.Sync(). Please see internal/poll/fd_fsync_darwin.go</code></span>
+<span class="codeline" id="line-272"><code>//sys	Ftruncate(fd int, length int64) (err error)</code></span>
+<span class="codeline" id="line-273"><code>//sys	Getdtablesize() (size int)</code></span>
+<span class="codeline" id="line-274"><code>//sysnb	Getegid() (egid int)</code></span>
+<span class="codeline" id="line-275"><code>//sysnb	Geteuid() (uid int)</code></span>
+<span class="codeline" id="line-276"><code>//sysnb	Getgid() (gid int)</code></span>
+<span class="codeline" id="line-277"><code>//sysnb	Getpgid(pid int) (pgid int, err error)</code></span>
+<span class="codeline" id="line-278"><code>//sysnb	Getpgrp() (pgrp int)</code></span>
+<span class="codeline" id="line-279"><code>//sysnb	Getpid() (pid int)</code></span>
+<span class="codeline" id="line-280"><code>//sysnb	Getppid() (ppid int)</code></span>
+<span class="codeline" id="line-281"><code>//sys	Getpriority(which int, who int) (prio int, err error)</code></span>
+<span class="codeline" id="line-282"><code>//sysnb	Getrlimit(which int, lim *Rlimit) (err error)</code></span>
+<span class="codeline" id="line-283"><code>//sysnb	Getrusage(who int, rusage *Rusage) (err error)</code></span>
+<span class="codeline" id="line-284"><code>//sysnb	Getsid(pid int) (sid int, err error)</code></span>
+<span class="codeline" id="line-285"><code>//sysnb	Getuid() (uid int)</code></span>
+<span class="codeline" id="line-286"><code>//sysnb	Issetugid() (tainted bool)</code></span>
+<span class="codeline" id="line-287"><code>//sys	Kqueue() (fd int, err error)</code></span>
+<span class="codeline" id="line-288"><code>//sys	Lchown(path string, uid int, gid int) (err error)</code></span>
+<span class="codeline" id="line-289"><code>//sys	Link(path string, link string) (err error)</code></span>
+<span class="codeline" id="line-290"><code>//sys	Listen(s int, backlog int) (err error)</code></span>
+<span class="codeline" id="line-291"><code>//sys	Mkdir(path string, mode uint32) (err error)</code></span>
+<span class="codeline" id="line-292"><code>//sys	Mkfifo(path string, mode uint32) (err error)</code></span>
+<span class="codeline" id="line-293"><code>//sys	Mknod(path string, mode uint32, dev int) (err error)</code></span>
+<span class="codeline" id="line-294"><code>//sys	Mlock(b []byte) (err error)</code></span>
+<span class="codeline" id="line-295"><code>//sys	Mlockall(flags int) (err error)</code></span>
+<span class="codeline" id="line-296"><code>//sys	Mprotect(b []byte, prot int) (err error)</code></span>
+<span class="codeline" id="line-297"><code>//sys	Munlock(b []byte) (err error)</code></span>
+<span class="codeline" id="line-298"><code>//sys	Munlockall() (err error)</code></span>
+<span class="codeline" id="line-299"><code>//sys	Open(path string, mode int, perm uint32) (fd int, err error)</code></span>
+<span class="codeline" id="line-300"><code>//sys	Pathconf(path string, name int) (val int, err error)</code></span>
+<span class="codeline" id="line-301"><code>//sys	Pread(fd int, p []byte, offset int64) (n int, err error)</code></span>
+<span class="codeline" id="line-302"><code>//sys	Pwrite(fd int, p []byte, offset int64) (n int, err error)</code></span>
+<span class="codeline" id="line-303"><code>//sys	read(fd int, p []byte) (n int, err error)</code></span>
+<span class="codeline" id="line-304"><code>//sys	readdir_r(dir uintptr, entry *Dirent, result **Dirent) (res Errno)</code></span>
+<span class="codeline" id="line-305"><code>//sys	Readlink(path string, buf []byte) (n int, err error)</code></span>
+<span class="codeline" id="line-306"><code>//sys	Rename(from string, to string) (err error)</code></span>
+<span class="codeline" id="line-307"><code>//sys	Revoke(path string) (err error)</code></span>
+<span class="codeline" id="line-308"><code>//sys	Rmdir(path string) (err error)</code></span>
+<span class="codeline" id="line-309"><code>//sys	Seek(fd int, offset int64, whence int) (newoffset int64, err error) = SYS_lseek</code></span>
+<span class="codeline" id="line-310"><code>//sys	Select(n int, r *FdSet, w *FdSet, e *FdSet, timeout *Timeval) (err error)</code></span>
+<span class="codeline" id="line-311"><code>//sys	Setegid(egid int) (err error)</code></span>
+<span class="codeline" id="line-312"><code>//sysnb	Seteuid(euid int) (err error)</code></span>
+<span class="codeline" id="line-313"><code>//sysnb	Setgid(gid int) (err error)</code></span>
+<span class="codeline" id="line-314"><code>//sys	Setlogin(name string) (err error)</code></span>
+<span class="codeline" id="line-315"><code>//sysnb	Setpgid(pid int, pgid int) (err error)</code></span>
+<span class="codeline" id="line-316"><code>//sys	Setpriority(which int, who int, prio int) (err error)</code></span>
+<span class="codeline" id="line-317"><code>//sys	Setprivexec(flag int) (err error)</code></span>
+<span class="codeline" id="line-318"><code>//sysnb	Setregid(rgid int, egid int) (err error)</code></span>
+<span class="codeline" id="line-319"><code>//sysnb	Setreuid(ruid int, euid int) (err error)</code></span>
+<span class="codeline" id="line-320"><code>//sysnb	Setrlimit(which int, lim *Rlimit) (err error)</code></span>
+<span class="codeline" id="line-321"><code>//sysnb	Setsid() (pid int, err error)</code></span>
+<span class="codeline" id="line-322"><code>//sysnb	Settimeofday(tp *Timeval) (err error)</code></span>
+<span class="codeline" id="line-323"><code>//sysnb	Setuid(uid int) (err error)</code></span>
+<span class="codeline" id="line-324"><code>//sys	Symlink(path string, link string) (err error)</code></span>
+<span class="codeline" id="line-325"><code>//sys	Sync() (err error)</code></span>
+<span class="codeline" id="line-326"><code>//sys	Truncate(path string, length int64) (err error)</code></span>
+<span class="codeline" id="line-327"><code>//sys	Umask(newmask int) (oldmask int)</code></span>
+<span class="codeline" id="line-328"><code>//sys	Undelete(path string) (err error)</code></span>
+<span class="codeline" id="line-329"><code>//sys	Unlink(path string) (err error)</code></span>
+<span class="codeline" id="line-330"><code>//sys	Unmount(path string, flags int) (err error)</code></span>
+<span class="codeline" id="line-331"><code>//sys	write(fd int, p []byte) (n int, err error)</code></span>
+<span class="codeline" id="line-332"><code>//sys	writev(fd int, iovecs []Iovec) (cnt uintptr, err error)</code></span>
+<span class="codeline" id="line-333"><code>//sys   mmap(addr uintptr, length uintptr, prot int, flag int, fd int, pos int64) (ret uintptr, err error)</code></span>
+<span class="codeline" id="line-334"><code>//sys   munmap(addr uintptr, length uintptr) (err error)</code></span>
+<span class="codeline" id="line-335"><code>//sysnb fork() (pid int, err error)</code></span>
+<span class="codeline" id="line-336"><code>//sysnb ioctl(fd int, req int, arg int) (err error)</code></span>
+<span class="codeline" id="line-337"><code>//sysnb ioctlPtr(fd int, req uint, arg unsafe.Pointer) (err error) = SYS_ioctl</code></span>
+<span class="codeline" id="line-338"><code>//sysnb execve(path *byte, argv **byte, envp **byte) (err error)</code></span>
+<span class="codeline" id="line-339"><code>//sysnb exit(res int) (err error)</code></span>
+<span class="codeline" id="line-340"><code>//sys	sysctl(mib []_C_int, old *byte, oldlen *uintptr, new *byte, newlen uintptr) (err error)</code></span>
+<span class="codeline" id="line-341"><code>//sys	fcntlPtr(fd int, cmd int, arg unsafe.Pointer) (val int, err error) = SYS_fcntl</code></span>
+<span class="codeline" id="line-342"><code>//sys   unlinkat(fd int, path string, flags int) (err error)</code></span>
+<span class="codeline" id="line-343"><code>//sys   openat(fd int, path string, flags int, perm uint32) (fdret int, err error)</code></span>
+<span class="codeline" id="line-344"><code></code></span>
+<span class="codeline" id="line-345"><code>func init() {</code></span>
+<span class="codeline" id="line-346"><code>	execveDarwin = execve</code></span>
+<span class="codeline" id="line-347"><code>}</code></span>
+<span class="codeline" id="line-348"><code></code></span>
+<span class="codeline" id="line-349"><code>func fdopendir(fd int) (dir uintptr, err error) {</code></span>
+<span class="codeline" id="line-350"><code>	r0, _, e1 := syscallPtr(funcPC(libc_fdopendir_trampoline), uintptr(fd), 0, 0)</code></span>
+<span class="codeline" id="line-351"><code>	dir = uintptr(r0)</code></span>
+<span class="codeline" id="line-352"><code>	if e1 != 0 {</code></span>
+<span class="codeline" id="line-353"><code>		err = errnoErr(e1)</code></span>
+<span class="codeline" id="line-354"><code>	}</code></span>
+<span class="codeline" id="line-355"><code>	return</code></span>
+<span class="codeline" id="line-356"><code>}</code></span>
+<span class="codeline" id="line-357"><code></code></span>
+<span class="codeline" id="line-358"><code>func libc_fdopendir_trampoline()</code></span>
+<span class="codeline" id="line-359"><code></code></span>
+<span class="codeline" id="line-360"><code>//go:linkname libc_fdopendir libc_fdopendir</code></span>
+<span class="codeline" id="line-361"><code>//go:cgo_import_dynamic libc_fdopendir fdopendir "/usr/lib/libSystem.B.dylib"</code></span>
+<span class="codeline" id="line-362"><code></code></span>
+<span class="codeline" id="line-363"><code>func readlen(fd int, buf *byte, nbuf int) (n int, err error) {</code></span>
+<span class="codeline" id="line-364"><code>	r0, _, e1 := syscall(funcPC(libc_read_trampoline), uintptr(fd), uintptr(unsafe.Pointer(buf)), uintptr(nbuf))</code></span>
+<span class="codeline" id="line-365"><code>	n = int(r0)</code></span>
+<span class="codeline" id="line-366"><code>	if e1 != 0 {</code></span>
+<span class="codeline" id="line-367"><code>		err = errnoErr(e1)</code></span>
+<span class="codeline" id="line-368"><code>	}</code></span>
+<span class="codeline" id="line-369"><code>	return</code></span>
+<span class="codeline" id="line-370"><code>}</code></span>
+<span class="codeline" id="line-371"><code></code></span>
+<span class="codeline" id="line-372"><code>func writelen(fd int, buf *byte, nbuf int) (n int, err error) {</code></span>
+<span class="codeline" id="line-373"><code>	r0, _, e1 := syscall(funcPC(libc_write_trampoline), uintptr(fd), uintptr(unsafe.Pointer(buf)), uintptr(nbuf))</code></span>
+<span class="codeline" id="line-374"><code>	n = int(r0)</code></span>
+<span class="codeline" id="line-375"><code>	if e1 != 0 {</code></span>
+<span class="codeline" id="line-376"><code>		err = errnoErr(e1)</code></span>
+<span class="codeline" id="line-377"><code>	}</code></span>
+<span class="codeline" id="line-378"><code>	return</code></span>
+<span class="codeline" id="line-379"><code>}</code></span>
+<span class="codeline" id="line-380"><code></code></span>
+<span class="codeline" id="line-381"><code>func Getdirentries(fd int, buf []byte, basep *uintptr) (n int, err error) {</code></span>
+<span class="codeline" id="line-382"><code>	// Simulate Getdirentries using fdopendir/readdir_r/closedir.</code></span>
+<span class="codeline" id="line-383"><code>	// We store the number of entries to skip in the seek</code></span>
+<span class="codeline" id="line-384"><code>	// offset of fd. See issue #31368.</code></span>
+<span class="codeline" id="line-385"><code>	// It's not the full required semantics, but should handle the case</code></span>
+<span class="codeline" id="line-386"><code>	// of calling Getdirentries or ReadDirent repeatedly.</code></span>
+<span class="codeline" id="line-387"><code>	// It won't handle assigning the results of lseek to *basep, or handle</code></span>
+<span class="codeline" id="line-388"><code>	// the directory being edited underfoot.</code></span>
+<span class="codeline" id="line-389"><code>	skip, err := Seek(fd, 0, 1 /* SEEK_CUR */)</code></span>
+<span class="codeline" id="line-390"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-391"><code>		return 0, err</code></span>
+<span class="codeline" id="line-392"><code>	}</code></span>
+<span class="codeline" id="line-393"><code></code></span>
+<span class="codeline" id="line-394"><code>	// We need to duplicate the incoming file descriptor</code></span>
+<span class="codeline" id="line-395"><code>	// because the caller expects to retain control of it, but</code></span>
+<span class="codeline" id="line-396"><code>	// fdopendir expects to take control of its argument.</code></span>
+<span class="codeline" id="line-397"><code>	// Just Dup'ing the file descriptor is not enough, as the</code></span>
+<span class="codeline" id="line-398"><code>	// result shares underlying state. Use openat to make a really</code></span>
+<span class="codeline" id="line-399"><code>	// new file descriptor referring to the same directory.</code></span>
+<span class="codeline" id="line-400"><code>	fd2, err := openat(fd, ".", O_RDONLY, 0)</code></span>
+<span class="codeline" id="line-401"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-402"><code>		return 0, err</code></span>
+<span class="codeline" id="line-403"><code>	}</code></span>
+<span class="codeline" id="line-404"><code>	d, err := fdopendir(fd2)</code></span>
+<span class="codeline" id="line-405"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-406"><code>		Close(fd2)</code></span>
+<span class="codeline" id="line-407"><code>		return 0, err</code></span>
+<span class="codeline" id="line-408"><code>	}</code></span>
+<span class="codeline" id="line-409"><code>	defer closedir(d)</code></span>
+<span class="codeline" id="line-410"><code></code></span>
+<span class="codeline" id="line-411"><code>	var cnt int64</code></span>
+<span class="codeline" id="line-412"><code>	for {</code></span>
+<span class="codeline" id="line-413"><code>		var entry Dirent</code></span>
+<span class="codeline" id="line-414"><code>		var entryp *Dirent</code></span>
+<span class="codeline" id="line-415"><code>		e := readdir_r(d, &amp;entry, &amp;entryp)</code></span>
+<span class="codeline" id="line-416"><code>		if e != 0 {</code></span>
+<span class="codeline" id="line-417"><code>			return n, errnoErr(e)</code></span>
+<span class="codeline" id="line-418"><code>		}</code></span>
+<span class="codeline" id="line-419"><code>		if entryp == nil {</code></span>
+<span class="codeline" id="line-420"><code>			break</code></span>
+<span class="codeline" id="line-421"><code>		}</code></span>
+<span class="codeline" id="line-422"><code>		if skip &gt; 0 {</code></span>
+<span class="codeline" id="line-423"><code>			skip--</code></span>
+<span class="codeline" id="line-424"><code>			cnt++</code></span>
+<span class="codeline" id="line-425"><code>			continue</code></span>
+<span class="codeline" id="line-426"><code>		}</code></span>
+<span class="codeline" id="line-427"><code>		reclen := int(entry.Reclen)</code></span>
+<span class="codeline" id="line-428"><code>		if reclen &gt; len(buf) {</code></span>
+<span class="codeline" id="line-429"><code>			// Not enough room. Return for now.</code></span>
+<span class="codeline" id="line-430"><code>			// The counter will let us know where we should start up again.</code></span>
+<span class="codeline" id="line-431"><code>			// Note: this strategy for suspending in the middle and</code></span>
+<span class="codeline" id="line-432"><code>			// restarting is O(n^2) in the length of the directory. Oh well.</code></span>
+<span class="codeline" id="line-433"><code>			break</code></span>
+<span class="codeline" id="line-434"><code>		}</code></span>
+<span class="codeline" id="line-435"><code>		// Copy entry into return buffer.</code></span>
+<span class="codeline" id="line-436"><code>		s := struct {</code></span>
+<span class="codeline" id="line-437"><code>			ptr unsafe.Pointer</code></span>
+<span class="codeline" id="line-438"><code>			siz int</code></span>
+<span class="codeline" id="line-439"><code>			cap int</code></span>
+<span class="codeline" id="line-440"><code>		}{ptr: unsafe.Pointer(&amp;entry), siz: reclen, cap: reclen}</code></span>
+<span class="codeline" id="line-441"><code>		copy(buf, *(*[]byte)(unsafe.Pointer(&amp;s)))</code></span>
+<span class="codeline" id="line-442"><code>		buf = buf[reclen:]</code></span>
+<span class="codeline" id="line-443"><code>		n += reclen</code></span>
+<span class="codeline" id="line-444"><code>		cnt++</code></span>
+<span class="codeline" id="line-445"><code>	}</code></span>
+<span class="codeline" id="line-446"><code>	// Set the seek offset of the input fd to record</code></span>
+<span class="codeline" id="line-447"><code>	// how many files we've already returned.</code></span>
+<span class="codeline" id="line-448"><code>	_, err = Seek(fd, cnt, 0 /* SEEK_SET */)</code></span>
+<span class="codeline" id="line-449"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-450"><code>		return n, err</code></span>
+<span class="codeline" id="line-451"><code>	}</code></span>
+<span class="codeline" id="line-452"><code></code></span>
+<span class="codeline" id="line-453"><code>	return n, nil</code></span>
+<span class="codeline" id="line-454"><code>}</code></span>
+<span class="codeline" id="line-455"><code></code></span>
+<span class="codeline" id="line-456"><code>// Implemented in the runtime package (runtime/sys_darwin.go)</code></span>
+<span class="codeline" id="line-457"><code>func syscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+<span class="codeline" id="line-458"><code>func syscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+<span class="codeline" id="line-459"><code>func syscall6X(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+<span class="codeline" id="line-460"><code>func rawSyscall(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+<span class="codeline" id="line-461"><code>func rawSyscall6(fn, a1, a2, a3, a4, a5, a6 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+<span class="codeline" id="line-462"><code>func syscallPtr(fn, a1, a2, a3 uintptr) (r1, r2 uintptr, err Errno)</code></span>
+<span class="codeline" id="line-463"><code></code></span>
+<span class="codeline" id="line-464"><code>// Find the entry point for f. See comments in runtime/proc.go for the</code></span>
+<span class="codeline" id="line-465"><code>// function of the same name.</code></span>
+<span class="codeline" id="line-466"><code>//go:nosplit</code></span>
+<span class="codeline" id="line-467"><code>func funcPC(f func()) uintptr {</code></span>
+<span class="codeline" id="line-468"><code>	return **(**uintptr)(unsafe.Pointer(&amp;f))</code></span>
+<span class="codeline" id="line-469"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

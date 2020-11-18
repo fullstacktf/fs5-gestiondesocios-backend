@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: go/ast</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>ast</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-go/ast">go/ast</a><i> (on <a href="https://golang.org/pkg/go/ast/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/go/ast" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/go/ast.html">10 packages</a>, and imported by <a href="../../dep/go/ast.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/go/ast/ast.go.html#doc">d-&gt;</a> <a href="../../src/go/ast/ast.go.html">ast.go</a>
+	    <a href="../../src/go/ast/commentmap.go.html">commentmap.go</a>
+	    <a href="../../src/go/ast/filter.go.html">filter.go</a>
+	    <a href="../../src/go/ast/import.go.html">import.go</a>
+	    <a href="../../src/go/ast/print.go.html">print.go</a>
+	    <a href="../../src/go/ast/resolve.go.html">resolve.go</a>
+	    <a href="../../src/go/ast/scope.go.html">scope.go</a>
+	    <a href="../../src/go/ast/walk.go.html">walk.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-ArrayType" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-411">ArrayType</a> <i>(struct)</i>
+		An ArrayType node represents an array or slice type.
+
+		<input type='checkbox' class="stat" id="ArrayType-stat-fields"><label for="ArrayType-stat-fields">Exported Fields (3)</label><span id='ArrayType-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-414">Elt</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-412">Lbrack</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-413">Len</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="ArrayType-stat-methods"><label for="ArrayType-stat-methods">Exported Methods (2)</label><span id='ArrayType-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-512">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-479">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ArrayType-stat-impls"><label for="ArrayType-stat-impls">Implements (2+)</label><span id='ArrayType-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-AssignStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-634">AssignStmt</a> <i>(struct)</i>
+		An AssignStmt node represents an assignment or
+		a short variable declaration.
+
+		<input type='checkbox' class="stat" id="AssignStmt-stat-fields"><label for="AssignStmt-stat-fields">Exported Fields (4)</label><span id='AssignStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-635">Lhs</a> <i>[]<a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-638">Rhs</a> <i>[]<a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-637">Tok</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-636">TokPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="AssignStmt-stat-methods"><label for="AssignStmt-stat-methods">Exported Methods (2)</label><span id='AssignStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-780">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-751">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="AssignStmt-stat-impls"><label for="AssignStmt-stat-impls">Implements (2+)</label><span id='AssignStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-BadDecl" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-939">BadDecl</a> <i>(struct)</i>
+		A BadDecl node is a placeholder for a declaration containing
+		syntax errors for which a correct declaration node cannot be
+		created.
+
+		<input type='checkbox' class="stat" id="BadDecl-stat-fields"><label for="BadDecl-stat-fields">Exported Fields (2)</label><span id='BadDecl-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-269">From</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-269">To</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="BadDecl-stat-methods"><label for="BadDecl-stat-methods">Exported Methods (2)</label><span id='BadDecl-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-979">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-975">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="BadDecl-stat-impls"><label for="BadDecl-stat-impls">Implements (2+)</label><span id='BadDecl-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Decl">Decl</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-BadExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-268">BadExpr</a> <i>(struct)</i>
+		A BadExpr node is a placeholder for an expression containing
+		syntax errors for which a correct expression node cannot be
+		created.
+
+		<input type='checkbox' class="stat" id="BadExpr-stat-fields"><label for="BadExpr-stat-fields">Exported Fields (2)</label><span id='BadExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-269">From</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-269">To</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="BadExpr-stat-methods"><label for="BadExpr-stat-methods">Exported Methods (2)</label><span id='BadExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-491">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-458">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="BadExpr-stat-impls"><label for="BadExpr-stat-impls">Implements (2+)</label><span id='BadExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-BadStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-585">BadStmt</a> <i>(struct)</i>
+		A BadStmt node is a placeholder for statements containing
+		syntax errors for which no correct statement nodes can be
+		created.
+
+		<input type='checkbox' class="stat" id="BadStmt-stat-fields"><label for="BadStmt-stat-fields">Exported Fields (2)</label><span id='BadStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-269">From</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-269">To</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="BadStmt-stat-methods"><label for="BadStmt-stat-methods">Exported Methods (2)</label><span id='BadStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-766">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-744">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="BadStmt-stat-impls"><label for="BadStmt-stat-impls">Implements (2+)</label><span id='BadStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-BasicLit" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-288">BasicLit</a> <i>(struct)</i>
+		A BasicLit node represents a literal of basic type.
+
+		<input type='checkbox' class="stat" id="BasicLit-stat-fields"><label for="BasicLit-stat-fields">Exported Fields (3)</label><span id='BasicLit-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-290">Kind</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-291">Value</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-289">ValuePos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="BasicLit-stat-methods"><label for="BasicLit-stat-methods">Exported Methods (2)</label><span id='BasicLit-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-499">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-461">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="BasicLit-stat-impls"><label for="BasicLit-stat-impls">Implements (2+)</label><span id='BasicLit-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-BinaryExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-378">BinaryExpr</a> <i>(struct)</i>
+		A BinaryExpr node represents a binary expression.
+
+		<input type='checkbox' class="stat" id="BinaryExpr-stat-fields"><label for="BinaryExpr-stat-fields">Exported Fields (4)</label><span id='BinaryExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-381">Op</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-380">OpPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-379">X</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-382">Y</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="BinaryExpr-stat-methods"><label for="BinaryExpr-stat-methods">Exported Methods (2)</label><span id='BinaryExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-510">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-477">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="BinaryExpr-stat-impls"><label for="BinaryExpr-stat-impls">Implements (2+)</label><span id='BinaryExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-BlockStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-669">BlockStmt</a> <i>(struct)</i>
+		A BlockStmt node represents a braced statement list.
+
+		<input type='checkbox' class="stat" id="BlockStmt-stat-fields"><label for="BlockStmt-stat-fields">Exported Fields (3)</label><span id='BlockStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-670">Lbrace</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-671">List</a> <i>[]<a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-672">Rbrace</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="BlockStmt-stat-methods"><label for="BlockStmt-stat-methods">Exported Methods (2)</label><span id='BlockStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-795">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-756">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="BlockStmt-stat-impls"><label for="BlockStmt-stat-impls">Implements (2+)</label><span id='BlockStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-BranchStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-662">BranchStmt</a> <i>(struct)</i>
+		A BranchStmt node represents a break, continue, goto,
+		or fallthrough statement.
+
+		<input type='checkbox' class="stat" id="BranchStmt-stat-fields"><label for="BranchStmt-stat-fields">Exported Fields (3)</label><span id='BranchStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-665">Label</a> <i>*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-664">Tok</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-663">TokPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="BranchStmt-stat-methods"><label for="BranchStmt-stat-methods">Exported Methods (2)</label><span id='BranchStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-789">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-755">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="BranchStmt-stat-impls"><label for="BranchStmt-stat-impls">Implements (2+)</label><span id='BranchStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-CallExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-352">CallExpr</a> <i>(struct)</i>
+		A CallExpr node represents an expression followed by an argument list.
+
+		<input type='checkbox' class="stat" id="CallExpr-stat-fields"><label for="CallExpr-stat-fields">Exported Fields (5)</label><span id='CallExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-355">Args</a> <i>[]<a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-356">Ellipsis</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-353">Fun</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-354">Lparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-357">Rparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="CallExpr-stat-methods"><label for="CallExpr-stat-methods">Exported Methods (2)</label><span id='CallExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-507">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-474">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="CallExpr-stat-impls"><label for="CallExpr-stat-impls">Implements (2+)</label><span id='CallExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-CaseClause" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-685">CaseClause</a> <i>(struct)</i>
+		A CaseClause represents a case of an expression or type switch statement.
+
+		<input type='checkbox' class="stat" id="CaseClause-stat-fields"><label for="CaseClause-stat-fields">Exported Fields (4)</label><span id='CaseClause-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-689">Body</a> <i>[]<a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-686">Case</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-688">Colon</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-687">List</a> <i>[]<a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="CaseClause-stat-methods"><label for="CaseClause-stat-methods">Exported Methods (2)</label><span id='CaseClause-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-810">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-758">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="CaseClause-stat-impls"><label for="CaseClause-stat-impls">Implements (2+)</label><span id='CaseClause-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-ChanDir" data-popularity="10">	 type <a href="../../src/go/ast/ast.go.html#line-398">ChanDir</a> <a href="../builtin.html#name-int">int</a>
+		The direction of a channel type is indicated by a bit
+		mask including one or both of the following constants.
+
+		<input type='checkbox' class="stat" id="ChanDir-stat-values"><label for="ChanDir-stat-values">As Types Of (2+)</label><span id='ChanDir-stat-values-content' class="stat-content">
+			const <a href="#name-RECV">RECV</a>
+			const <a href="#name-SEND">SEND</a></span></div>
+<div class="anchor" id="name-ChanType" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-448">ChanType</a> <i>(struct)</i>
+		A ChanType node represents a channel type.
+
+		<input type='checkbox' class="stat" id="ChanType-stat-fields"><label for="ChanType-stat-fields">Exported Fields (4)</label><span id='ChanType-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-450">Arrow</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-449">Begin</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-451">Dir</a> <i><a href="#name-ChanDir">ChanDir</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-452">Value</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="ChanType-stat-methods"><label for="ChanType-stat-methods">Exported Methods (2)</label><span id='ChanType-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-522">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-489">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ChanType-stat-impls"><label for="ChanType-stat-impls">Implements (2+)</label><span id='ChanType-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-CommClause" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-709">CommClause</a> <i>(struct)</i>
+		A CommClause node represents a case of a select statement.
+
+		<input type='checkbox' class="stat" id="CommClause-stat-fields"><label for="CommClause-stat-fields">Exported Fields (4)</label><span id='CommClause-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-713">Body</a> <i>[]<a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-710">Case</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-712">Colon</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-711">Comm</a> <i><a href="#name-Stmt">Stmt</a></i></span>
+		<input type='checkbox' class="stat" id="CommClause-stat-methods"><label for="CommClause-stat-methods">Exported Methods (2)</label><span id='CommClause-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-818">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-761">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="CommClause-stat-impls"><label for="CommClause-stat-impls">Implements (2+)</label><span id='CommClause-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-Comment" data-popularity="150">	 type <a href="../../src/go/ast/ast.go.html#line-60">Comment</a> <i>(struct)</i>
+		A Comment node represents a single //-style or /*-style comment.
+
+		<input type='checkbox' class="stat" id="Comment-stat-fields"><label for="Comment-stat-fields">Exported Fields (2)</label><span id='Comment-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-61">Slash</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-62">Text</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Comment-stat-methods"><label for="Comment-stat-methods">Exported Methods (2)</label><span id='Comment-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-66">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-65">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Comment-stat-impls"><label for="Comment-stat-impls">Implements (1+)</label><span id='Comment-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-CommentGroup" data-popularity="310">	 type <a href="../../src/go/ast/ast.go.html#line-71">CommentGroup</a> <i>(struct)</i>
+		A CommentGroup represents a sequence of comments
+		with no other tokens and no empty lines between.
+
+		<input type='checkbox' class="stat" id="CommentGroup-stat-fields"><label for="CommentGroup-stat-fields">One Exported Field</label><span id='CommentGroup-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-72">List</a> <i>[]*<a href="#name-Comment">Comment</a></i></span>
+		<input type='checkbox' class="stat" id="CommentGroup-stat-methods"><label for="CommentGroup-stat-methods">Exported Methods (3)</label><span id='CommentGroup-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-76">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-75">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-94">Text</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="CommentGroup-stat-impls"><label for="CommentGroup-stat-impls">Implements (1+)</label><span id='CommentGroup-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a></span>
+		<input type='checkbox' class="stat" id="CommentGroup-stat-results"><label for="CommentGroup-stat-results">As Outputs Of (1+)</label><span id='CommentGroup-stat-results-content' class="stat-content">
+			func <a href="#name-CommentMap">CommentMap</a>.<a href="../../src/go/ast/commentmap.go.html#line-272">Comments</a>() []*<b>CommentGroup</b></span>
+		<input type='checkbox' class="stat" id="CommentGroup-stat-params"><label for="CommentGroup-stat-params">As Inputs Of (1+)</label><span id='CommentGroup-stat-params-content' class="stat-content">
+			func <a href="#name-NewCommentMap">NewCommentMap</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, node <a href="#name-Node">Node</a>, comments []*<b>CommentGroup</b>) <a href="#name-CommentMap">CommentMap</a></span></div>
+<div class="anchor" id="name-CommentMap" data-popularity="400">	 type <a href="../../src/go/ast/commentmap.go.html#line-35">CommentMap</a> <i>(map)</i>
+		A CommentMap maps an AST node to a list of comment groups
+		associated with it. See NewCommentMap for a description of
+		the association.
+
+		<input type='checkbox' class="stat" id="CommentMap-stat-methods"><label for="CommentMap-stat-methods">Exported Methods (4)</label><span id='CommentMap-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/commentmap.go.html#line-272">Comments</a>() []*<a href="#name-CommentGroup">CommentGroup</a>
+			 (T) <a href="../../src/go/ast/commentmap.go.html#line-258">Filter</a>(node <a href="#name-Node">Node</a>) <b>CommentMap</b>
+			 (T) <a href="../../src/go/ast/commentmap.go.html#line-317">String</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/go/ast/commentmap.go.html#line-246">Update</a>(old, new <a href="#name-Node">Node</a>) <a href="#name-Node">Node</a></span>
+		<input type='checkbox' class="stat" id="CommentMap-stat-impls"><label for="CommentMap-stat-impls">Implements (1+)</label><span id='CommentMap-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="CommentMap-stat-results"><label for="CommentMap-stat-results">As Outputs Of (2+)</label><span id='CommentMap-stat-results-content' class="stat-content">
+			func <a href="#name-NewCommentMap">NewCommentMap</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, node <a href="#name-Node">Node</a>, comments []*<a href="#name-CommentGroup">CommentGroup</a>) <b>CommentMap</b>
+			func <a href="#name-CommentMap">CommentMap</a>.<a href="../../src/go/ast/commentmap.go.html#line-258">Filter</a>(node <a href="#name-Node">Node</a>) <b>CommentMap</b></span></div>
+<div class="anchor" id="name-CompositeLit" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-301">CompositeLit</a> <i>(struct)</i>
+		A CompositeLit node represents a composite literal.
+
+		<input type='checkbox' class="stat" id="CompositeLit-stat-fields"><label for="CompositeLit-stat-fields">Exported Fields (5)</label><span id='CompositeLit-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-304">Elts</a> <i>[]<a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-306">Incomplete</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-303">Lbrace</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-305">Rbrace</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-302">Type</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="CompositeLit-stat-methods"><label for="CompositeLit-stat-methods">Exported Methods (2)</label><span id='CompositeLit-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-501">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-463">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="CompositeLit-stat-impls"><label for="CompositeLit-stat-impls">Implements (2+)</label><span id='CompositeLit-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-Decl" data-popularity="635">	 type <a href="../../src/go/ast/ast.go.html#line-51">Decl</a> <b<i>(interface)</i></b>
+		All declaration nodes implement the Decl interface.
+
+		<input type='checkbox' class="stat" id="Decl-stat-methods"><label for="Decl-stat-methods">Exported Methods (2)</label><span id='Decl-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/ast.go.html#line-35">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			 (T) <a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Decl-stat-impledby"><label for="Decl-stat-impledby">Implemented By (3+)</label><span id='Decl-stat-impledby-content' class="stat-content">
+			*<a href="#name-BadDecl">BadDecl</a>
+			*<a href="#name-FuncDecl">FuncDecl</a>
+			*<a href="#name-GenDecl">GenDecl</a></span>
+		<input type='checkbox' class="stat" id="Decl-stat-impls"><label for="Decl-stat-impls">Implements (1+)</label><span id='Decl-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Node">Node</a></span>
+		<input type='checkbox' class="stat" id="Decl-stat-params"><label for="Decl-stat-params">As Inputs Of (1+)</label><span id='Decl-stat-params-content' class="stat-content">
+			func <a href="#name-FilterDecl">FilterDecl</a>(decl <b>Decl</b>, f <a href="#name-Filter">Filter</a>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-DeclStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-590">DeclStmt</a> <i>(struct)</i>
+		A DeclStmt node represents a declaration in a statement list.
+
+		<input type='checkbox' class="stat" id="DeclStmt-stat-fields"><label for="DeclStmt-stat-fields">One Exported Field</label><span id='DeclStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-591">Decl</a> <i><a href="#name-Decl">Decl</a></i></span>
+		<input type='checkbox' class="stat" id="DeclStmt-stat-methods"><label for="DeclStmt-stat-methods">Exported Methods (2)</label><span id='DeclStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-767">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-745">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="DeclStmt-stat-impls"><label for="DeclStmt-stat-impls">Implements (2+)</label><span id='DeclStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-DeferStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-648">DeferStmt</a> <i>(struct)</i>
+		A DeferStmt node represents a defer statement.
+
+		<input type='checkbox' class="stat" id="DeferStmt-stat-fields"><label for="DeferStmt-stat-fields">Exported Fields (2)</label><span id='DeferStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-650">Call</a> <i>*<a href="#name-CallExpr">CallExpr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-649">Defer</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="DeferStmt-stat-methods"><label for="DeferStmt-stat-methods">Exported Methods (2)</label><span id='DeferStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-782">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-753">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="DeferStmt-stat-impls"><label for="DeferStmt-stat-impls">Implements (2+)</label><span id='DeferStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-Ellipsis" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-282">Ellipsis</a> <i>(struct)</i>
+		An Ellipsis node stands for the "..." type in a
+		parameter list or the "..." length in an array type.
+
+		<input type='checkbox' class="stat" id="Ellipsis-stat-fields"><label for="Ellipsis-stat-fields">Exported Fields (2)</label><span id='Ellipsis-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-283">Ellipsis</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-284">Elt</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="Ellipsis-stat-methods"><label for="Ellipsis-stat-methods">Exported Methods (2)</label><span id='Ellipsis-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-493">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-460">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Ellipsis-stat-impls"><label for="Ellipsis-stat-impls">Implements (2+)</label><span id='Ellipsis-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-EmptyStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-598">EmptyStmt</a> <i>(struct)</i>
+		An EmptyStmt node represents an empty statement.
+		The "position" of the empty statement is the position
+		of the immediately following (explicit or implicit) semicolon.
+
+		<input type='checkbox' class="stat" id="EmptyStmt-stat-fields"><label for="EmptyStmt-stat-fields">Exported Fields (2)</label><span id='EmptyStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-600">Implicit</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-599">Semicolon</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="EmptyStmt-stat-methods"><label for="EmptyStmt-stat-methods">Exported Methods (2)</label><span id='EmptyStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-768">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-746">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="EmptyStmt-stat-impls"><label for="EmptyStmt-stat-impls">Implements (2+)</label><span id='EmptyStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-Expr" data-popularity="3450">	 type <a href="../../src/go/ast/ast.go.html#line-39">Expr</a> <b<i>(interface)</i></b>
+		All expression nodes implement the Expr interface.
+
+		<input type='checkbox' class="stat" id="Expr-stat-methods"><label for="Expr-stat-methods">Exported Methods (2)</label><span id='Expr-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/ast.go.html#line-35">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			 (T) <a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Expr-stat-impledby"><label for="Expr-stat-impledby">Implemented By (22+)</label><span id='Expr-stat-impledby-content' class="stat-content">
+			*<a href="#name-ArrayType">ArrayType</a>
+			*<a href="#name-BadExpr">BadExpr</a>
+			*<a href="#name-BasicLit">BasicLit</a>
+			*<a href="#name-BinaryExpr">BinaryExpr</a>
+			*<a href="#name-CallExpr">CallExpr</a>
+			*<a href="#name-ChanType">ChanType</a>
+			*<a href="#name-CompositeLit">CompositeLit</a>
+			*<a href="#name-Ellipsis">Ellipsis</a>
+			*<a href="#name-FuncLit">FuncLit</a>
+			*<a href="#name-FuncType">FuncType</a>
+			*<a href="#name-Ident">Ident</a>
+			*<a href="#name-IndexExpr">IndexExpr</a>
+			*<a href="#name-InterfaceType">InterfaceType</a>
+			*<a href="#name-KeyValueExpr">KeyValueExpr</a>
+			*<a href="#name-MapType">MapType</a>
+			*<a href="#name-ParenExpr">ParenExpr</a>
+			*<a href="#name-SelectorExpr">SelectorExpr</a>
+			*<a href="#name-SliceExpr">SliceExpr</a>
+			*<a href="#name-StarExpr">StarExpr</a>
+			*<a href="#name-StructType">StructType</a>
+			*<a href="#name-TypeAssertExpr">TypeAssertExpr</a>
+			*<a href="#name-UnaryExpr">UnaryExpr</a></span>
+		<input type='checkbox' class="stat" id="Expr-stat-impls"><label for="Expr-stat-impls">Implements (1+)</label><span id='Expr-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-ExprStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-613">ExprStmt</a> <i>(struct)</i>
+		An ExprStmt node represents a (stand-alone) expression
+		in a statement list.
+
+		<input type='checkbox' class="stat" id="ExprStmt-stat-fields"><label for="ExprStmt-stat-fields">One Exported Field</label><span id='ExprStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-614">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="ExprStmt-stat-methods"><label for="ExprStmt-stat-methods">Exported Methods (2)</label><span id='ExprStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-775">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-748">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ExprStmt-stat-impls"><label for="ExprStmt-stat-impls">Implements (2+)</label><span id='ExprStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-Field" data-popularity="150">	 type <a href="../../src/go/ast/ast.go.html#line-192">Field</a> <i>(struct)</i>
+		A Field represents a Field declaration list in a struct type,
+		a method list in an interface type, or a parameter/result declaration
+		in a signature.
+		Field.Names is nil for unnamed parameters (parameter lists which only contain types)
+		and embedded struct fields. In the latter case, the field name is the type name.
+
+		<input type='checkbox' class="stat" id="Field-stat-fields"><label for="Field-stat-fields">Exported Fields (5)</label><span id='Field-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-197">Comment</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-193">Doc</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-194">Names</a> <i>[]*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-196">Tag</a> <i>*<a href="#name-BasicLit">BasicLit</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-195">Type</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="Field-stat-methods"><label for="Field-stat-methods">Exported Methods (2)</label><span id='Field-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-207">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-200">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Field-stat-impls"><label for="Field-stat-impls">Implements (1+)</label><span id='Field-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-FieldFilter" data-popularity="35">	 type <a href="../../src/go/ast/print.go.html#line-18">FieldFilter</a> <i>(func)</i>
+		A FieldFilter may be provided to Fprint to control the output.
+
+		<input type='checkbox' class="stat" id="FieldFilter-stat-params"><label for="FieldFilter-stat-params">As Inputs Of (1+)</label><span id='FieldFilter-stat-params-content' class="stat-content">
+			func <a href="#name-Fprint">Fprint</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, x interface{}, f <b>FieldFilter</b>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-FieldList" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-215">FieldList</a> <i>(struct)</i>
+		A FieldList represents a list of Fields, enclosed by parentheses or braces.
+
+		<input type='checkbox' class="stat" id="FieldList-stat-fields"><label for="FieldList-stat-fields">Exported Fields (3)</label><span id='FieldList-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-218">Closing</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-217">List</a> <i>[]*<a href="#name-Field">Field</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-216">Opening</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="FieldList-stat-methods"><label for="FieldList-stat-methods">Exported Methods (3)</label><span id='FieldList-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-233">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-246">NumFields</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-221">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="FieldList-stat-impls"><label for="FieldList-stat-impls">Implements (1+)</label><span id='FieldList-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-File" data-popularity="365">	 type <a href="../../src/go/ast/ast.go.html#line-1022">File</a> <i>(struct)</i>
+		A File node represents a Go source file.
+
+		The Comments list contains all comments in the source file in order of
+		appearance, including the comments that are pointed to from other nodes
+		via Doc and Comment fields.
+
+		For correct printing of source code containing comments (using packages
+		go/format and go/printer), special care must be taken to update comments
+		when a File's syntax tree is modified: For printing, comments are interspersed
+		between tokens based on their position. If syntax tree nodes are
+		removed or moved, relevant comments in their vicinity must also be removed
+		(from the File.Comments list) or moved accordingly (by updating their
+		positions). A CommentMap may be used to facilitate some of these operations.
+
+		Whether and how a comment is associated with a node depends on the
+		interpretation of the syntax tree by the manipulating program: Except for Doc
+		and Comment comments directly associated with nodes, the remaining comments
+		are "free-floating" (see also issues #18593, #20744).
+
+		<input type='checkbox' class="stat" id="File-stat-fields"><label for="File-stat-fields">Exported Fields (8)</label><span id='File-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-1030">Comments</a> <i>[]*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1026">Decls</a> <i>[]<a href="#name-Decl">Decl</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1023">Doc</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1028">Imports</a> <i>[]*<a href="#name-ImportSpec">ImportSpec</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1025">Name</a> <i>*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1024">Package</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1027">Scope</a> <i>*<a href="#name-Scope">Scope</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1029">Unresolved</a> <i>[]*<a href="#name-Ident">Ident</a></i></span>
+		<input type='checkbox' class="stat" id="File-stat-methods"><label for="File-stat-methods">Exported Methods (2)</label><span id='File-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-1034">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-1033">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="File-stat-impls"><label for="File-stat-impls">Implements (1+)</label><span id='File-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a></span>
+		<input type='checkbox' class="stat" id="File-stat-results"><label for="File-stat-results">As Outputs Of (1+)</label><span id='File-stat-results-content' class="stat-content">
+			func <a href="#name-MergePackageFiles">MergePackageFiles</a>(pkg *<a href="#name-Package">Package</a>, mode <a href="#name-MergeMode">MergeMode</a>) *<b>File</b></span>
+		<input type='checkbox' class="stat" id="File-stat-params"><label for="File-stat-params">As Inputs Of (4+)</label><span id='File-stat-params-content' class="stat-content">
+			func <a href="#name-FileExports">FileExports</a>(src *<b>File</b>) <a href="../builtin.html#name-bool">bool</a>
+			func <a href="#name-FilterFile">FilterFile</a>(src *<b>File</b>, f <a href="#name-Filter">Filter</a>) <a href="../builtin.html#name-bool">bool</a>
+			func <a href="#name-NewPackage">NewPackage</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, files map[<a href="../builtin.html#name-string">string</a>]*<b>File</b>, importer <a href="#name-Importer">Importer</a>, universe *<a href="#name-Scope">Scope</a>) (*<a href="#name-Package">Package</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-SortImports">SortImports</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, f *<b>File</b>)</span></div>
+<div class="anchor" id="name-Filter" data-popularity="105">	 type <a href="../../src/go/ast/filter.go.html#line-46">Filter</a> <i>(func)</i>
+
+		<input type='checkbox' class="stat" id="Filter-stat-params"><label for="Filter-stat-params">As Inputs Of (3+)</label><span id='Filter-stat-params-content' class="stat-content">
+			func <a href="#name-FilterDecl">FilterDecl</a>(decl <a href="#name-Decl">Decl</a>, f <b>Filter</b>) <a href="../builtin.html#name-bool">bool</a>
+			func <a href="#name-FilterFile">FilterFile</a>(src *<a href="#name-File">File</a>, f <b>Filter</b>) <a href="../builtin.html#name-bool">bool</a>
+			func <a href="#name-FilterPackage">FilterPackage</a>(pkg *<a href="#name-Package">Package</a>, f <b>Filter</b>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-ForStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-723">ForStmt</a> <i>(struct)</i>
+		A ForStmt represents a for statement.
+
+		<input type='checkbox' class="stat" id="ForStmt-stat-fields"><label for="ForStmt-stat-fields">Exported Fields (5)</label><span id='ForStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-728">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-726">Cond</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-724">For</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-725">Init</a> <i><a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-727">Post</a> <i><a href="#name-Stmt">Stmt</a></i></span>
+		<input type='checkbox' class="stat" id="ForStmt-stat-methods"><label for="ForStmt-stat-methods">Exported Methods (2)</label><span id='ForStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-825">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-763">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ForStmt-stat-impls"><label for="ForStmt-stat-impls">Implements (2+)</label><span id='ForStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-FuncDecl" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-964">FuncDecl</a> <i>(struct)</i>
+		A FuncDecl node represents a function declaration.
+
+		<input type='checkbox' class="stat" id="FuncDecl-stat-fields"><label for="FuncDecl-stat-fields">Exported Fields (5)</label><span id='FuncDecl-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-969">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-965">Doc</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-967">Name</a> <i>*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-966">Recv</a> <i>*<a href="#name-FieldList">FieldList</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-968">Type</a> <i>*<a href="#name-FuncType">FuncType</a></i></span>
+		<input type='checkbox' class="stat" id="FuncDecl-stat-methods"><label for="FuncDecl-stat-methods">Exported Methods (2)</label><span id='FuncDecl-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-986">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-977">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="FuncDecl-stat-impls"><label for="FuncDecl-stat-impls">Implements (2+)</label><span id='FuncDecl-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Decl">Decl</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-FuncLit" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-295">FuncLit</a> <i>(struct)</i>
+		A FuncLit node represents a function literal.
+
+		<input type='checkbox' class="stat" id="FuncLit-stat-fields"><label for="FuncLit-stat-fields">Exported Fields (2)</label><span id='FuncLit-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-297">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-296">Type</a> <i>*<a href="#name-FuncType">FuncType</a></i></span>
+		<input type='checkbox' class="stat" id="FuncLit-stat-methods"><label for="FuncLit-stat-methods">Exported Methods (2)</label><span id='FuncLit-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-500">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-462">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="FuncLit-stat-impls"><label for="FuncLit-stat-impls">Implements (2+)</label><span id='FuncLit-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-FuncType" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-427">FuncType</a> <i>(struct)</i>
+		A FuncType node represents a function type.
+
+		<input type='checkbox' class="stat" id="FuncType-stat-fields"><label for="FuncType-stat-fields">Exported Fields (3)</label><span id='FuncType-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-428">Func</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-429">Params</a> <i>*<a href="#name-FieldList">FieldList</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-430">Results</a> <i>*<a href="#name-FieldList">FieldList</a></i></span>
+		<input type='checkbox' class="stat" id="FuncType-stat-methods"><label for="FuncType-stat-methods">Exported Methods (2)</label><span id='FuncType-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-514">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-481">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="FuncType-stat-impls"><label for="FuncType-stat-impls">Implements (2+)</label><span id='FuncType-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-GenDecl" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-954">GenDecl</a> <i>(struct)</i>
+		A GenDecl node (generic declaration node) represents an import,
+		constant, type or variable declaration. A valid Lparen position
+		(Lparen.IsValid()) indicates a parenthesized declaration.
+
+		Relationship between Tok value and Specs element type:
+
+			token.IMPORT  *ImportSpec
+			token.CONST   *ValueSpec
+			token.TYPE    *TypeSpec
+			token.VAR     *ValueSpec
+
+		<input type='checkbox' class="stat" id="GenDecl-stat-fields"><label for="GenDecl-stat-fields">Exported Fields (6)</label><span id='GenDecl-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-955">Doc</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-958">Lparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-960">Rparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-959">Specs</a> <i>[]<a href="#name-Spec">Spec</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-957">Tok</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-956">TokPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="GenDecl-stat-methods"><label for="GenDecl-stat-methods">Exported Methods (2)</label><span id='GenDecl-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-980">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-976">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="GenDecl-stat-impls"><label for="GenDecl-stat-impls">Implements (2+)</label><span id='GenDecl-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Decl">Decl</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-GoStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-642">GoStmt</a> <i>(struct)</i>
+		A GoStmt node represents a go statement.
+
+		<input type='checkbox' class="stat" id="GoStmt-stat-fields"><label for="GoStmt-stat-fields">Exported Fields (2)</label><span id='GoStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-644">Call</a> <i>*<a href="#name-CallExpr">CallExpr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-643">Go</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="GoStmt-stat-methods"><label for="GoStmt-stat-methods">Exported Methods (2)</label><span id='GoStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-781">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-752">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="GoStmt-stat-impls"><label for="GoStmt-stat-impls">Implements (2+)</label><span id='GoStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-Ident" data-popularity="425">	 type <a href="../../src/go/ast/ast.go.html#line-273">Ident</a> <i>(struct)</i>
+		An Ident node represents an identifier.
+
+		<input type='checkbox' class="stat" id="Ident-stat-fields"><label for="Ident-stat-fields">Exported Fields (3)</label><span id='Ident-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-275">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-274">NamePos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-276">Obj</a> <i>*<a href="#name-Object">Object</a></i></span>
+		<input type='checkbox' class="stat" id="Ident-stat-methods"><label for="Ident-stat-methods">Exported Methods (4)</label><span id='Ident-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-492">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-565">IsExported</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-459">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-567">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Ident-stat-impls"><label for="Ident-stat-impls">Implements (3+)</label><span id='Ident-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a>
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Ident-stat-results"><label for="Ident-stat-results">As Outputs Of (1+)</label><span id='Ident-stat-results-content' class="stat-content">
+			func <a href="#name-NewIdent">NewIdent</a>(name <a href="../builtin.html#name-string">string</a>) *<b>Ident</b></span></div>
+<div class="anchor" id="name-IfStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-676">IfStmt</a> <i>(struct)</i>
+		An IfStmt node represents an if statement.
+
+		<input type='checkbox' class="stat" id="IfStmt-stat-fields"><label for="IfStmt-stat-fields">Exported Fields (5)</label><span id='IfStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-680">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-679">Cond</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-681">Else</a> <i><a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-677">If</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-678">Init</a> <i><a href="#name-Stmt">Stmt</a></i></span>
+		<input type='checkbox' class="stat" id="IfStmt-stat-methods"><label for="IfStmt-stat-methods">Exported Methods (2)</label><span id='IfStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-804">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-757">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="IfStmt-stat-impls"><label for="IfStmt-stat-impls">Implements (2+)</label><span id='IfStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-Importer" data-popularity="35">	 type <a href="../../src/go/ast/resolve.go.html#line-63">Importer</a> <i>(func)</i>
+		An Importer resolves import paths to package Objects.
+		The imports map records the packages already imported,
+		indexed by package id (canonical import path).
+		An Importer must determine the canonical import path and
+		check the map to see if it is already present in the imports map.
+		If so, the Importer can return the map entry. Otherwise, the
+		Importer should load the package data for the given path into
+		a new *Object (pkg), record pkg in the imports map, and then
+		return pkg.
+
+		<input type='checkbox' class="stat" id="Importer-stat-params"><label for="Importer-stat-params">As Inputs Of (1+)</label><span id='Importer-stat-params-content' class="stat-content">
+			func <a href="#name-NewPackage">NewPackage</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, files map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-File">File</a>, importer <b>Importer</b>, universe *<a href="#name-Scope">Scope</a>) (*<a href="#name-Package">Package</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ImportSpec" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-867">ImportSpec</a> <i>(struct)</i>
+		An ImportSpec node represents a single package import.
+
+		<input type='checkbox' class="stat" id="ImportSpec-stat-fields"><label for="ImportSpec-stat-fields">Exported Fields (5)</label><span id='ImportSpec-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-871">Comment</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-868">Doc</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-872">EndPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-869">Name</a> <i>*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-870">Path</a> <i>*<a href="#name-BasicLit">BasicLit</a></i></span>
+		<input type='checkbox' class="stat" id="ImportSpec-stat-methods"><label for="ImportSpec-stat-methods">Exported Methods (2)</label><span id='ImportSpec-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-907">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-898">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ImportSpec-stat-impls"><label for="ImportSpec-stat-impls">Implements (2+)</label><span id='ImportSpec-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Spec">Spec</a></span></div>
+<div class="anchor" id="name-IncDecStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-625">IncDecStmt</a> <i>(struct)</i>
+		An IncDecStmt node represents an increment or decrement statement.
+
+		<input type='checkbox' class="stat" id="IncDecStmt-stat-fields"><label for="IncDecStmt-stat-fields">Exported Fields (3)</label><span id='IncDecStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-628">Tok</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-627">TokPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-626">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="IncDecStmt-stat-methods"><label for="IncDecStmt-stat-methods">Exported Methods (2)</label><span id='IncDecStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-777">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-750">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="IncDecStmt-stat-impls"><label for="IncDecStmt-stat-impls">Implements (2+)</label><span id='IncDecStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-IndexExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-323">IndexExpr</a> <i>(struct)</i>
+		An IndexExpr node represents an expression followed by an index.
+
+		<input type='checkbox' class="stat" id="IndexExpr-stat-fields"><label for="IndexExpr-stat-fields">Exported Fields (4)</label><span id='IndexExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-326">Index</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-325">Lbrack</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-327">Rbrack</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-324">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="IndexExpr-stat-methods"><label for="IndexExpr-stat-methods">Exported Methods (2)</label><span id='IndexExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-504">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-471">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="IndexExpr-stat-impls"><label for="IndexExpr-stat-impls">Implements (2+)</label><span id='IndexExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-InterfaceType" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-434">InterfaceType</a> <i>(struct)</i>
+		An InterfaceType node represents an interface type.
+
+		<input type='checkbox' class="stat" id="InterfaceType-stat-fields"><label for="InterfaceType-stat-fields">Exported Fields (3)</label><span id='InterfaceType-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-437">Incomplete</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-435">Interface</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-436">Methods</a> <i>*<a href="#name-FieldList">FieldList</a></i></span>
+		<input type='checkbox' class="stat" id="InterfaceType-stat-methods"><label for="InterfaceType-stat-methods">Exported Methods (2)</label><span id='InterfaceType-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-520">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-487">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="InterfaceType-stat-impls"><label for="InterfaceType-stat-impls">Implements (2+)</label><span id='InterfaceType-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-KeyValueExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-388">KeyValueExpr</a> <i>(struct)</i>
+		A KeyValueExpr node represents (key : value) pairs
+		in composite literals.
+
+		<input type='checkbox' class="stat" id="KeyValueExpr-stat-fields"><label for="KeyValueExpr-stat-fields">Exported Fields (3)</label><span id='KeyValueExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-390">Colon</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-389">Key</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-391">Value</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="KeyValueExpr-stat-methods"><label for="KeyValueExpr-stat-methods">Exported Methods (2)</label><span id='KeyValueExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-511">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-478">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="KeyValueExpr-stat-impls"><label for="KeyValueExpr-stat-impls">Implements (2+)</label><span id='KeyValueExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-LabeledStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-604">LabeledStmt</a> <i>(struct)</i>
+		A LabeledStmt node represents a labeled statement.
+
+		<input type='checkbox' class="stat" id="LabeledStmt-stat-fields"><label for="LabeledStmt-stat-fields">Exported Fields (3)</label><span id='LabeledStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-606">Colon</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-605">Label</a> <i>*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-607">Stmt</a> <i><a href="#name-Stmt">Stmt</a></i></span>
+		<input type='checkbox' class="stat" id="LabeledStmt-stat-methods"><label for="LabeledStmt-stat-methods">Exported Methods (2)</label><span id='LabeledStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-774">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-747">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="LabeledStmt-stat-impls"><label for="LabeledStmt-stat-impls">Implements (2+)</label><span id='LabeledStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-MapType" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-441">MapType</a> <i>(struct)</i>
+		A MapType node represents a map type.
+
+		<input type='checkbox' class="stat" id="MapType-stat-fields"><label for="MapType-stat-fields">Exported Fields (3)</label><span id='MapType-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-443">Key</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-442">Map</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-444">Value</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="MapType-stat-methods"><label for="MapType-stat-methods">Exported Methods (2)</label><span id='MapType-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-521">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-488">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="MapType-stat-impls"><label for="MapType-stat-impls">Implements (2+)</label><span id='MapType-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-MergeMode" data-popularity="50">	 type <a href="../../src/go/ast/filter.go.html#line-303">MergeMode</a> <a href="../builtin.html#name-uint">uint</a>
+		The MergeMode flags control the behavior of MergePackageFiles.
+
+		<input type='checkbox' class="stat" id="MergeMode-stat-params"><label for="MergeMode-stat-params">As Inputs Of (1+)</label><span id='MergeMode-stat-params-content' class="stat-content">
+			func <a href="#name-MergePackageFiles">MergePackageFiles</a>(pkg *<a href="#name-Package">Package</a>, mode <b>MergeMode</b>) *<a href="#name-File">File</a></span>
+		<input type='checkbox' class="stat" id="MergeMode-stat-values"><label for="MergeMode-stat-values">As Types Of (3+)</label><span id='MergeMode-stat-values-content' class="stat-content">
+			const <a href="#name-FilterFuncDuplicates">FilterFuncDuplicates</a>
+			const <a href="#name-FilterImportDuplicates">FilterImportDuplicates</a>
+			const <a href="#name-FilterUnassociatedComments">FilterUnassociatedComments</a></span></div>
+<div class="anchor" id="name-Node" data-popularity="9235">	 type <a href="../../src/go/ast/ast.go.html#line-33">Node</a> <b<i>(interface)</i></b>
+		All node types implement the Node interface.
+
+		<input type='checkbox' class="stat" id="Node-stat-methods"><label for="Node-stat-methods">Exported Methods (2)</label><span id='Node-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/ast.go.html#line-35">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			 (T) <a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Node-stat-impledby"><label for="Node-stat-impledby">Implemented By (59+)</label><span id='Node-stat-impledby-content' class="stat-content">
+			*<a href="#name-ArrayType">ArrayType</a>
+			*<a href="#name-AssignStmt">AssignStmt</a>
+			*<a href="#name-BadDecl">BadDecl</a>
+			*<a href="#name-BadExpr">BadExpr</a>
+			*<a href="#name-BadStmt">BadStmt</a>
+			*<a href="#name-BasicLit">BasicLit</a>
+			*<a href="#name-BinaryExpr">BinaryExpr</a>
+			*<a href="#name-BlockStmt">BlockStmt</a>
+			*<a href="#name-BranchStmt">BranchStmt</a>
+			*<a href="#name-CallExpr">CallExpr</a>
+			*<a href="#name-CaseClause">CaseClause</a>
+			*<a href="#name-ChanType">ChanType</a>
+			*<a href="#name-CommClause">CommClause</a>
+			*<a href="#name-Comment">Comment</a>
+			*<a href="#name-CommentGroup">CommentGroup</a>
+			*<a href="#name-CompositeLit">CompositeLit</a>
+			<a href="#name-Decl">Decl</a> <i>(interface)</i>
+			*<a href="#name-DeclStmt">DeclStmt</a>
+			*<a href="#name-DeferStmt">DeferStmt</a>
+			*<a href="#name-Ellipsis">Ellipsis</a>
+			*<a href="#name-EmptyStmt">EmptyStmt</a>
+			<a href="#name-Expr">Expr</a> <i>(interface)</i>
+			*<a href="#name-ExprStmt">ExprStmt</a>
+			*<a href="#name-Field">Field</a>
+			*<a href="#name-FieldList">FieldList</a>
+			*<a href="#name-File">File</a>
+			*<a href="#name-ForStmt">ForStmt</a>
+			*<a href="#name-FuncDecl">FuncDecl</a>
+			*<a href="#name-FuncLit">FuncLit</a>
+			*<a href="#name-FuncType">FuncType</a>
+			*<a href="#name-GenDecl">GenDecl</a>
+			*<a href="#name-GoStmt">GoStmt</a>
+			*<a href="#name-Ident">Ident</a>
+			*<a href="#name-IfStmt">IfStmt</a>
+			*<a href="#name-ImportSpec">ImportSpec</a>
+			*<a href="#name-IncDecStmt">IncDecStmt</a>
+			*<a href="#name-IndexExpr">IndexExpr</a>
+			*<a href="#name-InterfaceType">InterfaceType</a>
+			*<a href="#name-KeyValueExpr">KeyValueExpr</a>
+			*<a href="#name-LabeledStmt">LabeledStmt</a>
+			*<a href="#name-MapType">MapType</a>
+			*<a href="#name-Package">Package</a>
+			*<a href="#name-ParenExpr">ParenExpr</a>
+			*<a href="#name-RangeStmt">RangeStmt</a>
+			*<a href="#name-ReturnStmt">ReturnStmt</a>
+			*<a href="#name-SelectorExpr">SelectorExpr</a>
+			*<a href="#name-SelectStmt">SelectStmt</a>
+			*<a href="#name-SendStmt">SendStmt</a>
+			*<a href="#name-SliceExpr">SliceExpr</a>
+			<a href="#name-Spec">Spec</a> <i>(interface)</i>
+			*<a href="#name-StarExpr">StarExpr</a>
+			<a href="#name-Stmt">Stmt</a> <i>(interface)</i>
+			*<a href="#name-StructType">StructType</a>
+			*<a href="#name-SwitchStmt">SwitchStmt</a>
+			*<a href="#name-TypeAssertExpr">TypeAssertExpr</a>
+			*<a href="#name-TypeSpec">TypeSpec</a>
+			*<a href="#name-TypeSwitchStmt">TypeSwitchStmt</a>
+			*<a href="#name-UnaryExpr">UnaryExpr</a>
+			*<a href="#name-ValueSpec">ValueSpec</a></span>
+		<input type='checkbox' class="stat" id="Node-stat-results"><label for="Node-stat-results">As Outputs Of (1+)</label><span id='Node-stat-results-content' class="stat-content">
+			func <a href="#name-CommentMap">CommentMap</a>.<a href="../../src/go/ast/commentmap.go.html#line-246">Update</a>(old, new <b>Node</b>) <b>Node</b></span>
+		<input type='checkbox' class="stat" id="Node-stat-params"><label for="Node-stat-params">As Inputs Of (6+)</label><span id='Node-stat-params-content' class="stat-content">
+			func <a href="#name-Inspect">Inspect</a>(node <b>Node</b>, f func(<b>Node</b>) <a href="../builtin.html#name-bool">bool</a>)
+			func <a href="#name-NewCommentMap">NewCommentMap</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, node <b>Node</b>, comments []*<a href="#name-CommentGroup">CommentGroup</a>) <a href="#name-CommentMap">CommentMap</a>
+			func <a href="#name-Walk">Walk</a>(v <a href="#name-Visitor">Visitor</a>, node <b>Node</b>)
+			func <a href="#name-CommentMap">CommentMap</a>.<a href="../../src/go/ast/commentmap.go.html#line-258">Filter</a>(node <b>Node</b>) <a href="#name-CommentMap">CommentMap</a>
+			func <a href="#name-CommentMap">CommentMap</a>.<a href="../../src/go/ast/commentmap.go.html#line-246">Update</a>(old, new <b>Node</b>) <b>Node</b>
+			func <a href="#name-Visitor">Visitor</a>.<a href="../../src/go/ast/walk.go.html#line-13">Visit</a>(node <b>Node</b>) (w <a href="#name-Visitor">Visitor</a>)</span></div>
+<div class="anchor" id="name-Object" data-popularity="310">	 type <a href="../../src/go/ast/scope.go.html#line-76">Object</a> <i>(struct)</i>
+		An Object describes a named language entity such as a package,
+		constant, type, variable, function (incl. methods), or label.
+
+		The Data fields contains object-specific data:
+
+			Kind    Data type         Data value
+			Pkg     *Scope            package scope
+			Con     int               iota for the respective declaration
+
+		<input type='checkbox' class="stat" id="Object-stat-fields"><label for="Object-stat-fields">Exported Fields (5)</label><span id='Object-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/scope.go.html#line-80">Data</a> <i>interface{}</i>
+			<a href="../../src/go/ast/scope.go.html#line-79">Decl</a> <i>interface{}</i>
+			<a href="../../src/go/ast/scope.go.html#line-77">Kind</a> <i><a href="#name-ObjKind">ObjKind</a></i>
+			<a href="../../src/go/ast/scope.go.html#line-78">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/go/ast/scope.go.html#line-81">Type</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Object-stat-methods"><label for="Object-stat-methods">One Exported Method</label><span id='Object-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/scope.go.html#line-92">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Object-stat-results"><label for="Object-stat-results">As Outputs Of (3+)</label><span id='Object-stat-results-content' class="stat-content">
+			func <a href="#name-NewObj">NewObj</a>(kind <a href="#name-ObjKind">ObjKind</a>, name <a href="../builtin.html#name-string">string</a>) *<b>Object</b>
+			func (*<a href="#name-Scope">Scope</a>).<a href="../../src/go/ast/scope.go.html#line-43">Insert</a>(obj *<b>Object</b>) (alt *<b>Object</b>)
+			func (*<a href="#name-Scope">Scope</a>).<a href="../../src/go/ast/scope.go.html#line-34">Lookup</a>(name <a href="../builtin.html#name-string">string</a>) *<b>Object</b></span>
+		<input type='checkbox' class="stat" id="Object-stat-params"><label for="Object-stat-params">As Inputs Of (1+)</label><span id='Object-stat-params-content' class="stat-content">
+			func (*<a href="#name-Scope">Scope</a>).<a href="../../src/go/ast/scope.go.html#line-43">Insert</a>(obj *<b>Object</b>) (alt *<b>Object</b>)</span></div>
+<div class="anchor" id="name-ObjKind" data-popularity="150">	 type <a href="../../src/go/ast/scope.go.html#line-137">ObjKind</a> <a href="../builtin.html#name-int">int</a>
+		ObjKind describes what an object represents.
+
+		<input type='checkbox' class="stat" id="ObjKind-stat-methods"><label for="ObjKind-stat-methods">One Exported Method</label><span id='ObjKind-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/scope.go.html#line-160">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ObjKind-stat-impls"><label for="ObjKind-stat-impls">Implements (1+)</label><span id='ObjKind-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="ObjKind-stat-params"><label for="ObjKind-stat-params">As Inputs Of (1+)</label><span id='ObjKind-stat-params-content' class="stat-content">
+			func <a href="#name-NewObj">NewObj</a>(kind <b>ObjKind</b>, name <a href="../builtin.html#name-string">string</a>) *<a href="#name-Object">Object</a></span>
+		<input type='checkbox' class="stat" id="ObjKind-stat-values"><label for="ObjKind-stat-values">As Types Of (7+)</label><span id='ObjKind-stat-values-content' class="stat-content">
+			const <a href="#name-Bad">Bad</a>
+			const <a href="#name-Con">Con</a>
+			const <a href="#name-Fun">Fun</a>
+			const <a href="#name-Lbl">Lbl</a>
+			const <a href="#name-Pkg">Pkg</a>
+			const <a href="#name-Typ">Typ</a>
+			const <a href="#name-Var">Var</a></span></div>
+<div class="anchor" id="name-Package" data-popularity="330">	 type <a href="../../src/go/ast/ast.go.html#line-1044">Package</a> <i>(struct)</i>
+		A Package node represents a set of source files
+		collectively building a Go package.
+
+		<input type='checkbox' class="stat" id="Package-stat-fields"><label for="Package-stat-fields">Exported Fields (4)</label><span id='Package-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-1048">Files</a> <i>map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-File">File</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1047">Imports</a> <i>map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-Object">Object</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1045">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-1046">Scope</a> <i>*<a href="#name-Scope">Scope</a></i></span>
+		<input type='checkbox' class="stat" id="Package-stat-methods"><label for="Package-stat-methods">Exported Methods (2)</label><span id='Package-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-1052">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-1051">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Package-stat-impls"><label for="Package-stat-impls">Implements (1+)</label><span id='Package-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a></span>
+		<input type='checkbox' class="stat" id="Package-stat-results"><label for="Package-stat-results">As Outputs Of (1+)</label><span id='Package-stat-results-content' class="stat-content">
+			func <a href="#name-NewPackage">NewPackage</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, files map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-File">File</a>, importer <a href="#name-Importer">Importer</a>, universe *<a href="#name-Scope">Scope</a>) (*<b>Package</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Package-stat-params"><label for="Package-stat-params">As Inputs Of (3+)</label><span id='Package-stat-params-content' class="stat-content">
+			func <a href="#name-FilterPackage">FilterPackage</a>(pkg *<b>Package</b>, f <a href="#name-Filter">Filter</a>) <a href="../builtin.html#name-bool">bool</a>
+			func <a href="#name-MergePackageFiles">MergePackageFiles</a>(pkg *<b>Package</b>, mode <a href="#name-MergeMode">MergeMode</a>) *<a href="#name-File">File</a>
+			func <a href="#name-PackageExports">PackageExports</a>(pkg *<b>Package</b>) <a href="../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-ParenExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-310">ParenExpr</a> <i>(struct)</i>
+		A ParenExpr node represents a parenthesized expression.
+
+		<input type='checkbox' class="stat" id="ParenExpr-stat-fields"><label for="ParenExpr-stat-fields">Exported Fields (3)</label><span id='ParenExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-311">Lparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-313">Rparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-312">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="ParenExpr-stat-methods"><label for="ParenExpr-stat-methods">Exported Methods (2)</label><span id='ParenExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-502">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-469">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ParenExpr-stat-impls"><label for="ParenExpr-stat-impls">Implements (2+)</label><span id='ParenExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-RangeStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-732">RangeStmt</a> <i>(struct)</i>
+		A RangeStmt represents a for statement with a range clause.
+
+		<input type='checkbox' class="stat" id="RangeStmt-stat-fields"><label for="RangeStmt-stat-fields">Exported Fields (7)</label><span id='RangeStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-738">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-733">For</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-734">Key</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-736">Tok</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-735">TokPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-734">Value</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-737">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="RangeStmt-stat-methods"><label for="RangeStmt-stat-methods">Exported Methods (2)</label><span id='RangeStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-826">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-764">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="RangeStmt-stat-impls"><label for="RangeStmt-stat-impls">Implements (2+)</label><span id='RangeStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-ReturnStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-654">ReturnStmt</a> <i>(struct)</i>
+		A ReturnStmt node represents a return statement.
+
+		<input type='checkbox' class="stat" id="ReturnStmt-stat-fields"><label for="ReturnStmt-stat-fields">Exported Fields (2)</label><span id='ReturnStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-656">Results</a> <i>[]<a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-655">Return</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="ReturnStmt-stat-methods"><label for="ReturnStmt-stat-methods">Exported Methods (2)</label><span id='ReturnStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-783">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-754">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ReturnStmt-stat-impls"><label for="ReturnStmt-stat-impls">Implements (2+)</label><span id='ReturnStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-Scope" data-popularity="345">	 type <a href="../../src/go/ast/scope.go.html#line-19">Scope</a> <i>(struct)</i>
+		A Scope maintains the set of named language entities declared
+		in the scope and a link to the immediately surrounding (outer)
+		scope.
+
+		<input type='checkbox' class="stat" id="Scope-stat-fields"><label for="Scope-stat-fields">Exported Fields (2)</label><span id='Scope-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/scope.go.html#line-21">Objects</a> <i>map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-Object">Object</a></i>
+			<a href="../../src/go/ast/scope.go.html#line-20">Outer</a> <i>*<b>Scope</b></i></span>
+		<input type='checkbox' class="stat" id="Scope-stat-methods"><label for="Scope-stat-methods">Exported Methods (3)</label><span id='Scope-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/scope.go.html#line-43">Insert</a>(obj *<a href="#name-Object">Object</a>) (alt *<a href="#name-Object">Object</a>)
+			(*T) <a href="../../src/go/ast/scope.go.html#line-34">Lookup</a>(name <a href="../builtin.html#name-string">string</a>) *<a href="#name-Object">Object</a>
+			(*T) <a href="../../src/go/ast/scope.go.html#line-51">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Scope-stat-impls"><label for="Scope-stat-impls">Implements (1+)</label><span id='Scope-stat-impls-content' class="stat-content">
+			*T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="Scope-stat-results"><label for="Scope-stat-results">As Outputs Of (1+)</label><span id='Scope-stat-results-content' class="stat-content">
+			func <a href="#name-NewScope">NewScope</a>(outer *<b>Scope</b>) *<b>Scope</b></span>
+		<input type='checkbox' class="stat" id="Scope-stat-params"><label for="Scope-stat-params">As Inputs Of (2+)</label><span id='Scope-stat-params-content' class="stat-content">
+			func <a href="#name-NewPackage">NewPackage</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, files map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-File">File</a>, importer <a href="#name-Importer">Importer</a>, universe *<b>Scope</b>) (*<a href="#name-Package">Package</a>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-NewScope">NewScope</a>(outer *<b>Scope</b>) *<b>Scope</b></span></div>
+<div class="anchor" id="name-SelectorExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-317">SelectorExpr</a> <i>(struct)</i>
+		A SelectorExpr node represents an expression followed by a selector.
+
+		<input type='checkbox' class="stat" id="SelectorExpr-stat-fields"><label for="SelectorExpr-stat-fields">Exported Fields (2)</label><span id='SelectorExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-319">Sel</a> <i>*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-318">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="SelectorExpr-stat-methods"><label for="SelectorExpr-stat-methods">Exported Methods (2)</label><span id='SelectorExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-503">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-470">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="SelectorExpr-stat-impls"><label for="SelectorExpr-stat-impls">Implements (2+)</label><span id='SelectorExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-SelectStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-717">SelectStmt</a> <i>(struct)</i>
+		A SelectStmt node represents a select statement.
+
+		<input type='checkbox' class="stat" id="SelectStmt-stat-fields"><label for="SelectStmt-stat-fields">Exported Fields (2)</label><span id='SelectStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-719">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-718">Select</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="SelectStmt-stat-methods"><label for="SelectStmt-stat-methods">Exported Methods (2)</label><span id='SelectStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-824">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-762">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="SelectStmt-stat-impls"><label for="SelectStmt-stat-impls">Implements (2+)</label><span id='SelectStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-SendStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-618">SendStmt</a> <i>(struct)</i>
+		A SendStmt node represents a send statement.
+
+		<input type='checkbox' class="stat" id="SendStmt-stat-fields"><label for="SendStmt-stat-fields">Exported Fields (3)</label><span id='SendStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-620">Arrow</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-619">Chan</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-621">Value</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="SendStmt-stat-methods"><label for="SendStmt-stat-methods">Exported Methods (2)</label><span id='SendStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-776">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-749">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="SendStmt-stat-impls"><label for="SendStmt-stat-impls">Implements (2+)</label><span id='SendStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-SliceExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-331">SliceExpr</a> <i>(struct)</i>
+		A SliceExpr node represents an expression followed by slice indices.
+
+		<input type='checkbox' class="stat" id="SliceExpr-stat-fields"><label for="SliceExpr-stat-fields">Exported Fields (7)</label><span id='SliceExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-335">High</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-333">Lbrack</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-334">Low</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-336">Max</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-338">Rbrack</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-337">Slice3</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-332">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="SliceExpr-stat-methods"><label for="SliceExpr-stat-methods">Exported Methods (2)</label><span id='SliceExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-505">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-472">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="SliceExpr-stat-impls"><label for="SliceExpr-stat-impls">Implements (2+)</label><span id='SliceExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-Spec" data-popularity="600">	 type <a href="../../src/go/ast/ast.go.html#line-861">Spec</a> <b<i>(interface)</i></b>
+		The Spec type stands for any of *ImportSpec, *ValueSpec, and *TypeSpec.
+
+		<input type='checkbox' class="stat" id="Spec-stat-methods"><label for="Spec-stat-methods">Exported Methods (2)</label><span id='Spec-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/ast.go.html#line-35">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			 (T) <a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Spec-stat-impledby"><label for="Spec-stat-impledby">Implemented By (3+)</label><span id='Spec-stat-impledby-content' class="stat-content">
+			*<a href="#name-ImportSpec">ImportSpec</a>
+			*<a href="#name-TypeSpec">TypeSpec</a>
+			*<a href="#name-ValueSpec">ValueSpec</a></span>
+		<input type='checkbox' class="stat" id="Spec-stat-impls"><label for="Spec-stat-impls">Implements (1+)</label><span id='Spec-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-StarExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-363">StarExpr</a> <i>(struct)</i>
+		A StarExpr node represents an expression of the form "*" Expression.
+		Semantically it could be a unary "*" expression, or a pointer type.
+
+		<input type='checkbox' class="stat" id="StarExpr-stat-fields"><label for="StarExpr-stat-fields">Exported Fields (2)</label><span id='StarExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-364">Star</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-365">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="StarExpr-stat-methods"><label for="StarExpr-stat-methods">Exported Methods (2)</label><span id='StarExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-508">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-475">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="StarExpr-stat-impls"><label for="StarExpr-stat-impls">Implements (2+)</label><span id='StarExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-Stmt" data-popularity="3300">	 type <a href="../../src/go/ast/ast.go.html#line-45">Stmt</a> <b<i>(interface)</i></b>
+		All statement nodes implement the Stmt interface.
+
+		<input type='checkbox' class="stat" id="Stmt-stat-methods"><label for="Stmt-stat-methods">Exported Methods (2)</label><span id='Stmt-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/ast.go.html#line-35">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			 (T) <a href="../../src/go/ast/ast.go.html#line-34">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="Stmt-stat-impledby"><label for="Stmt-stat-impledby">Implemented By (21+)</label><span id='Stmt-stat-impledby-content' class="stat-content">
+			*<a href="#name-AssignStmt">AssignStmt</a>
+			*<a href="#name-BadStmt">BadStmt</a>
+			*<a href="#name-BlockStmt">BlockStmt</a>
+			*<a href="#name-BranchStmt">BranchStmt</a>
+			*<a href="#name-CaseClause">CaseClause</a>
+			*<a href="#name-CommClause">CommClause</a>
+			*<a href="#name-DeclStmt">DeclStmt</a>
+			*<a href="#name-DeferStmt">DeferStmt</a>
+			*<a href="#name-EmptyStmt">EmptyStmt</a>
+			*<a href="#name-ExprStmt">ExprStmt</a>
+			*<a href="#name-ForStmt">ForStmt</a>
+			*<a href="#name-GoStmt">GoStmt</a>
+			*<a href="#name-IfStmt">IfStmt</a>
+			*<a href="#name-IncDecStmt">IncDecStmt</a>
+			*<a href="#name-LabeledStmt">LabeledStmt</a>
+			*<a href="#name-RangeStmt">RangeStmt</a>
+			*<a href="#name-ReturnStmt">ReturnStmt</a>
+			*<a href="#name-SelectStmt">SelectStmt</a>
+			*<a href="#name-SendStmt">SendStmt</a>
+			*<a href="#name-SwitchStmt">SwitchStmt</a>
+			*<a href="#name-TypeSwitchStmt">TypeSwitchStmt</a></span>
+		<input type='checkbox' class="stat" id="Stmt-stat-impls"><label for="Stmt-stat-impls">Implements (1+)</label><span id='Stmt-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-StructType" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-418">StructType</a> <i>(struct)</i>
+		A StructType node represents a struct type.
+
+		<input type='checkbox' class="stat" id="StructType-stat-fields"><label for="StructType-stat-fields">Exported Fields (3)</label><span id='StructType-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-420">Fields</a> <i>*<a href="#name-FieldList">FieldList</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-421">Incomplete</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-419">Struct</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="StructType-stat-methods"><label for="StructType-stat-methods">Exported Methods (2)</label><span id='StructType-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-513">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-480">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="StructType-stat-impls"><label for="StructType-stat-impls">Implements (2+)</label><span id='StructType-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-SwitchStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-693">SwitchStmt</a> <i>(struct)</i>
+		A SwitchStmt node represents an expression switch statement.
+
+		<input type='checkbox' class="stat" id="SwitchStmt-stat-fields"><label for="SwitchStmt-stat-fields">Exported Fields (4)</label><span id='SwitchStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-697">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-695">Init</a> <i><a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-694">Switch</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-696">Tag</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="SwitchStmt-stat-methods"><label for="SwitchStmt-stat-methods">Exported Methods (2)</label><span id='SwitchStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-816">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-759">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="SwitchStmt-stat-impls"><label for="SwitchStmt-stat-impls">Implements (2+)</label><span id='SwitchStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-TypeAssertExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-344">TypeAssertExpr</a> <i>(struct)</i>
+		A TypeAssertExpr node represents an expression followed by a
+		type assertion.
+
+		<input type='checkbox' class="stat" id="TypeAssertExpr-stat-fields"><label for="TypeAssertExpr-stat-fields">Exported Fields (4)</label><span id='TypeAssertExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-346">Lparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-348">Rparen</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-347">Type</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-345">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="TypeAssertExpr-stat-methods"><label for="TypeAssertExpr-stat-methods">Exported Methods (2)</label><span id='TypeAssertExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-506">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-473">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="TypeAssertExpr-stat-impls"><label for="TypeAssertExpr-stat-impls">Implements (2+)</label><span id='TypeAssertExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-TypeSpec" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-887">TypeSpec</a> <i>(struct)</i>
+		A TypeSpec node represents a type declaration (TypeSpec production).
+
+		<input type='checkbox' class="stat" id="TypeSpec-stat-fields"><label for="TypeSpec-stat-fields">Exported Fields (5)</label><span id='TypeSpec-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-890">Assign</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-892">Comment</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-888">Doc</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-889">Name</a> <i>*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-891">Type</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="TypeSpec-stat-methods"><label for="TypeSpec-stat-methods">Exported Methods (2)</label><span id='TypeSpec-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-923">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-905">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="TypeSpec-stat-impls"><label for="TypeSpec-stat-impls">Implements (2+)</label><span id='TypeSpec-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Spec">Spec</a></span></div>
+<div class="anchor" id="name-TypeSwitchStmt" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-701">TypeSwitchStmt</a> <i>(struct)</i>
+		A TypeSwitchStmt node represents a type switch statement.
+
+		<input type='checkbox' class="stat" id="TypeSwitchStmt-stat-fields"><label for="TypeSwitchStmt-stat-fields">Exported Fields (4)</label><span id='TypeSwitchStmt-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-704">Assign</a> <i><a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-705">Body</a> <i>*<a href="#name-BlockStmt">BlockStmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-703">Init</a> <i><a href="#name-Stmt">Stmt</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-702">Switch</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i></span>
+		<input type='checkbox' class="stat" id="TypeSwitchStmt-stat-methods"><label for="TypeSwitchStmt-stat-methods">Exported Methods (2)</label><span id='TypeSwitchStmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-817">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-760">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="TypeSwitchStmt-stat-impls"><label for="TypeSwitchStmt-stat-impls">Implements (2+)</label><span id='TypeSwitchStmt-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Stmt">Stmt</a></span></div>
+<div class="anchor" id="name-UnaryExpr" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-371">UnaryExpr</a> <i>(struct)</i>
+		A UnaryExpr node represents a unary expression.
+		Unary "*" expressions are represented via StarExpr nodes.
+
+		<input type='checkbox' class="stat" id="UnaryExpr-stat-fields"><label for="UnaryExpr-stat-fields">Exported Fields (3)</label><span id='UnaryExpr-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-373">Op</a> <i><a href="token.html">token</a>.<a href="token.html#name-Token">Token</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-372">OpPos</a> <i><a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-374">X</a> <i><a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="UnaryExpr-stat-methods"><label for="UnaryExpr-stat-methods">Exported Methods (2)</label><span id='UnaryExpr-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-509">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-476">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="UnaryExpr-stat-impls"><label for="UnaryExpr-stat-impls">Implements (2+)</label><span id='UnaryExpr-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Expr">Expr</a>
+			*T : <a href="#name-Node">Node</a></span></div>
+<div class="anchor" id="name-ValueSpec" data-popularity="200">	 type <a href="../../src/go/ast/ast.go.html#line-878">ValueSpec</a> <i>(struct)</i>
+		A ValueSpec node represents a constant or variable declaration
+		(ConstSpec or VarSpec production).
+
+		<input type='checkbox' class="stat" id="ValueSpec-stat-fields"><label for="ValueSpec-stat-fields">Exported Fields (5)</label><span id='ValueSpec-stat-fields-content' class="stat-content">
+			<a href="../../src/go/ast/ast.go.html#line-883">Comment</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-879">Doc</a> <i>*<a href="#name-CommentGroup">CommentGroup</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-880">Names</a> <i>[]*<a href="#name-Ident">Ident</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-881">Type</a> <i><a href="#name-Expr">Expr</a></i>
+			<a href="../../src/go/ast/ast.go.html#line-882">Values</a> <i>[]<a href="#name-Expr">Expr</a></i></span>
+		<input type='checkbox' class="stat" id="ValueSpec-stat-methods"><label for="ValueSpec-stat-methods">Exported Methods (2)</label><span id='ValueSpec-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/go/ast/ast.go.html#line-914">End</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a>
+			(*T) <a href="../../src/go/ast/ast.go.html#line-904">Pos</a>() <a href="token.html">token</a>.<a href="token.html#name-Pos">Pos</a></span>
+		<input type='checkbox' class="stat" id="ValueSpec-stat-impls"><label for="ValueSpec-stat-impls">Implements (2+)</label><span id='ValueSpec-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Node">Node</a>
+			*T : <a href="#name-Spec">Spec</a></span></div>
+<div class="anchor" id="name-Visitor" data-popularity="160">	 type <a href="../../src/go/ast/walk.go.html#line-12">Visitor</a> <b<i>(interface)</i></b>
+		A Visitor's Visit method is invoked for each node encountered by Walk.
+		If the result visitor w is not nil, Walk visits each of the children
+		of node with the visitor w, followed by a call of w.Visit(nil).
+
+		<input type='checkbox' class="stat" id="Visitor-stat-methods"><label for="Visitor-stat-methods">One Exported Method</label><span id='Visitor-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/go/ast/walk.go.html#line-13">Visit</a>(node <a href="#name-Node">Node</a>) (w <b>Visitor</b>)</span>
+		<input type='checkbox' class="stat" id="Visitor-stat-results"><label for="Visitor-stat-results">As Outputs Of (1+)</label><span id='Visitor-stat-results-content' class="stat-content">
+			func <a href="#name-Visitor">Visitor</a>.<a href="../../src/go/ast/walk.go.html#line-13">Visit</a>(node <a href="#name-Node">Node</a>) (w <b>Visitor</b>)</span>
+		<input type='checkbox' class="stat" id="Visitor-stat-params"><label for="Visitor-stat-params">As Inputs Of (1+)</label><span id='Visitor-stat-params-content' class="stat-content">
+			func <a href="#name-Walk">Walk</a>(v <b>Visitor</b>, node <a href="#name-Node">Node</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Bad">	const <a href="../../src/go/ast/scope.go.html#line-141">Bad</a> <a href="#name-ObjKind">ObjKind</a> = 0 // for error handling
+		The list of possible Object kinds.</div>
+<div class="anchor" id="name-Con">	const <a href="../../src/go/ast/scope.go.html#line-143">Con</a> <a href="#name-ObjKind">ObjKind</a> = 2 // constant
+		The list of possible Object kinds.</div>
+<div class="anchor" id="name-FileExports">	 func <a href="../../src/go/ast/filter.go.html#line-28">FileExports</a>(src *<a href="#name-File">File</a>) <a href="../builtin.html#name-bool">bool</a>
+		FileExports trims the AST for a Go source file in place such that
+		only exported nodes remain: all top-level identifiers which are not exported
+		and their associated information (such as type, initial value, or function
+		body) are removed. Non-exported fields and methods of exported types are
+		stripped. The File.Comments list is not changed.
+
+		FileExports reports whether there are exported declarations.</div>
+<div class="anchor" id="name-FilterDecl">	 func <a href="../../src/go/ast/filter.go.html#line-233">FilterDecl</a>(decl <a href="#name-Decl">Decl</a>, f <a href="#name-Filter">Filter</a>) <a href="../builtin.html#name-bool">bool</a>
+		FilterDecl trims the AST for a Go declaration in place by removing
+		all names (including struct field and interface method names, but
+		not from parameter lists) that don't pass through the filter f.
+
+		FilterDecl reports whether there are any declared names left after
+		filtering.</div>
+<div class="anchor" id="name-FilterFile">	 func <a href="../../src/go/ast/filter.go.html#line-258">FilterFile</a>(src *<a href="#name-File">File</a>, f <a href="#name-Filter">Filter</a>) <a href="../builtin.html#name-bool">bool</a>
+		FilterFile trims the AST for a Go file in place by removing all
+		names from top-level declarations (including struct field and
+		interface method names, but not from parameter lists) that don't
+		pass through the filter f. If the declaration is empty afterwards,
+		the declaration is removed from the AST. Import declarations are
+		always removed. The File.Comments list is not changed.
+
+		FilterFile reports whether there are any top-level declarations
+		left after filtering.</div>
+<div class="anchor" id="name-FilterFuncDuplicates">	const <a href="../../src/go/ast/filter.go.html#line-307">FilterFuncDuplicates</a> <a href="#name-MergeMode">MergeMode</a> = 1
+		If set, duplicate function declarations are excluded.</div>
+<div class="anchor" id="name-FilterImportDuplicates">	const <a href="../../src/go/ast/filter.go.html#line-312">FilterImportDuplicates</a> <a href="#name-MergeMode">MergeMode</a> = 4
+		If set, duplicate import declarations are excluded.</div>
+<div class="anchor" id="name-FilterPackage">	 func <a href="../../src/go/ast/filter.go.html#line-285">FilterPackage</a>(pkg *<a href="#name-Package">Package</a>, f <a href="#name-Filter">Filter</a>) <a href="../builtin.html#name-bool">bool</a>
+		FilterPackage trims the AST for a Go package in place by removing
+		all names from top-level declarations (including struct field and
+		interface method names, but not from parameter lists) that don't
+		pass through the filter f. If the declaration is empty afterwards,
+		the declaration is removed from the AST. The pkg.Files list is not
+		changed, so that file names and top-level package comments don't get
+		lost.
+
+		FilterPackage reports whether there are any top-level declarations
+		left after filtering.</div>
+<div class="anchor" id="name-FilterUnassociatedComments">	const <a href="../../src/go/ast/filter.go.html#line-310">FilterUnassociatedComments</a> <a href="#name-MergeMode">MergeMode</a> = 2
+		If set, comments that are not associated with a specific
+		AST node (as Doc or Comment) are excluded.</div>
+<div class="anchor" id="name-Fprint">	 func <a href="../../src/go/ast/print.go.html#line-39">Fprint</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, x interface{}, f <a href="#name-FieldFilter">FieldFilter</a>) <a href="../builtin.html#name-error">error</a>
+		Fprint prints the (sub-)tree starting at AST node x to w.
+		If fset != nil, position information is interpreted relative
+		to that file set. Otherwise positions are printed as integer
+		values (file set specific offsets).
+
+		A non-nil FieldFilter f may be provided to control the output:
+		struct fields for which f(fieldname, fieldvalue) is true are
+		printed; all others are filtered from the output. Unexported
+		struct fields are never printed.</div>
+<div class="anchor" id="name-Fun">	const <a href="../../src/go/ast/scope.go.html#line-146">Fun</a> <a href="#name-ObjKind">ObjKind</a> = 5 // function or method
+		The list of possible Object kinds.</div>
+<div class="anchor" id="name-Inspect">	 func <a href="../../src/go/ast/walk.go.html#line-384">Inspect</a>(node <a href="#name-Node">Node</a>, f func(<a href="#name-Node">Node</a>) <a href="../builtin.html#name-bool">bool</a>)
+		Inspect traverses an AST in depth-first order: It starts by calling
+		f(node); node must not be nil. If f returns true, Inspect invokes f
+		recursively for each of the non-nil children of node, followed by a
+		call of f(nil).</div>
+<div class="anchor" id="name-IsExported">	 func <a href="../../src/go/ast/ast.go.html#line-561">IsExported</a>(name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+		IsExported reports whether name starts with an upper-case letter.</div>
+<div class="anchor" id="name-Lbl">	const <a href="../../src/go/ast/scope.go.html#line-147">Lbl</a> <a href="#name-ObjKind">ObjKind</a> = 6 // label
+		The list of possible Object kinds.</div>
+<div class="anchor" id="name-MergePackageFiles">	 func <a href="../../src/go/ast/filter.go.html#line-344">MergePackageFiles</a>(pkg *<a href="#name-Package">Package</a>, mode <a href="#name-MergeMode">MergeMode</a>) *<a href="#name-File">File</a>
+		MergePackageFiles creates a file AST by merging the ASTs of the
+		files belonging to a package. The mode flags control merging behavior.</div>
+<div class="anchor" id="name-NewCommentMap">	 func <a href="../../src/go/ast/commentmap.go.html#line-143">NewCommentMap</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, node <a href="#name-Node">Node</a>, comments []*<a href="#name-CommentGroup">CommentGroup</a>) <a href="#name-CommentMap">CommentMap</a>
+		NewCommentMap creates a new comment map by associating comment groups
+		of the comments list with the nodes of the AST specified by node.
+
+		A comment group g is associated with a node n if:
+
+		  - g starts on the same line as n ends
+		  - g starts on the line immediately following n, and there is
+		    at least one empty line after g and before the next node
+		  - g starts before n and is not associated to the node before n
+		    via the previous rules
+
+		NewCommentMap tries to associate a comment group to the "largest"
+		node possible: For instance, if the comment is a line comment
+		trailing an assignment, the comment is associated with the entire
+		assignment rather than just the last operand in the assignment.</div>
+<div class="anchor" id="name-NewIdent">	 func <a href="../../src/go/ast/ast.go.html#line-557">NewIdent</a>(name <a href="../builtin.html#name-string">string</a>) *<a href="#name-Ident">Ident</a>
+		NewIdent creates a new Ident without position.
+		Useful for ASTs generated by code other than the Go parser.</div>
+<div class="anchor" id="name-NewObj">	 func <a href="../../src/go/ast/scope.go.html#line-85">NewObj</a>(kind <a href="#name-ObjKind">ObjKind</a>, name <a href="../builtin.html#name-string">string</a>) *<a href="#name-Object">Object</a>
+		NewObj creates a new object of a given kind and name.</div>
+<div class="anchor" id="name-NewPackage">	 func <a href="../../src/go/ast/resolve.go.html#line-74">NewPackage</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, files map[<a href="../builtin.html#name-string">string</a>]*<a href="#name-File">File</a>, importer <a href="#name-Importer">Importer</a>, universe *<a href="#name-Scope">Scope</a>) (*<a href="#name-Package">Package</a>, <a href="../builtin.html#name-error">error</a>)
+		NewPackage creates a new Package node from a set of File nodes. It resolves
+		unresolved identifiers across files and updates each file's Unresolved list
+		accordingly. If a non-nil importer and universe scope are provided, they are
+		used to resolve identifiers not declared in any of the package files. Any
+		remaining unresolved identifiers are reported as undeclared. If the files
+		belong to different packages, one package name is selected and files with
+		different package names are reported and then ignored.
+		The result is a package node and a scanner.ErrorList if there were errors.</div>
+<div class="anchor" id="name-NewScope">	 func <a href="../../src/go/ast/scope.go.html#line-25">NewScope</a>(outer *<a href="#name-Scope">Scope</a>) *<a href="#name-Scope">Scope</a>
+		NewScope creates a new scope nested in the outer scope.</div>
+<div class="anchor" id="name-NotNilFilter">	 func <a href="../../src/go/ast/print.go.html#line-22">NotNilFilter</a>(_ <a href="../builtin.html#name-string">string</a>, v <a href="../reflect.html">reflect</a>.<a href="../reflect.html#name-Value">Value</a>) <a href="../builtin.html#name-bool">bool</a>
+		NotNilFilter returns true for field values that are not nil;
+		it returns false otherwise.</div>
+<div class="anchor" id="name-PackageExports">	 func <a href="../../src/go/ast/filter.go.html#line-39">PackageExports</a>(pkg *<a href="#name-Package">Package</a>) <a href="../builtin.html#name-bool">bool</a>
+		PackageExports trims the AST for a Go package in place such that
+		only exported nodes remain. The pkg.Files list is not changed, so that
+		file names and top-level package comments don't get lost.
+
+		PackageExports reports whether there are exported declarations;
+		it returns false otherwise.</div>
+<div class="anchor" id="name-Pkg">	const <a href="../../src/go/ast/scope.go.html#line-142">Pkg</a> <a href="#name-ObjKind">ObjKind</a> = 1 // package
+		The list of possible Object kinds.</div>
+<div class="anchor" id="name-Print">	 func <a href="../../src/go/ast/print.go.html#line-73">Print</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, x interface{}) <a href="../builtin.html#name-error">error</a>
+		Print prints x to standard output, skipping nil fields.
+		Print(fset, x) is the same as Fprint(os.Stdout, fset, x, NotNilFilter).</div>
+<div class="anchor" id="name-RECV">	const <a href="../../src/go/ast/ast.go.html#line-402">RECV</a> <a href="#name-ChanDir">ChanDir</a> = 2</div>
+<div class="anchor" id="name-SEND">	const <a href="../../src/go/ast/ast.go.html#line-401">SEND</a> <a href="#name-ChanDir">ChanDir</a> = 1</div>
+<div class="anchor" id="name-SortImports">	 func <a href="../../src/go/ast/import.go.html#line-15">SortImports</a>(fset *<a href="token.html">token</a>.<a href="token.html#name-FileSet">FileSet</a>, f *<a href="#name-File">File</a>)
+		SortImports sorts runs of consecutive import lines in import blocks in f.
+		It also removes duplicate imports when it is possible to do so without data loss.</div>
+<div class="anchor" id="name-Typ">	const <a href="../../src/go/ast/scope.go.html#line-144">Typ</a> <a href="#name-ObjKind">ObjKind</a> = 3 // type
+		The list of possible Object kinds.</div>
+<div class="anchor" id="name-Var">	const <a href="../../src/go/ast/scope.go.html#line-145">Var</a> <a href="#name-ObjKind">ObjKind</a> = 4 // variable
+		The list of possible Object kinds.</div>
+<div class="anchor" id="name-Walk">	 func <a href="../../src/go/ast/walk.go.html#line-51">Walk</a>(v <a href="#name-Visitor">Visitor</a>, node <a href="#name-Node">Node</a>)
+		Walk traverses an AST in depth-first order: It starts by calling
+		v.Visit(node); node must not be nil. If the visitor w returned by
+		v.Visit(node) is not nil, Walk is invoked recursively with visitor
+		w for each of the non-nil children of node, followed by a call of
+		w.Visit(nil).</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

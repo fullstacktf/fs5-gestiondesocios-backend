@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: p224.go in package crypto/elliptic</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	p224.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/elliptic.html">crypto/elliptic</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2012 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package elliptic</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>// This is a constant-time, 32-bit implementation of P224. See FIPS 186-3,</code></span>
+<span class="codeline" id="line-8"><code>// section D.2.2.</code></span>
+<span class="codeline" id="line-9"><code>//</code></span>
+<span class="codeline" id="line-10"><code>// See https://www.imperialviolet.org/2010/12/04/ecc.html ([1]) for background.</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>import (</code></span>
+<span class="codeline" id="line-13"><code>	"math/big"</code></span>
+<span class="codeline" id="line-14"><code>)</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>var p224 p224Curve</code></span>
+<span class="codeline" id="line-17"><code></code></span>
+<span class="codeline" id="line-18"><code>type p224Curve struct {</code></span>
+<span class="codeline" id="line-19"><code>	*CurveParams</code></span>
+<span class="codeline" id="line-20"><code>	gx, gy, b p224FieldElement</code></span>
+<span class="codeline" id="line-21"><code>}</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>func initP224() {</code></span>
+<span class="codeline" id="line-24"><code>	// See FIPS 186-3, section D.2.2</code></span>
+<span class="codeline" id="line-25"><code>	p224.CurveParams = &amp;CurveParams{Name: "P-224"}</code></span>
+<span class="codeline" id="line-26"><code>	p224.P, _ = new(big.Int).SetString("26959946667150639794667015087019630673557916260026308143510066298881", 10)</code></span>
+<span class="codeline" id="line-27"><code>	p224.N, _ = new(big.Int).SetString("26959946667150639794667015087019625940457807714424391721682722368061", 10)</code></span>
+<span class="codeline" id="line-28"><code>	p224.B, _ = new(big.Int).SetString("b4050a850c04b3abf54132565044b0b7d7bfd8ba270b39432355ffb4", 16)</code></span>
+<span class="codeline" id="line-29"><code>	p224.Gx, _ = new(big.Int).SetString("b70e0cbd6bb4bf7f321390b94a03c1d356c21122343280d6115c1d21", 16)</code></span>
+<span class="codeline" id="line-30"><code>	p224.Gy, _ = new(big.Int).SetString("bd376388b5f723fb4c22dfe6cd4375a05a07476444d5819985007e34", 16)</code></span>
+<span class="codeline" id="line-31"><code>	p224.BitSize = 224</code></span>
+<span class="codeline" id="line-32"><code></code></span>
+<span class="codeline" id="line-33"><code>	p224FromBig(&amp;p224.gx, p224.Gx)</code></span>
+<span class="codeline" id="line-34"><code>	p224FromBig(&amp;p224.gy, p224.Gy)</code></span>
+<span class="codeline" id="line-35"><code>	p224FromBig(&amp;p224.b, p224.B)</code></span>
+<span class="codeline" id="line-36"><code>}</code></span>
+<span class="codeline" id="line-37"><code></code></span>
+<span class="codeline" id="line-38"><code>// P224 returns a Curve which implements P-224 (see FIPS 186-3, section D.2.2).</code></span>
+<span class="codeline" id="line-39"><code>//</code></span>
+<span class="codeline" id="line-40"><code>// The cryptographic operations are implemented using constant-time algorithms.</code></span>
+<span class="codeline" id="line-41"><code>func P224() Curve {</code></span>
+<span class="codeline" id="line-42"><code>	initonce.Do(initAll)</code></span>
+<span class="codeline" id="line-43"><code>	return p224</code></span>
+<span class="codeline" id="line-44"><code>}</code></span>
+<span class="codeline" id="line-45"><code></code></span>
+<span class="codeline" id="line-46"><code>func (curve p224Curve) Params() *CurveParams {</code></span>
+<span class="codeline" id="line-47"><code>	return curve.CurveParams</code></span>
+<span class="codeline" id="line-48"><code>}</code></span>
+<span class="codeline" id="line-49"><code></code></span>
+<span class="codeline" id="line-50"><code>func (curve p224Curve) IsOnCurve(bigX, bigY *big.Int) bool {</code></span>
+<span class="codeline" id="line-51"><code>	var x, y p224FieldElement</code></span>
+<span class="codeline" id="line-52"><code>	p224FromBig(&amp;x, bigX)</code></span>
+<span class="codeline" id="line-53"><code>	p224FromBig(&amp;y, bigY)</code></span>
+<span class="codeline" id="line-54"><code></code></span>
+<span class="codeline" id="line-55"><code>	// y² = x³ - 3x + b</code></span>
+<span class="codeline" id="line-56"><code>	var tmp p224LargeFieldElement</code></span>
+<span class="codeline" id="line-57"><code>	var x3 p224FieldElement</code></span>
+<span class="codeline" id="line-58"><code>	p224Square(&amp;x3, &amp;x, &amp;tmp)</code></span>
+<span class="codeline" id="line-59"><code>	p224Mul(&amp;x3, &amp;x3, &amp;x, &amp;tmp)</code></span>
+<span class="codeline" id="line-60"><code></code></span>
+<span class="codeline" id="line-61"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-62"><code>		x[i] *= 3</code></span>
+<span class="codeline" id="line-63"><code>	}</code></span>
+<span class="codeline" id="line-64"><code>	p224Sub(&amp;x3, &amp;x3, &amp;x)</code></span>
+<span class="codeline" id="line-65"><code>	p224Reduce(&amp;x3)</code></span>
+<span class="codeline" id="line-66"><code>	p224Add(&amp;x3, &amp;x3, &amp;curve.b)</code></span>
+<span class="codeline" id="line-67"><code>	p224Contract(&amp;x3, &amp;x3)</code></span>
+<span class="codeline" id="line-68"><code></code></span>
+<span class="codeline" id="line-69"><code>	p224Square(&amp;y, &amp;y, &amp;tmp)</code></span>
+<span class="codeline" id="line-70"><code>	p224Contract(&amp;y, &amp;y)</code></span>
+<span class="codeline" id="line-71"><code></code></span>
+<span class="codeline" id="line-72"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-73"><code>		if y[i] != x3[i] {</code></span>
+<span class="codeline" id="line-74"><code>			return false</code></span>
+<span class="codeline" id="line-75"><code>		}</code></span>
+<span class="codeline" id="line-76"><code>	}</code></span>
+<span class="codeline" id="line-77"><code>	return true</code></span>
+<span class="codeline" id="line-78"><code>}</code></span>
+<span class="codeline" id="line-79"><code></code></span>
+<span class="codeline" id="line-80"><code>func (p224Curve) Add(bigX1, bigY1, bigX2, bigY2 *big.Int) (x, y *big.Int) {</code></span>
+<span class="codeline" id="line-81"><code>	var x1, y1, z1, x2, y2, z2, x3, y3, z3 p224FieldElement</code></span>
+<span class="codeline" id="line-82"><code></code></span>
+<span class="codeline" id="line-83"><code>	p224FromBig(&amp;x1, bigX1)</code></span>
+<span class="codeline" id="line-84"><code>	p224FromBig(&amp;y1, bigY1)</code></span>
+<span class="codeline" id="line-85"><code>	if bigX1.Sign() != 0 || bigY1.Sign() != 0 {</code></span>
+<span class="codeline" id="line-86"><code>		z1[0] = 1</code></span>
+<span class="codeline" id="line-87"><code>	}</code></span>
+<span class="codeline" id="line-88"><code>	p224FromBig(&amp;x2, bigX2)</code></span>
+<span class="codeline" id="line-89"><code>	p224FromBig(&amp;y2, bigY2)</code></span>
+<span class="codeline" id="line-90"><code>	if bigX2.Sign() != 0 || bigY2.Sign() != 0 {</code></span>
+<span class="codeline" id="line-91"><code>		z2[0] = 1</code></span>
+<span class="codeline" id="line-92"><code>	}</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>	p224AddJacobian(&amp;x3, &amp;y3, &amp;z3, &amp;x1, &amp;y1, &amp;z1, &amp;x2, &amp;y2, &amp;z2)</code></span>
+<span class="codeline" id="line-95"><code>	return p224ToAffine(&amp;x3, &amp;y3, &amp;z3)</code></span>
+<span class="codeline" id="line-96"><code>}</code></span>
+<span class="codeline" id="line-97"><code></code></span>
+<span class="codeline" id="line-98"><code>func (p224Curve) Double(bigX1, bigY1 *big.Int) (x, y *big.Int) {</code></span>
+<span class="codeline" id="line-99"><code>	var x1, y1, z1, x2, y2, z2 p224FieldElement</code></span>
+<span class="codeline" id="line-100"><code></code></span>
+<span class="codeline" id="line-101"><code>	p224FromBig(&amp;x1, bigX1)</code></span>
+<span class="codeline" id="line-102"><code>	p224FromBig(&amp;y1, bigY1)</code></span>
+<span class="codeline" id="line-103"><code>	z1[0] = 1</code></span>
+<span class="codeline" id="line-104"><code></code></span>
+<span class="codeline" id="line-105"><code>	p224DoubleJacobian(&amp;x2, &amp;y2, &amp;z2, &amp;x1, &amp;y1, &amp;z1)</code></span>
+<span class="codeline" id="line-106"><code>	return p224ToAffine(&amp;x2, &amp;y2, &amp;z2)</code></span>
+<span class="codeline" id="line-107"><code>}</code></span>
+<span class="codeline" id="line-108"><code></code></span>
+<span class="codeline" id="line-109"><code>func (p224Curve) ScalarMult(bigX1, bigY1 *big.Int, scalar []byte) (x, y *big.Int) {</code></span>
+<span class="codeline" id="line-110"><code>	var x1, y1, z1, x2, y2, z2 p224FieldElement</code></span>
+<span class="codeline" id="line-111"><code></code></span>
+<span class="codeline" id="line-112"><code>	p224FromBig(&amp;x1, bigX1)</code></span>
+<span class="codeline" id="line-113"><code>	p224FromBig(&amp;y1, bigY1)</code></span>
+<span class="codeline" id="line-114"><code>	z1[0] = 1</code></span>
+<span class="codeline" id="line-115"><code></code></span>
+<span class="codeline" id="line-116"><code>	p224ScalarMult(&amp;x2, &amp;y2, &amp;z2, &amp;x1, &amp;y1, &amp;z1, scalar)</code></span>
+<span class="codeline" id="line-117"><code>	return p224ToAffine(&amp;x2, &amp;y2, &amp;z2)</code></span>
+<span class="codeline" id="line-118"><code>}</code></span>
+<span class="codeline" id="line-119"><code></code></span>
+<span class="codeline" id="line-120"><code>func (curve p224Curve) ScalarBaseMult(scalar []byte) (x, y *big.Int) {</code></span>
+<span class="codeline" id="line-121"><code>	var z1, x2, y2, z2 p224FieldElement</code></span>
+<span class="codeline" id="line-122"><code></code></span>
+<span class="codeline" id="line-123"><code>	z1[0] = 1</code></span>
+<span class="codeline" id="line-124"><code>	p224ScalarMult(&amp;x2, &amp;y2, &amp;z2, &amp;curve.gx, &amp;curve.gy, &amp;z1, scalar)</code></span>
+<span class="codeline" id="line-125"><code>	return p224ToAffine(&amp;x2, &amp;y2, &amp;z2)</code></span>
+<span class="codeline" id="line-126"><code>}</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>// Field element functions.</code></span>
+<span class="codeline" id="line-129"><code>//</code></span>
+<span class="codeline" id="line-130"><code>// The field that we're dealing with is ℤ/pℤ where p = 2**224 - 2**96 + 1.</code></span>
+<span class="codeline" id="line-131"><code>//</code></span>
+<span class="codeline" id="line-132"><code>// Field elements are represented by a FieldElement, which is a typedef to an</code></span>
+<span class="codeline" id="line-133"><code>// array of 8 uint32's. The value of a FieldElement, a, is:</code></span>
+<span class="codeline" id="line-134"><code>//   a[0] + 2**28·a[1] + 2**56·a[1] + ... + 2**196·a[7]</code></span>
+<span class="codeline" id="line-135"><code>//</code></span>
+<span class="codeline" id="line-136"><code>// Using 28-bit limbs means that there's only 4 bits of headroom, which is less</code></span>
+<span class="codeline" id="line-137"><code>// than we would really like. But it has the useful feature that we hit 2**224</code></span>
+<span class="codeline" id="line-138"><code>// exactly, making the reflections during a reduce much nicer.</code></span>
+<span class="codeline" id="line-139"><code>type p224FieldElement [8]uint32</code></span>
+<span class="codeline" id="line-140"><code></code></span>
+<span class="codeline" id="line-141"><code>// p224P is the order of the field, represented as a p224FieldElement.</code></span>
+<span class="codeline" id="line-142"><code>var p224P = [8]uint32{1, 0, 0, 0xffff000, 0xfffffff, 0xfffffff, 0xfffffff, 0xfffffff}</code></span>
+<span class="codeline" id="line-143"><code></code></span>
+<span class="codeline" id="line-144"><code>// p224IsZero returns 1 if a == 0 mod p and 0 otherwise.</code></span>
+<span class="codeline" id="line-145"><code>//</code></span>
+<span class="codeline" id="line-146"><code>// a[i] &lt; 2**29</code></span>
+<span class="codeline" id="line-147"><code>func p224IsZero(a *p224FieldElement) uint32 {</code></span>
+<span class="codeline" id="line-148"><code>	// Since a p224FieldElement contains 224 bits there are two possible</code></span>
+<span class="codeline" id="line-149"><code>	// representations of 0: 0 and p.</code></span>
+<span class="codeline" id="line-150"><code>	var minimal p224FieldElement</code></span>
+<span class="codeline" id="line-151"><code>	p224Contract(&amp;minimal, a)</code></span>
+<span class="codeline" id="line-152"><code></code></span>
+<span class="codeline" id="line-153"><code>	var isZero, isP uint32</code></span>
+<span class="codeline" id="line-154"><code>	for i, v := range minimal {</code></span>
+<span class="codeline" id="line-155"><code>		isZero |= v</code></span>
+<span class="codeline" id="line-156"><code>		isP |= v - p224P[i]</code></span>
+<span class="codeline" id="line-157"><code>	}</code></span>
+<span class="codeline" id="line-158"><code></code></span>
+<span class="codeline" id="line-159"><code>	// If either isZero or isP is 0, then we should return 1.</code></span>
+<span class="codeline" id="line-160"><code>	isZero |= isZero &gt;&gt; 16</code></span>
+<span class="codeline" id="line-161"><code>	isZero |= isZero &gt;&gt; 8</code></span>
+<span class="codeline" id="line-162"><code>	isZero |= isZero &gt;&gt; 4</code></span>
+<span class="codeline" id="line-163"><code>	isZero |= isZero &gt;&gt; 2</code></span>
+<span class="codeline" id="line-164"><code>	isZero |= isZero &gt;&gt; 1</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>	isP |= isP &gt;&gt; 16</code></span>
+<span class="codeline" id="line-167"><code>	isP |= isP &gt;&gt; 8</code></span>
+<span class="codeline" id="line-168"><code>	isP |= isP &gt;&gt; 4</code></span>
+<span class="codeline" id="line-169"><code>	isP |= isP &gt;&gt; 2</code></span>
+<span class="codeline" id="line-170"><code>	isP |= isP &gt;&gt; 1</code></span>
+<span class="codeline" id="line-171"><code></code></span>
+<span class="codeline" id="line-172"><code>	// For isZero and isP, the LSB is 0 iff all the bits are zero.</code></span>
+<span class="codeline" id="line-173"><code>	result := isZero &amp; isP</code></span>
+<span class="codeline" id="line-174"><code>	result = (^result) &amp; 1</code></span>
+<span class="codeline" id="line-175"><code></code></span>
+<span class="codeline" id="line-176"><code>	return result</code></span>
+<span class="codeline" id="line-177"><code>}</code></span>
+<span class="codeline" id="line-178"><code></code></span>
+<span class="codeline" id="line-179"><code>// p224Add computes *out = a+b</code></span>
+<span class="codeline" id="line-180"><code>//</code></span>
+<span class="codeline" id="line-181"><code>// a[i] + b[i] &lt; 2**32</code></span>
+<span class="codeline" id="line-182"><code>func p224Add(out, a, b *p224FieldElement) {</code></span>
+<span class="codeline" id="line-183"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-184"><code>		out[i] = a[i] + b[i]</code></span>
+<span class="codeline" id="line-185"><code>	}</code></span>
+<span class="codeline" id="line-186"><code>}</code></span>
+<span class="codeline" id="line-187"><code></code></span>
+<span class="codeline" id="line-188"><code>const two31p3 = 1&lt;&lt;31 + 1&lt;&lt;3</code></span>
+<span class="codeline" id="line-189"><code>const two31m3 = 1&lt;&lt;31 - 1&lt;&lt;3</code></span>
+<span class="codeline" id="line-190"><code>const two31m15m3 = 1&lt;&lt;31 - 1&lt;&lt;15 - 1&lt;&lt;3</code></span>
+<span class="codeline" id="line-191"><code></code></span>
+<span class="codeline" id="line-192"><code>// p224ZeroModP31 is 0 mod p where bit 31 is set in all limbs so that we can</code></span>
+<span class="codeline" id="line-193"><code>// subtract smaller amounts without underflow. See the section "Subtraction" in</code></span>
+<span class="codeline" id="line-194"><code>// [1] for reasoning.</code></span>
+<span class="codeline" id="line-195"><code>var p224ZeroModP31 = []uint32{two31p3, two31m3, two31m3, two31m15m3, two31m3, two31m3, two31m3, two31m3}</code></span>
+<span class="codeline" id="line-196"><code></code></span>
+<span class="codeline" id="line-197"><code>// p224Sub computes *out = a-b</code></span>
+<span class="codeline" id="line-198"><code>//</code></span>
+<span class="codeline" id="line-199"><code>// a[i], b[i] &lt; 2**30</code></span>
+<span class="codeline" id="line-200"><code>// out[i] &lt; 2**32</code></span>
+<span class="codeline" id="line-201"><code>func p224Sub(out, a, b *p224FieldElement) {</code></span>
+<span class="codeline" id="line-202"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-203"><code>		out[i] = a[i] + p224ZeroModP31[i] - b[i]</code></span>
+<span class="codeline" id="line-204"><code>	}</code></span>
+<span class="codeline" id="line-205"><code>}</code></span>
+<span class="codeline" id="line-206"><code></code></span>
+<span class="codeline" id="line-207"><code>// LargeFieldElement also represents an element of the field. The limbs are</code></span>
+<span class="codeline" id="line-208"><code>// still spaced 28-bits apart and in little-endian order. So the limbs are at</code></span>
+<span class="codeline" id="line-209"><code>// 0, 28, 56, ..., 392 bits, each 64-bits wide.</code></span>
+<span class="codeline" id="line-210"><code>type p224LargeFieldElement [15]uint64</code></span>
+<span class="codeline" id="line-211"><code></code></span>
+<span class="codeline" id="line-212"><code>const two63p35 = 1&lt;&lt;63 + 1&lt;&lt;35</code></span>
+<span class="codeline" id="line-213"><code>const two63m35 = 1&lt;&lt;63 - 1&lt;&lt;35</code></span>
+<span class="codeline" id="line-214"><code>const two63m35m19 = 1&lt;&lt;63 - 1&lt;&lt;35 - 1&lt;&lt;19</code></span>
+<span class="codeline" id="line-215"><code></code></span>
+<span class="codeline" id="line-216"><code>// p224ZeroModP63 is 0 mod p where bit 63 is set in all limbs. See the section</code></span>
+<span class="codeline" id="line-217"><code>// "Subtraction" in [1] for why.</code></span>
+<span class="codeline" id="line-218"><code>var p224ZeroModP63 = [8]uint64{two63p35, two63m35, two63m35, two63m35, two63m35m19, two63m35, two63m35, two63m35}</code></span>
+<span class="codeline" id="line-219"><code></code></span>
+<span class="codeline" id="line-220"><code>const bottom12Bits = 0xfff</code></span>
+<span class="codeline" id="line-221"><code>const bottom28Bits = 0xfffffff</code></span>
+<span class="codeline" id="line-222"><code></code></span>
+<span class="codeline" id="line-223"><code>// p224Mul computes *out = a*b</code></span>
+<span class="codeline" id="line-224"><code>//</code></span>
+<span class="codeline" id="line-225"><code>// a[i] &lt; 2**29, b[i] &lt; 2**30 (or vice versa)</code></span>
+<span class="codeline" id="line-226"><code>// out[i] &lt; 2**29</code></span>
+<span class="codeline" id="line-227"><code>func p224Mul(out, a, b *p224FieldElement, tmp *p224LargeFieldElement) {</code></span>
+<span class="codeline" id="line-228"><code>	for i := 0; i &lt; 15; i++ {</code></span>
+<span class="codeline" id="line-229"><code>		tmp[i] = 0</code></span>
+<span class="codeline" id="line-230"><code>	}</code></span>
+<span class="codeline" id="line-231"><code></code></span>
+<span class="codeline" id="line-232"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-233"><code>		for j := 0; j &lt; 8; j++ {</code></span>
+<span class="codeline" id="line-234"><code>			tmp[i+j] += uint64(a[i]) * uint64(b[j])</code></span>
+<span class="codeline" id="line-235"><code>		}</code></span>
+<span class="codeline" id="line-236"><code>	}</code></span>
+<span class="codeline" id="line-237"><code></code></span>
+<span class="codeline" id="line-238"><code>	p224ReduceLarge(out, tmp)</code></span>
+<span class="codeline" id="line-239"><code>}</code></span>
+<span class="codeline" id="line-240"><code></code></span>
+<span class="codeline" id="line-241"><code>// Square computes *out = a*a</code></span>
+<span class="codeline" id="line-242"><code>//</code></span>
+<span class="codeline" id="line-243"><code>// a[i] &lt; 2**29</code></span>
+<span class="codeline" id="line-244"><code>// out[i] &lt; 2**29</code></span>
+<span class="codeline" id="line-245"><code>func p224Square(out, a *p224FieldElement, tmp *p224LargeFieldElement) {</code></span>
+<span class="codeline" id="line-246"><code>	for i := 0; i &lt; 15; i++ {</code></span>
+<span class="codeline" id="line-247"><code>		tmp[i] = 0</code></span>
+<span class="codeline" id="line-248"><code>	}</code></span>
+<span class="codeline" id="line-249"><code></code></span>
+<span class="codeline" id="line-250"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-251"><code>		for j := 0; j &lt;= i; j++ {</code></span>
+<span class="codeline" id="line-252"><code>			r := uint64(a[i]) * uint64(a[j])</code></span>
+<span class="codeline" id="line-253"><code>			if i == j {</code></span>
+<span class="codeline" id="line-254"><code>				tmp[i+j] += r</code></span>
+<span class="codeline" id="line-255"><code>			} else {</code></span>
+<span class="codeline" id="line-256"><code>				tmp[i+j] += r &lt;&lt; 1</code></span>
+<span class="codeline" id="line-257"><code>			}</code></span>
+<span class="codeline" id="line-258"><code>		}</code></span>
+<span class="codeline" id="line-259"><code>	}</code></span>
+<span class="codeline" id="line-260"><code></code></span>
+<span class="codeline" id="line-261"><code>	p224ReduceLarge(out, tmp)</code></span>
+<span class="codeline" id="line-262"><code>}</code></span>
+<span class="codeline" id="line-263"><code></code></span>
+<span class="codeline" id="line-264"><code>// ReduceLarge converts a p224LargeFieldElement to a p224FieldElement.</code></span>
+<span class="codeline" id="line-265"><code>//</code></span>
+<span class="codeline" id="line-266"><code>// in[i] &lt; 2**62</code></span>
+<span class="codeline" id="line-267"><code>func p224ReduceLarge(out *p224FieldElement, in *p224LargeFieldElement) {</code></span>
+<span class="codeline" id="line-268"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-269"><code>		in[i] += p224ZeroModP63[i]</code></span>
+<span class="codeline" id="line-270"><code>	}</code></span>
+<span class="codeline" id="line-271"><code></code></span>
+<span class="codeline" id="line-272"><code>	// Eliminate the coefficients at 2**224 and greater.</code></span>
+<span class="codeline" id="line-273"><code>	for i := 14; i &gt;= 8; i-- {</code></span>
+<span class="codeline" id="line-274"><code>		in[i-8] -= in[i]</code></span>
+<span class="codeline" id="line-275"><code>		in[i-5] += (in[i] &amp; 0xffff) &lt;&lt; 12</code></span>
+<span class="codeline" id="line-276"><code>		in[i-4] += in[i] &gt;&gt; 16</code></span>
+<span class="codeline" id="line-277"><code>	}</code></span>
+<span class="codeline" id="line-278"><code>	in[8] = 0</code></span>
+<span class="codeline" id="line-279"><code>	// in[0..8] &lt; 2**64</code></span>
+<span class="codeline" id="line-280"><code></code></span>
+<span class="codeline" id="line-281"><code>	// As the values become small enough, we start to store them in |out|</code></span>
+<span class="codeline" id="line-282"><code>	// and use 32-bit operations.</code></span>
+<span class="codeline" id="line-283"><code>	for i := 1; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-284"><code>		in[i+1] += in[i] &gt;&gt; 28</code></span>
+<span class="codeline" id="line-285"><code>		out[i] = uint32(in[i] &amp; bottom28Bits)</code></span>
+<span class="codeline" id="line-286"><code>	}</code></span>
+<span class="codeline" id="line-287"><code>	in[0] -= in[8]</code></span>
+<span class="codeline" id="line-288"><code>	out[3] += uint32(in[8]&amp;0xffff) &lt;&lt; 12</code></span>
+<span class="codeline" id="line-289"><code>	out[4] += uint32(in[8] &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-290"><code>	// in[0] &lt; 2**64</code></span>
+<span class="codeline" id="line-291"><code>	// out[3] &lt; 2**29</code></span>
+<span class="codeline" id="line-292"><code>	// out[4] &lt; 2**29</code></span>
+<span class="codeline" id="line-293"><code>	// out[1,2,5..7] &lt; 2**28</code></span>
+<span class="codeline" id="line-294"><code></code></span>
+<span class="codeline" id="line-295"><code>	out[0] = uint32(in[0] &amp; bottom28Bits)</code></span>
+<span class="codeline" id="line-296"><code>	out[1] += uint32((in[0] &gt;&gt; 28) &amp; bottom28Bits)</code></span>
+<span class="codeline" id="line-297"><code>	out[2] += uint32(in[0] &gt;&gt; 56)</code></span>
+<span class="codeline" id="line-298"><code>	// out[0] &lt; 2**28</code></span>
+<span class="codeline" id="line-299"><code>	// out[1..4] &lt; 2**29</code></span>
+<span class="codeline" id="line-300"><code>	// out[5..7] &lt; 2**28</code></span>
+<span class="codeline" id="line-301"><code>}</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>// Reduce reduces the coefficients of a to smaller bounds.</code></span>
+<span class="codeline" id="line-304"><code>//</code></span>
+<span class="codeline" id="line-305"><code>// On entry: a[i] &lt; 2**31 + 2**30</code></span>
+<span class="codeline" id="line-306"><code>// On exit: a[i] &lt; 2**29</code></span>
+<span class="codeline" id="line-307"><code>func p224Reduce(a *p224FieldElement) {</code></span>
+<span class="codeline" id="line-308"><code>	for i := 0; i &lt; 7; i++ {</code></span>
+<span class="codeline" id="line-309"><code>		a[i+1] += a[i] &gt;&gt; 28</code></span>
+<span class="codeline" id="line-310"><code>		a[i] &amp;= bottom28Bits</code></span>
+<span class="codeline" id="line-311"><code>	}</code></span>
+<span class="codeline" id="line-312"><code>	top := a[7] &gt;&gt; 28</code></span>
+<span class="codeline" id="line-313"><code>	a[7] &amp;= bottom28Bits</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>	// top &lt; 2**4</code></span>
+<span class="codeline" id="line-316"><code>	mask := top</code></span>
+<span class="codeline" id="line-317"><code>	mask |= mask &gt;&gt; 2</code></span>
+<span class="codeline" id="line-318"><code>	mask |= mask &gt;&gt; 1</code></span>
+<span class="codeline" id="line-319"><code>	mask &lt;&lt;= 31</code></span>
+<span class="codeline" id="line-320"><code>	mask = uint32(int32(mask) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-321"><code>	// Mask is all ones if top != 0, all zero otherwise</code></span>
+<span class="codeline" id="line-322"><code></code></span>
+<span class="codeline" id="line-323"><code>	a[0] -= top</code></span>
+<span class="codeline" id="line-324"><code>	a[3] += top &lt;&lt; 12</code></span>
+<span class="codeline" id="line-325"><code></code></span>
+<span class="codeline" id="line-326"><code>	// We may have just made a[0] negative but, if we did, then we must</code></span>
+<span class="codeline" id="line-327"><code>	// have added something to a[3], this it's &gt; 2**12. Therefore we can</code></span>
+<span class="codeline" id="line-328"><code>	// carry down to a[0].</code></span>
+<span class="codeline" id="line-329"><code>	a[3] -= 1 &amp; mask</code></span>
+<span class="codeline" id="line-330"><code>	a[2] += mask &amp; (1&lt;&lt;28 - 1)</code></span>
+<span class="codeline" id="line-331"><code>	a[1] += mask &amp; (1&lt;&lt;28 - 1)</code></span>
+<span class="codeline" id="line-332"><code>	a[0] += mask &amp; (1 &lt;&lt; 28)</code></span>
+<span class="codeline" id="line-333"><code>}</code></span>
+<span class="codeline" id="line-334"><code></code></span>
+<span class="codeline" id="line-335"><code>// p224Invert calculates *out = in**-1 by computing in**(2**224 - 2**96 - 1),</code></span>
+<span class="codeline" id="line-336"><code>// i.e. Fermat's little theorem.</code></span>
+<span class="codeline" id="line-337"><code>func p224Invert(out, in *p224FieldElement) {</code></span>
+<span class="codeline" id="line-338"><code>	var f1, f2, f3, f4 p224FieldElement</code></span>
+<span class="codeline" id="line-339"><code>	var c p224LargeFieldElement</code></span>
+<span class="codeline" id="line-340"><code></code></span>
+<span class="codeline" id="line-341"><code>	p224Square(&amp;f1, in, &amp;c)    // 2</code></span>
+<span class="codeline" id="line-342"><code>	p224Mul(&amp;f1, &amp;f1, in, &amp;c)  // 2**2 - 1</code></span>
+<span class="codeline" id="line-343"><code>	p224Square(&amp;f1, &amp;f1, &amp;c)   // 2**3 - 2</code></span>
+<span class="codeline" id="line-344"><code>	p224Mul(&amp;f1, &amp;f1, in, &amp;c)  // 2**3 - 1</code></span>
+<span class="codeline" id="line-345"><code>	p224Square(&amp;f2, &amp;f1, &amp;c)   // 2**4 - 2</code></span>
+<span class="codeline" id="line-346"><code>	p224Square(&amp;f2, &amp;f2, &amp;c)   // 2**5 - 4</code></span>
+<span class="codeline" id="line-347"><code>	p224Square(&amp;f2, &amp;f2, &amp;c)   // 2**6 - 8</code></span>
+<span class="codeline" id="line-348"><code>	p224Mul(&amp;f1, &amp;f1, &amp;f2, &amp;c) // 2**6 - 1</code></span>
+<span class="codeline" id="line-349"><code>	p224Square(&amp;f2, &amp;f1, &amp;c)   // 2**7 - 2</code></span>
+<span class="codeline" id="line-350"><code>	for i := 0; i &lt; 5; i++ {   // 2**12 - 2**6</code></span>
+<span class="codeline" id="line-351"><code>		p224Square(&amp;f2, &amp;f2, &amp;c)</code></span>
+<span class="codeline" id="line-352"><code>	}</code></span>
+<span class="codeline" id="line-353"><code>	p224Mul(&amp;f2, &amp;f2, &amp;f1, &amp;c) // 2**12 - 1</code></span>
+<span class="codeline" id="line-354"><code>	p224Square(&amp;f3, &amp;f2, &amp;c)   // 2**13 - 2</code></span>
+<span class="codeline" id="line-355"><code>	for i := 0; i &lt; 11; i++ {  // 2**24 - 2**12</code></span>
+<span class="codeline" id="line-356"><code>		p224Square(&amp;f3, &amp;f3, &amp;c)</code></span>
+<span class="codeline" id="line-357"><code>	}</code></span>
+<span class="codeline" id="line-358"><code>	p224Mul(&amp;f2, &amp;f3, &amp;f2, &amp;c) // 2**24 - 1</code></span>
+<span class="codeline" id="line-359"><code>	p224Square(&amp;f3, &amp;f2, &amp;c)   // 2**25 - 2</code></span>
+<span class="codeline" id="line-360"><code>	for i := 0; i &lt; 23; i++ {  // 2**48 - 2**24</code></span>
+<span class="codeline" id="line-361"><code>		p224Square(&amp;f3, &amp;f3, &amp;c)</code></span>
+<span class="codeline" id="line-362"><code>	}</code></span>
+<span class="codeline" id="line-363"><code>	p224Mul(&amp;f3, &amp;f3, &amp;f2, &amp;c) // 2**48 - 1</code></span>
+<span class="codeline" id="line-364"><code>	p224Square(&amp;f4, &amp;f3, &amp;c)   // 2**49 - 2</code></span>
+<span class="codeline" id="line-365"><code>	for i := 0; i &lt; 47; i++ {  // 2**96 - 2**48</code></span>
+<span class="codeline" id="line-366"><code>		p224Square(&amp;f4, &amp;f4, &amp;c)</code></span>
+<span class="codeline" id="line-367"><code>	}</code></span>
+<span class="codeline" id="line-368"><code>	p224Mul(&amp;f3, &amp;f3, &amp;f4, &amp;c) // 2**96 - 1</code></span>
+<span class="codeline" id="line-369"><code>	p224Square(&amp;f4, &amp;f3, &amp;c)   // 2**97 - 2</code></span>
+<span class="codeline" id="line-370"><code>	for i := 0; i &lt; 23; i++ {  // 2**120 - 2**24</code></span>
+<span class="codeline" id="line-371"><code>		p224Square(&amp;f4, &amp;f4, &amp;c)</code></span>
+<span class="codeline" id="line-372"><code>	}</code></span>
+<span class="codeline" id="line-373"><code>	p224Mul(&amp;f2, &amp;f4, &amp;f2, &amp;c) // 2**120 - 1</code></span>
+<span class="codeline" id="line-374"><code>	for i := 0; i &lt; 6; i++ {   // 2**126 - 2**6</code></span>
+<span class="codeline" id="line-375"><code>		p224Square(&amp;f2, &amp;f2, &amp;c)</code></span>
+<span class="codeline" id="line-376"><code>	}</code></span>
+<span class="codeline" id="line-377"><code>	p224Mul(&amp;f1, &amp;f1, &amp;f2, &amp;c) // 2**126 - 1</code></span>
+<span class="codeline" id="line-378"><code>	p224Square(&amp;f1, &amp;f1, &amp;c)   // 2**127 - 2</code></span>
+<span class="codeline" id="line-379"><code>	p224Mul(&amp;f1, &amp;f1, in, &amp;c)  // 2**127 - 1</code></span>
+<span class="codeline" id="line-380"><code>	for i := 0; i &lt; 97; i++ {  // 2**224 - 2**97</code></span>
+<span class="codeline" id="line-381"><code>		p224Square(&amp;f1, &amp;f1, &amp;c)</code></span>
+<span class="codeline" id="line-382"><code>	}</code></span>
+<span class="codeline" id="line-383"><code>	p224Mul(out, &amp;f1, &amp;f3, &amp;c) // 2**224 - 2**96 - 1</code></span>
+<span class="codeline" id="line-384"><code>}</code></span>
+<span class="codeline" id="line-385"><code></code></span>
+<span class="codeline" id="line-386"><code>// p224Contract converts a FieldElement to its unique, minimal form.</code></span>
+<span class="codeline" id="line-387"><code>//</code></span>
+<span class="codeline" id="line-388"><code>// On entry, in[i] &lt; 2**29</code></span>
+<span class="codeline" id="line-389"><code>// On exit, in[i] &lt; 2**28</code></span>
+<span class="codeline" id="line-390"><code>func p224Contract(out, in *p224FieldElement) {</code></span>
+<span class="codeline" id="line-391"><code>	copy(out[:], in[:])</code></span>
+<span class="codeline" id="line-392"><code></code></span>
+<span class="codeline" id="line-393"><code>	for i := 0; i &lt; 7; i++ {</code></span>
+<span class="codeline" id="line-394"><code>		out[i+1] += out[i] &gt;&gt; 28</code></span>
+<span class="codeline" id="line-395"><code>		out[i] &amp;= bottom28Bits</code></span>
+<span class="codeline" id="line-396"><code>	}</code></span>
+<span class="codeline" id="line-397"><code>	top := out[7] &gt;&gt; 28</code></span>
+<span class="codeline" id="line-398"><code>	out[7] &amp;= bottom28Bits</code></span>
+<span class="codeline" id="line-399"><code></code></span>
+<span class="codeline" id="line-400"><code>	out[0] -= top</code></span>
+<span class="codeline" id="line-401"><code>	out[3] += top &lt;&lt; 12</code></span>
+<span class="codeline" id="line-402"><code></code></span>
+<span class="codeline" id="line-403"><code>	// We may just have made out[i] negative. So we carry down. If we made</code></span>
+<span class="codeline" id="line-404"><code>	// out[0] negative then we know that out[3] is sufficiently positive</code></span>
+<span class="codeline" id="line-405"><code>	// because we just added to it.</code></span>
+<span class="codeline" id="line-406"><code>	for i := 0; i &lt; 3; i++ {</code></span>
+<span class="codeline" id="line-407"><code>		mask := uint32(int32(out[i]) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-408"><code>		out[i] += (1 &lt;&lt; 28) &amp; mask</code></span>
+<span class="codeline" id="line-409"><code>		out[i+1] -= 1 &amp; mask</code></span>
+<span class="codeline" id="line-410"><code>	}</code></span>
+<span class="codeline" id="line-411"><code></code></span>
+<span class="codeline" id="line-412"><code>	// We might have pushed out[3] over 2**28 so we perform another, partial,</code></span>
+<span class="codeline" id="line-413"><code>	// carry chain.</code></span>
+<span class="codeline" id="line-414"><code>	for i := 3; i &lt; 7; i++ {</code></span>
+<span class="codeline" id="line-415"><code>		out[i+1] += out[i] &gt;&gt; 28</code></span>
+<span class="codeline" id="line-416"><code>		out[i] &amp;= bottom28Bits</code></span>
+<span class="codeline" id="line-417"><code>	}</code></span>
+<span class="codeline" id="line-418"><code>	top = out[7] &gt;&gt; 28</code></span>
+<span class="codeline" id="line-419"><code>	out[7] &amp;= bottom28Bits</code></span>
+<span class="codeline" id="line-420"><code></code></span>
+<span class="codeline" id="line-421"><code>	// Eliminate top while maintaining the same value mod p.</code></span>
+<span class="codeline" id="line-422"><code>	out[0] -= top</code></span>
+<span class="codeline" id="line-423"><code>	out[3] += top &lt;&lt; 12</code></span>
+<span class="codeline" id="line-424"><code></code></span>
+<span class="codeline" id="line-425"><code>	// There are two cases to consider for out[3]:</code></span>
+<span class="codeline" id="line-426"><code>	//   1) The first time that we eliminated top, we didn't push out[3] over</code></span>
+<span class="codeline" id="line-427"><code>	//      2**28. In this case, the partial carry chain didn't change any values</code></span>
+<span class="codeline" id="line-428"><code>	//      and top is zero.</code></span>
+<span class="codeline" id="line-429"><code>	//   2) We did push out[3] over 2**28 the first time that we eliminated top.</code></span>
+<span class="codeline" id="line-430"><code>	//      The first value of top was in [0..16), therefore, prior to eliminating</code></span>
+<span class="codeline" id="line-431"><code>	//      the first top, 0xfff1000 &lt;= out[3] &lt;= 0xfffffff. Therefore, after</code></span>
+<span class="codeline" id="line-432"><code>	//      overflowing and being reduced by the second carry chain, out[3] &lt;=</code></span>
+<span class="codeline" id="line-433"><code>	//      0xf000. Thus it cannot have overflowed when we eliminated top for the</code></span>
+<span class="codeline" id="line-434"><code>	//      second time.</code></span>
+<span class="codeline" id="line-435"><code></code></span>
+<span class="codeline" id="line-436"><code>	// Again, we may just have made out[0] negative, so do the same carry down.</code></span>
+<span class="codeline" id="line-437"><code>	// As before, if we made out[0] negative then we know that out[3] is</code></span>
+<span class="codeline" id="line-438"><code>	// sufficiently positive.</code></span>
+<span class="codeline" id="line-439"><code>	for i := 0; i &lt; 3; i++ {</code></span>
+<span class="codeline" id="line-440"><code>		mask := uint32(int32(out[i]) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-441"><code>		out[i] += (1 &lt;&lt; 28) &amp; mask</code></span>
+<span class="codeline" id="line-442"><code>		out[i+1] -= 1 &amp; mask</code></span>
+<span class="codeline" id="line-443"><code>	}</code></span>
+<span class="codeline" id="line-444"><code></code></span>
+<span class="codeline" id="line-445"><code>	// Now we see if the value is &gt;= p and, if so, subtract p.</code></span>
+<span class="codeline" id="line-446"><code></code></span>
+<span class="codeline" id="line-447"><code>	// First we build a mask from the top four limbs, which must all be</code></span>
+<span class="codeline" id="line-448"><code>	// equal to bottom28Bits if the whole value is &gt;= p. If top4AllOnes</code></span>
+<span class="codeline" id="line-449"><code>	// ends up with any zero bits in the bottom 28 bits, then this wasn't</code></span>
+<span class="codeline" id="line-450"><code>	// true.</code></span>
+<span class="codeline" id="line-451"><code>	top4AllOnes := uint32(0xffffffff)</code></span>
+<span class="codeline" id="line-452"><code>	for i := 4; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-453"><code>		top4AllOnes &amp;= out[i]</code></span>
+<span class="codeline" id="line-454"><code>	}</code></span>
+<span class="codeline" id="line-455"><code>	top4AllOnes |= 0xf0000000</code></span>
+<span class="codeline" id="line-456"><code>	// Now we replicate any zero bits to all the bits in top4AllOnes.</code></span>
+<span class="codeline" id="line-457"><code>	top4AllOnes &amp;= top4AllOnes &gt;&gt; 16</code></span>
+<span class="codeline" id="line-458"><code>	top4AllOnes &amp;= top4AllOnes &gt;&gt; 8</code></span>
+<span class="codeline" id="line-459"><code>	top4AllOnes &amp;= top4AllOnes &gt;&gt; 4</code></span>
+<span class="codeline" id="line-460"><code>	top4AllOnes &amp;= top4AllOnes &gt;&gt; 2</code></span>
+<span class="codeline" id="line-461"><code>	top4AllOnes &amp;= top4AllOnes &gt;&gt; 1</code></span>
+<span class="codeline" id="line-462"><code>	top4AllOnes = uint32(int32(top4AllOnes&lt;&lt;31) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-463"><code></code></span>
+<span class="codeline" id="line-464"><code>	// Now we test whether the bottom three limbs are non-zero.</code></span>
+<span class="codeline" id="line-465"><code>	bottom3NonZero := out[0] | out[1] | out[2]</code></span>
+<span class="codeline" id="line-466"><code>	bottom3NonZero |= bottom3NonZero &gt;&gt; 16</code></span>
+<span class="codeline" id="line-467"><code>	bottom3NonZero |= bottom3NonZero &gt;&gt; 8</code></span>
+<span class="codeline" id="line-468"><code>	bottom3NonZero |= bottom3NonZero &gt;&gt; 4</code></span>
+<span class="codeline" id="line-469"><code>	bottom3NonZero |= bottom3NonZero &gt;&gt; 2</code></span>
+<span class="codeline" id="line-470"><code>	bottom3NonZero |= bottom3NonZero &gt;&gt; 1</code></span>
+<span class="codeline" id="line-471"><code>	bottom3NonZero = uint32(int32(bottom3NonZero&lt;&lt;31) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-472"><code></code></span>
+<span class="codeline" id="line-473"><code>	// Everything depends on the value of out[3].</code></span>
+<span class="codeline" id="line-474"><code>	//    If it's &gt; 0xffff000 and top4AllOnes != 0 then the whole value is &gt;= p</code></span>
+<span class="codeline" id="line-475"><code>	//    If it's = 0xffff000 and top4AllOnes != 0 and bottom3NonZero != 0,</code></span>
+<span class="codeline" id="line-476"><code>	//      then the whole value is &gt;= p</code></span>
+<span class="codeline" id="line-477"><code>	//    If it's &lt; 0xffff000, then the whole value is &lt; p</code></span>
+<span class="codeline" id="line-478"><code>	n := out[3] - 0xffff000</code></span>
+<span class="codeline" id="line-479"><code>	out3Equal := n</code></span>
+<span class="codeline" id="line-480"><code>	out3Equal |= out3Equal &gt;&gt; 16</code></span>
+<span class="codeline" id="line-481"><code>	out3Equal |= out3Equal &gt;&gt; 8</code></span>
+<span class="codeline" id="line-482"><code>	out3Equal |= out3Equal &gt;&gt; 4</code></span>
+<span class="codeline" id="line-483"><code>	out3Equal |= out3Equal &gt;&gt; 2</code></span>
+<span class="codeline" id="line-484"><code>	out3Equal |= out3Equal &gt;&gt; 1</code></span>
+<span class="codeline" id="line-485"><code>	out3Equal = ^uint32(int32(out3Equal&lt;&lt;31) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-486"><code></code></span>
+<span class="codeline" id="line-487"><code>	// If out[3] &gt; 0xffff000 then n's MSB will be zero.</code></span>
+<span class="codeline" id="line-488"><code>	out3GT := ^uint32(int32(n) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-489"><code></code></span>
+<span class="codeline" id="line-490"><code>	mask := top4AllOnes &amp; ((out3Equal &amp; bottom3NonZero) | out3GT)</code></span>
+<span class="codeline" id="line-491"><code>	out[0] -= 1 &amp; mask</code></span>
+<span class="codeline" id="line-492"><code>	out[3] -= 0xffff000 &amp; mask</code></span>
+<span class="codeline" id="line-493"><code>	out[4] -= 0xfffffff &amp; mask</code></span>
+<span class="codeline" id="line-494"><code>	out[5] -= 0xfffffff &amp; mask</code></span>
+<span class="codeline" id="line-495"><code>	out[6] -= 0xfffffff &amp; mask</code></span>
+<span class="codeline" id="line-496"><code>	out[7] -= 0xfffffff &amp; mask</code></span>
+<span class="codeline" id="line-497"><code>}</code></span>
+<span class="codeline" id="line-498"><code></code></span>
+<span class="codeline" id="line-499"><code>// Group element functions.</code></span>
+<span class="codeline" id="line-500"><code>//</code></span>
+<span class="codeline" id="line-501"><code>// These functions deal with group elements. The group is an elliptic curve</code></span>
+<span class="codeline" id="line-502"><code>// group with a = -3 defined in FIPS 186-3, section D.2.2.</code></span>
+<span class="codeline" id="line-503"><code></code></span>
+<span class="codeline" id="line-504"><code>// p224AddJacobian computes *out = a+b where a != b.</code></span>
+<span class="codeline" id="line-505"><code>func p224AddJacobian(x3, y3, z3, x1, y1, z1, x2, y2, z2 *p224FieldElement) {</code></span>
+<span class="codeline" id="line-506"><code>	// See https://hyperelliptic.org/EFD/g1p/auto-shortw-jacobian-3.html#addition-p224Add-2007-bl</code></span>
+<span class="codeline" id="line-507"><code>	var z1z1, z2z2, u1, u2, s1, s2, h, i, j, r, v p224FieldElement</code></span>
+<span class="codeline" id="line-508"><code>	var c p224LargeFieldElement</code></span>
+<span class="codeline" id="line-509"><code></code></span>
+<span class="codeline" id="line-510"><code>	z1IsZero := p224IsZero(z1)</code></span>
+<span class="codeline" id="line-511"><code>	z2IsZero := p224IsZero(z2)</code></span>
+<span class="codeline" id="line-512"><code></code></span>
+<span class="codeline" id="line-513"><code>	// Z1Z1 = Z1²</code></span>
+<span class="codeline" id="line-514"><code>	p224Square(&amp;z1z1, z1, &amp;c)</code></span>
+<span class="codeline" id="line-515"><code>	// Z2Z2 = Z2²</code></span>
+<span class="codeline" id="line-516"><code>	p224Square(&amp;z2z2, z2, &amp;c)</code></span>
+<span class="codeline" id="line-517"><code>	// U1 = X1*Z2Z2</code></span>
+<span class="codeline" id="line-518"><code>	p224Mul(&amp;u1, x1, &amp;z2z2, &amp;c)</code></span>
+<span class="codeline" id="line-519"><code>	// U2 = X2*Z1Z1</code></span>
+<span class="codeline" id="line-520"><code>	p224Mul(&amp;u2, x2, &amp;z1z1, &amp;c)</code></span>
+<span class="codeline" id="line-521"><code>	// S1 = Y1*Z2*Z2Z2</code></span>
+<span class="codeline" id="line-522"><code>	p224Mul(&amp;s1, z2, &amp;z2z2, &amp;c)</code></span>
+<span class="codeline" id="line-523"><code>	p224Mul(&amp;s1, y1, &amp;s1, &amp;c)</code></span>
+<span class="codeline" id="line-524"><code>	// S2 = Y2*Z1*Z1Z1</code></span>
+<span class="codeline" id="line-525"><code>	p224Mul(&amp;s2, z1, &amp;z1z1, &amp;c)</code></span>
+<span class="codeline" id="line-526"><code>	p224Mul(&amp;s2, y2, &amp;s2, &amp;c)</code></span>
+<span class="codeline" id="line-527"><code>	// H = U2-U1</code></span>
+<span class="codeline" id="line-528"><code>	p224Sub(&amp;h, &amp;u2, &amp;u1)</code></span>
+<span class="codeline" id="line-529"><code>	p224Reduce(&amp;h)</code></span>
+<span class="codeline" id="line-530"><code>	xEqual := p224IsZero(&amp;h)</code></span>
+<span class="codeline" id="line-531"><code>	// I = (2*H)²</code></span>
+<span class="codeline" id="line-532"><code>	for j := 0; j &lt; 8; j++ {</code></span>
+<span class="codeline" id="line-533"><code>		i[j] = h[j] &lt;&lt; 1</code></span>
+<span class="codeline" id="line-534"><code>	}</code></span>
+<span class="codeline" id="line-535"><code>	p224Reduce(&amp;i)</code></span>
+<span class="codeline" id="line-536"><code>	p224Square(&amp;i, &amp;i, &amp;c)</code></span>
+<span class="codeline" id="line-537"><code>	// J = H*I</code></span>
+<span class="codeline" id="line-538"><code>	p224Mul(&amp;j, &amp;h, &amp;i, &amp;c)</code></span>
+<span class="codeline" id="line-539"><code>	// r = 2*(S2-S1)</code></span>
+<span class="codeline" id="line-540"><code>	p224Sub(&amp;r, &amp;s2, &amp;s1)</code></span>
+<span class="codeline" id="line-541"><code>	p224Reduce(&amp;r)</code></span>
+<span class="codeline" id="line-542"><code>	yEqual := p224IsZero(&amp;r)</code></span>
+<span class="codeline" id="line-543"><code>	if xEqual == 1 &amp;&amp; yEqual == 1 &amp;&amp; z1IsZero == 0 &amp;&amp; z2IsZero == 0 {</code></span>
+<span class="codeline" id="line-544"><code>		p224DoubleJacobian(x3, y3, z3, x1, y1, z1)</code></span>
+<span class="codeline" id="line-545"><code>		return</code></span>
+<span class="codeline" id="line-546"><code>	}</code></span>
+<span class="codeline" id="line-547"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-548"><code>		r[i] &lt;&lt;= 1</code></span>
+<span class="codeline" id="line-549"><code>	}</code></span>
+<span class="codeline" id="line-550"><code>	p224Reduce(&amp;r)</code></span>
+<span class="codeline" id="line-551"><code>	// V = U1*I</code></span>
+<span class="codeline" id="line-552"><code>	p224Mul(&amp;v, &amp;u1, &amp;i, &amp;c)</code></span>
+<span class="codeline" id="line-553"><code>	// Z3 = ((Z1+Z2)²-Z1Z1-Z2Z2)*H</code></span>
+<span class="codeline" id="line-554"><code>	p224Add(&amp;z1z1, &amp;z1z1, &amp;z2z2)</code></span>
+<span class="codeline" id="line-555"><code>	p224Add(&amp;z2z2, z1, z2)</code></span>
+<span class="codeline" id="line-556"><code>	p224Reduce(&amp;z2z2)</code></span>
+<span class="codeline" id="line-557"><code>	p224Square(&amp;z2z2, &amp;z2z2, &amp;c)</code></span>
+<span class="codeline" id="line-558"><code>	p224Sub(z3, &amp;z2z2, &amp;z1z1)</code></span>
+<span class="codeline" id="line-559"><code>	p224Reduce(z3)</code></span>
+<span class="codeline" id="line-560"><code>	p224Mul(z3, z3, &amp;h, &amp;c)</code></span>
+<span class="codeline" id="line-561"><code>	// X3 = r²-J-2*V</code></span>
+<span class="codeline" id="line-562"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-563"><code>		z1z1[i] = v[i] &lt;&lt; 1</code></span>
+<span class="codeline" id="line-564"><code>	}</code></span>
+<span class="codeline" id="line-565"><code>	p224Add(&amp;z1z1, &amp;j, &amp;z1z1)</code></span>
+<span class="codeline" id="line-566"><code>	p224Reduce(&amp;z1z1)</code></span>
+<span class="codeline" id="line-567"><code>	p224Square(x3, &amp;r, &amp;c)</code></span>
+<span class="codeline" id="line-568"><code>	p224Sub(x3, x3, &amp;z1z1)</code></span>
+<span class="codeline" id="line-569"><code>	p224Reduce(x3)</code></span>
+<span class="codeline" id="line-570"><code>	// Y3 = r*(V-X3)-2*S1*J</code></span>
+<span class="codeline" id="line-571"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-572"><code>		s1[i] &lt;&lt;= 1</code></span>
+<span class="codeline" id="line-573"><code>	}</code></span>
+<span class="codeline" id="line-574"><code>	p224Mul(&amp;s1, &amp;s1, &amp;j, &amp;c)</code></span>
+<span class="codeline" id="line-575"><code>	p224Sub(&amp;z1z1, &amp;v, x3)</code></span>
+<span class="codeline" id="line-576"><code>	p224Reduce(&amp;z1z1)</code></span>
+<span class="codeline" id="line-577"><code>	p224Mul(&amp;z1z1, &amp;z1z1, &amp;r, &amp;c)</code></span>
+<span class="codeline" id="line-578"><code>	p224Sub(y3, &amp;z1z1, &amp;s1)</code></span>
+<span class="codeline" id="line-579"><code>	p224Reduce(y3)</code></span>
+<span class="codeline" id="line-580"><code></code></span>
+<span class="codeline" id="line-581"><code>	p224CopyConditional(x3, x2, z1IsZero)</code></span>
+<span class="codeline" id="line-582"><code>	p224CopyConditional(x3, x1, z2IsZero)</code></span>
+<span class="codeline" id="line-583"><code>	p224CopyConditional(y3, y2, z1IsZero)</code></span>
+<span class="codeline" id="line-584"><code>	p224CopyConditional(y3, y1, z2IsZero)</code></span>
+<span class="codeline" id="line-585"><code>	p224CopyConditional(z3, z2, z1IsZero)</code></span>
+<span class="codeline" id="line-586"><code>	p224CopyConditional(z3, z1, z2IsZero)</code></span>
+<span class="codeline" id="line-587"><code>}</code></span>
+<span class="codeline" id="line-588"><code></code></span>
+<span class="codeline" id="line-589"><code>// p224DoubleJacobian computes *out = a+a.</code></span>
+<span class="codeline" id="line-590"><code>func p224DoubleJacobian(x3, y3, z3, x1, y1, z1 *p224FieldElement) {</code></span>
+<span class="codeline" id="line-591"><code>	var delta, gamma, beta, alpha, t p224FieldElement</code></span>
+<span class="codeline" id="line-592"><code>	var c p224LargeFieldElement</code></span>
+<span class="codeline" id="line-593"><code></code></span>
+<span class="codeline" id="line-594"><code>	p224Square(&amp;delta, z1, &amp;c)</code></span>
+<span class="codeline" id="line-595"><code>	p224Square(&amp;gamma, y1, &amp;c)</code></span>
+<span class="codeline" id="line-596"><code>	p224Mul(&amp;beta, x1, &amp;gamma, &amp;c)</code></span>
+<span class="codeline" id="line-597"><code></code></span>
+<span class="codeline" id="line-598"><code>	// alpha = 3*(X1-delta)*(X1+delta)</code></span>
+<span class="codeline" id="line-599"><code>	p224Add(&amp;t, x1, &amp;delta)</code></span>
+<span class="codeline" id="line-600"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-601"><code>		t[i] += t[i] &lt;&lt; 1</code></span>
+<span class="codeline" id="line-602"><code>	}</code></span>
+<span class="codeline" id="line-603"><code>	p224Reduce(&amp;t)</code></span>
+<span class="codeline" id="line-604"><code>	p224Sub(&amp;alpha, x1, &amp;delta)</code></span>
+<span class="codeline" id="line-605"><code>	p224Reduce(&amp;alpha)</code></span>
+<span class="codeline" id="line-606"><code>	p224Mul(&amp;alpha, &amp;alpha, &amp;t, &amp;c)</code></span>
+<span class="codeline" id="line-607"><code></code></span>
+<span class="codeline" id="line-608"><code>	// Z3 = (Y1+Z1)²-gamma-delta</code></span>
+<span class="codeline" id="line-609"><code>	p224Add(z3, y1, z1)</code></span>
+<span class="codeline" id="line-610"><code>	p224Reduce(z3)</code></span>
+<span class="codeline" id="line-611"><code>	p224Square(z3, z3, &amp;c)</code></span>
+<span class="codeline" id="line-612"><code>	p224Sub(z3, z3, &amp;gamma)</code></span>
+<span class="codeline" id="line-613"><code>	p224Reduce(z3)</code></span>
+<span class="codeline" id="line-614"><code>	p224Sub(z3, z3, &amp;delta)</code></span>
+<span class="codeline" id="line-615"><code>	p224Reduce(z3)</code></span>
+<span class="codeline" id="line-616"><code></code></span>
+<span class="codeline" id="line-617"><code>	// X3 = alpha²-8*beta</code></span>
+<span class="codeline" id="line-618"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-619"><code>		delta[i] = beta[i] &lt;&lt; 3</code></span>
+<span class="codeline" id="line-620"><code>	}</code></span>
+<span class="codeline" id="line-621"><code>	p224Reduce(&amp;delta)</code></span>
+<span class="codeline" id="line-622"><code>	p224Square(x3, &amp;alpha, &amp;c)</code></span>
+<span class="codeline" id="line-623"><code>	p224Sub(x3, x3, &amp;delta)</code></span>
+<span class="codeline" id="line-624"><code>	p224Reduce(x3)</code></span>
+<span class="codeline" id="line-625"><code></code></span>
+<span class="codeline" id="line-626"><code>	// Y3 = alpha*(4*beta-X3)-8*gamma²</code></span>
+<span class="codeline" id="line-627"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-628"><code>		beta[i] &lt;&lt;= 2</code></span>
+<span class="codeline" id="line-629"><code>	}</code></span>
+<span class="codeline" id="line-630"><code>	p224Sub(&amp;beta, &amp;beta, x3)</code></span>
+<span class="codeline" id="line-631"><code>	p224Reduce(&amp;beta)</code></span>
+<span class="codeline" id="line-632"><code>	p224Square(&amp;gamma, &amp;gamma, &amp;c)</code></span>
+<span class="codeline" id="line-633"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-634"><code>		gamma[i] &lt;&lt;= 3</code></span>
+<span class="codeline" id="line-635"><code>	}</code></span>
+<span class="codeline" id="line-636"><code>	p224Reduce(&amp;gamma)</code></span>
+<span class="codeline" id="line-637"><code>	p224Mul(y3, &amp;alpha, &amp;beta, &amp;c)</code></span>
+<span class="codeline" id="line-638"><code>	p224Sub(y3, y3, &amp;gamma)</code></span>
+<span class="codeline" id="line-639"><code>	p224Reduce(y3)</code></span>
+<span class="codeline" id="line-640"><code>}</code></span>
+<span class="codeline" id="line-641"><code></code></span>
+<span class="codeline" id="line-642"><code>// p224CopyConditional sets *out = *in iff the least-significant-bit of control</code></span>
+<span class="codeline" id="line-643"><code>// is true, and it runs in constant time.</code></span>
+<span class="codeline" id="line-644"><code>func p224CopyConditional(out, in *p224FieldElement, control uint32) {</code></span>
+<span class="codeline" id="line-645"><code>	control &lt;&lt;= 31</code></span>
+<span class="codeline" id="line-646"><code>	control = uint32(int32(control) &gt;&gt; 31)</code></span>
+<span class="codeline" id="line-647"><code></code></span>
+<span class="codeline" id="line-648"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-649"><code>		out[i] ^= (out[i] ^ in[i]) &amp; control</code></span>
+<span class="codeline" id="line-650"><code>	}</code></span>
+<span class="codeline" id="line-651"><code>}</code></span>
+<span class="codeline" id="line-652"><code></code></span>
+<span class="codeline" id="line-653"><code>func p224ScalarMult(outX, outY, outZ, inX, inY, inZ *p224FieldElement, scalar []byte) {</code></span>
+<span class="codeline" id="line-654"><code>	var xx, yy, zz p224FieldElement</code></span>
+<span class="codeline" id="line-655"><code>	for i := 0; i &lt; 8; i++ {</code></span>
+<span class="codeline" id="line-656"><code>		outX[i] = 0</code></span>
+<span class="codeline" id="line-657"><code>		outY[i] = 0</code></span>
+<span class="codeline" id="line-658"><code>		outZ[i] = 0</code></span>
+<span class="codeline" id="line-659"><code>	}</code></span>
+<span class="codeline" id="line-660"><code></code></span>
+<span class="codeline" id="line-661"><code>	for _, byte := range scalar {</code></span>
+<span class="codeline" id="line-662"><code>		for bitNum := uint(0); bitNum &lt; 8; bitNum++ {</code></span>
+<span class="codeline" id="line-663"><code>			p224DoubleJacobian(outX, outY, outZ, outX, outY, outZ)</code></span>
+<span class="codeline" id="line-664"><code>			bit := uint32((byte &gt;&gt; (7 - bitNum)) &amp; 1)</code></span>
+<span class="codeline" id="line-665"><code>			p224AddJacobian(&amp;xx, &amp;yy, &amp;zz, inX, inY, inZ, outX, outY, outZ)</code></span>
+<span class="codeline" id="line-666"><code>			p224CopyConditional(outX, &amp;xx, bit)</code></span>
+<span class="codeline" id="line-667"><code>			p224CopyConditional(outY, &amp;yy, bit)</code></span>
+<span class="codeline" id="line-668"><code>			p224CopyConditional(outZ, &amp;zz, bit)</code></span>
+<span class="codeline" id="line-669"><code>		}</code></span>
+<span class="codeline" id="line-670"><code>	}</code></span>
+<span class="codeline" id="line-671"><code>}</code></span>
+<span class="codeline" id="line-672"><code></code></span>
+<span class="codeline" id="line-673"><code>// p224ToAffine converts from Jacobian to affine form.</code></span>
+<span class="codeline" id="line-674"><code>func p224ToAffine(x, y, z *p224FieldElement) (*big.Int, *big.Int) {</code></span>
+<span class="codeline" id="line-675"><code>	var zinv, zinvsq, outx, outy p224FieldElement</code></span>
+<span class="codeline" id="line-676"><code>	var tmp p224LargeFieldElement</code></span>
+<span class="codeline" id="line-677"><code></code></span>
+<span class="codeline" id="line-678"><code>	if isPointAtInfinity := p224IsZero(z); isPointAtInfinity == 1 {</code></span>
+<span class="codeline" id="line-679"><code>		return new(big.Int), new(big.Int)</code></span>
+<span class="codeline" id="line-680"><code>	}</code></span>
+<span class="codeline" id="line-681"><code></code></span>
+<span class="codeline" id="line-682"><code>	p224Invert(&amp;zinv, z)</code></span>
+<span class="codeline" id="line-683"><code>	p224Square(&amp;zinvsq, &amp;zinv, &amp;tmp)</code></span>
+<span class="codeline" id="line-684"><code>	p224Mul(x, x, &amp;zinvsq, &amp;tmp)</code></span>
+<span class="codeline" id="line-685"><code>	p224Mul(&amp;zinvsq, &amp;zinvsq, &amp;zinv, &amp;tmp)</code></span>
+<span class="codeline" id="line-686"><code>	p224Mul(y, y, &amp;zinvsq, &amp;tmp)</code></span>
+<span class="codeline" id="line-687"><code></code></span>
+<span class="codeline" id="line-688"><code>	p224Contract(&amp;outx, x)</code></span>
+<span class="codeline" id="line-689"><code>	p224Contract(&amp;outy, y)</code></span>
+<span class="codeline" id="line-690"><code>	return p224ToBig(&amp;outx), p224ToBig(&amp;outy)</code></span>
+<span class="codeline" id="line-691"><code>}</code></span>
+<span class="codeline" id="line-692"><code></code></span>
+<span class="codeline" id="line-693"><code>// get28BitsFromEnd returns the least-significant 28 bits from buf&gt;&gt;shift,</code></span>
+<span class="codeline" id="line-694"><code>// where buf is interpreted as a big-endian number.</code></span>
+<span class="codeline" id="line-695"><code>func get28BitsFromEnd(buf []byte, shift uint) (uint32, []byte) {</code></span>
+<span class="codeline" id="line-696"><code>	var ret uint32</code></span>
+<span class="codeline" id="line-697"><code></code></span>
+<span class="codeline" id="line-698"><code>	for i := uint(0); i &lt; 4; i++ {</code></span>
+<span class="codeline" id="line-699"><code>		var b byte</code></span>
+<span class="codeline" id="line-700"><code>		if l := len(buf); l &gt; 0 {</code></span>
+<span class="codeline" id="line-701"><code>			b = buf[l-1]</code></span>
+<span class="codeline" id="line-702"><code>			// We don't remove the byte if we're about to return and we're not</code></span>
+<span class="codeline" id="line-703"><code>			// reading all of it.</code></span>
+<span class="codeline" id="line-704"><code>			if i != 3 || shift == 4 {</code></span>
+<span class="codeline" id="line-705"><code>				buf = buf[:l-1]</code></span>
+<span class="codeline" id="line-706"><code>			}</code></span>
+<span class="codeline" id="line-707"><code>		}</code></span>
+<span class="codeline" id="line-708"><code>		ret |= uint32(b) &lt;&lt; (8 * i) &gt;&gt; shift</code></span>
+<span class="codeline" id="line-709"><code>	}</code></span>
+<span class="codeline" id="line-710"><code>	ret &amp;= bottom28Bits</code></span>
+<span class="codeline" id="line-711"><code>	return ret, buf</code></span>
+<span class="codeline" id="line-712"><code>}</code></span>
+<span class="codeline" id="line-713"><code></code></span>
+<span class="codeline" id="line-714"><code>// p224FromBig sets *out = *in.</code></span>
+<span class="codeline" id="line-715"><code>func p224FromBig(out *p224FieldElement, in *big.Int) {</code></span>
+<span class="codeline" id="line-716"><code>	bytes := in.Bytes()</code></span>
+<span class="codeline" id="line-717"><code>	out[0], bytes = get28BitsFromEnd(bytes, 0)</code></span>
+<span class="codeline" id="line-718"><code>	out[1], bytes = get28BitsFromEnd(bytes, 4)</code></span>
+<span class="codeline" id="line-719"><code>	out[2], bytes = get28BitsFromEnd(bytes, 0)</code></span>
+<span class="codeline" id="line-720"><code>	out[3], bytes = get28BitsFromEnd(bytes, 4)</code></span>
+<span class="codeline" id="line-721"><code>	out[4], bytes = get28BitsFromEnd(bytes, 0)</code></span>
+<span class="codeline" id="line-722"><code>	out[5], bytes = get28BitsFromEnd(bytes, 4)</code></span>
+<span class="codeline" id="line-723"><code>	out[6], bytes = get28BitsFromEnd(bytes, 0)</code></span>
+<span class="codeline" id="line-724"><code>	out[7], bytes = get28BitsFromEnd(bytes, 4)</code></span>
+<span class="codeline" id="line-725"><code>}</code></span>
+<span class="codeline" id="line-726"><code></code></span>
+<span class="codeline" id="line-727"><code>// p224ToBig returns in as a big.Int.</code></span>
+<span class="codeline" id="line-728"><code>func p224ToBig(in *p224FieldElement) *big.Int {</code></span>
+<span class="codeline" id="line-729"><code>	var buf [28]byte</code></span>
+<span class="codeline" id="line-730"><code>	buf[27] = byte(in[0])</code></span>
+<span class="codeline" id="line-731"><code>	buf[26] = byte(in[0] &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-732"><code>	buf[25] = byte(in[0] &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-733"><code>	buf[24] = byte(((in[0] &gt;&gt; 24) &amp; 0x0f) | (in[1]&lt;&lt;4)&amp;0xf0)</code></span>
+<span class="codeline" id="line-734"><code></code></span>
+<span class="codeline" id="line-735"><code>	buf[23] = byte(in[1] &gt;&gt; 4)</code></span>
+<span class="codeline" id="line-736"><code>	buf[22] = byte(in[1] &gt;&gt; 12)</code></span>
+<span class="codeline" id="line-737"><code>	buf[21] = byte(in[1] &gt;&gt; 20)</code></span>
+<span class="codeline" id="line-738"><code></code></span>
+<span class="codeline" id="line-739"><code>	buf[20] = byte(in[2])</code></span>
+<span class="codeline" id="line-740"><code>	buf[19] = byte(in[2] &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-741"><code>	buf[18] = byte(in[2] &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-742"><code>	buf[17] = byte(((in[2] &gt;&gt; 24) &amp; 0x0f) | (in[3]&lt;&lt;4)&amp;0xf0)</code></span>
+<span class="codeline" id="line-743"><code></code></span>
+<span class="codeline" id="line-744"><code>	buf[16] = byte(in[3] &gt;&gt; 4)</code></span>
+<span class="codeline" id="line-745"><code>	buf[15] = byte(in[3] &gt;&gt; 12)</code></span>
+<span class="codeline" id="line-746"><code>	buf[14] = byte(in[3] &gt;&gt; 20)</code></span>
+<span class="codeline" id="line-747"><code></code></span>
+<span class="codeline" id="line-748"><code>	buf[13] = byte(in[4])</code></span>
+<span class="codeline" id="line-749"><code>	buf[12] = byte(in[4] &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-750"><code>	buf[11] = byte(in[4] &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-751"><code>	buf[10] = byte(((in[4] &gt;&gt; 24) &amp; 0x0f) | (in[5]&lt;&lt;4)&amp;0xf0)</code></span>
+<span class="codeline" id="line-752"><code></code></span>
+<span class="codeline" id="line-753"><code>	buf[9] = byte(in[5] &gt;&gt; 4)</code></span>
+<span class="codeline" id="line-754"><code>	buf[8] = byte(in[5] &gt;&gt; 12)</code></span>
+<span class="codeline" id="line-755"><code>	buf[7] = byte(in[5] &gt;&gt; 20)</code></span>
+<span class="codeline" id="line-756"><code></code></span>
+<span class="codeline" id="line-757"><code>	buf[6] = byte(in[6])</code></span>
+<span class="codeline" id="line-758"><code>	buf[5] = byte(in[6] &gt;&gt; 8)</code></span>
+<span class="codeline" id="line-759"><code>	buf[4] = byte(in[6] &gt;&gt; 16)</code></span>
+<span class="codeline" id="line-760"><code>	buf[3] = byte(((in[6] &gt;&gt; 24) &amp; 0x0f) | (in[7]&lt;&lt;4)&amp;0xf0)</code></span>
+<span class="codeline" id="line-761"><code></code></span>
+<span class="codeline" id="line-762"><code>	buf[2] = byte(in[7] &gt;&gt; 4)</code></span>
+<span class="codeline" id="line-763"><code>	buf[1] = byte(in[7] &gt;&gt; 12)</code></span>
+<span class="codeline" id="line-764"><code>	buf[0] = byte(in[7] &gt;&gt; 20)</code></span>
+<span class="codeline" id="line-765"><code></code></span>
+<span class="codeline" id="line-766"><code>	return new(big.Int).SetBytes(buf[:])</code></span>
+<span class="codeline" id="line-767"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

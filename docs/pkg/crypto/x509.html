@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/x509</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>x509</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/x509">crypto/x509</a><i> (on <a href="https://golang.org/pkg/crypto/x509/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/x509" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/x509.html">38 packages</a>, and imported by <a href="../../dep/crypto/x509.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/crypto/x509/cert_pool.go.html">cert_pool.go</a>
+	    <a href="../../src/crypto/x509/pem_decrypt.go.html">pem_decrypt.go</a>
+	    <a href="../../src/crypto/x509/pkcs1.go.html">pkcs1.go</a>
+	    <a href="../../src/crypto/x509/pkcs8.go.html">pkcs8.go</a>
+	    <a href="../../src/crypto/x509/root.go.html">root.go</a>
+	    <a href="../../src/crypto/x509/root_darwin_amd64.go.html">root_darwin_amd64.go</a>
+	    <a href="../../src/crypto/x509/sec1.go.html">sec1.go</a>
+	    <a href="../../src/crypto/x509/verify.go.html">verify.go</a>
+	<a href="../../src/crypto/x509/x509.go.html#doc">d-&gt;</a> <a href="../../src/crypto/x509/x509.go.html">x509.go</a>
+	    <a href="../../src/crypto/x509/root_cgo_darwin_amd64.go.html">root_cgo_darwin_amd64.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Certificate" data-popularity="750">	 type <a href="../../src/crypto/x509/x509.go.html#line-661">Certificate</a> <i>(struct)</i>
+		A Certificate represents an X.509 certificate.
+
+		<input type='checkbox' class="stat" id="Certificate-stat-fields"><label for="Certificate-stat-fields">Exported Fields (44)</label><span id='Certificate-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/x509/x509.go.html#line-731">AuthorityKeyId</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-708">BasicConstraintsValid</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-757">CRLDistributionPoints</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-740">DNSNames</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-741">EmailAddresses</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-748">ExcludedDNSDomains</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-752">ExcludedEmailAddresses</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-750">ExcludedIPRanges</a> <i>[]*<a href="../net.html">net</a>.<a href="../net.html#name-IPNet">IPNet</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-754">ExcludedURIDomains</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-703">ExtKeyUsage</a> <i>[]<a href="#name-ExtKeyUsage">ExtKeyUsage</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-685">Extensions</a> <i>[]<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Extension">Extension</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-691">ExtraExtensions</a> <i>[]<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Extension">Extension</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-742">IPAddresses</a> <i>[]<a href="../net.html">net</a>.<a href="../net.html#name-IP">IP</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-709">IsCA</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-676">Issuer</a> <i><a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Name">Name</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-735">IssuingCertificateURL</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-679">KeyUsage</a> <i><a href="#name-KeyUsage">KeyUsage</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-723">MaxPathLen</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-728">MaxPathLenZero</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-678">NotAfter</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-678">NotBefore</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-734">OCSPServer</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-747">PermittedDNSDomains</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-746">PermittedDNSDomainsCritical</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-751">PermittedEmailAddresses</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-749">PermittedIPRanges</a> <i>[]*<a href="../net.html">net</a>.<a href="../net.html#name-IPNet">IPNet</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-753">PermittedURIDomains</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-759">PolicyIdentifiers</a> <i>[]<a href="../encoding/asn1.html">asn1</a>.<a href="../encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-672">PublicKey</a> <i>interface{}</i>
+			<a href="../../src/crypto/x509/x509.go.html#line-671">PublicKeyAlgorithm</a> <i><a href="#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-662">Raw</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-666">RawIssuer</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-665">RawSubject</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-664">RawSubjectPublicKeyInfo</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-663">RawTBSCertificate</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-675">SerialNumber</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-668">Signature</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-669">SignatureAlgorithm</a> <i><a href="#name-SignatureAlgorithm">SignatureAlgorithm</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-677">Subject</a> <i><a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Name">Name</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-730">SubjectKeyId</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-743">URIs</a> <i>[]*<a href="../net/url.html">url</a>.<a href="../net/url.html#name-URL">URL</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-701">UnhandledCriticalExtensions</a> <i>[]<a href="../encoding/asn1.html">asn1</a>.<a href="../encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-704">UnknownExtKeyUsage</a> <i>[]<a href="../encoding/asn1.html">asn1</a>.<a href="../encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-674">Version</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="Certificate-stat-methods"><label for="Certificate-stat-methods">Exported Methods (7)</label><span id='Certificate-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/x509/x509.go.html#line-924">CheckCRLSignature</a>(crl *<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-CertificateList">CertificateList</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/x509/x509.go.html#line-821">CheckSignature</a>(algo <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a>, signed, signature []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/x509/x509.go.html#line-795">CheckSignatureFrom</a>(parent *<b>Certificate</b>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/crypto/x509/x509.go.html#line-2227">CreateCRL</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, priv interface{}, revokedCerts []<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-RevokedCertificate">RevokedCertificate</a>, now, expiry <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a>) (crlBytes []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/crypto/x509/x509.go.html#line-782">Equal</a>(other *<b>Certificate</b>) <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/crypto/x509/verify.go.html#line-756">Verify</a>(opts <a href="#name-VerifyOptions">VerifyOptions</a>) (chains [][]*<b>Certificate</b>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/crypto/x509/verify.go.html#line-1049">VerifyHostname</a>(h <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Certificate-stat-results"><label for="Certificate-stat-results">As Outputs Of (3+)</label><span id='Certificate-stat-results-content' class="stat-content">
+			func <a href="#name-ParseCertificate">ParseCertificate</a>(asn1Data []<a href="../builtin.html#name-byte">byte</a>) (*<b>Certificate</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-ParseCertificates">ParseCertificates</a>(asn1Data []<a href="../builtin.html#name-byte">byte</a>) ([]*<b>Certificate</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Certificate">Certificate</a>).<a href="../../src/crypto/x509/verify.go.html#line-756">Verify</a>(opts <a href="#name-VerifyOptions">VerifyOptions</a>) (chains [][]*<b>Certificate</b>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Certificate-stat-params"><label for="Certificate-stat-params">As Inputs Of (5+)</label><span id='Certificate-stat-params-content' class="stat-content">
+			func <a href="#name-CreateCertificate">CreateCertificate</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, template, parent *<b>Certificate</b>, pub, priv interface{}) (cert []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-CreateRevocationList">CreateRevocationList</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, template *<a href="#name-RevocationList">RevocationList</a>, issuer *<b>Certificate</b>, priv <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Signer">Signer</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Certificate">Certificate</a>).<a href="../../src/crypto/x509/x509.go.html#line-795">CheckSignatureFrom</a>(parent *<b>Certificate</b>) <a href="../builtin.html#name-error">error</a>
+			func (*<a href="#name-Certificate">Certificate</a>).<a href="../../src/crypto/x509/x509.go.html#line-782">Equal</a>(other *<b>Certificate</b>) <a href="../builtin.html#name-bool">bool</a>
+			func (*<a href="#name-CertPool">CertPool</a>).<a href="../../src/crypto/x509/cert_pool.go.html#line-105">AddCert</a>(cert *<b>Certificate</b>)</span></div>
+<div class="anchor" id="name-CertificateInvalidError" data-popularity="100">	 type <a href="../../src/crypto/x509/verify.go.html#line-72">CertificateInvalidError</a> <i>(struct)</i>
+		CertificateInvalidError results when an odd error occurs. Users of this
+		library probably want to handle all these errors uniformly.
+
+		<input type='checkbox' class="stat" id="CertificateInvalidError-stat-fields"><label for="CertificateInvalidError-stat-fields">Exported Fields (3)</label><span id='CertificateInvalidError-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/x509/verify.go.html#line-73">Cert</a> <i>*<a href="#name-Certificate">Certificate</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-75">Detail</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-74">Reason</a> <i><a href="#name-InvalidReason">InvalidReason</a></i></span>
+		<input type='checkbox' class="stat" id="CertificateInvalidError-stat-methods"><label for="CertificateInvalidError-stat-methods">One Exported Method</label><span id='CertificateInvalidError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/verify.go.html#line-78">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="CertificateInvalidError-stat-impls"><label for="CertificateInvalidError-stat-impls">Implements (1+)</label><span id='CertificateInvalidError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-CertificateRequest" data-popularity="160">	 type <a href="../../src/crypto/x509/x509.go.html#line-2291">CertificateRequest</a> <i>(struct)</i>
+		CertificateRequest represents a PKCS #10, certificate signature request.
+
+		<input type='checkbox' class="stat" id="CertificateRequest-stat-fields"><label for="CertificateRequest-stat-fields">Exported Fields (17)</label><span id='CertificateRequest-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/x509/x509.go.html#line-2311">Attributes</a> <i>[]<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-AttributeTypeAndValueSET">AttributeTypeAndValueSET</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2328">DNSNames</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2329">EmailAddresses</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2316">Extensions</a> <i>[]<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Extension">Extension</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2325">ExtraExtensions</a> <i>[]<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Extension">Extension</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2330">IPAddresses</a> <i>[]<a href="../net.html">net</a>.<a href="../net.html#name-IP">IP</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2302">PublicKey</a> <i>interface{}</i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2301">PublicKeyAlgorithm</a> <i><a href="#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2292">Raw</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2295">RawSubject</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2294">RawSubjectPublicKeyInfo</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2293">RawTBSCertificateRequest</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2298">Signature</a> <i>[]<a href="../builtin.html#name-byte">byte</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2299">SignatureAlgorithm</a> <i><a href="#name-SignatureAlgorithm">SignatureAlgorithm</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2304">Subject</a> <i><a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Name">Name</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2331">URIs</a> <i>[]*<a href="../net/url.html">url</a>.<a href="../net/url.html#name-URL">URL</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2297">Version</a> <i><a href="../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="CertificateRequest-stat-methods"><label for="CertificateRequest-stat-methods">One Exported Method</label><span id='CertificateRequest-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/x509/x509.go.html#line-2671">CheckSignature</a>() <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="CertificateRequest-stat-results"><label for="CertificateRequest-stat-results">As Outputs Of (1+)</label><span id='CertificateRequest-stat-results-content' class="stat-content">
+			func <a href="#name-ParseCertificateRequest">ParseCertificateRequest</a>(asn1Data []<a href="../builtin.html#name-byte">byte</a>) (*<b>CertificateRequest</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="CertificateRequest-stat-params"><label for="CertificateRequest-stat-params">As Inputs Of (1+)</label><span id='CertificateRequest-stat-params-content' class="stat-content">
+			func <a href="#name-CreateCertificateRequest">CreateCertificateRequest</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, template *<b>CertificateRequest</b>, priv interface{}) (csr []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-CertPool" data-popularity="300">	 type <a href="../../src/crypto/x509/cert_pool.go.html#line-14">CertPool</a> <i>(struct)</i>
+		CertPool is a set of certificates.
+
+		<input type='checkbox' class="stat" id="CertPool-stat-methods"><label for="CertPool-stat-methods">Exported Methods (3)</label><span id='CertPool-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/crypto/x509/cert_pool.go.html#line-105">AddCert</a>(cert *<a href="#name-Certificate">Certificate</a>)
+			(*T) <a href="../../src/crypto/x509/cert_pool.go.html#line-132">AppendCertsFromPEM</a>(pemCerts []<a href="../builtin.html#name-byte">byte</a>) (ok <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/crypto/x509/cert_pool.go.html#line-157">Subjects</a>() [][]<a href="../builtin.html#name-byte">byte</a></span>
+		<input type='checkbox' class="stat" id="CertPool-stat-results"><label for="CertPool-stat-results">As Outputs Of (2+)</label><span id='CertPool-stat-results-content' class="stat-content">
+			func <a href="#name-NewCertPool">NewCertPool</a>() *<b>CertPool</b>
+			func <a href="#name-SystemCertPool">SystemCertPool</a>() (*<b>CertPool</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ConstraintViolationError" data-popularity="100">	 type <a href="../../src/crypto/x509/x509.go.html#line-776">ConstraintViolationError</a> <i>(struct)</i>
+		ConstraintViolationError results when a requested usage is not permitted by
+		a certificate. For example: checking a signature when the public key isn't a
+		certificate signing key.
+
+		<input type='checkbox' class="stat" id="ConstraintViolationError-stat-methods"><label for="ConstraintViolationError-stat-methods">One Exported Method</label><span id='ConstraintViolationError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/x509.go.html#line-778">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ConstraintViolationError-stat-impls"><label for="ConstraintViolationError-stat-impls">Implements (1+)</label><span id='ConstraintViolationError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-ExtKeyUsage" data-popularity="15">	 type <a href="../../src/crypto/x509/x509.go.html#line-602">ExtKeyUsage</a> <a href="../builtin.html#name-int">int</a>
+		ExtKeyUsage represents an extended set of actions that are valid for a given key.
+		Each of the ExtKeyUsage* constants define a unique action.
+
+		<input type='checkbox' class="stat" id="ExtKeyUsage-stat-values"><label for="ExtKeyUsage-stat-values">As Types Of (14+)</label><span id='ExtKeyUsage-stat-values-content' class="stat-content">
+			const <a href="#name-ExtKeyUsageAny">ExtKeyUsageAny</a>
+			const <a href="#name-ExtKeyUsageClientAuth">ExtKeyUsageClientAuth</a>
+			const <a href="#name-ExtKeyUsageCodeSigning">ExtKeyUsageCodeSigning</a>
+			const <a href="#name-ExtKeyUsageEmailProtection">ExtKeyUsageEmailProtection</a>
+			const <a href="#name-ExtKeyUsageIPSECEndSystem">ExtKeyUsageIPSECEndSystem</a>
+			const <a href="#name-ExtKeyUsageIPSECTunnel">ExtKeyUsageIPSECTunnel</a>
+			const <a href="#name-ExtKeyUsageIPSECUser">ExtKeyUsageIPSECUser</a>
+			const <a href="#name-ExtKeyUsageMicrosoftCommercialCodeSigning">ExtKeyUsageMicrosoftCommercialCodeSigning</a>
+			const <a href="#name-ExtKeyUsageMicrosoftKernelCodeSigning">ExtKeyUsageMicrosoftKernelCodeSigning</a>
+			const <a href="#name-ExtKeyUsageMicrosoftServerGatedCrypto">ExtKeyUsageMicrosoftServerGatedCrypto</a>
+			const <a href="#name-ExtKeyUsageNetscapeServerGatedCrypto">ExtKeyUsageNetscapeServerGatedCrypto</a>
+			const <a href="#name-ExtKeyUsageOCSPSigning">ExtKeyUsageOCSPSigning</a>
+			const <a href="#name-ExtKeyUsageServerAuth">ExtKeyUsageServerAuth</a>
+			const <a href="#name-ExtKeyUsageTimeStamping">ExtKeyUsageTimeStamping</a></span></div>
+<div class="anchor" id="name-HostnameError" data-popularity="100">	 type <a href="../../src/crypto/x509/verify.go.html#line-104">HostnameError</a> <i>(struct)</i>
+		HostnameError results when the set of authorized names doesn't match the
+		requested name.
+
+		<input type='checkbox' class="stat" id="HostnameError-stat-fields"><label for="HostnameError-stat-fields">Exported Fields (2)</label><span id='HostnameError-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/x509/verify.go.html#line-105">Certificate</a> <i>*<a href="#name-Certificate">Certificate</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-106">Host</a> <i><a href="../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="HostnameError-stat-methods"><label for="HostnameError-stat-methods">One Exported Method</label><span id='HostnameError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/verify.go.html#line-109">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="HostnameError-stat-impls"><label for="HostnameError-stat-impls">Implements (1+)</label><span id='HostnameError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-InsecureAlgorithmError" data-popularity="100">	 type <a href="../../src/crypto/x509/x509.go.html#line-767">InsecureAlgorithmError</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a>
+		An InsecureAlgorithmError
+
+		<input type='checkbox' class="stat" id="InsecureAlgorithmError-stat-methods"><label for="InsecureAlgorithmError-stat-methods">One Exported Method</label><span id='InsecureAlgorithmError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/x509.go.html#line-769">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="InsecureAlgorithmError-stat-impls"><label for="InsecureAlgorithmError-stat-impls">Implements (1+)</label><span id='InsecureAlgorithmError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-InvalidReason" data-popularity="15">	 type <a href="../../src/crypto/x509/verify.go.html#line-24">InvalidReason</a> <a href="../builtin.html#name-int">int</a>
+
+		<input type='checkbox' class="stat" id="InvalidReason-stat-values"><label for="InvalidReason-stat-values">As Types Of (10+)</label><span id='InvalidReason-stat-values-content' class="stat-content">
+			const <a href="#name-CANotAuthorizedForExtKeyUsage">CANotAuthorizedForExtKeyUsage</a>
+			const <a href="#name-CANotAuthorizedForThisName">CANotAuthorizedForThisName</a>
+			const <a href="#name-Expired">Expired</a>
+			const <a href="#name-IncompatibleUsage">IncompatibleUsage</a>
+			const <a href="#name-NameConstraintsWithoutSANs">NameConstraintsWithoutSANs</a>
+			const <a href="#name-NameMismatch">NameMismatch</a>
+			const <a href="#name-NotAuthorizedToSign">NotAuthorizedToSign</a>
+			const <a href="#name-TooManyConstraints">TooManyConstraints</a>
+			const <a href="#name-TooManyIntermediates">TooManyIntermediates</a>
+			const <a href="#name-UnconstrainedName">UnconstrainedName</a></span></div>
+<div class="anchor" id="name-KeyUsage" data-popularity="15">	 type <a href="../../src/crypto/x509/x509.go.html#line-557">KeyUsage</a> <a href="../builtin.html#name-int">int</a>
+		KeyUsage represents the set of actions that are valid for a given key. It's
+		a bitmap of the KeyUsage* constants.
+
+		<input type='checkbox' class="stat" id="KeyUsage-stat-values"><label for="KeyUsage-stat-values">As Types Of (9+)</label><span id='KeyUsage-stat-values-content' class="stat-content">
+			const <a href="#name-KeyUsageCertSign">KeyUsageCertSign</a>
+			const <a href="#name-KeyUsageContentCommitment">KeyUsageContentCommitment</a>
+			const <a href="#name-KeyUsageCRLSign">KeyUsageCRLSign</a>
+			const <a href="#name-KeyUsageDataEncipherment">KeyUsageDataEncipherment</a>
+			const <a href="#name-KeyUsageDecipherOnly">KeyUsageDecipherOnly</a>
+			const <a href="#name-KeyUsageDigitalSignature">KeyUsageDigitalSignature</a>
+			const <a href="#name-KeyUsageEncipherOnly">KeyUsageEncipherOnly</a>
+			const <a href="#name-KeyUsageKeyAgreement">KeyUsageKeyAgreement</a>
+			const <a href="#name-KeyUsageKeyEncipherment">KeyUsageKeyEncipherment</a></span></div>
+<div class="anchor" id="name-PEMCipher" data-popularity="50">	 type <a href="../../src/crypto/x509/pem_decrypt.go.html#line-23">PEMCipher</a> <a href="../builtin.html#name-int">int</a>
+
+		<input type='checkbox' class="stat" id="PEMCipher-stat-params"><label for="PEMCipher-stat-params">As Inputs Of (1+)</label><span id='PEMCipher-stat-params-content' class="stat-content">
+			func <a href="#name-EncryptPEMBlock">EncryptPEMBlock</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, blockType <a href="../builtin.html#name-string">string</a>, data, password []<a href="../builtin.html#name-byte">byte</a>, alg <b>PEMCipher</b>) (*<a href="../encoding/pem.html">pem</a>.<a href="../encoding/pem.html#name-Block">Block</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="PEMCipher-stat-values"><label for="PEMCipher-stat-values">As Types Of (5+)</label><span id='PEMCipher-stat-values-content' class="stat-content">
+			const <a href="#name-PEMCipher3DES">PEMCipher3DES</a>
+			const <a href="#name-PEMCipherAES128">PEMCipherAES128</a>
+			const <a href="#name-PEMCipherAES192">PEMCipherAES192</a>
+			const <a href="#name-PEMCipherAES256">PEMCipherAES256</a>
+			const <a href="#name-PEMCipherDES">PEMCipherDES</a></span></div>
+<div class="anchor" id="name-PublicKeyAlgorithm" data-popularity="115">	 type <a href="../../src/crypto/x509/x509.go.html#line-222">PublicKeyAlgorithm</a> <a href="../builtin.html#name-int">int</a>
+
+		<input type='checkbox' class="stat" id="PublicKeyAlgorithm-stat-methods"><label for="PublicKeyAlgorithm-stat-methods">One Exported Method</label><span id='PublicKeyAlgorithm-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/x509.go.html#line-239">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="PublicKeyAlgorithm-stat-impls"><label for="PublicKeyAlgorithm-stat-impls">Implements (1+)</label><span id='PublicKeyAlgorithm-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="PublicKeyAlgorithm-stat-values"><label for="PublicKeyAlgorithm-stat-values">As Types Of (5+)</label><span id='PublicKeyAlgorithm-stat-values-content' class="stat-content">
+			const <a href="#name-DSA">DSA</a>
+			const <a href="#name-ECDSA">ECDSA</a>
+			const <a href="#name-Ed25519">Ed25519</a>
+			const <a href="#name-RSA">RSA</a>
+			const <a href="#name-UnknownPublicKeyAlgorithm">UnknownPublicKeyAlgorithm</a></span></div>
+<div class="anchor" id="name-RevocationList" data-popularity="35">	 type <a href="../../src/crypto/x509/x509.go.html#line-2677">RevocationList</a> <i>(struct)</i>
+		RevocationList contains the fields used to create an X.509 v2 Certificate
+		Revocation list with CreateRevocationList.
+
+		<input type='checkbox' class="stat" id="RevocationList-stat-fields"><label for="RevocationList-stat-fields">Exported Fields (6)</label><span id='RevocationList-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/x509/x509.go.html#line-2701">ExtraExtensions</a> <i>[]<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-Extension">Extension</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2698">NextUpdate</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2691">Number</a> <i>*<a href="../math/big.html">big</a>.<a href="../math/big.html#name-Int">Int</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2686">RevokedCertificates</a> <i>[]<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-RevokedCertificate">RevokedCertificate</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2681">SignatureAlgorithm</a> <i><a href="#name-SignatureAlgorithm">SignatureAlgorithm</a></i>
+			<a href="../../src/crypto/x509/x509.go.html#line-2694">ThisUpdate</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i></span>
+		<input type='checkbox' class="stat" id="RevocationList-stat-params"><label for="RevocationList-stat-params">As Inputs Of (1+)</label><span id='RevocationList-stat-params-content' class="stat-content">
+			func <a href="#name-CreateRevocationList">CreateRevocationList</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, template *<b>RevocationList</b>, issuer *<a href="#name-Certificate">Certificate</a>, priv <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Signer">Signer</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-SignatureAlgorithm" data-popularity="150">	 type <a href="../../src/crypto/x509/x509.go.html#line-182">SignatureAlgorithm</a> <a href="../builtin.html#name-int">int</a>
+
+		<input type='checkbox' class="stat" id="SignatureAlgorithm-stat-methods"><label for="SignatureAlgorithm-stat-methods">One Exported Method</label><span id='SignatureAlgorithm-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/x509.go.html#line-213">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SignatureAlgorithm-stat-impls"><label for="SignatureAlgorithm-stat-impls">Implements (1+)</label><span id='SignatureAlgorithm-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="SignatureAlgorithm-stat-params"><label for="SignatureAlgorithm-stat-params">As Inputs Of (1+)</label><span id='SignatureAlgorithm-stat-params-content' class="stat-content">
+			func (*<a href="#name-Certificate">Certificate</a>).<a href="../../src/crypto/x509/x509.go.html#line-821">CheckSignature</a>(algo <b>SignatureAlgorithm</b>, signed, signature []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="SignatureAlgorithm-stat-values"><label for="SignatureAlgorithm-stat-values">As Types Of (17+)</label><span id='SignatureAlgorithm-stat-values-content' class="stat-content">
+			const <a href="#name-DSAWithSHA1">DSAWithSHA1</a>
+			const <a href="#name-DSAWithSHA256">DSAWithSHA256</a>
+			const <a href="#name-ECDSAWithSHA1">ECDSAWithSHA1</a>
+			const <a href="#name-ECDSAWithSHA256">ECDSAWithSHA256</a>
+			const <a href="#name-ECDSAWithSHA384">ECDSAWithSHA384</a>
+			const <a href="#name-ECDSAWithSHA512">ECDSAWithSHA512</a>
+			const <a href="#name-MD2WithRSA">MD2WithRSA</a>
+			const <a href="#name-MD5WithRSA">MD5WithRSA</a>
+			const <a href="#name-PureEd25519">PureEd25519</a>
+			const <a href="#name-SHA1WithRSA">SHA1WithRSA</a>
+			const <a href="#name-SHA256WithRSA">SHA256WithRSA</a>
+			const <a href="#name-SHA256WithRSAPSS">SHA256WithRSAPSS</a>
+			const <a href="#name-SHA384WithRSA">SHA384WithRSA</a>
+			const <a href="#name-SHA384WithRSAPSS">SHA384WithRSAPSS</a>
+			const <a href="#name-SHA512WithRSA">SHA512WithRSA</a>
+			const <a href="#name-SHA512WithRSAPSS">SHA512WithRSAPSS</a>
+			const <a href="#name-UnknownSignatureAlgorithm">UnknownSignatureAlgorithm</a></span></div>
+<div class="anchor" id="name-SystemRootsError" data-popularity="100">	 type <a href="../../src/crypto/x509/verify.go.html#line-178">SystemRootsError</a> <i>(struct)</i>
+		SystemRootsError results when we fail to load the system root certificates.
+
+		<input type='checkbox' class="stat" id="SystemRootsError-stat-fields"><label for="SystemRootsError-stat-fields">One Exported Field</label><span id='SystemRootsError-stat-fields-content' class="stat-content">
+			<a href="../../src/net/net.go.html#line-590">Err</a> <i><a href="../builtin.html#name-error">error</a></i></span>
+		<input type='checkbox' class="stat" id="SystemRootsError-stat-methods"><label for="SystemRootsError-stat-methods">One Exported Method</label><span id='SystemRootsError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/verify.go.html#line-182">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SystemRootsError-stat-impls"><label for="SystemRootsError-stat-impls">Implements (1+)</label><span id='SystemRootsError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-UnhandledCriticalExtension" data-popularity="100">	 type <a href="../../src/crypto/x509/x509.go.html#line-929">UnhandledCriticalExtension</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="UnhandledCriticalExtension-stat-methods"><label for="UnhandledCriticalExtension-stat-methods">One Exported Method</label><span id='UnhandledCriticalExtension-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/x509.go.html#line-931">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="UnhandledCriticalExtension-stat-impls"><label for="UnhandledCriticalExtension-stat-impls">Implements (1+)</label><span id='UnhandledCriticalExtension-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-UnknownAuthorityError" data-popularity="100">	 type <a href="../../src/crypto/x509/verify.go.html#line-151">UnknownAuthorityError</a> <i>(struct)</i>
+		UnknownAuthorityError results when the certificate issuer is unknown
+
+		<input type='checkbox' class="stat" id="UnknownAuthorityError-stat-fields"><label for="UnknownAuthorityError-stat-fields">One Exported Field</label><span id='UnknownAuthorityError-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/x509/verify.go.html#line-152">Cert</a> <i>*<a href="#name-Certificate">Certificate</a></i></span>
+		<input type='checkbox' class="stat" id="UnknownAuthorityError-stat-methods"><label for="UnknownAuthorityError-stat-methods">One Exported Method</label><span id='UnknownAuthorityError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/crypto/x509/verify.go.html#line-161">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="UnknownAuthorityError-stat-impls"><label for="UnknownAuthorityError-stat-impls">Implements (1+)</label><span id='UnknownAuthorityError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-VerifyOptions" data-popularity="35">	 type <a href="../../src/crypto/x509/verify.go.html#line-195">VerifyOptions</a> <i>(struct)</i>
+		VerifyOptions contains parameters for Certificate.Verify.
+
+		<input type='checkbox' class="stat" id="VerifyOptions-stat-fields"><label for="VerifyOptions-stat-fields">Exported Fields (6)</label><span id='VerifyOptions-stat-fields-content' class="stat-content">
+			<a href="../../src/crypto/x509/verify.go.html#line-210">CurrentTime</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-198">DNSName</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-203">Intermediates</a> <i>*<a href="#name-CertPool">CertPool</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-215">KeyUsages</a> <i>[]<a href="#name-ExtKeyUsage">ExtKeyUsage</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-222">MaxConstraintComparisions</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/crypto/x509/verify.go.html#line-206">Roots</a> <i>*<a href="#name-CertPool">CertPool</a></i></span>
+		<input type='checkbox' class="stat" id="VerifyOptions-stat-params"><label for="VerifyOptions-stat-params">As Inputs Of (1+)</label><span id='VerifyOptions-stat-params-content' class="stat-content">
+			func (*<a href="#name-Certificate">Certificate</a>).<a href="../../src/crypto/x509/verify.go.html#line-756">Verify</a>(opts <b>VerifyOptions</b>) (chains [][]*<a href="#name-Certificate">Certificate</a>, err <a href="../builtin.html#name-error">error</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-CANotAuthorizedForExtKeyUsage">	const <a href="../../src/crypto/x509/verify.go.html#line-67">CANotAuthorizedForExtKeyUsage</a> <a href="#name-InvalidReason">InvalidReason</a> = 9
+		CANotAuthorizedForExtKeyUsage results when an intermediate or root
+		certificate does not permit a requested extended key usage.</div>
+<div class="anchor" id="name-CANotAuthorizedForThisName">	const <a href="../../src/crypto/x509/verify.go.html#line-36">CANotAuthorizedForThisName</a> <a href="#name-InvalidReason">InvalidReason</a> = 2
+		CANotAuthorizedForThisName results when an intermediate or root
+		certificate has a name constraint which doesn't permit a DNS or
+		other name (including IP address) in the leaf certificate.</div>
+<div class="anchor" id="name-CreateCertificate">	 func <a href="../../src/crypto/x509/x509.go.html#line-2089">CreateCertificate</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, template, parent *<a href="#name-Certificate">Certificate</a>, pub, priv interface{}) (cert []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+		CreateCertificate creates a new X.509v3 certificate based on a template.
+		The following members of template are used:
+
+		 - AuthorityKeyId
+		 - BasicConstraintsValid
+		 - CRLDistributionPoints
+		 - DNSNames
+		 - EmailAddresses
+		 - ExcludedDNSDomains
+		 - ExcludedEmailAddresses
+		 - ExcludedIPRanges
+		 - ExcludedURIDomains
+		 - ExtKeyUsage
+		 - ExtraExtensions
+		 - IPAddresses
+		 - IsCA
+		 - IssuingCertificateURL
+		 - KeyUsage
+		 - MaxPathLen
+		 - MaxPathLenZero
+		 - NotAfter
+		 - NotBefore
+		 - OCSPServer
+		 - PermittedDNSDomains
+		 - PermittedDNSDomainsCritical
+		 - PermittedEmailAddresses
+		 - PermittedIPRanges
+		 - PermittedURIDomains
+		 - PolicyIdentifiers
+		 - SerialNumber
+		 - SignatureAlgorithm
+		 - Subject
+		 - SubjectKeyId
+		 - URIs
+		 - UnknownExtKeyUsage
+
+		The certificate is signed by parent. If parent is equal to template then the
+		certificate is self-signed. The parameter pub is the public key of the
+		signee and priv is the private key of the signer.
+
+		The returned slice is the certificate in DER encoding.
+
+		The currently supported key types are *rsa.PublicKey, *ecdsa.PublicKey and
+		ed25519.PublicKey. pub must be a supported key type, and priv must be a
+		crypto.Signer with a supported public key.
+
+		The AuthorityKeyId will be taken from the SubjectKeyId of parent, if any,
+		unless the resulting certificate is self-signed. Otherwise the value from
+		template will be used.
+
+		If SubjectKeyId from template is empty and the template is a CA, SubjectKeyId
+		will be generated from the hash of the public key.</div>
+<div class="anchor" id="name-CreateCertificateRequest">	 func <a href="../../src/crypto/x509/x509.go.html#line-2439">CreateCertificateRequest</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, template *<a href="#name-CertificateRequest">CertificateRequest</a>, priv interface{}) (csr []<a href="../builtin.html#name-byte">byte</a>, err <a href="../builtin.html#name-error">error</a>)
+		CreateCertificateRequest creates a new certificate request based on a
+		template. The following members of template are used:
+
+		 - SignatureAlgorithm
+		 - Subject
+		 - DNSNames
+		 - EmailAddresses
+		 - IPAddresses
+		 - URIs
+		 - ExtraExtensions
+		 - Attributes (deprecated)
+
+		priv is the private key to sign the CSR with, and the corresponding public
+		key will be included in the CSR. It must implement crypto.Signer and its
+		Public() method must return a *rsa.PublicKey or a *ecdsa.PublicKey or a
+		ed25519.PublicKey. (A *rsa.PrivateKey, *ecdsa.PrivateKey or
+		ed25519.PrivateKey satisfies this.)
+
+		The returned slice is the certificate request in DER encoding.</div>
+<div class="anchor" id="name-CreateRevocationList">	 func <a href="../../src/crypto/x509/x509.go.html#line-2716">CreateRevocationList</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, template *<a href="#name-RevocationList">RevocationList</a>, issuer *<a href="#name-Certificate">Certificate</a>, priv <a href="../crypto.html">crypto</a>.<a href="../crypto.html#name-Signer">Signer</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		CreateRevocationList creates a new X.509 v2 Certificate Revocation List,
+		according to RFC 5280, based on template.
+
+		The CRL is signed by priv which should be the private key associated with
+		the public key in the issuer certificate.
+
+		The issuer may not be nil, and the crlSign bit must be set in KeyUsage in
+		order to use it as a CRL issuer.
+
+		The issuer distinguished name CRL field and authority key identifier
+		extension are populated using the issuer certificate. issuer must have
+		SubjectKeyId set.</div>
+<div class="anchor" id="name-DecryptPEMBlock">	 func <a href="../../src/crypto/x509/pem_decrypt.go.html#line-115">DecryptPEMBlock</a>(b *<a href="../encoding/pem.html">pem</a>.<a href="../encoding/pem.html#name-Block">Block</a>, password []<a href="../builtin.html#name-byte">byte</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		DecryptPEMBlock takes a password encrypted PEM block and the password used to
+		encrypt it and returns a slice of decrypted DER encoded bytes. It inspects
+		the DEK-Info header to determine the algorithm used for decryption. If no
+		DEK-Info header is present, an error is returned. If an incorrect password
+		is detected an IncorrectPasswordError is returned. Because of deficiencies
+		in the encrypted-PEM format, it's not always possible to detect an incorrect
+		password. In these cases no error will be returned but the decrypted DER
+		bytes will be random noise.</div>
+<div class="anchor" id="name-DSA">	const <a href="../../src/crypto/x509/x509.go.html#line-227">DSA</a> <a href="#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a> = 2</div>
+<div class="anchor" id="name-DSAWithSHA1">	const <a href="../../src/crypto/x509/x509.go.html#line-192">DSAWithSHA1</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 7</div>
+<div class="anchor" id="name-DSAWithSHA256">	const <a href="../../src/crypto/x509/x509.go.html#line-193">DSAWithSHA256</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 8</div>
+<div class="anchor" id="name-ECDSA">	const <a href="../../src/crypto/x509/x509.go.html#line-228">ECDSA</a> <a href="#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a> = 3</div>
+<div class="anchor" id="name-ECDSAWithSHA1">	const <a href="../../src/crypto/x509/x509.go.html#line-194">ECDSAWithSHA1</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 9</div>
+<div class="anchor" id="name-ECDSAWithSHA256">	const <a href="../../src/crypto/x509/x509.go.html#line-195">ECDSAWithSHA256</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 10</div>
+<div class="anchor" id="name-ECDSAWithSHA384">	const <a href="../../src/crypto/x509/x509.go.html#line-196">ECDSAWithSHA384</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 11</div>
+<div class="anchor" id="name-ECDSAWithSHA512">	const <a href="../../src/crypto/x509/x509.go.html#line-197">ECDSAWithSHA512</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 12</div>
+<div class="anchor" id="name-Ed25519">	const <a href="../../src/crypto/x509/x509.go.html#line-229">Ed25519</a> <a href="#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a> = 4</div>
+<div class="anchor" id="name-EncryptPEMBlock">	 func <a href="../../src/crypto/x509/pem_decrypt.go.html#line-183">EncryptPEMBlock</a>(rand <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, blockType <a href="../builtin.html#name-string">string</a>, data, password []<a href="../builtin.html#name-byte">byte</a>, alg <a href="#name-PEMCipher">PEMCipher</a>) (*<a href="../encoding/pem.html">pem</a>.<a href="../encoding/pem.html#name-Block">Block</a>, <a href="../builtin.html#name-error">error</a>)
+		EncryptPEMBlock returns a PEM block of the specified type holding the
+		given DER-encoded data encrypted with the specified algorithm and
+		password.</div>
+<div class="anchor" id="name-ErrUnsupportedAlgorithm">	  var <a href="../../src/crypto/x509/x509.go.html#line-764">ErrUnsupportedAlgorithm</a> <a href="../builtin.html#name-error">error</a>
+		ErrUnsupportedAlgorithm results from attempting to perform an operation that
+		involves algorithms that are not currently implemented.</div>
+<div class="anchor" id="name-Expired">	const <a href="../../src/crypto/x509/verify.go.html#line-32">Expired</a> <a href="#name-InvalidReason">InvalidReason</a> = 1
+		Expired results when a certificate has expired, based on the time
+		given in the VerifyOptions.</div>
+<div class="anchor" id="name-ExtKeyUsageAny">	const <a href="../../src/crypto/x509/x509.go.html#line-605">ExtKeyUsageAny</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 0</div>
+<div class="anchor" id="name-ExtKeyUsageClientAuth">	const <a href="../../src/crypto/x509/x509.go.html#line-607">ExtKeyUsageClientAuth</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 2</div>
+<div class="anchor" id="name-ExtKeyUsageCodeSigning">	const <a href="../../src/crypto/x509/x509.go.html#line-608">ExtKeyUsageCodeSigning</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 3</div>
+<div class="anchor" id="name-ExtKeyUsageEmailProtection">	const <a href="../../src/crypto/x509/x509.go.html#line-609">ExtKeyUsageEmailProtection</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 4</div>
+<div class="anchor" id="name-ExtKeyUsageIPSECEndSystem">	const <a href="../../src/crypto/x509/x509.go.html#line-610">ExtKeyUsageIPSECEndSystem</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 5</div>
+<div class="anchor" id="name-ExtKeyUsageIPSECTunnel">	const <a href="../../src/crypto/x509/x509.go.html#line-611">ExtKeyUsageIPSECTunnel</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 6</div>
+<div class="anchor" id="name-ExtKeyUsageIPSECUser">	const <a href="../../src/crypto/x509/x509.go.html#line-612">ExtKeyUsageIPSECUser</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 7</div>
+<div class="anchor" id="name-ExtKeyUsageMicrosoftCommercialCodeSigning">	const <a href="../../src/crypto/x509/x509.go.html#line-617">ExtKeyUsageMicrosoftCommercialCodeSigning</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 12</div>
+<div class="anchor" id="name-ExtKeyUsageMicrosoftKernelCodeSigning">	const <a href="../../src/crypto/x509/x509.go.html#line-618">ExtKeyUsageMicrosoftKernelCodeSigning</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 13</div>
+<div class="anchor" id="name-ExtKeyUsageMicrosoftServerGatedCrypto">	const <a href="../../src/crypto/x509/x509.go.html#line-615">ExtKeyUsageMicrosoftServerGatedCrypto</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 10</div>
+<div class="anchor" id="name-ExtKeyUsageNetscapeServerGatedCrypto">	const <a href="../../src/crypto/x509/x509.go.html#line-616">ExtKeyUsageNetscapeServerGatedCrypto</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 11</div>
+<div class="anchor" id="name-ExtKeyUsageOCSPSigning">	const <a href="../../src/crypto/x509/x509.go.html#line-614">ExtKeyUsageOCSPSigning</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 9</div>
+<div class="anchor" id="name-ExtKeyUsageServerAuth">	const <a href="../../src/crypto/x509/x509.go.html#line-606">ExtKeyUsageServerAuth</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 1</div>
+<div class="anchor" id="name-ExtKeyUsageTimeStamping">	const <a href="../../src/crypto/x509/x509.go.html#line-613">ExtKeyUsageTimeStamping</a> <a href="#name-ExtKeyUsage">ExtKeyUsage</a> = 8</div>
+<div class="anchor" id="name-IncompatibleUsage">	const <a href="../../src/crypto/x509/verify.go.html#line-42">IncompatibleUsage</a> <a href="#name-InvalidReason">InvalidReason</a> = 4
+		IncompatibleUsage results when the certificate's key usage indicates
+		that it may only be used for a different purpose.</div>
+<div class="anchor" id="name-IncorrectPasswordError">	  var <a href="../../src/crypto/x509/pem_decrypt.go.html#line-105">IncorrectPasswordError</a> <a href="../builtin.html#name-error">error</a>
+		IncorrectPasswordError is returned when an incorrect password is detected.</div>
+<div class="anchor" id="name-IsEncryptedPEMBlock">	 func <a href="../../src/crypto/x509/pem_decrypt.go.html#line-99">IsEncryptedPEMBlock</a>(b *<a href="../encoding/pem.html">pem</a>.<a href="../encoding/pem.html#name-Block">Block</a>) <a href="../builtin.html#name-bool">bool</a>
+		IsEncryptedPEMBlock returns if the PEM block is password encrypted.</div>
+<div class="anchor" id="name-KeyUsageCertSign">	const <a href="../../src/crypto/x509/x509.go.html#line-565">KeyUsageCertSign</a> <a href="#name-KeyUsage">KeyUsage</a> = 32</div>
+<div class="anchor" id="name-KeyUsageContentCommitment">	const <a href="../../src/crypto/x509/x509.go.html#line-561">KeyUsageContentCommitment</a> <a href="#name-KeyUsage">KeyUsage</a> = 2</div>
+<div class="anchor" id="name-KeyUsageCRLSign">	const <a href="../../src/crypto/x509/x509.go.html#line-566">KeyUsageCRLSign</a> <a href="#name-KeyUsage">KeyUsage</a> = 64</div>
+<div class="anchor" id="name-KeyUsageDataEncipherment">	const <a href="../../src/crypto/x509/x509.go.html#line-563">KeyUsageDataEncipherment</a> <a href="#name-KeyUsage">KeyUsage</a> = 8</div>
+<div class="anchor" id="name-KeyUsageDecipherOnly">	const <a href="../../src/crypto/x509/x509.go.html#line-568">KeyUsageDecipherOnly</a> <a href="#name-KeyUsage">KeyUsage</a> = 256</div>
+<div class="anchor" id="name-KeyUsageDigitalSignature">	const <a href="../../src/crypto/x509/x509.go.html#line-560">KeyUsageDigitalSignature</a> <a href="#name-KeyUsage">KeyUsage</a> = 1</div>
+<div class="anchor" id="name-KeyUsageEncipherOnly">	const <a href="../../src/crypto/x509/x509.go.html#line-567">KeyUsageEncipherOnly</a> <a href="#name-KeyUsage">KeyUsage</a> = 128</div>
+<div class="anchor" id="name-KeyUsageKeyAgreement">	const <a href="../../src/crypto/x509/x509.go.html#line-564">KeyUsageKeyAgreement</a> <a href="#name-KeyUsage">KeyUsage</a> = 16</div>
+<div class="anchor" id="name-KeyUsageKeyEncipherment">	const <a href="../../src/crypto/x509/x509.go.html#line-562">KeyUsageKeyEncipherment</a> <a href="#name-KeyUsage">KeyUsage</a> = 4</div>
+<div class="anchor" id="name-MarshalECPrivateKey">	 func <a href="../../src/crypto/x509/sec1.go.html#line-43">MarshalECPrivateKey</a>(key *<a href="ecdsa.html">ecdsa</a>.<a href="ecdsa.html#name-PrivateKey">PrivateKey</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		MarshalECPrivateKey converts an EC private key to SEC 1, ASN.1 DER form.
+
+		This kind of key is commonly encoded in PEM blocks of type "EC PRIVATE KEY".
+		For a more flexible key format which is not EC specific, use
+		MarshalPKCS8PrivateKey.</div>
+<div class="anchor" id="name-MarshalPKCS1PrivateKey">	 func <a href="../../src/crypto/x509/pkcs1.go.html#line-104">MarshalPKCS1PrivateKey</a>(key *<a href="rsa.html">rsa</a>.<a href="rsa.html#name-PrivateKey">PrivateKey</a>) []<a href="../builtin.html#name-byte">byte</a>
+		MarshalPKCS1PrivateKey converts an RSA private key to PKCS #1, ASN.1 DER form.
+
+		This kind of key is commonly encoded in PEM blocks of type "RSA PRIVATE KEY".
+		For a more flexible key format which is not RSA specific, use
+		MarshalPKCS8PrivateKey.</div>
+<div class="anchor" id="name-MarshalPKCS1PublicKey">	 func <a href="../../src/crypto/x509/pkcs1.go.html#line-167">MarshalPKCS1PublicKey</a>(key *<a href="rsa.html">rsa</a>.<a href="rsa.html#name-PublicKey">PublicKey</a>) []<a href="../builtin.html#name-byte">byte</a>
+		MarshalPKCS1PublicKey converts an RSA public key to PKCS #1, ASN.1 DER form.
+
+		This kind of key is commonly encoded in PEM blocks of type "RSA PUBLIC KEY".</div>
+<div class="anchor" id="name-MarshalPKCS8PrivateKey">	 func <a href="../../src/crypto/x509/pkcs8.go.html#line-88">MarshalPKCS8PrivateKey</a>(key interface{}) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		MarshalPKCS8PrivateKey converts a private key to PKCS #8, ASN.1 DER form.
+
+		The following key types are currently supported: *rsa.PrivateKey, *ecdsa.PrivateKey
+		and ed25519.PrivateKey. Unsupported key types result in an error.
+
+		This kind of key is commonly encoded in PEM blocks of type "PRIVATE KEY".</div>
+<div class="anchor" id="name-MarshalPKIXPublicKey">	 func <a href="../../src/crypto/x509/x509.go.html#line-115">MarshalPKIXPublicKey</a>(pub interface{}) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		MarshalPKIXPublicKey converts a public key to PKIX, ASN.1 DER form.
+		The encoded public key is a SubjectPublicKeyInfo structure
+		(see RFC 5280, Section 4.1).
+
+		The following key types are currently supported: *rsa.PublicKey, *ecdsa.PublicKey
+		and ed25519.PublicKey. Unsupported key types result in an error.
+
+		This kind of key is commonly encoded in PEM blocks of type "PUBLIC KEY".</div>
+<div class="anchor" id="name-MD2WithRSA">	const <a href="../../src/crypto/x509/x509.go.html#line-186">MD2WithRSA</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 1</div>
+<div class="anchor" id="name-MD5WithRSA">	const <a href="../../src/crypto/x509/x509.go.html#line-187">MD5WithRSA</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 2</div>
+<div class="anchor" id="name-NameConstraintsWithoutSANs">	const <a href="../../src/crypto/x509/verify.go.html#line-54">NameConstraintsWithoutSANs</a> <a href="#name-InvalidReason">InvalidReason</a> = 6
+		NameConstraintsWithoutSANs results when a leaf certificate doesn't
+		contain a Subject Alternative Name extension, but a CA certificate
+		contains name constraints, and the Common Name can be interpreted as
+		a hostname.
+
+		This error is only returned when legacy Common Name matching is enabled
+		by setting the GODEBUG environment variable to "x509ignoreCN=1". This
+		setting might be removed in the future.</div>
+<div class="anchor" id="name-NameMismatch">	const <a href="../../src/crypto/x509/verify.go.html#line-45">NameMismatch</a> <a href="#name-InvalidReason">InvalidReason</a> = 5
+		NameMismatch results when the subject name of a parent certificate
+		does not match the issuer name in the child.</div>
+<div class="anchor" id="name-NewCertPool">	 func <a href="../../src/crypto/x509/cert_pool.go.html#line-21">NewCertPool</a>() *<a href="#name-CertPool">CertPool</a>
+		NewCertPool returns a new, empty CertPool.</div>
+<div class="anchor" id="name-NotAuthorizedToSign">	const <a href="../../src/crypto/x509/verify.go.html#line-29">NotAuthorizedToSign</a> <a href="#name-InvalidReason">InvalidReason</a> = 0
+		NotAuthorizedToSign results when a certificate is signed by another
+		which isn't marked as a CA certificate.</div>
+<div class="anchor" id="name-ParseCertificate">	 func <a href="../../src/crypto/x509/x509.go.html#line-1559">ParseCertificate</a>(asn1Data []<a href="../builtin.html#name-byte">byte</a>) (*<a href="#name-Certificate">Certificate</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseCertificate parses a single certificate from the given ASN.1 DER data.</div>
+<div class="anchor" id="name-ParseCertificateRequest">	 func <a href="../../src/crypto/x509/x509.go.html#line-2610">ParseCertificateRequest</a>(asn1Data []<a href="../builtin.html#name-byte">byte</a>) (*<a href="#name-CertificateRequest">CertificateRequest</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseCertificateRequest parses a single certificate request from the
+		given ASN.1 DER data.</div>
+<div class="anchor" id="name-ParseCertificates">	 func <a href="../../src/crypto/x509/x509.go.html#line-1574">ParseCertificates</a>(asn1Data []<a href="../builtin.html#name-byte">byte</a>) ([]*<a href="#name-Certificate">Certificate</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseCertificates parses one or more certificates from the given ASN.1 DER
+		data. The certificates must be concatenated with no intermediate padding.</div>
+<div class="anchor" id="name-ParseCRL">	 func <a href="../../src/crypto/x509/x509.go.html#line-2201">ParseCRL</a>(crlBytes []<a href="../builtin.html#name-byte">byte</a>) (*<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-CertificateList">CertificateList</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseCRL parses a CRL from the given bytes. It's often the case that PEM
+		encoded CRLs will appear where they should be DER encoded, so this function
+		will transparently handle PEM encoding as long as there isn't any leading
+		garbage.</div>
+<div class="anchor" id="name-ParseDERCRL">	 func <a href="../../src/crypto/x509/x509.go.html#line-2212">ParseDERCRL</a>(derBytes []<a href="../builtin.html#name-byte">byte</a>) (*<a href="x509/pkix.html">pkix</a>.<a href="x509/pkix.html#name-CertificateList">CertificateList</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseDERCRL parses a DER encoded CRL from the given bytes.</div>
+<div class="anchor" id="name-ParseECPrivateKey">	 func <a href="../../src/crypto/x509/sec1.go.html#line-34">ParseECPrivateKey</a>(der []<a href="../builtin.html#name-byte">byte</a>) (*<a href="ecdsa.html">ecdsa</a>.<a href="ecdsa.html#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)
+		ParseECPrivateKey parses an EC private key in SEC 1, ASN.1 DER form.
+
+		This kind of key is commonly encoded in PEM blocks of type "EC PRIVATE KEY".</div>
+<div class="anchor" id="name-ParsePKCS1PrivateKey">	 func <a href="../../src/crypto/x509/pkcs1.go.html#line-47">ParsePKCS1PrivateKey</a>(der []<a href="../builtin.html#name-byte">byte</a>) (*<a href="rsa.html">rsa</a>.<a href="rsa.html#name-PrivateKey">PrivateKey</a>, <a href="../builtin.html#name-error">error</a>)
+		ParsePKCS1PrivateKey parses an RSA private key in PKCS #1, ASN.1 DER form.
+
+		This kind of key is commonly encoded in PEM blocks of type "RSA PRIVATE KEY".</div>
+<div class="anchor" id="name-ParsePKCS1PublicKey">	 func <a href="../../src/crypto/x509/pkcs1.go.html#line-138">ParsePKCS1PublicKey</a>(der []<a href="../builtin.html#name-byte">byte</a>) (*<a href="rsa.html">rsa</a>.<a href="rsa.html#name-PublicKey">PublicKey</a>, <a href="../builtin.html#name-error">error</a>)
+		ParsePKCS1PublicKey parses an RSA public key in PKCS #1, ASN.1 DER form.
+
+		This kind of key is commonly encoded in PEM blocks of type "RSA PUBLIC KEY".</div>
+<div class="anchor" id="name-ParsePKCS8PrivateKey">	 func <a href="../../src/crypto/x509/pkcs8.go.html#line-33">ParsePKCS8PrivateKey</a>(der []<a href="../builtin.html#name-byte">byte</a>) (key interface{}, err <a href="../builtin.html#name-error">error</a>)
+		ParsePKCS8PrivateKey parses an unencrypted private key in PKCS #8, ASN.1 DER form.
+
+		It returns a *rsa.PrivateKey, a *ecdsa.PrivateKey, or a ed25519.PrivateKey.
+		More types might be supported in the future.
+
+		This kind of key is commonly encoded in PEM blocks of type "PRIVATE KEY".</div>
+<div class="anchor" id="name-ParsePKIXPublicKey">	 func <a href="../../src/crypto/x509/x509.go.html#line-53">ParsePKIXPublicKey</a>(derBytes []<a href="../builtin.html#name-byte">byte</a>) (pub interface{}, err <a href="../builtin.html#name-error">error</a>)
+		ParsePKIXPublicKey parses a public key in PKIX, ASN.1 DER form.
+		The encoded public key is a SubjectPublicKeyInfo structure
+		(see RFC 5280, Section 4.1).
+
+		It returns a *rsa.PublicKey, *dsa.PublicKey, *ecdsa.PublicKey, or
+		ed25519.PublicKey. More types might be supported in the future.
+
+		This kind of key is commonly encoded in PEM blocks of type "PUBLIC KEY".</div>
+<div class="anchor" id="name-PEMCipher3DES">	const <a href="../../src/crypto/x509/pem_decrypt.go.html#line-29">PEMCipher3DES</a> <a href="#name-PEMCipher">PEMCipher</a> = 2
+		Possible values for the EncryptPEMBlock encryption algorithm.</div>
+<div class="anchor" id="name-PEMCipherAES128">	const <a href="../../src/crypto/x509/pem_decrypt.go.html#line-30">PEMCipherAES128</a> <a href="#name-PEMCipher">PEMCipher</a> = 3
+		Possible values for the EncryptPEMBlock encryption algorithm.</div>
+<div class="anchor" id="name-PEMCipherAES192">	const <a href="../../src/crypto/x509/pem_decrypt.go.html#line-31">PEMCipherAES192</a> <a href="#name-PEMCipher">PEMCipher</a> = 4
+		Possible values for the EncryptPEMBlock encryption algorithm.</div>
+<div class="anchor" id="name-PEMCipherAES256">	const <a href="../../src/crypto/x509/pem_decrypt.go.html#line-32">PEMCipherAES256</a> <a href="#name-PEMCipher">PEMCipher</a> = 5
+		Possible values for the EncryptPEMBlock encryption algorithm.</div>
+<div class="anchor" id="name-PEMCipherDES">	const <a href="../../src/crypto/x509/pem_decrypt.go.html#line-28">PEMCipherDES</a> <a href="#name-PEMCipher">PEMCipher</a> = 1
+		Possible values for the EncryptPEMBlock encryption algorithm.</div>
+<div class="anchor" id="name-PureEd25519">	const <a href="../../src/crypto/x509/x509.go.html#line-201">PureEd25519</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 16</div>
+<div class="anchor" id="name-RSA">	const <a href="../../src/crypto/x509/x509.go.html#line-226">RSA</a> <a href="#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a> = 1</div>
+<div class="anchor" id="name-SHA1WithRSA">	const <a href="../../src/crypto/x509/x509.go.html#line-188">SHA1WithRSA</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 3</div>
+<div class="anchor" id="name-SHA256WithRSA">	const <a href="../../src/crypto/x509/x509.go.html#line-189">SHA256WithRSA</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 4</div>
+<div class="anchor" id="name-SHA256WithRSAPSS">	const <a href="../../src/crypto/x509/x509.go.html#line-198">SHA256WithRSAPSS</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 13</div>
+<div class="anchor" id="name-SHA384WithRSA">	const <a href="../../src/crypto/x509/x509.go.html#line-190">SHA384WithRSA</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 5</div>
+<div class="anchor" id="name-SHA384WithRSAPSS">	const <a href="../../src/crypto/x509/x509.go.html#line-199">SHA384WithRSAPSS</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 14</div>
+<div class="anchor" id="name-SHA512WithRSA">	const <a href="../../src/crypto/x509/x509.go.html#line-191">SHA512WithRSA</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 6</div>
+<div class="anchor" id="name-SHA512WithRSAPSS">	const <a href="../../src/crypto/x509/x509.go.html#line-200">SHA512WithRSAPSS</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 15</div>
+<div class="anchor" id="name-SystemCertPool">	 func <a href="../../src/crypto/x509/cert_pool.go.html#line-59">SystemCertPool</a>() (*<a href="#name-CertPool">CertPool</a>, <a href="../builtin.html#name-error">error</a>)
+		SystemCertPool returns a copy of the system cert pool.
+
+		On Unix systems other than macOS the environment variables SSL_CERT_FILE and
+		SSL_CERT_DIR can be used to override the system default locations for the SSL
+		certificate file and SSL certificate files directory, respectively. The
+		latter can be a colon-separated list.
+
+		Any mutations to the returned pool are not written to disk and do not affect
+		any other pool returned by SystemCertPool.
+
+		New changes in the system cert pool might not be reflected in subsequent calls.</div>
+<div class="anchor" id="name-TooManyConstraints">	const <a href="../../src/crypto/x509/verify.go.html#line-64">TooManyConstraints</a> <a href="#name-InvalidReason">InvalidReason</a> = 8
+		TooManyConstraints results when the number of comparison operations
+		needed to check a certificate exceeds the limit set by
+		VerifyOptions.MaxConstraintComparisions. This limit exists to
+		prevent pathological certificates can consuming excessive amounts of
+		CPU time to verify.</div>
+<div class="anchor" id="name-TooManyIntermediates">	const <a href="../../src/crypto/x509/verify.go.html#line-39">TooManyIntermediates</a> <a href="#name-InvalidReason">InvalidReason</a> = 3
+		TooManyIntermediates results when a path length constraint is
+		violated.</div>
+<div class="anchor" id="name-UnconstrainedName">	const <a href="../../src/crypto/x509/verify.go.html#line-58">UnconstrainedName</a> <a href="#name-InvalidReason">InvalidReason</a> = 7
+		UnconstrainedName results when a CA certificate contains permitted
+		name constraints, but leaf certificate contains a name of an
+		unsupported or unconstrained type.</div>
+<div class="anchor" id="name-UnknownPublicKeyAlgorithm">	const <a href="../../src/crypto/x509/x509.go.html#line-225">UnknownPublicKeyAlgorithm</a> <a href="#name-PublicKeyAlgorithm">PublicKeyAlgorithm</a> = 0</div>
+<div class="anchor" id="name-UnknownSignatureAlgorithm">	const <a href="../../src/crypto/x509/x509.go.html#line-185">UnknownSignatureAlgorithm</a> <a href="#name-SignatureAlgorithm">SignatureAlgorithm</a> = 0</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

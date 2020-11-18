@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: root_darwin_amd64.go in package crypto/x509</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	root_darwin_amd64.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/x509.html">crypto/x509</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2020 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build !ios</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>package x509</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>import (</code></span>
+<span class="codeline" id="line-10"><code>	"bytes"</code></span>
+<span class="codeline" id="line-11"><code>	macOS "crypto/x509/internal/macos"</code></span>
+<span class="codeline" id="line-12"><code>	"fmt"</code></span>
+<span class="codeline" id="line-13"><code>	"os"</code></span>
+<span class="codeline" id="line-14"><code>	"strings"</code></span>
+<span class="codeline" id="line-15"><code>)</code></span>
+<span class="codeline" id="line-16"><code></code></span>
+<span class="codeline" id="line-17"><code>var debugDarwinRoots = strings.Contains(os.Getenv("GODEBUG"), "x509roots=1")</code></span>
+<span class="codeline" id="line-18"><code></code></span>
+<span class="codeline" id="line-19"><code>func (c *Certificate) systemVerify(opts *VerifyOptions) (chains [][]*Certificate, err error) {</code></span>
+<span class="codeline" id="line-20"><code>	return nil, nil</code></span>
+<span class="codeline" id="line-21"><code>}</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>// loadSystemRootsWithCgo is set in root_cgo_darwin_amd64.go when cgo is</code></span>
+<span class="codeline" id="line-24"><code>// available, and is only used for testing.</code></span>
+<span class="codeline" id="line-25"><code>var loadSystemRootsWithCgo func() (*CertPool, error)</code></span>
+<span class="codeline" id="line-26"><code></code></span>
+<span class="codeline" id="line-27"><code>func loadSystemRoots() (*CertPool, error) {</code></span>
+<span class="codeline" id="line-28"><code>	var trustedRoots []*Certificate</code></span>
+<span class="codeline" id="line-29"><code>	untrustedRoots := make(map[string]bool)</code></span>
+<span class="codeline" id="line-30"><code></code></span>
+<span class="codeline" id="line-31"><code>	// macOS has three trust domains: one for CAs added by users to their</code></span>
+<span class="codeline" id="line-32"><code>	// "login" keychain, one for CAs added by Admins to the "System" keychain,</code></span>
+<span class="codeline" id="line-33"><code>	// and one for the CAs that ship with the OS.</code></span>
+<span class="codeline" id="line-34"><code>	for _, domain := range []macOS.SecTrustSettingsDomain{</code></span>
+<span class="codeline" id="line-35"><code>		macOS.SecTrustSettingsDomainUser,</code></span>
+<span class="codeline" id="line-36"><code>		macOS.SecTrustSettingsDomainAdmin,</code></span>
+<span class="codeline" id="line-37"><code>		macOS.SecTrustSettingsDomainSystem,</code></span>
+<span class="codeline" id="line-38"><code>	} {</code></span>
+<span class="codeline" id="line-39"><code>		certs, err := macOS.SecTrustSettingsCopyCertificates(domain)</code></span>
+<span class="codeline" id="line-40"><code>		if err == macOS.ErrNoTrustSettings {</code></span>
+<span class="codeline" id="line-41"><code>			continue</code></span>
+<span class="codeline" id="line-42"><code>		} else if err != nil {</code></span>
+<span class="codeline" id="line-43"><code>			return nil, err</code></span>
+<span class="codeline" id="line-44"><code>		}</code></span>
+<span class="codeline" id="line-45"><code>		defer macOS.CFRelease(certs)</code></span>
+<span class="codeline" id="line-46"><code></code></span>
+<span class="codeline" id="line-47"><code>		for i := 0; i &lt; macOS.CFArrayGetCount(certs); i++ {</code></span>
+<span class="codeline" id="line-48"><code>			c := macOS.CFArrayGetValueAtIndex(certs, i)</code></span>
+<span class="codeline" id="line-49"><code>			cert, err := exportCertificate(c)</code></span>
+<span class="codeline" id="line-50"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-51"><code>				if debugDarwinRoots {</code></span>
+<span class="codeline" id="line-52"><code>					fmt.Fprintf(os.Stderr, "crypto/x509: domain %d, certificate #%d: %v\n", domain, i, err)</code></span>
+<span class="codeline" id="line-53"><code>				}</code></span>
+<span class="codeline" id="line-54"><code>				continue</code></span>
+<span class="codeline" id="line-55"><code>			}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>			var result macOS.SecTrustSettingsResult</code></span>
+<span class="codeline" id="line-58"><code>			if domain == macOS.SecTrustSettingsDomainSystem {</code></span>
+<span class="codeline" id="line-59"><code>				// Certs found in the system domain are always trusted. If the user</code></span>
+<span class="codeline" id="line-60"><code>				// configures "Never Trust" on such a cert, it will also be found in the</code></span>
+<span class="codeline" id="line-61"><code>				// admin or user domain, causing it to be added to untrustedRoots.</code></span>
+<span class="codeline" id="line-62"><code>				result = macOS.SecTrustSettingsResultTrustRoot</code></span>
+<span class="codeline" id="line-63"><code>			} else {</code></span>
+<span class="codeline" id="line-64"><code>				result, err = sslTrustSettingsResult(c)</code></span>
+<span class="codeline" id="line-65"><code>				if err != nil {</code></span>
+<span class="codeline" id="line-66"><code>					if debugDarwinRoots {</code></span>
+<span class="codeline" id="line-67"><code>						fmt.Fprintf(os.Stderr, "crypto/x509: trust settings for %v: %v\n", cert.Subject, err)</code></span>
+<span class="codeline" id="line-68"><code>					}</code></span>
+<span class="codeline" id="line-69"><code>					continue</code></span>
+<span class="codeline" id="line-70"><code>				}</code></span>
+<span class="codeline" id="line-71"><code>				if debugDarwinRoots {</code></span>
+<span class="codeline" id="line-72"><code>					fmt.Fprintf(os.Stderr, "crypto/x509: trust settings for %v: %d\n", cert.Subject, result)</code></span>
+<span class="codeline" id="line-73"><code>				}</code></span>
+<span class="codeline" id="line-74"><code>			}</code></span>
+<span class="codeline" id="line-75"><code></code></span>
+<span class="codeline" id="line-76"><code>			switch result {</code></span>
+<span class="codeline" id="line-77"><code>			// "Note the distinction between the results kSecTrustSettingsResultTrustRoot</code></span>
+<span class="codeline" id="line-78"><code>			// and kSecTrustSettingsResultTrustAsRoot: The former can only be applied to</code></span>
+<span class="codeline" id="line-79"><code>			// root (self-signed) certificates; the latter can only be applied to</code></span>
+<span class="codeline" id="line-80"><code>			// non-root certificates."</code></span>
+<span class="codeline" id="line-81"><code>			case macOS.SecTrustSettingsResultTrustRoot:</code></span>
+<span class="codeline" id="line-82"><code>				if isRootCertificate(cert) {</code></span>
+<span class="codeline" id="line-83"><code>					trustedRoots = append(trustedRoots, cert)</code></span>
+<span class="codeline" id="line-84"><code>				}</code></span>
+<span class="codeline" id="line-85"><code>			case macOS.SecTrustSettingsResultTrustAsRoot:</code></span>
+<span class="codeline" id="line-86"><code>				if !isRootCertificate(cert) {</code></span>
+<span class="codeline" id="line-87"><code>					trustedRoots = append(trustedRoots, cert)</code></span>
+<span class="codeline" id="line-88"><code>				}</code></span>
+<span class="codeline" id="line-89"><code></code></span>
+<span class="codeline" id="line-90"><code>			case macOS.SecTrustSettingsResultDeny:</code></span>
+<span class="codeline" id="line-91"><code>				// Add this certificate to untrustedRoots, which are subtracted</code></span>
+<span class="codeline" id="line-92"><code>				// from trustedRoots, so that we don't have to evaluate policies</code></span>
+<span class="codeline" id="line-93"><code>				// for every root in the system domain, but still apply user and</code></span>
+<span class="codeline" id="line-94"><code>				// admin policies that override system roots.</code></span>
+<span class="codeline" id="line-95"><code>				untrustedRoots[string(cert.Raw)] = true</code></span>
+<span class="codeline" id="line-96"><code></code></span>
+<span class="codeline" id="line-97"><code>			case macOS.SecTrustSettingsResultUnspecified:</code></span>
+<span class="codeline" id="line-98"><code>				// Certificates with unspecified trust should be added to a pool</code></span>
+<span class="codeline" id="line-99"><code>				// of intermediates for chain building, but we don't support it</code></span>
+<span class="codeline" id="line-100"><code>				// at the moment. This is Issue 35631.</code></span>
+<span class="codeline" id="line-101"><code></code></span>
+<span class="codeline" id="line-102"><code>			default:</code></span>
+<span class="codeline" id="line-103"><code>				if debugDarwinRoots {</code></span>
+<span class="codeline" id="line-104"><code>					fmt.Fprintf(os.Stderr, "crypto/x509: unknown trust setting for %v: %d\n", cert.Subject, result)</code></span>
+<span class="codeline" id="line-105"><code>				}</code></span>
+<span class="codeline" id="line-106"><code>			}</code></span>
+<span class="codeline" id="line-107"><code>		}</code></span>
+<span class="codeline" id="line-108"><code>	}</code></span>
+<span class="codeline" id="line-109"><code></code></span>
+<span class="codeline" id="line-110"><code>	pool := NewCertPool()</code></span>
+<span class="codeline" id="line-111"><code>	for _, cert := range trustedRoots {</code></span>
+<span class="codeline" id="line-112"><code>		if !untrustedRoots[string(cert.Raw)] {</code></span>
+<span class="codeline" id="line-113"><code>			pool.AddCert(cert)</code></span>
+<span class="codeline" id="line-114"><code>		}</code></span>
+<span class="codeline" id="line-115"><code>	}</code></span>
+<span class="codeline" id="line-116"><code>	return pool, nil</code></span>
+<span class="codeline" id="line-117"><code>}</code></span>
+<span class="codeline" id="line-118"><code></code></span>
+<span class="codeline" id="line-119"><code>// exportCertificate returns a *Certificate for a SecCertificateRef.</code></span>
+<span class="codeline" id="line-120"><code>func exportCertificate(cert macOS.CFRef) (*Certificate, error) {</code></span>
+<span class="codeline" id="line-121"><code>	data, err := macOS.SecItemExport(cert)</code></span>
+<span class="codeline" id="line-122"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-123"><code>		return nil, err</code></span>
+<span class="codeline" id="line-124"><code>	}</code></span>
+<span class="codeline" id="line-125"><code>	defer macOS.CFRelease(data)</code></span>
+<span class="codeline" id="line-126"><code>	der := macOS.CFDataToSlice(data)</code></span>
+<span class="codeline" id="line-127"><code></code></span>
+<span class="codeline" id="line-128"><code>	return ParseCertificate(der)</code></span>
+<span class="codeline" id="line-129"><code>}</code></span>
+<span class="codeline" id="line-130"><code></code></span>
+<span class="codeline" id="line-131"><code>// isRootCertificate reports whether Subject and Issuer match.</code></span>
+<span class="codeline" id="line-132"><code>func isRootCertificate(cert *Certificate) bool {</code></span>
+<span class="codeline" id="line-133"><code>	return bytes.Equal(cert.RawSubject, cert.RawIssuer)</code></span>
+<span class="codeline" id="line-134"><code>}</code></span>
+<span class="codeline" id="line-135"><code></code></span>
+<span class="codeline" id="line-136"><code>// sslTrustSettingsResult obtains the final kSecTrustSettingsResult value for a</code></span>
+<span class="codeline" id="line-137"><code>// certificate in the user or admin domain, combining usage constraints for the</code></span>
+<span class="codeline" id="line-138"><code>// SSL SecTrustSettingsPolicy,</code></span>
+<span class="codeline" id="line-139"><code>//</code></span>
+<span class="codeline" id="line-140"><code>// It ignores SecTrustSettingsKeyUsage and kSecTrustSettingsAllowedError, and</code></span>
+<span class="codeline" id="line-141"><code>// doesn't support kSecTrustSettingsDefaultRootCertSetting.</code></span>
+<span class="codeline" id="line-142"><code>//</code></span>
+<span class="codeline" id="line-143"><code>// https://developer.apple.com/documentation/security/1400261-sectrustsettingscopytrustsetting</code></span>
+<span class="codeline" id="line-144"><code>func sslTrustSettingsResult(cert macOS.CFRef) (macOS.SecTrustSettingsResult, error) {</code></span>
+<span class="codeline" id="line-145"><code>	// In Apple's implementation user trust settings override admin trust settings</code></span>
+<span class="codeline" id="line-146"><code>	// (which themselves override system trust settings). If SecTrustSettingsCopyTrustSettings</code></span>
+<span class="codeline" id="line-147"><code>	// fails, or returns a NULL trust settings, when looking for the user trust</code></span>
+<span class="codeline" id="line-148"><code>	// settings then fallback to checking the admin trust settings.</code></span>
+<span class="codeline" id="line-149"><code>	//</code></span>
+<span class="codeline" id="line-150"><code>	// See Security-59306.41.2/trust/headers/SecTrustSettings.h for a description of</code></span>
+<span class="codeline" id="line-151"><code>	// the trust settings overrides, and SecLegacyAnchorSourceCopyUsageConstraints in</code></span>
+<span class="codeline" id="line-152"><code>	// Security-59306.41.2/trust/trustd/SecCertificateSource.c for a concrete example</code></span>
+<span class="codeline" id="line-153"><code>	// of how Apple applies the override in the case of NULL trust settings, or non</code></span>
+<span class="codeline" id="line-154"><code>	// success errors.</code></span>
+<span class="codeline" id="line-155"><code>	trustSettings, err := macOS.SecTrustSettingsCopyTrustSettings(cert, macOS.SecTrustSettingsDomainUser)</code></span>
+<span class="codeline" id="line-156"><code>	if err != nil || trustSettings == 0 {</code></span>
+<span class="codeline" id="line-157"><code>		if debugDarwinRoots &amp;&amp; err != macOS.ErrNoTrustSettings {</code></span>
+<span class="codeline" id="line-158"><code>			fmt.Fprintf(os.Stderr, "crypto/x509: SecTrustSettingsCopyTrustSettings for SecTrustSettingsDomainUser failed: %s\n", err)</code></span>
+<span class="codeline" id="line-159"><code>		}</code></span>
+<span class="codeline" id="line-160"><code>		trustSettings, err = macOS.SecTrustSettingsCopyTrustSettings(cert, macOS.SecTrustSettingsDomainAdmin)</code></span>
+<span class="codeline" id="line-161"><code>	}</code></span>
+<span class="codeline" id="line-162"><code>	if err != nil || trustSettings == 0 {</code></span>
+<span class="codeline" id="line-163"><code>		// If there are neither user nor admin trust settings for a certificate returned</code></span>
+<span class="codeline" id="line-164"><code>		// from SecTrustSettingsCopyCertificates Apple returns kSecTrustSettingsResultInvalid,</code></span>
+<span class="codeline" id="line-165"><code>		// as this method is intended to return certificates _which have trust settings_.</code></span>
+<span class="codeline" id="line-166"><code>		// The most likely case for this being triggered is that the existing trust settings</code></span>
+<span class="codeline" id="line-167"><code>		// are invalid and cannot be properly parsed. In this case SecTrustSettingsCopyTrustSettings</code></span>
+<span class="codeline" id="line-168"><code>		// returns errSecInvalidTrustSettings. The existing cgo implementation returns</code></span>
+<span class="codeline" id="line-169"><code>		// kSecTrustSettingsResultUnspecified in this case, which mostly matches the Apple</code></span>
+<span class="codeline" id="line-170"><code>		// implementation because we don't do anything with certificates marked with this</code></span>
+<span class="codeline" id="line-171"><code>		// result.</code></span>
+<span class="codeline" id="line-172"><code>		//</code></span>
+<span class="codeline" id="line-173"><code>		// See SecPVCGetTrustSettingsResult in Security-59306.41.2/trust/trustd/SecPolicyServer.c</code></span>
+<span class="codeline" id="line-174"><code>		if debugDarwinRoots &amp;&amp; err != macOS.ErrNoTrustSettings {</code></span>
+<span class="codeline" id="line-175"><code>			fmt.Fprintf(os.Stderr, "crypto/x509: SecTrustSettingsCopyTrustSettings for SecTrustSettingsDomainAdmin failed: %s\n", err)</code></span>
+<span class="codeline" id="line-176"><code>		}</code></span>
+<span class="codeline" id="line-177"><code>		return macOS.SecTrustSettingsResultUnspecified, nil</code></span>
+<span class="codeline" id="line-178"><code>	}</code></span>
+<span class="codeline" id="line-179"><code>	defer macOS.CFRelease(trustSettings)</code></span>
+<span class="codeline" id="line-180"><code></code></span>
+<span class="codeline" id="line-181"><code>	// "An empty trust settings array means 'always trust this certificate' with an</code></span>
+<span class="codeline" id="line-182"><code>	// overall trust setting for the certificate of kSecTrustSettingsResultTrustRoot."</code></span>
+<span class="codeline" id="line-183"><code>	if macOS.CFArrayGetCount(trustSettings) == 0 {</code></span>
+<span class="codeline" id="line-184"><code>		return macOS.SecTrustSettingsResultTrustRoot, nil</code></span>
+<span class="codeline" id="line-185"><code>	}</code></span>
+<span class="codeline" id="line-186"><code></code></span>
+<span class="codeline" id="line-187"><code>	isSSLPolicy := func(policyRef macOS.CFRef) bool {</code></span>
+<span class="codeline" id="line-188"><code>		properties := macOS.SecPolicyCopyProperties(policyRef)</code></span>
+<span class="codeline" id="line-189"><code>		defer macOS.CFRelease(properties)</code></span>
+<span class="codeline" id="line-190"><code>		if v, ok := macOS.CFDictionaryGetValueIfPresent(properties, macOS.SecPolicyOid); ok {</code></span>
+<span class="codeline" id="line-191"><code>			return macOS.CFEqual(v, macOS.CFRef(macOS.SecPolicyAppleSSL))</code></span>
+<span class="codeline" id="line-192"><code>		}</code></span>
+<span class="codeline" id="line-193"><code>		return false</code></span>
+<span class="codeline" id="line-194"><code>	}</code></span>
+<span class="codeline" id="line-195"><code></code></span>
+<span class="codeline" id="line-196"><code>	for i := 0; i &lt; macOS.CFArrayGetCount(trustSettings); i++ {</code></span>
+<span class="codeline" id="line-197"><code>		tSetting := macOS.CFArrayGetValueAtIndex(trustSettings, i)</code></span>
+<span class="codeline" id="line-198"><code></code></span>
+<span class="codeline" id="line-199"><code>		// First, check if this trust setting is constrained to a non-SSL policy.</code></span>
+<span class="codeline" id="line-200"><code>		if policyRef, ok := macOS.CFDictionaryGetValueIfPresent(tSetting, macOS.SecTrustSettingsPolicy); ok {</code></span>
+<span class="codeline" id="line-201"><code>			if !isSSLPolicy(policyRef) {</code></span>
+<span class="codeline" id="line-202"><code>				continue</code></span>
+<span class="codeline" id="line-203"><code>			}</code></span>
+<span class="codeline" id="line-204"><code>		}</code></span>
+<span class="codeline" id="line-205"><code></code></span>
+<span class="codeline" id="line-206"><code>		// Then check if it is restricted to a hostname, so not a root.</code></span>
+<span class="codeline" id="line-207"><code>		if _, ok := macOS.CFDictionaryGetValueIfPresent(tSetting, macOS.SecTrustSettingsPolicyString); ok {</code></span>
+<span class="codeline" id="line-208"><code>			continue</code></span>
+<span class="codeline" id="line-209"><code>		}</code></span>
+<span class="codeline" id="line-210"><code></code></span>
+<span class="codeline" id="line-211"><code>		cfNum, ok := macOS.CFDictionaryGetValueIfPresent(tSetting, macOS.SecTrustSettingsResultKey)</code></span>
+<span class="codeline" id="line-212"><code>		// "If this key is not present, a default value of kSecTrustSettingsResultTrustRoot is assumed."</code></span>
+<span class="codeline" id="line-213"><code>		if !ok {</code></span>
+<span class="codeline" id="line-214"><code>			return macOS.SecTrustSettingsResultTrustRoot, nil</code></span>
+<span class="codeline" id="line-215"><code>		}</code></span>
+<span class="codeline" id="line-216"><code>		result, err := macOS.CFNumberGetValue(cfNum)</code></span>
+<span class="codeline" id="line-217"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-218"><code>			return 0, err</code></span>
+<span class="codeline" id="line-219"><code>		}</code></span>
+<span class="codeline" id="line-220"><code></code></span>
+<span class="codeline" id="line-221"><code>		// If multiple dictionaries match, we are supposed to "OR" them,</code></span>
+<span class="codeline" id="line-222"><code>		// the semantics of which are not clear. Since TrustRoot and TrustAsRoot</code></span>
+<span class="codeline" id="line-223"><code>		// are mutually exclusive, Deny should probably override, and Invalid and</code></span>
+<span class="codeline" id="line-224"><code>		// Unspecified be overridden, approximate this by stopping at the first</code></span>
+<span class="codeline" id="line-225"><code>		// TrustRoot, TrustAsRoot or Deny.</code></span>
+<span class="codeline" id="line-226"><code>		switch r := macOS.SecTrustSettingsResult(result); r {</code></span>
+<span class="codeline" id="line-227"><code>		case macOS.SecTrustSettingsResultTrustRoot,</code></span>
+<span class="codeline" id="line-228"><code>			macOS.SecTrustSettingsResultTrustAsRoot,</code></span>
+<span class="codeline" id="line-229"><code>			macOS.SecTrustSettingsResultDeny:</code></span>
+<span class="codeline" id="line-230"><code>			return r, nil</code></span>
+<span class="codeline" id="line-231"><code>		}</code></span>
+<span class="codeline" id="line-232"><code>	}</code></span>
+<span class="codeline" id="line-233"><code></code></span>
+<span class="codeline" id="line-234"><code>	// If trust settings are present, but none of them match the policy...</code></span>
+<span class="codeline" id="line-235"><code>	// the docs don't tell us what to do.</code></span>
+<span class="codeline" id="line-236"><code>	//</code></span>
+<span class="codeline" id="line-237"><code>	// "Trust settings for a given use apply if any of the dictionaries in the</code></span>
+<span class="codeline" id="line-238"><code>	// certificate’s trust settings array satisfies the specified use." suggests</code></span>
+<span class="codeline" id="line-239"><code>	// that it's as if there were no trust settings at all, so we should maybe</code></span>
+<span class="codeline" id="line-240"><code>	// fallback to the admin trust settings? TODO(golang.org/issue/38888).</code></span>
+<span class="codeline" id="line-241"><code></code></span>
+<span class="codeline" id="line-242"><code>	return macOS.SecTrustSettingsResultUnspecified, nil</code></span>
+<span class="codeline" id="line-243"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

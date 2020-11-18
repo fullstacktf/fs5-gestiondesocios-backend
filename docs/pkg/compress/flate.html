@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: compress/flate</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>flate</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-compress/flate">compress/flate</a><i> (on <a href="https://golang.org/pkg/compress/flate/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/compress/flate" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/compress/flate.html">8 packages</a>, and imported by <a href="../../dep/compress/flate.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/compress/flate/deflate.go.html">deflate.go</a>
+	    <a href="../../src/compress/flate/deflatefast.go.html">deflatefast.go</a>
+	    <a href="../../src/compress/flate/dict_decoder.go.html">dict_decoder.go</a>
+	    <a href="../../src/compress/flate/huffman_bit_writer.go.html">huffman_bit_writer.go</a>
+	    <a href="../../src/compress/flate/huffman_code.go.html">huffman_code.go</a>
+	<a href="../../src/compress/flate/inflate.go.html#doc">d-&gt;</a> <a href="../../src/compress/flate/inflate.go.html">inflate.go</a>
+	    <a href="../../src/compress/flate/token.go.html">token.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-CorruptInputError" data-popularity="100">	 type <a href="../../src/compress/flate/inflate.go.html#line-33">CorruptInputError</a> <a href="../builtin.html#name-int64">int64</a>
+		A CorruptInputError reports the presence of corrupt input at a given offset.
+
+		<input type='checkbox' class="stat" id="CorruptInputError-stat-methods"><label for="CorruptInputError-stat-methods">One Exported Method</label><span id='CorruptInputError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/compress/flate/inflate.go.html#line-35">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="CorruptInputError-stat-impls"><label for="CorruptInputError-stat-impls">Implements (1+)</label><span id='CorruptInputError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-InternalError" data-popularity="100">	 type <a href="../../src/compress/flate/inflate.go.html#line-40">InternalError</a> <a href="../builtin.html#name-string">string</a>
+		An InternalError reports an error in the flate code itself.
+
+		<input type='checkbox' class="stat" id="InternalError-stat-methods"><label for="InternalError-stat-methods">One Exported Method</label><span id='InternalError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/compress/flate/inflate.go.html#line-42">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="InternalError-stat-impls"><label for="InternalError-stat-impls">Implements (1+)</label><span id='InternalError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Reader" data-popularity="950">	 type <a href="../../src/compress/flate/inflate.go.html#line-261">Reader</a> <b<i>(interface)</i></b>
+		The actual read interface needed by NewReader.
+		If the passed in io.Reader does not also have ReadByte,
+		the NewReader will introduce its own buffering.
+
+		<input type='checkbox' class="stat" id="Reader-stat-methods"><label for="Reader-stat-methods">Exported Methods (2)</label><span id='Reader-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/io/io.go.html#line-78">Read</a>(p []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/io/io.go.html#line-244">ReadByte</a>() (<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-impledby"><label for="Reader-stat-impledby">Implemented By (5+)</label><span id='Reader-stat-impledby-content' class="stat-content">
+			bufio.(*<a href="../bufio.html#name-Reader">Reader</a>)
+			bufio.<a href="../bufio.html#name-ReadWriter">ReadWriter</a>
+			bytes.(*<a href="../bytes.html#name-Buffer">Buffer</a>)
+			bytes.(*<a href="../bytes.html#name-Reader">Reader</a>)
+			strings.(*<a href="../strings.html#name-Reader">Reader</a>)</span>
+		<input type='checkbox' class="stat" id="Reader-stat-impls"><label for="Reader-stat-impls">Implements (2+)</label><span id='Reader-stat-impls-content' class="stat-content">
+			 T : io.<a href="../io.html#name-ByteReader">ByteReader</a>
+			 T : io.<a href="../io.html#name-Reader">Reader</a></span></div>
+<div class="anchor" id="name-ReadError" data-popularity="100">	 type <a href="../../src/compress/flate/inflate.go.html#line-47">ReadError</a> <i>(struct)</i>
+		A ReadError reports an error encountered while reading input.
+
+		Deprecated: No longer returned.
+
+		<input type='checkbox' class="stat" id="ReadError-stat-fields"><label for="ReadError-stat-fields">Exported Fields (2)</label><span id='ReadError-stat-fields-content' class="stat-content">
+			<a href="../../src/compress/flate/inflate.go.html#line-49">Err</a> <i><a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/compress/flate/inflate.go.html#line-48">Offset</a> <i><a href="../builtin.html#name-int64">int64</a></i></span>
+		<input type='checkbox' class="stat" id="ReadError-stat-methods"><label for="ReadError-stat-methods">One Exported Method</label><span id='ReadError-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/compress/flate/inflate.go.html#line-52">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="ReadError-stat-impls"><label for="ReadError-stat-impls">Implements (1+)</label><span id='ReadError-stat-impls-content' class="stat-content">
+			*T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Resetter" data-popularity="50">	 type <a href="../../src/compress/flate/inflate.go.html#line-71">Resetter</a> <b<i>(interface)</i></b>
+		Resetter resets a ReadCloser returned by NewReader or NewReaderDict
+		to switch to a new underlying Reader. This permits reusing a ReadCloser
+		instead of allocating a new one.
+
+		<input type='checkbox' class="stat" id="Resetter-stat-methods"><label for="Resetter-stat-methods">One Exported Method</label><span id='Resetter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/compress/flate/inflate.go.html#line-74">Reset</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, dict []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-WriteError" data-popularity="100">	 type <a href="../../src/compress/flate/inflate.go.html#line-59">WriteError</a> <i>(struct)</i>
+		A WriteError reports an error encountered while writing output.
+
+		Deprecated: No longer returned.
+
+		<input type='checkbox' class="stat" id="WriteError-stat-fields"><label for="WriteError-stat-fields">Exported Fields (2)</label><span id='WriteError-stat-fields-content' class="stat-content">
+			<a href="../../src/compress/flate/inflate.go.html#line-49">Err</a> <i><a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/compress/flate/inflate.go.html#line-48">Offset</a> <i><a href="../builtin.html#name-int64">int64</a></i></span>
+		<input type='checkbox' class="stat" id="WriteError-stat-methods"><label for="WriteError-stat-methods">One Exported Method</label><span id='WriteError-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/compress/flate/inflate.go.html#line-64">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="WriteError-stat-impls"><label for="WriteError-stat-impls">Implements (1+)</label><span id='WriteError-stat-impls-content' class="stat-content">
+			*T : <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Writer" data-popularity="500">	 type <a href="../../src/compress/flate/deflate.go.html#line-704">Writer</a> <i>(struct)</i>
+		A Writer takes data written to it and writes the compressed
+		form of that data to an underlying writer (see NewWriter).
+
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">Exported Methods (4)</label><span id='Writer-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/compress/flate/deflate.go.html#line-731">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/compress/flate/deflate.go.html#line-724">Flush</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/compress/flate/deflate.go.html#line-738">Reset</a>(dst <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>)
+			(*T) <a href="../../src/compress/flate/deflate.go.html#line-711">Write</a>(data []<a href="../builtin.html#name-byte">byte</a>) (n <a href="../builtin.html#name-int">int</a>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impls"><label for="Writer-stat-impls">Implements (3+)</label><span id='Writer-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a>
+			*T : io.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+			*T : io.<a href="../io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Writer-stat-results"><label for="Writer-stat-results">As Outputs Of (2+)</label><span id='Writer-stat-results-content' class="stat-content">
+			func <a href="#name-NewWriter">NewWriter</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, level <a href="../builtin.html#name-int">int</a>) (*<b>Writer</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-NewWriterDict">NewWriterDict</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, level <a href="../builtin.html#name-int">int</a>, dict []<a href="../builtin.html#name-byte">byte</a>) (*<b>Writer</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BestCompression">	const <a href="../../src/compress/flate/deflate.go.html#line-16">BestCompression</a> = 9</div>
+<div class="anchor" id="name-BestSpeed">	const <a href="../../src/compress/flate/deflate.go.html#line-15">BestSpeed</a> = 1</div>
+<div class="anchor" id="name-DefaultCompression">	const <a href="../../src/compress/flate/deflate.go.html#line-17">DefaultCompression</a> = -1</div>
+<div class="anchor" id="name-HuffmanOnly">	const <a href="../../src/compress/flate/deflate.go.html#line-28">HuffmanOnly</a> = -2
+		HuffmanOnly disables Lempel-Ziv match searching and only performs Huffman
+		entropy encoding. This mode is useful in compressing data that has
+		already been compressed with an LZ style algorithm (e.g. Snappy or LZ4)
+		that lacks an entropy encoder. Compression gains are achieved when
+		certain bytes in the input stream occur more frequently than others.
+
+		Note that HuffmanOnly produces a compressed output that is
+		RFC 1951 compliant. That is, any valid DEFLATE decompressor will
+		continue to be able to decompress this output.</div>
+<div class="anchor" id="name-NewReader">	 func <a href="../../src/compress/flate/inflate.go.html#line-796">NewReader</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) <a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+		NewReader returns a new ReadCloser that can be used
+		to read the uncompressed version of r.
+		If r does not also implement io.ByteReader,
+		the decompressor may read more data than necessary from r.
+		It is the caller's responsibility to call Close on the ReadCloser
+		when finished reading.
+
+		The ReadCloser returned by NewReader also implements Resetter.</div>
+<div class="anchor" id="name-NewReaderDict">	 func <a href="../../src/compress/flate/inflate.go.html#line-815">NewReaderDict</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>, dict []<a href="../builtin.html#name-byte">byte</a>) <a href="../io.html">io</a>.<a href="../io.html#name-ReadCloser">ReadCloser</a>
+		NewReaderDict is like NewReader but initializes the reader
+		with a preset dictionary. The returned Reader behaves as if
+		the uncompressed data stream started with the given dictionary,
+		which has already been read. NewReaderDict is typically used
+		to read data compressed by NewWriterDict.
+
+		The ReadCloser returned by NewReader also implements Resetter.</div>
+<div class="anchor" id="name-NewWriter">	 func <a href="../../src/compress/flate/deflate.go.html#line-669">NewWriter</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, level <a href="../builtin.html#name-int">int</a>) (*<a href="#name-Writer">Writer</a>, <a href="../builtin.html#name-error">error</a>)
+		NewWriter returns a new Writer compressing data at the given level.
+		Following zlib, levels range from 1 (BestSpeed) to 9 (BestCompression);
+		higher levels typically run slower but compress more. Level 0
+		(NoCompression) does not attempt any compression; it only adds the
+		necessary DEFLATE framing.
+		Level -1 (DefaultCompression) uses the default compression level.
+		Level -2 (HuffmanOnly) will use Huffman compression only, giving
+		a very fast compression for all types of input, but sacrificing considerable
+		compression efficiency.
+
+		If level is in the range [-2, 9] then the error returned will be nil.
+		Otherwise the error returned will be non-nil.</div>
+<div class="anchor" id="name-NewWriterDict">	 func <a href="../../src/compress/flate/deflate.go.html#line-683">NewWriterDict</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>, level <a href="../builtin.html#name-int">int</a>, dict []<a href="../builtin.html#name-byte">byte</a>) (*<a href="#name-Writer">Writer</a>, <a href="../builtin.html#name-error">error</a>)
+		NewWriterDict is like NewWriter but initializes the new
+		Writer with a preset dictionary. The returned Writer behaves
+		as if the dictionary had been written to it without producing
+		any compressed output. The compressed data written to w
+		can only be decompressed by a Reader initialized with the
+		same dictionary.</div>
+<div class="anchor" id="name-NoCompression">	const <a href="../../src/compress/flate/deflate.go.html#line-14">NoCompression</a> = 0</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

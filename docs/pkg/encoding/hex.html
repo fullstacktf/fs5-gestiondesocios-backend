@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: encoding/hex</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>hex</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-encoding/hex">encoding/hex</a><i> (on <a href="https://golang.org/pkg/encoding/hex/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/encoding/hex" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/encoding/hex.html">4 packages</a>, and imported by <a href="../../dep/encoding/hex.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/encoding/hex/hex.go.html#doc">d-&gt;</a> <a href="../../src/encoding/hex/hex.go.html">hex.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-InvalidByteError" data-popularity="100">	 type <a href="../../src/encoding/hex/hex.go.html#line-41">InvalidByteError</a> <a href="../builtin.html#name-byte">byte</a>
+		InvalidByteError values describe errors resulting from an invalid byte in a hex string.
+
+		<input type='checkbox' class="stat" id="InvalidByteError-stat-methods"><label for="InvalidByteError-stat-methods">One Exported Method</label><span id='InvalidByteError-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/encoding/hex/hex.go.html#line-43">Error</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="InvalidByteError-stat-impls"><label for="InvalidByteError-stat-impls">Implements (1+)</label><span id='InvalidByteError-stat-impls-content' class="stat-content">
+			 T : <a href="../builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Decode">	 func <a href="../../src/encoding/hex/hex.go.html#line-58">Decode</a>(dst, src []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)
+		Decode decodes src into DecodedLen(len(src)) bytes,
+		returning the actual number of bytes written to dst.
+
+		Decode expects that src contains only hexadecimal
+		characters and that src has even length.
+		If the input is malformed, Decode returns the number
+		of bytes decoded before the error.</div>
+<div class="anchor" id="name-DecodedLen">	 func <a href="../../src/encoding/hex/hex.go.html#line-49">DecodedLen</a>(x <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-int">int</a>
+		DecodedLen returns the length of a decoding of x source bytes.
+		Specifically, it returns x / 2.</div>
+<div class="anchor" id="name-DecodeString">	 func <a href="../../src/encoding/hex/hex.go.html#line-110">DecodeString</a>(s <a href="../builtin.html#name-string">string</a>) ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+		DecodeString returns the bytes represented by the hexadecimal string s.
+
+		DecodeString expects that src contains only hexadecimal
+		characters and that src has even length.
+		If the input is malformed, DecodeString returns
+		the bytes decoded before the error.</div>
+<div class="anchor" id="name-Dump">	 func <a href="../../src/encoding/hex/hex.go.html#line-120">Dump</a>(data []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-string">string</a>
+		Dump returns a string that contains a hex dump of the given data. The format
+		of the hex dump matches the output of `hexdump -C` on the command line.</div>
+<div class="anchor" id="name-Dumper">	 func <a href="../../src/encoding/hex/hex.go.html#line-215">Dumper</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) <a href="../io.html">io</a>.<a href="../io.html#name-WriteCloser">WriteCloser</a>
+		Dumper returns a WriteCloser that writes a hex dump of all written data to
+		w. The format of the dump matches the output of `hexdump -C` on the command
+		line.</div>
+<div class="anchor" id="name-Encode">	 func <a href="../../src/encoding/hex/hex.go.html#line-25">Encode</a>(dst, src []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a>
+		Encode encodes src into EncodedLen(len(src))
+		bytes of dst. As a convenience, it returns the number
+		of bytes written to dst, but this value is always EncodedLen(len(src)).
+		Encode implements hexadecimal encoding.</div>
+<div class="anchor" id="name-EncodedLen">	 func <a href="../../src/encoding/hex/hex.go.html#line-19">EncodedLen</a>(n <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-int">int</a>
+		EncodedLen returns the length of an encoding of n source bytes.
+		Specifically, it returns n * 2.</div>
+<div class="anchor" id="name-EncodeToString">	 func <a href="../../src/encoding/hex/hex.go.html#line-98">EncodeToString</a>(src []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-string">string</a>
+		EncodeToString returns the hexadecimal encoding of src.</div>
+<div class="anchor" id="name-ErrLength">	  var <a href="../../src/encoding/hex/hex.go.html#line-38">ErrLength</a> <a href="../builtin.html#name-error">error</a>
+		ErrLength reports an attempt to decode an odd-length input
+		using Decode or DecodeString.
+		The stream-based Decoder returns io.ErrUnexpectedEOF instead of ErrLength.</div>
+<div class="anchor" id="name-NewDecoder">	 func <a href="../../src/encoding/hex/hex.go.html#line-176">NewDecoder</a>(r <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>) <a href="../io.html">io</a>.<a href="../io.html#name-Reader">Reader</a>
+		NewDecoder returns an io.Reader that decodes hexadecimal characters from r.
+		NewDecoder expects that r contain only an even number of hexadecimal characters.</div>
+<div class="anchor" id="name-NewEncoder">	 func <a href="../../src/encoding/hex/hex.go.html#line-147">NewEncoder</a>(w <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>) <a href="../io.html">io</a>.<a href="../io.html#name-Writer">Writer</a>
+		NewEncoder returns an io.Writer that writes lowercase hexadecimal characters to w.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

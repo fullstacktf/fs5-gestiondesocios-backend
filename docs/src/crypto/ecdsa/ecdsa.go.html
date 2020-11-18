@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: ecdsa.go in package crypto/ecdsa</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	ecdsa.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../pkg/crypto/ecdsa.html">crypto/ecdsa</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<div class="anchor" id="doc"><span class="codeline" id="line-5"><code>// Package ecdsa implements the Elliptic Curve Digital Signature Algorithm, as</code></span>
+<span class="codeline" id="line-6"><code>// defined in FIPS 186-3.</code></span>
+<span class="codeline" id="line-7"><code>//</code></span>
+<span class="codeline" id="line-8"><code>// This implementation derives the nonce from an AES-CTR CSPRNG keyed by:</code></span>
+<span class="codeline" id="line-9"><code>//</code></span>
+<span class="codeline" id="line-10"><code>// SHA2-512(priv.D || entropy || hash)[:32]</code></span>
+<span class="codeline" id="line-11"><code>//</code></span>
+<span class="codeline" id="line-12"><code>// The CSPRNG key is indifferentiable from a random oracle as shown in</code></span>
+<span class="codeline" id="line-13"><code>// [Coron], the AES-CTR stream is indifferentiable from a random oracle</code></span>
+<span class="codeline" id="line-14"><code>// under standard cryptographic assumptions (see [Larsson] for examples).</code></span>
+<span class="codeline" id="line-15"><code>//</code></span>
+<span class="codeline" id="line-16"><code>// References:</code></span>
+<span class="codeline" id="line-17"><code>//   [Coron]</code></span>
+<span class="codeline" id="line-18"><code>//     https://cs.nyu.edu/~dodis/ps/merkle.pdf</code></span>
+<span class="codeline" id="line-19"><code>//   [Larsson]</code></span>
+<span class="codeline" id="line-20"><code>//     https://www.nada.kth.se/kurser/kth/2D1441/semteo03/lecturenotes/assump.pdf</code></span></div><span class="codeline" id="line-21"><code>package ecdsa</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>// Further references:</code></span>
+<span class="codeline" id="line-24"><code>//   [NSA]: Suite B implementer's guide to FIPS 186-3</code></span>
+<span class="codeline" id="line-25"><code>//     https://apps.nsa.gov/iaarchive/library/ia-guidance/ia-solutions-for-classified/algorithm-guidance/suite-b-implementers-guide-to-fips-186-3-ecdsa.cfm</code></span>
+<span class="codeline" id="line-26"><code>//   [SECG]: SECG, SEC1</code></span>
+<span class="codeline" id="line-27"><code>//     http://www.secg.org/sec1-v2.pdf</code></span>
+<span class="codeline" id="line-28"><code></code></span>
+<span class="codeline" id="line-29"><code>import (</code></span>
+<span class="codeline" id="line-30"><code>	"crypto"</code></span>
+<span class="codeline" id="line-31"><code>	"crypto/aes"</code></span>
+<span class="codeline" id="line-32"><code>	"crypto/cipher"</code></span>
+<span class="codeline" id="line-33"><code>	"crypto/elliptic"</code></span>
+<span class="codeline" id="line-34"><code>	"crypto/internal/randutil"</code></span>
+<span class="codeline" id="line-35"><code>	"crypto/sha512"</code></span>
+<span class="codeline" id="line-36"><code>	"errors"</code></span>
+<span class="codeline" id="line-37"><code>	"io"</code></span>
+<span class="codeline" id="line-38"><code>	"math/big"</code></span>
+<span class="codeline" id="line-39"><code></code></span>
+<span class="codeline" id="line-40"><code>	"golang.org/x/crypto/cryptobyte"</code></span>
+<span class="codeline" id="line-41"><code>	"golang.org/x/crypto/cryptobyte/asn1"</code></span>
+<span class="codeline" id="line-42"><code>)</code></span>
+<span class="codeline" id="line-43"><code></code></span>
+<span class="codeline" id="line-44"><code>// A invertible implements fast inverse mod Curve.Params().N</code></span>
+<span class="codeline" id="line-45"><code>type invertible interface {</code></span>
+<span class="codeline" id="line-46"><code>	// Inverse returns the inverse of k in GF(P)</code></span>
+<span class="codeline" id="line-47"><code>	Inverse(k *big.Int) *big.Int</code></span>
+<span class="codeline" id="line-48"><code>}</code></span>
+<span class="codeline" id="line-49"><code></code></span>
+<span class="codeline" id="line-50"><code>// combinedMult implements fast multiplication S1*g + S2*p (g - generator, p - arbitrary point)</code></span>
+<span class="codeline" id="line-51"><code>type combinedMult interface {</code></span>
+<span class="codeline" id="line-52"><code>	CombinedMult(bigX, bigY *big.Int, baseScalar, scalar []byte) (x, y *big.Int)</code></span>
+<span class="codeline" id="line-53"><code>}</code></span>
+<span class="codeline" id="line-54"><code></code></span>
+<span class="codeline" id="line-55"><code>const (</code></span>
+<span class="codeline" id="line-56"><code>	aesIV = "IV for ECDSA CTR"</code></span>
+<span class="codeline" id="line-57"><code>)</code></span>
+<span class="codeline" id="line-58"><code></code></span>
+<span class="codeline" id="line-59"><code>// PublicKey represents an ECDSA public key.</code></span>
+<span class="codeline" id="line-60"><code>type PublicKey struct {</code></span>
+<span class="codeline" id="line-61"><code>	elliptic.Curve</code></span>
+<span class="codeline" id="line-62"><code>	X, Y *big.Int</code></span>
+<span class="codeline" id="line-63"><code>}</code></span>
+<span class="codeline" id="line-64"><code></code></span>
+<span class="codeline" id="line-65"><code>// Any methods implemented on PublicKey might need to also be implemented on</code></span>
+<span class="codeline" id="line-66"><code>// PrivateKey, as the latter embeds the former and will expose its methods.</code></span>
+<span class="codeline" id="line-67"><code></code></span>
+<span class="codeline" id="line-68"><code>// Equal reports whether pub and x have the same value.</code></span>
+<span class="codeline" id="line-69"><code>//</code></span>
+<span class="codeline" id="line-70"><code>// Two keys are only considered to have the same value if they have the same Curve value.</code></span>
+<span class="codeline" id="line-71"><code>// Note that for example elliptic.P256() and elliptic.P256().Params() are different</code></span>
+<span class="codeline" id="line-72"><code>// values, as the latter is a generic not constant time implementation.</code></span>
+<span class="codeline" id="line-73"><code>func (pub *PublicKey) Equal(x crypto.PublicKey) bool {</code></span>
+<span class="codeline" id="line-74"><code>	xx, ok := x.(*PublicKey)</code></span>
+<span class="codeline" id="line-75"><code>	if !ok {</code></span>
+<span class="codeline" id="line-76"><code>		return false</code></span>
+<span class="codeline" id="line-77"><code>	}</code></span>
+<span class="codeline" id="line-78"><code>	return pub.X.Cmp(xx.X) == 0 &amp;&amp; pub.Y.Cmp(xx.Y) == 0 &amp;&amp;</code></span>
+<span class="codeline" id="line-79"><code>		// Standard library Curve implementations are singletons, so this check</code></span>
+<span class="codeline" id="line-80"><code>		// will work for those. Other Curves might be equivalent even if not</code></span>
+<span class="codeline" id="line-81"><code>		// singletons, but there is no definitive way to check for that, and</code></span>
+<span class="codeline" id="line-82"><code>		// better to err on the side of safety.</code></span>
+<span class="codeline" id="line-83"><code>		pub.Curve == xx.Curve</code></span>
+<span class="codeline" id="line-84"><code>}</code></span>
+<span class="codeline" id="line-85"><code></code></span>
+<span class="codeline" id="line-86"><code>// PrivateKey represents an ECDSA private key.</code></span>
+<span class="codeline" id="line-87"><code>type PrivateKey struct {</code></span>
+<span class="codeline" id="line-88"><code>	PublicKey</code></span>
+<span class="codeline" id="line-89"><code>	D *big.Int</code></span>
+<span class="codeline" id="line-90"><code>}</code></span>
+<span class="codeline" id="line-91"><code></code></span>
+<span class="codeline" id="line-92"><code>// Public returns the public key corresponding to priv.</code></span>
+<span class="codeline" id="line-93"><code>func (priv *PrivateKey) Public() crypto.PublicKey {</code></span>
+<span class="codeline" id="line-94"><code>	return &amp;priv.PublicKey</code></span>
+<span class="codeline" id="line-95"><code>}</code></span>
+<span class="codeline" id="line-96"><code></code></span>
+<span class="codeline" id="line-97"><code>// Equal reports whether priv and x have the same value.</code></span>
+<span class="codeline" id="line-98"><code>//</code></span>
+<span class="codeline" id="line-99"><code>// See PublicKey.Equal for details on how Curve is compared.</code></span>
+<span class="codeline" id="line-100"><code>func (priv *PrivateKey) Equal(x crypto.PrivateKey) bool {</code></span>
+<span class="codeline" id="line-101"><code>	xx, ok := x.(*PrivateKey)</code></span>
+<span class="codeline" id="line-102"><code>	if !ok {</code></span>
+<span class="codeline" id="line-103"><code>		return false</code></span>
+<span class="codeline" id="line-104"><code>	}</code></span>
+<span class="codeline" id="line-105"><code>	return priv.PublicKey.Equal(&amp;xx.PublicKey) &amp;&amp; priv.D.Cmp(xx.D) == 0</code></span>
+<span class="codeline" id="line-106"><code>}</code></span>
+<span class="codeline" id="line-107"><code></code></span>
+<span class="codeline" id="line-108"><code>// Sign signs digest with priv, reading randomness from rand. The opts argument</code></span>
+<span class="codeline" id="line-109"><code>// is not currently used but, in keeping with the crypto.Signer interface,</code></span>
+<span class="codeline" id="line-110"><code>// should be the hash function used to digest the message.</code></span>
+<span class="codeline" id="line-111"><code>//</code></span>
+<span class="codeline" id="line-112"><code>// This method implements crypto.Signer, which is an interface to support keys</code></span>
+<span class="codeline" id="line-113"><code>// where the private part is kept in, for example, a hardware module. Common</code></span>
+<span class="codeline" id="line-114"><code>// uses should use the Sign function in this package directly.</code></span>
+<span class="codeline" id="line-115"><code>func (priv *PrivateKey) Sign(rand io.Reader, digest []byte, opts crypto.SignerOpts) ([]byte, error) {</code></span>
+<span class="codeline" id="line-116"><code>	r, s, err := Sign(rand, priv, digest)</code></span>
+<span class="codeline" id="line-117"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-118"><code>		return nil, err</code></span>
+<span class="codeline" id="line-119"><code>	}</code></span>
+<span class="codeline" id="line-120"><code></code></span>
+<span class="codeline" id="line-121"><code>	var b cryptobyte.Builder</code></span>
+<span class="codeline" id="line-122"><code>	b.AddASN1(asn1.SEQUENCE, func(b *cryptobyte.Builder) {</code></span>
+<span class="codeline" id="line-123"><code>		b.AddASN1BigInt(r)</code></span>
+<span class="codeline" id="line-124"><code>		b.AddASN1BigInt(s)</code></span>
+<span class="codeline" id="line-125"><code>	})</code></span>
+<span class="codeline" id="line-126"><code>	return b.Bytes()</code></span>
+<span class="codeline" id="line-127"><code>}</code></span>
+<span class="codeline" id="line-128"><code></code></span>
+<span class="codeline" id="line-129"><code>var one = new(big.Int).SetInt64(1)</code></span>
+<span class="codeline" id="line-130"><code></code></span>
+<span class="codeline" id="line-131"><code>// randFieldElement returns a random element of the field underlying the given</code></span>
+<span class="codeline" id="line-132"><code>// curve using the procedure given in [NSA] A.2.1.</code></span>
+<span class="codeline" id="line-133"><code>func randFieldElement(c elliptic.Curve, rand io.Reader) (k *big.Int, err error) {</code></span>
+<span class="codeline" id="line-134"><code>	params := c.Params()</code></span>
+<span class="codeline" id="line-135"><code>	b := make([]byte, params.BitSize/8+8)</code></span>
+<span class="codeline" id="line-136"><code>	_, err = io.ReadFull(rand, b)</code></span>
+<span class="codeline" id="line-137"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-138"><code>		return</code></span>
+<span class="codeline" id="line-139"><code>	}</code></span>
+<span class="codeline" id="line-140"><code></code></span>
+<span class="codeline" id="line-141"><code>	k = new(big.Int).SetBytes(b)</code></span>
+<span class="codeline" id="line-142"><code>	n := new(big.Int).Sub(params.N, one)</code></span>
+<span class="codeline" id="line-143"><code>	k.Mod(k, n)</code></span>
+<span class="codeline" id="line-144"><code>	k.Add(k, one)</code></span>
+<span class="codeline" id="line-145"><code>	return</code></span>
+<span class="codeline" id="line-146"><code>}</code></span>
+<span class="codeline" id="line-147"><code></code></span>
+<span class="codeline" id="line-148"><code>// GenerateKey generates a public and private key pair.</code></span>
+<span class="codeline" id="line-149"><code>func GenerateKey(c elliptic.Curve, rand io.Reader) (*PrivateKey, error) {</code></span>
+<span class="codeline" id="line-150"><code>	k, err := randFieldElement(c, rand)</code></span>
+<span class="codeline" id="line-151"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-152"><code>		return nil, err</code></span>
+<span class="codeline" id="line-153"><code>	}</code></span>
+<span class="codeline" id="line-154"><code></code></span>
+<span class="codeline" id="line-155"><code>	priv := new(PrivateKey)</code></span>
+<span class="codeline" id="line-156"><code>	priv.PublicKey.Curve = c</code></span>
+<span class="codeline" id="line-157"><code>	priv.D = k</code></span>
+<span class="codeline" id="line-158"><code>	priv.PublicKey.X, priv.PublicKey.Y = c.ScalarBaseMult(k.Bytes())</code></span>
+<span class="codeline" id="line-159"><code>	return priv, nil</code></span>
+<span class="codeline" id="line-160"><code>}</code></span>
+<span class="codeline" id="line-161"><code></code></span>
+<span class="codeline" id="line-162"><code>// hashToInt converts a hash value to an integer. There is some disagreement</code></span>
+<span class="codeline" id="line-163"><code>// about how this is done. [NSA] suggests that this is done in the obvious</code></span>
+<span class="codeline" id="line-164"><code>// manner, but [SECG] truncates the hash to the bit-length of the curve order</code></span>
+<span class="codeline" id="line-165"><code>// first. We follow [SECG] because that's what OpenSSL does. Additionally,</code></span>
+<span class="codeline" id="line-166"><code>// OpenSSL right shifts excess bits from the number if the hash is too large</code></span>
+<span class="codeline" id="line-167"><code>// and we mirror that too.</code></span>
+<span class="codeline" id="line-168"><code>func hashToInt(hash []byte, c elliptic.Curve) *big.Int {</code></span>
+<span class="codeline" id="line-169"><code>	orderBits := c.Params().N.BitLen()</code></span>
+<span class="codeline" id="line-170"><code>	orderBytes := (orderBits + 7) / 8</code></span>
+<span class="codeline" id="line-171"><code>	if len(hash) &gt; orderBytes {</code></span>
+<span class="codeline" id="line-172"><code>		hash = hash[:orderBytes]</code></span>
+<span class="codeline" id="line-173"><code>	}</code></span>
+<span class="codeline" id="line-174"><code></code></span>
+<span class="codeline" id="line-175"><code>	ret := new(big.Int).SetBytes(hash)</code></span>
+<span class="codeline" id="line-176"><code>	excess := len(hash)*8 - orderBits</code></span>
+<span class="codeline" id="line-177"><code>	if excess &gt; 0 {</code></span>
+<span class="codeline" id="line-178"><code>		ret.Rsh(ret, uint(excess))</code></span>
+<span class="codeline" id="line-179"><code>	}</code></span>
+<span class="codeline" id="line-180"><code>	return ret</code></span>
+<span class="codeline" id="line-181"><code>}</code></span>
+<span class="codeline" id="line-182"><code></code></span>
+<span class="codeline" id="line-183"><code>// fermatInverse calculates the inverse of k in GF(P) using Fermat's method.</code></span>
+<span class="codeline" id="line-184"><code>// This has better constant-time properties than Euclid's method (implemented</code></span>
+<span class="codeline" id="line-185"><code>// in math/big.Int.ModInverse) although math/big itself isn't strictly</code></span>
+<span class="codeline" id="line-186"><code>// constant-time so it's not perfect.</code></span>
+<span class="codeline" id="line-187"><code>func fermatInverse(k, N *big.Int) *big.Int {</code></span>
+<span class="codeline" id="line-188"><code>	two := big.NewInt(2)</code></span>
+<span class="codeline" id="line-189"><code>	nMinus2 := new(big.Int).Sub(N, two)</code></span>
+<span class="codeline" id="line-190"><code>	return new(big.Int).Exp(k, nMinus2, N)</code></span>
+<span class="codeline" id="line-191"><code>}</code></span>
+<span class="codeline" id="line-192"><code></code></span>
+<span class="codeline" id="line-193"><code>var errZeroParam = errors.New("zero parameter")</code></span>
+<span class="codeline" id="line-194"><code></code></span>
+<span class="codeline" id="line-195"><code>// Sign signs a hash (which should be the result of hashing a larger message)</code></span>
+<span class="codeline" id="line-196"><code>// using the private key, priv. If the hash is longer than the bit-length of the</code></span>
+<span class="codeline" id="line-197"><code>// private key's curve order, the hash will be truncated to that length. It</code></span>
+<span class="codeline" id="line-198"><code>// returns the signature as a pair of integers. The security of the private key</code></span>
+<span class="codeline" id="line-199"><code>// depends on the entropy of rand.</code></span>
+<span class="codeline" id="line-200"><code>func Sign(rand io.Reader, priv *PrivateKey, hash []byte) (r, s *big.Int, err error) {</code></span>
+<span class="codeline" id="line-201"><code>	randutil.MaybeReadByte(rand)</code></span>
+<span class="codeline" id="line-202"><code></code></span>
+<span class="codeline" id="line-203"><code>	// Get min(log2(q) / 2, 256) bits of entropy from rand.</code></span>
+<span class="codeline" id="line-204"><code>	entropylen := (priv.Curve.Params().BitSize + 7) / 16</code></span>
+<span class="codeline" id="line-205"><code>	if entropylen &gt; 32 {</code></span>
+<span class="codeline" id="line-206"><code>		entropylen = 32</code></span>
+<span class="codeline" id="line-207"><code>	}</code></span>
+<span class="codeline" id="line-208"><code>	entropy := make([]byte, entropylen)</code></span>
+<span class="codeline" id="line-209"><code>	_, err = io.ReadFull(rand, entropy)</code></span>
+<span class="codeline" id="line-210"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-211"><code>		return</code></span>
+<span class="codeline" id="line-212"><code>	}</code></span>
+<span class="codeline" id="line-213"><code></code></span>
+<span class="codeline" id="line-214"><code>	// Initialize an SHA-512 hash context; digest ...</code></span>
+<span class="codeline" id="line-215"><code>	md := sha512.New()</code></span>
+<span class="codeline" id="line-216"><code>	md.Write(priv.D.Bytes()) // the private key,</code></span>
+<span class="codeline" id="line-217"><code>	md.Write(entropy)        // the entropy,</code></span>
+<span class="codeline" id="line-218"><code>	md.Write(hash)           // and the input hash;</code></span>
+<span class="codeline" id="line-219"><code>	key := md.Sum(nil)[:32]  // and compute ChopMD-256(SHA-512),</code></span>
+<span class="codeline" id="line-220"><code>	// which is an indifferentiable MAC.</code></span>
+<span class="codeline" id="line-221"><code></code></span>
+<span class="codeline" id="line-222"><code>	// Create an AES-CTR instance to use as a CSPRNG.</code></span>
+<span class="codeline" id="line-223"><code>	block, err := aes.NewCipher(key)</code></span>
+<span class="codeline" id="line-224"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-225"><code>		return nil, nil, err</code></span>
+<span class="codeline" id="line-226"><code>	}</code></span>
+<span class="codeline" id="line-227"><code></code></span>
+<span class="codeline" id="line-228"><code>	// Create a CSPRNG that xors a stream of zeros with</code></span>
+<span class="codeline" id="line-229"><code>	// the output of the AES-CTR instance.</code></span>
+<span class="codeline" id="line-230"><code>	csprng := cipher.StreamReader{</code></span>
+<span class="codeline" id="line-231"><code>		R: zeroReader,</code></span>
+<span class="codeline" id="line-232"><code>		S: cipher.NewCTR(block, []byte(aesIV)),</code></span>
+<span class="codeline" id="line-233"><code>	}</code></span>
+<span class="codeline" id="line-234"><code></code></span>
+<span class="codeline" id="line-235"><code>	// See [NSA] 3.4.1</code></span>
+<span class="codeline" id="line-236"><code>	c := priv.PublicKey.Curve</code></span>
+<span class="codeline" id="line-237"><code>	return sign(priv, &amp;csprng, c, hash)</code></span>
+<span class="codeline" id="line-238"><code>}</code></span>
+<span class="codeline" id="line-239"><code></code></span>
+<span class="codeline" id="line-240"><code>func signGeneric(priv *PrivateKey, csprng *cipher.StreamReader, c elliptic.Curve, hash []byte) (r, s *big.Int, err error) {</code></span>
+<span class="codeline" id="line-241"><code>	N := c.Params().N</code></span>
+<span class="codeline" id="line-242"><code>	if N.Sign() == 0 {</code></span>
+<span class="codeline" id="line-243"><code>		return nil, nil, errZeroParam</code></span>
+<span class="codeline" id="line-244"><code>	}</code></span>
+<span class="codeline" id="line-245"><code>	var k, kInv *big.Int</code></span>
+<span class="codeline" id="line-246"><code>	for {</code></span>
+<span class="codeline" id="line-247"><code>		for {</code></span>
+<span class="codeline" id="line-248"><code>			k, err = randFieldElement(c, *csprng)</code></span>
+<span class="codeline" id="line-249"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-250"><code>				r = nil</code></span>
+<span class="codeline" id="line-251"><code>				return</code></span>
+<span class="codeline" id="line-252"><code>			}</code></span>
+<span class="codeline" id="line-253"><code></code></span>
+<span class="codeline" id="line-254"><code>			if in, ok := priv.Curve.(invertible); ok {</code></span>
+<span class="codeline" id="line-255"><code>				kInv = in.Inverse(k)</code></span>
+<span class="codeline" id="line-256"><code>			} else {</code></span>
+<span class="codeline" id="line-257"><code>				kInv = fermatInverse(k, N) // N != 0</code></span>
+<span class="codeline" id="line-258"><code>			}</code></span>
+<span class="codeline" id="line-259"><code></code></span>
+<span class="codeline" id="line-260"><code>			r, _ = priv.Curve.ScalarBaseMult(k.Bytes())</code></span>
+<span class="codeline" id="line-261"><code>			r.Mod(r, N)</code></span>
+<span class="codeline" id="line-262"><code>			if r.Sign() != 0 {</code></span>
+<span class="codeline" id="line-263"><code>				break</code></span>
+<span class="codeline" id="line-264"><code>			}</code></span>
+<span class="codeline" id="line-265"><code>		}</code></span>
+<span class="codeline" id="line-266"><code></code></span>
+<span class="codeline" id="line-267"><code>		e := hashToInt(hash, c)</code></span>
+<span class="codeline" id="line-268"><code>		s = new(big.Int).Mul(priv.D, r)</code></span>
+<span class="codeline" id="line-269"><code>		s.Add(s, e)</code></span>
+<span class="codeline" id="line-270"><code>		s.Mul(s, kInv)</code></span>
+<span class="codeline" id="line-271"><code>		s.Mod(s, N) // N != 0</code></span>
+<span class="codeline" id="line-272"><code>		if s.Sign() != 0 {</code></span>
+<span class="codeline" id="line-273"><code>			break</code></span>
+<span class="codeline" id="line-274"><code>		}</code></span>
+<span class="codeline" id="line-275"><code>	}</code></span>
+<span class="codeline" id="line-276"><code></code></span>
+<span class="codeline" id="line-277"><code>	return</code></span>
+<span class="codeline" id="line-278"><code>}</code></span>
+<span class="codeline" id="line-279"><code></code></span>
+<span class="codeline" id="line-280"><code>// SignASN1 signs a hash (which should be the result of hashing a larger message)</code></span>
+<span class="codeline" id="line-281"><code>// using the private key, priv. If the hash is longer than the bit-length of the</code></span>
+<span class="codeline" id="line-282"><code>// private key's curve order, the hash will be truncated to that length. It</code></span>
+<span class="codeline" id="line-283"><code>// returns the ASN.1 encoded signature. The security of the private key</code></span>
+<span class="codeline" id="line-284"><code>// depends on the entropy of rand.</code></span>
+<span class="codeline" id="line-285"><code>func SignASN1(rand io.Reader, priv *PrivateKey, hash []byte) ([]byte, error) {</code></span>
+<span class="codeline" id="line-286"><code>	return priv.Sign(rand, hash, nil)</code></span>
+<span class="codeline" id="line-287"><code>}</code></span>
+<span class="codeline" id="line-288"><code></code></span>
+<span class="codeline" id="line-289"><code>// Verify verifies the signature in r, s of hash using the public key, pub. Its</code></span>
+<span class="codeline" id="line-290"><code>// return value records whether the signature is valid.</code></span>
+<span class="codeline" id="line-291"><code>func Verify(pub *PublicKey, hash []byte, r, s *big.Int) bool {</code></span>
+<span class="codeline" id="line-292"><code>	// See [NSA] 3.4.2</code></span>
+<span class="codeline" id="line-293"><code>	c := pub.Curve</code></span>
+<span class="codeline" id="line-294"><code>	N := c.Params().N</code></span>
+<span class="codeline" id="line-295"><code></code></span>
+<span class="codeline" id="line-296"><code>	if r.Sign() &lt;= 0 || s.Sign() &lt;= 0 {</code></span>
+<span class="codeline" id="line-297"><code>		return false</code></span>
+<span class="codeline" id="line-298"><code>	}</code></span>
+<span class="codeline" id="line-299"><code>	if r.Cmp(N) &gt;= 0 || s.Cmp(N) &gt;= 0 {</code></span>
+<span class="codeline" id="line-300"><code>		return false</code></span>
+<span class="codeline" id="line-301"><code>	}</code></span>
+<span class="codeline" id="line-302"><code>	return verify(pub, c, hash, r, s)</code></span>
+<span class="codeline" id="line-303"><code>}</code></span>
+<span class="codeline" id="line-304"><code></code></span>
+<span class="codeline" id="line-305"><code>func verifyGeneric(pub *PublicKey, c elliptic.Curve, hash []byte, r, s *big.Int) bool {</code></span>
+<span class="codeline" id="line-306"><code>	e := hashToInt(hash, c)</code></span>
+<span class="codeline" id="line-307"><code>	var w *big.Int</code></span>
+<span class="codeline" id="line-308"><code>	N := c.Params().N</code></span>
+<span class="codeline" id="line-309"><code>	if in, ok := c.(invertible); ok {</code></span>
+<span class="codeline" id="line-310"><code>		w = in.Inverse(s)</code></span>
+<span class="codeline" id="line-311"><code>	} else {</code></span>
+<span class="codeline" id="line-312"><code>		w = new(big.Int).ModInverse(s, N)</code></span>
+<span class="codeline" id="line-313"><code>	}</code></span>
+<span class="codeline" id="line-314"><code></code></span>
+<span class="codeline" id="line-315"><code>	u1 := e.Mul(e, w)</code></span>
+<span class="codeline" id="line-316"><code>	u1.Mod(u1, N)</code></span>
+<span class="codeline" id="line-317"><code>	u2 := w.Mul(r, w)</code></span>
+<span class="codeline" id="line-318"><code>	u2.Mod(u2, N)</code></span>
+<span class="codeline" id="line-319"><code></code></span>
+<span class="codeline" id="line-320"><code>	// Check if implements S1*g + S2*p</code></span>
+<span class="codeline" id="line-321"><code>	var x, y *big.Int</code></span>
+<span class="codeline" id="line-322"><code>	if opt, ok := c.(combinedMult); ok {</code></span>
+<span class="codeline" id="line-323"><code>		x, y = opt.CombinedMult(pub.X, pub.Y, u1.Bytes(), u2.Bytes())</code></span>
+<span class="codeline" id="line-324"><code>	} else {</code></span>
+<span class="codeline" id="line-325"><code>		x1, y1 := c.ScalarBaseMult(u1.Bytes())</code></span>
+<span class="codeline" id="line-326"><code>		x2, y2 := c.ScalarMult(pub.X, pub.Y, u2.Bytes())</code></span>
+<span class="codeline" id="line-327"><code>		x, y = c.Add(x1, y1, x2, y2)</code></span>
+<span class="codeline" id="line-328"><code>	}</code></span>
+<span class="codeline" id="line-329"><code></code></span>
+<span class="codeline" id="line-330"><code>	if x.Sign() == 0 &amp;&amp; y.Sign() == 0 {</code></span>
+<span class="codeline" id="line-331"><code>		return false</code></span>
+<span class="codeline" id="line-332"><code>	}</code></span>
+<span class="codeline" id="line-333"><code>	x.Mod(x, N)</code></span>
+<span class="codeline" id="line-334"><code>	return x.Cmp(r) == 0</code></span>
+<span class="codeline" id="line-335"><code>}</code></span>
+<span class="codeline" id="line-336"><code></code></span>
+<span class="codeline" id="line-337"><code>// VerifyASN1 verifies the ASN.1 encoded signature, sig, of hash using the</code></span>
+<span class="codeline" id="line-338"><code>// public key, pub. Its return value records whether the signature is valid.</code></span>
+<span class="codeline" id="line-339"><code>func VerifyASN1(pub *PublicKey, hash, sig []byte) bool {</code></span>
+<span class="codeline" id="line-340"><code>	var (</code></span>
+<span class="codeline" id="line-341"><code>		r, s  = &amp;big.Int{}, &amp;big.Int{}</code></span>
+<span class="codeline" id="line-342"><code>		inner cryptobyte.String</code></span>
+<span class="codeline" id="line-343"><code>	)</code></span>
+<span class="codeline" id="line-344"><code>	input := cryptobyte.String(sig)</code></span>
+<span class="codeline" id="line-345"><code>	if !input.ReadASN1(&amp;inner, asn1.SEQUENCE) ||</code></span>
+<span class="codeline" id="line-346"><code>		!input.Empty() ||</code></span>
+<span class="codeline" id="line-347"><code>		!inner.ReadASN1Integer(r) ||</code></span>
+<span class="codeline" id="line-348"><code>		!inner.ReadASN1Integer(s) ||</code></span>
+<span class="codeline" id="line-349"><code>		!inner.Empty() {</code></span>
+<span class="codeline" id="line-350"><code>		return false</code></span>
+<span class="codeline" id="line-351"><code>	}</code></span>
+<span class="codeline" id="line-352"><code>	return Verify(pub, hash, r, s)</code></span>
+<span class="codeline" id="line-353"><code>}</code></span>
+<span class="codeline" id="line-354"><code></code></span>
+<span class="codeline" id="line-355"><code>type zr struct {</code></span>
+<span class="codeline" id="line-356"><code>	io.Reader</code></span>
+<span class="codeline" id="line-357"><code>}</code></span>
+<span class="codeline" id="line-358"><code></code></span>
+<span class="codeline" id="line-359"><code>// Read replaces the contents of dst with zeros.</code></span>
+<span class="codeline" id="line-360"><code>func (z *zr) Read(dst []byte) (n int, err error) {</code></span>
+<span class="codeline" id="line-361"><code>	for i := range dst {</code></span>
+<span class="codeline" id="line-362"><code>		dst[i] = 0</code></span>
+<span class="codeline" id="line-363"><code>	}</code></span>
+<span class="codeline" id="line-364"><code>	return len(dst), nil</code></span>
+<span class="codeline" id="line-365"><code>}</code></span>
+<span class="codeline" id="line-366"><code></code></span>
+<span class="codeline" id="line-367"><code>var zeroReader = &amp;zr{}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

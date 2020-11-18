@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: log</title>
+<link href="../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>log</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../index.html#pkg-log">log</a><i> (on <a href="https://golang.org/pkg/log/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/log" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../dep/log.html">6 packages</a>, and imported by <a href="../dep/log.html#imported-by">7 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../src/log/log.go.html#doc">d-&gt;</a> <a href="../src/log/log.go.html">log.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Logger" data-popularity="975">	 type <a href="../src/log/log.go.html#line-52">Logger</a> <i>(struct)</i>
+		A Logger represents an active logging object that generates lines of
+		output to an io.Writer. Each logging operation makes a single call to
+		the Writer's Write method. A Logger can be used simultaneously from
+		multiple goroutines; it guarantees to serialize access to the Writer.
+
+		<input type='checkbox' class="stat" id="Logger-stat-methods"><label for="Logger-stat-methods">Exported Methods (16)</label><span id='Logger-stat-methods-content' class="stat-content">
+			(*T) <a href="../src/log/log.go.html#line-200">Fatal</a>(v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-206">Fatalf</a>(format <a href="builtin.html#name-string">string</a>, v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-212">Fatalln</a>(v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-240">Flags</a>() <a href="builtin.html#name-int">int</a>
+			(*T) <a href="../src/log/log.go.html#line-158">Output</a>(calldepth <a href="builtin.html#name-int">int</a>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-error">error</a>
+			(*T) <a href="../src/log/log.go.html#line-218">Panic</a>(v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-225">Panicf</a>(format <a href="builtin.html#name-string">string</a>, v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-232">Panicln</a>(v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-255">Prefix</a>() <a href="builtin.html#name-string">string</a>
+			(*T) <a href="../src/log/log.go.html#line-193">Print</a>(v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-187">Printf</a>(format <a href="builtin.html#name-string">string</a>, v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-197">Println</a>(v ...interface{})
+			(*T) <a href="../src/log/log.go.html#line-248">SetFlags</a>(flag <a href="builtin.html#name-int">int</a>)
+			(*T) <a href="../src/log/log.go.html#line-70">SetOutput</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>)
+			(*T) <a href="../src/log/log.go.html#line-262">SetPrefix</a>(prefix <a href="builtin.html#name-string">string</a>)
+			(*T) <a href="../src/log/log.go.html#line-269">Writer</a>() <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Logger-stat-impls"><label for="Logger-stat-impls">Implements (2+)</label><span id='Logger-stat-impls-content' class="stat-content">
+			*T : github.com/go-sql-driver/mysql.<a href="github.com/go-sql-driver/mysql.html#name-Logger">Logger</a>
+			*T : gorm.io/gorm/logger.<a href="gorm.io/gorm/logger.html#name-Writer">Writer</a></span>
+		<input type='checkbox' class="stat" id="Logger-stat-results"><label for="Logger-stat-results">As Outputs Of (1+)</label><span id='Logger-stat-results-content' class="stat-content">
+			func <a href="#name-New">New</a>(out <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, prefix <a href="builtin.html#name-string">string</a>, flag <a href="builtin.html#name-int">int</a>) *<b>Logger</b></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Fatal">	 func <a href="../src/log/log.go.html#line-330">Fatal</a>(v ...interface{})
+		Fatal is equivalent to Print() followed by a call to os.Exit(1).</div>
+<div class="anchor" id="name-Fatalf">	 func <a href="../src/log/log.go.html#line-336">Fatalf</a>(format <a href="builtin.html#name-string">string</a>, v ...interface{})
+		Fatalf is equivalent to Printf() followed by a call to os.Exit(1).</div>
+<div class="anchor" id="name-Fatalln">	 func <a href="../src/log/log.go.html#line-342">Fatalln</a>(v ...interface{})
+		Fatalln is equivalent to Println() followed by a call to os.Exit(1).</div>
+<div class="anchor" id="name-Flags">	 func <a href="../src/log/log.go.html#line-284">Flags</a>() <a href="builtin.html#name-int">int</a>
+		Flags returns the output flags for the standard logger.
+		The flag bits are Ldate, Ltime, and so on.</div>
+<div class="anchor" id="name-Ldate">	const <a href="../src/log/log.go.html#line-38">Ldate</a> = 1 // the date in the local time zone: 2009/01/23
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-Llongfile">	const <a href="../src/log/log.go.html#line-41">Llongfile</a> = 8 // full file name and line number: /a/b/c/d.go:23
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-Lmicroseconds">	const <a href="../src/log/log.go.html#line-40">Lmicroseconds</a> = 4 // microsecond resolution: 01:23:23.123123.  assumes Ltime.
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-Lmsgprefix">	const <a href="../src/log/log.go.html#line-44">Lmsgprefix</a> = 64 // move the "prefix" from the beginning of the line to before the message
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-Lshortfile">	const <a href="../src/log/log.go.html#line-42">Lshortfile</a> = 16 // final file name element and line number: d.go:23. overrides Llongfile
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-LstdFlags">	const <a href="../src/log/log.go.html#line-45">LstdFlags</a> = 3 // initial values for the standard logger
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-Ltime">	const <a href="../src/log/log.go.html#line-39">Ltime</a> = 2 // the time in the local time zone: 01:23:23
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-LUTC">	const <a href="../src/log/log.go.html#line-43">LUTC</a> = 32 // if Ldate or Ltime is set, use UTC rather than the local time zone
+		These flags define which text to prefix to each log entry generated by the Logger.
+		Bits are or'ed together to control what's printed.
+		With the exception of the Lmsgprefix flag, there is no
+		control over the order they appear (the order listed here)
+		or the format they present (as described in the comments).
+		The prefix is followed by a colon only when Llongfile or Lshortfile
+		is specified.
+		For example, flags Ldate | Ltime (or LstdFlags) produce,
+			2009/01/23 01:23:23 message
+		while flags Ldate | Ltime | Lmicroseconds | Llongfile produce,
+			2009/01/23 01:23:23.123123 /a/b/c/d.go:23: message</div>
+<div class="anchor" id="name-New">	 func <a href="../src/log/log.go.html#line-65">New</a>(out <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>, prefix <a href="builtin.html#name-string">string</a>, flag <a href="builtin.html#name-int">int</a>) *<a href="#name-Logger">Logger</a>
+		New creates a new Logger. The out variable sets the
+		destination to which log data will be written.
+		The prefix appears at the beginning of each generated log line, or
+		after the log header if the Lmsgprefix flag is provided.
+		The flag argument defines the logging properties.</div>
+<div class="anchor" id="name-Output">	 func <a href="../src/log/log.go.html#line-375">Output</a>(calldepth <a href="builtin.html#name-int">int</a>, s <a href="builtin.html#name-string">string</a>) <a href="builtin.html#name-error">error</a>
+		Output writes the output for a logging event. The string s contains
+		the text to print after the prefix specified by the flags of the
+		Logger. A newline is appended if the last character of s is not
+		already a newline. Calldepth is the count of the number of
+		frames to skip when computing the file name and line number
+		if Llongfile or Lshortfile is set; a value of 1 will print the details
+		for the caller of Output.</div>
+<div class="anchor" id="name-Panic">	 func <a href="../src/log/log.go.html#line-348">Panic</a>(v ...interface{})
+		Panic is equivalent to Print() followed by a call to panic().</div>
+<div class="anchor" id="name-Panicf">	 func <a href="../src/log/log.go.html#line-355">Panicf</a>(format <a href="builtin.html#name-string">string</a>, v ...interface{})
+		Panicf is equivalent to Printf() followed by a call to panic().</div>
+<div class="anchor" id="name-Panicln">	 func <a href="../src/log/log.go.html#line-362">Panicln</a>(v ...interface{})
+		Panicln is equivalent to Println() followed by a call to panic().</div>
+<div class="anchor" id="name-Prefix">	 func <a href="../src/log/log.go.html#line-295">Prefix</a>() <a href="builtin.html#name-string">string</a>
+		Prefix returns the output prefix for the standard logger.</div>
+<div class="anchor" id="name-Print">	 func <a href="../src/log/log.go.html#line-313">Print</a>(v ...interface{})
+		Print calls Output to print to the standard logger.
+		Arguments are handled in the manner of fmt.Print.</div>
+<div class="anchor" id="name-Printf">	 func <a href="../src/log/log.go.html#line-319">Printf</a>(format <a href="builtin.html#name-string">string</a>, v ...interface{})
+		Printf calls Output to print to the standard logger.
+		Arguments are handled in the manner of fmt.Printf.</div>
+<div class="anchor" id="name-Println">	 func <a href="../src/log/log.go.html#line-325">Println</a>(v ...interface{})
+		Println calls Output to print to the standard logger.
+		Arguments are handled in the manner of fmt.Println.</div>
+<div class="anchor" id="name-SetFlags">	 func <a href="../src/log/log.go.html#line-290">SetFlags</a>(flag <a href="builtin.html#name-int">int</a>)
+		SetFlags sets the output flags for the standard logger.
+		The flag bits are Ldate, Ltime, and so on.</div>
+<div class="anchor" id="name-SetOutput">	 func <a href="../src/log/log.go.html#line-276">SetOutput</a>(w <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>)
+		SetOutput sets the output destination for the standard logger.</div>
+<div class="anchor" id="name-SetPrefix">	 func <a href="../src/log/log.go.html#line-300">SetPrefix</a>(prefix <a href="builtin.html#name-string">string</a>)
+		SetPrefix sets the output prefix for the standard logger.</div>
+<div class="anchor" id="name-Writer">	 func <a href="../src/log/log.go.html#line-305">Writer</a>() <a href="io.html">io</a>.<a href="io.html#name-Writer">Writer</a>
+		Writer returns the output destination for the standard logger.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

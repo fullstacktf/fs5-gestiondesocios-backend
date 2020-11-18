@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: gorm.io/gorm/clause</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>clause</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-gorm.io/gorm/clause">gorm.io/gorm/clause</a><i> (on <a href="https://pkg.go.dev/gorm.io/gorm/clause" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/gorm.io/gorm/clause.html">7 packages</a>, and imported by <a href="../../../dep/gorm.io/gorm/clause.html#imported-by">5 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../src/gorm.io/gorm/clause/clause.go.html">clause.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/delete.go.html">delete.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/expression.go.html">expression.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/from.go.html">from.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/group_by.go.html">group_by.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/insert.go.html">insert.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/joins.go.html">joins.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/limit.go.html">limit.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/locking.go.html">locking.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html">on_conflict.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/order_by.go.html">order_by.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/returning.go.html">returning.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/select.go.html">select.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/set.go.html">set.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/update.go.html">update.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/values.go.html">values.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/where.go.html">where.go</a>
+	    <a href="../../../src/gorm.io/gorm/clause/with.go.html">with.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-AndConditions" data-popularity="100">	 type <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-98">AndConditions</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="AndConditions-stat-fields"><label for="AndConditions-stat-fields">One Exported Field</label><span id='AndConditions-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-9">Exprs</a> <i>[]<a href="#name-Expression">Expression</a></i></span>
+		<input type='checkbox' class="stat" id="AndConditions-stat-methods"><label for="AndConditions-stat-methods">One Exported Method</label><span id='AndConditions-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-102">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="AndConditions-stat-impls"><label for="AndConditions-stat-impls">Implements (1+)</label><span id='AndConditions-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span></div>
+<div class="anchor" id="name-Assignment" data-popularity="0">	 type <a href="../../../src/gorm.io/gorm/clause/set.go.html#line-7">Assignment</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Assignment-stat-fields"><label for="Assignment-stat-fields">Exported Fields (2)</label><span id='Assignment-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/set.go.html#line-8">Column</a> <i><a href="#name-Column">Column</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/set.go.html#line-9">Value</a> <i>interface{}</i></span></div>
+<div class="anchor" id="name-Builder" data-popularity="1970">	 type <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-19">Builder</a> <b<i>(interface)</i></b>
+		Builder builder interface
+
+		<input type='checkbox' class="stat" id="Builder-stat-methods"><label for="Builder-stat-methods">Exported Methods (4)</label><span id='Builder-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-22">AddVar</a>(<a href="#name-Writer">Writer</a>, ...interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-14">WriteByte</a>(<a href="../../builtin.html#name-byte">byte</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-21">WriteQuoted</a>(field interface{})
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-15">WriteString</a>(<a href="../../builtin.html#name-string">string</a>) (<a href="../../builtin.html#name-int">int</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Builder-stat-impledby"><label for="Builder-stat-impledby">Implemented By (1+)</label><span id='Builder-stat-impledby-content' class="stat-content">
+			gorm.io/gorm.(*<a href="../gorm.html#name-Statement">Statement</a>)</span>
+		<input type='checkbox' class="stat" id="Builder-stat-impls"><label for="Builder-stat-impls">Implements (3+)</label><span id='Builder-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Writer">Writer</a>
+			 T : io.<a href="../../io.html#name-ByteWriter">ByteWriter</a>
+			 T : io.<a href="../../io.html#name-StringWriter">StringWriter</a></span>
+		<input type='checkbox' class="stat" id="Builder-stat-params"><label for="Builder-stat-params">As Inputs Of (42+)</label><span id='Builder-stat-params-content' class="stat-content">
+			func <a href="#name-AndConditions">AndConditions</a>.<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-102">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Clause">Clause</a>.<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-36">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Delete">Delete</a>.<a href="../../../src/gorm.io/gorm/clause/delete.go.html#line-11">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Eq">Eq</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-193">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Eq">Eq</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-204">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-Expr">Expr</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-28">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Expression">Expression</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-12">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-From">From</a>.<a href="../../../src/gorm.io/gorm/clause/from.go.html#line-15">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-GroupBy">GroupBy</a>.<a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-15">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Gt">Gt</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-229">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Gt">Gt</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-235">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-Gte">Gte</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-242">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Gte">Gte</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-248">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-IN">IN</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-156">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-IN">IN</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-172">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-Insert">Insert</a>.<a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-14">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Interface">Interface</a>.<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-6">Build</a>(<b>Builder</b>)
+			func <a href="#name-Join">Join</a>.<a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-21">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Like">Like</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-281">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Like">Like</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-287">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-Limit">Limit</a>.<a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-17">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Locking">Locking</a>.<a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-15">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Lt">Lt</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-255">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Lt">Lt</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-261">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-Lte">Lte</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-268">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Lte">Lte</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-274">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-NamedExpr">NamedExpr</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-79">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-17">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-Neq">Neq</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-211">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Neq">Neq</a>.<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-222">NegationBuild</a>(builder <b>Builder</b>)
+			func <a href="#name-NotConditions">NotConditions</a>.<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-144">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-OnConflict">OnConflict</a>.<a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-15">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-OrConditions">OrConditions</a>.<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-123">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-OrderBy">OrderBy</a>.<a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-20">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Returning">Returning</a>.<a href="../../../src/gorm.io/gorm/clause/returning.go.html#line-13">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Select">Select</a>.<a href="../../../src/gorm.io/gorm/clause/select.go.html#line-14">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Set">Set</a>.<a href="../../../src/gorm.io/gorm/clause/set.go.html#line-16">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Update">Update</a>.<a href="../../../src/gorm.io/gorm/clause/update.go.html#line-14">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Values">Values</a>.<a href="../../../src/gorm.io/gorm/clause/values.go.html#line-14">Build</a>(builder <b>Builder</b>)
+			func <a href="#name-Where">Where</a>.<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-18">Build</a>(builder <b>Builder</b>)
+			func gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteDeleteClause">SoftDeleteDeleteClause</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-99">Build</a>(<b>Builder</b>)
+			func gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteQueryClause">SoftDeleteQueryClause</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-59">Build</a>(<b>Builder</b>)</span></div>
+<div class="anchor" id="name-Clause" data-popularity="695">	 type <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-26">Clause</a> <i>(struct)</i>
+		Clause
+
+		<input type='checkbox' class="stat" id="Clause-stat-fields"><label for="Clause-stat-fields">Exported Fields (6)</label><span id='Clause-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-30">AfterExpression</a> <i><a href="#name-Expression">Expression</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-29">AfterNameExpression</a> <i><a href="#name-Expression">Expression</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-28">BeforeExpression</a> <i><a href="#name-Expression">Expression</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-32">Builder</a> <i><a href="#name-ClauseBuilder">ClauseBuilder</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-31">Expression</a> <i><a href="#name-Expression">Expression</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-27">Name</a> <i><a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Clause-stat-methods"><label for="Clause-stat-methods">One Exported Method</label><span id='Clause-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-36">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Clause-stat-impls"><label for="Clause-stat-impls">Implements (1+)</label><span id='Clause-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span>
+		<input type='checkbox' class="stat" id="Clause-stat-params"><label for="Clause-stat-params">As Inputs Of (17+)</label><span id='Clause-stat-params-content' class="stat-content">
+			func <a href="#name-Delete">Delete</a>.<a href="../../../src/gorm.io/gorm/clause/delete.go.html#line-20">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-From">From</a>.<a href="../../../src/gorm.io/gorm/clause/from.go.html#line-35">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-GroupBy">GroupBy</a>.<a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-31">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Insert">Insert</a>.<a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-29">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Interface">Interface</a>.<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-7">MergeClause</a>(*<b>Clause</b>)
+			func <a href="#name-Limit">Limit</a>.<a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-32">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Locking">Locking</a>.<a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-29">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-OnConflict">OnConflict</a>.<a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-42">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-OrderBy">OrderBy</a>.<a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-38">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Returning">Returning</a>.<a href="../../../src/gorm.io/gorm/clause/returning.go.html#line-24">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Select">Select</a>.<a href="../../../src/gorm.io/gorm/clause/select.go.html#line-31">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Set">Set</a>.<a href="../../../src/gorm.io/gorm/clause/set.go.html#line-34">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Update">Update</a>.<a href="../../../src/gorm.io/gorm/clause/update.go.html#line-28">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Values">Values</a>.<a href="../../../src/gorm.io/gorm/clause/values.go.html#line-42">MergeClause</a>(clause *<b>Clause</b>)
+			func <a href="#name-Where">Where</a>.<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-78">MergeClause</a>(clause *<b>Clause</b>)
+			func gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteDeleteClause">SoftDeleteDeleteClause</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-102">MergeClause</a>(*<b>Clause</b>)
+			func gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteQueryClause">SoftDeleteQueryClause</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-62">MergeClause</a>(*<b>Clause</b>)</span></div>
+<div class="anchor" id="name-ClauseBuilder" data-popularity="75">	 type <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-11">ClauseBuilder</a> <i>(func)</i>
+		ClauseBuilder clause builder, allows to custmize how to build clause
+
+		<input type='checkbox' class="stat" id="ClauseBuilder-stat-results"><label for="ClauseBuilder-stat-results">As Outputs Of (1+)</label><span id='ClauseBuilder-stat-results-content' class="stat-content">
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-95">ClauseBuilders</a>() map[<a href="../../builtin.html#name-string">string</a>]<b>ClauseBuilder</b></span></div>
+<div class="anchor" id="name-Column" data-popularity="5">	 type <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-76">Column</a> <i>(struct)</i>
+		Column quote with name
+
+		<input type='checkbox' class="stat" id="Column-stat-fields"><label for="Column-stat-fields">Exported Fields (4)</label><span id='Column-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-79">Alias</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-78">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-80">Raw</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-77">Table</a> <i><a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Column-stat-values"><label for="Column-stat-values">As Types Of (1+)</label><span id='Column-stat-values-content' class="stat-content">
+			  var <a href="#name-PrimaryColumn">PrimaryColumn</a></span></div>
+<div class="anchor" id="name-Delete" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/delete.go.html#line-3">Delete</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Delete-stat-fields"><label for="Delete-stat-fields">One Exported Field</label><span id='Delete-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/delete.go.html#line-4">Modifier</a> <i><a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Delete-stat-methods"><label for="Delete-stat-methods">Exported Methods (3)</label><span id='Delete-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/delete.go.html#line-11">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/delete.go.html#line-20">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/delete.go.html#line-7">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Delete-stat-impls"><label for="Delete-stat-impls">Implements (2+)</label><span id='Delete-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Eq" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-188">Eq</a> <i>(struct)</i>
+		Eq equal to for where
+
+		<input type='checkbox' class="stat" id="Eq-stat-fields"><label for="Eq-stat-fields">Exported Fields (2)</label><span id='Eq-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-189">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-190">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Eq-stat-methods"><label for="Eq-stat-methods">Exported Methods (2)</label><span id='Eq-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-193">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-204">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Eq-stat-impls"><label for="Eq-stat-impls">Implements (2+)</label><span id='Eq-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-Expr" data-popularity="475">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-21">Expr</a> <i>(struct)</i>
+		Expr raw expression
+
+		<input type='checkbox' class="stat" id="Expr-stat-fields"><label for="Expr-stat-fields">Exported Fields (3)</label><span id='Expr-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-22">SQL</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-23">Vars</a> <i>[]interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-24">WithoutParentheses</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Expr-stat-methods"><label for="Expr-stat-methods">One Exported Method</label><span id='Expr-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-28">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Expr-stat-impls"><label for="Expr-stat-impls">Implements (1+)</label><span id='Expr-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span>
+		<input type='checkbox' class="stat" id="Expr-stat-results"><label for="Expr-stat-results">As Outputs Of (5+)</label><span id='Expr-stat-results-content' class="stat-content">
+			func gorm.io/gorm.<a href="../gorm.html#name-Expr">Expr</a>(expr <a href="../../builtin.html#name-string">string</a>, args ...interface{}) <b>Expr</b>
+			func gorm.io/gorm.<a href="../gorm.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator.go.html#line-39">FullDataTypeOf</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <b>Expr</b>
+			func gorm.io/gorm.<a href="../gorm.html#name-Valuer">Valuer</a>.<a href="../../../src/gorm.io/gorm/interfaces.go.html#line-58">GormValue</a>(<a href="../../context.html">context</a>.<a href="../../context.html#name-Context">Context</a>, *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>) <b>Expr</b>
+			func gorm.io/gorm/migrator.<a href="migrator.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/gorm/migrator/migrator.go.html#line-58">FullDataTypeOf</a>(field *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) (expr <b>Expr</b>)
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Migrator">Migrator</a>.<a href="../../../src/gorm.io/driver/mysql/migrator.go.html#line-70">FullDataTypeOf</a>(field *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <b>Expr</b></span></div>
+<div class="anchor" id="name-Expression" data-popularity="5515">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-11">Expression</a> <b<i>(interface)</i></b>
+		Expression expression interface
+
+		<input type='checkbox' class="stat" id="Expression-stat-methods"><label for="Expression-stat-methods">One Exported Method</label><span id='Expression-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-12">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Expression-stat-impledby"><label for="Expression-stat-impledby">Implemented By (32+)</label><span id='Expression-stat-impledby-content' class="stat-content">
+			<a href="#name-AndConditions">AndConditions</a>
+			<a href="#name-Clause">Clause</a>
+			<a href="#name-Delete">Delete</a>
+			<a href="#name-Eq">Eq</a>
+			<a href="#name-Expr">Expr</a>
+			<a href="#name-From">From</a>
+			<a href="#name-GroupBy">GroupBy</a>
+			<a href="#name-Gt">Gt</a>
+			<a href="#name-Gte">Gte</a>
+			<a href="#name-IN">IN</a>
+			<a href="#name-Insert">Insert</a>
+			<a href="#name-Interface">Interface</a> <i>(interface)</i>
+			<a href="#name-Join">Join</a>
+			<a href="#name-Like">Like</a>
+			<a href="#name-Limit">Limit</a>
+			<a href="#name-Locking">Locking</a>
+			<a href="#name-Lt">Lt</a>
+			<a href="#name-Lte">Lte</a>
+			<a href="#name-NamedExpr">NamedExpr</a>
+			<a href="#name-Neq">Neq</a>
+			<a href="#name-NotConditions">NotConditions</a>
+			<a href="#name-OnConflict">OnConflict</a>
+			<a href="#name-OrConditions">OrConditions</a>
+			<a href="#name-OrderBy">OrderBy</a>
+			<a href="#name-Returning">Returning</a>
+			<a href="#name-Select">Select</a>
+			<a href="#name-Set">Set</a>
+			<a href="#name-Update">Update</a>
+			<a href="#name-Values">Values</a>
+			<a href="#name-Where">Where</a>
+			gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteDeleteClause">SoftDeleteDeleteClause</a>
+			gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteQueryClause">SoftDeleteQueryClause</a></span>
+		<input type='checkbox' class="stat" id="Expression-stat-results"><label for="Expression-stat-results">As Outputs Of (7+)</label><span id='Expression-stat-results-content' class="stat-content">
+			func <a href="#name-And">And</a>(exprs ...<b>Expression</b>) <b>Expression</b>
+			func <a href="#name-Not">Not</a>(exprs ...<b>Expression</b>) <b>Expression</b>
+			func <a href="#name-Or">Or</a>(exprs ...<b>Expression</b>) <b>Expression</b>
+			func gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <b>Expression</b>
+			func gorm.io/gorm.(*<a href="../gorm.html#name-Statement">Statement</a>).<a href="../../../src/gorm.io/gorm/statement.go.html#line-242">BuildCondition</a>(query interface{}, args ...interface{}) (conds []<b>Expression</b>)
+			func gorm.io/gorm/schema.(*<a href="schema.html#name-Relationship">Relationship</a>).<a href="../../../src/gorm.io/gorm/schema/relationship.go.html#line-521">ToQueryConditions</a>(reflectValue <a href="../../reflect.html">reflect</a>.<a href="../../reflect.html#name-Value">Value</a>) (conds []<b>Expression</b>)
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-147">DefaultValueOf</a>(field *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) <b>Expression</b></span>
+		<input type='checkbox' class="stat" id="Expression-stat-params"><label for="Expression-stat-params">As Inputs Of (4+)</label><span id='Expression-stat-params-content' class="stat-content">
+			func <a href="#name-And">And</a>(exprs ...<b>Expression</b>) <b>Expression</b>
+			func <a href="#name-Not">Not</a>(exprs ...<b>Expression</b>) <b>Expression</b>
+			func <a href="#name-Or">Or</a>(exprs ...<b>Expression</b>) <b>Expression</b>
+			func gorm.io/gorm.(*<a href="../gorm.html#name-DB">DB</a>).<a href="../../../src/gorm.io/gorm/chainable_api.go.html#line-24">Clauses</a>(conds ...<b>Expression</b>) (tx *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-DB">DB</a>)</span></div>
+<div class="anchor" id="name-From" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/from.go.html#line-4">From</a> <i>(struct)</i>
+		From from clause
+
+		<input type='checkbox' class="stat" id="From-stat-fields"><label for="From-stat-fields">Exported Fields (2)</label><span id='From-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/from.go.html#line-6">Joins</a> <i>[]<a href="#name-Join">Join</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/from.go.html#line-5">Tables</a> <i>[]<a href="#name-Table">Table</a></i></span>
+		<input type='checkbox' class="stat" id="From-stat-methods"><label for="From-stat-methods">Exported Methods (3)</label><span id='From-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/from.go.html#line-15">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/from.go.html#line-35">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/from.go.html#line-10">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="From-stat-impls"><label for="From-stat-impls">Implements (2+)</label><span id='From-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-GroupBy" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-4">GroupBy</a> <i>(struct)</i>
+		GroupBy group by clause
+
+		<input type='checkbox' class="stat" id="GroupBy-stat-fields"><label for="GroupBy-stat-fields">Exported Fields (2)</label><span id='GroupBy-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-5">Columns</a> <i>[]<a href="#name-Column">Column</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-6">Having</a> <i>[]<a href="#name-Expression">Expression</a></i></span>
+		<input type='checkbox' class="stat" id="GroupBy-stat-methods"><label for="GroupBy-stat-methods">Exported Methods (3)</label><span id='GroupBy-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-15">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-31">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/group_by.go.html#line-10">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="GroupBy-stat-impls"><label for="GroupBy-stat-impls">Implements (2+)</label><span id='GroupBy-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Gt" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-227">Gt</a> <a href="#name-Eq">Eq</a> <i>(struct)</i>
+		Gt greater than for where
+
+		<input type='checkbox' class="stat" id="Gt-stat-fields"><label for="Gt-stat-fields">Exported Fields (2)</label><span id='Gt-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-189">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-190">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Gt-stat-methods"><label for="Gt-stat-methods">Exported Methods (2)</label><span id='Gt-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-229">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-235">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Gt-stat-impls"><label for="Gt-stat-impls">Implements (2+)</label><span id='Gt-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-Gte" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-240">Gte</a> <a href="#name-Eq">Eq</a> <i>(struct)</i>
+		Gte greater than or equal to for where
+
+		<input type='checkbox' class="stat" id="Gte-stat-fields"><label for="Gte-stat-fields">Exported Fields (2)</label><span id='Gte-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-189">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-190">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Gte-stat-methods"><label for="Gte-stat-methods">Exported Methods (2)</label><span id='Gte-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-242">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-248">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Gte-stat-impls"><label for="Gte-stat-impls">Implements (2+)</label><span id='Gte-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-IN" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-151">IN</a> <i>(struct)</i>
+		IN Whether a value is within a set of values
+
+		<input type='checkbox' class="stat" id="IN-stat-fields"><label for="IN-stat-fields">Exported Fields (2)</label><span id='IN-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-152">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-153">Values</a> <i>[]interface{}</i></span>
+		<input type='checkbox' class="stat" id="IN-stat-methods"><label for="IN-stat-methods">Exported Methods (2)</label><span id='IN-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-156">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-172">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="IN-stat-impls"><label for="IN-stat-impls">Implements (2+)</label><span id='IN-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-Insert" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-3">Insert</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Insert-stat-fields"><label for="Insert-stat-fields">Exported Fields (2)</label><span id='Insert-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-5">Modifier</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-4">Table</a> <i><a href="#name-Table">Table</a></i></span>
+		<input type='checkbox' class="stat" id="Insert-stat-methods"><label for="Insert-stat-methods">Exported Methods (3)</label><span id='Insert-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-14">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-29">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/insert.go.html#line-9">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Insert-stat-impls"><label for="Insert-stat-impls">Implements (2+)</label><span id='Insert-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Interface" data-popularity="3120">	 type <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-4">Interface</a> <b<i>(interface)</i></b>
+		Interface clause interface
+
+		<input type='checkbox' class="stat" id="Interface-stat-methods"><label for="Interface-stat-methods">Exported Methods (3)</label><span id='Interface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-6">Build</a>(<a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-7">MergeClause</a>(*<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-5">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Interface-stat-impledby"><label for="Interface-stat-impledby">Implemented By (16+)</label><span id='Interface-stat-impledby-content' class="stat-content">
+			<a href="#name-Delete">Delete</a>
+			<a href="#name-From">From</a>
+			<a href="#name-GroupBy">GroupBy</a>
+			<a href="#name-Insert">Insert</a>
+			<a href="#name-Limit">Limit</a>
+			<a href="#name-Locking">Locking</a>
+			<a href="#name-OnConflict">OnConflict</a>
+			<a href="#name-OrderBy">OrderBy</a>
+			<a href="#name-Returning">Returning</a>
+			<a href="#name-Select">Select</a>
+			<a href="#name-Set">Set</a>
+			<a href="#name-Update">Update</a>
+			<a href="#name-Values">Values</a>
+			<a href="#name-Where">Where</a>
+			gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteDeleteClause">SoftDeleteDeleteClause</a>
+			gorm.io/gorm.<a href="../gorm.html#name-SoftDeleteQueryClause">SoftDeleteQueryClause</a></span>
+		<input type='checkbox' class="stat" id="Interface-stat-impls"><label for="Interface-stat-impls">Implements (1+)</label><span id='Interface-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span>
+		<input type='checkbox' class="stat" id="Interface-stat-results"><label for="Interface-stat-results">As Outputs Of (6+)</label><span id='Interface-stat-results-content' class="stat-content">
+			func gorm.io/gorm.<a href="../gorm.html#name-DeletedAt">DeletedAt</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-87">DeleteClauses</a>(f *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) []<b>Interface</b>
+			func gorm.io/gorm.<a href="../gorm.html#name-DeletedAt">DeletedAt</a>.<a href="../../../src/gorm.io/gorm/soft_delete.go.html#line-47">QueryClauses</a>(f *<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) []<b>Interface</b>
+			func gorm.io/gorm/schema.<a href="schema.html#name-CreateClausesInterface">CreateClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-12">CreateClauses</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) []<b>Interface</b>
+			func gorm.io/gorm/schema.<a href="schema.html#name-DeleteClausesInterface">DeleteClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-24">DeleteClauses</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) []<b>Interface</b>
+			func gorm.io/gorm/schema.<a href="schema.html#name-QueryClausesInterface">QueryClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-16">QueryClauses</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) []<b>Interface</b>
+			func gorm.io/gorm/schema.<a href="schema.html#name-UpdateClausesInterface">UpdateClausesInterface</a>.<a href="../../../src/gorm.io/gorm/schema/interfaces.go.html#line-20">UpdateClauses</a>(*<a href="schema.html">schema</a>.<a href="schema.html#name-Field">Field</a>) []<b>Interface</b></span>
+		<input type='checkbox' class="stat" id="Interface-stat-params"><label for="Interface-stat-params">As Inputs Of (2+)</label><span id='Interface-stat-params-content' class="stat-content">
+			func gorm.io/gorm.(*<a href="../gorm.html#name-Statement">Statement</a>).<a href="../../../src/gorm.io/gorm/statement.go.html#line-222">AddClause</a>(v <b>Interface</b>)
+			func gorm.io/gorm.(*<a href="../gorm.html#name-Statement">Statement</a>).<a href="../../../src/gorm.io/gorm/statement.go.html#line-235">AddClauseIfNotExists</a>(v <b>Interface</b>)</span></div>
+<div class="anchor" id="name-Join" data-popularity="100">	 type <a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-13">Join</a> <i>(struct)</i>
+		Join join clause for from
+
+		<input type='checkbox' class="stat" id="Join-stat-fields"><label for="Join-stat-fields">Exported Fields (5)</label><span id='Join-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-18">Expression</a> <i><a href="#name-Expression">Expression</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-16">ON</a> <i><a href="#name-Where">Where</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-15">Table</a> <i><a href="#name-Table">Table</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-14">Type</a> <i><a href="#name-JoinType">JoinType</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-17">Using</a> <i>[]<a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Join-stat-methods"><label for="Join-stat-methods">One Exported Method</label><span id='Join-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-21">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Join-stat-impls"><label for="Join-stat-impls">Implements (1+)</label><span id='Join-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span></div>
+<div class="anchor" id="name-JoinType" data-popularity="15">	 type <a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-3">JoinType</a> <a href="../../builtin.html#name-string">string</a>
+
+		<input type='checkbox' class="stat" id="JoinType-stat-values"><label for="JoinType-stat-values">As Types Of (4+)</label><span id='JoinType-stat-values-content' class="stat-content">
+			const <a href="#name-CrossJoin">CrossJoin</a>
+			const <a href="#name-InnerJoin">InnerJoin</a>
+			const <a href="#name-LeftJoin">LeftJoin</a>
+			const <a href="#name-RightJoin">RightJoin</a></span></div>
+<div class="anchor" id="name-Like" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-279">Like</a> <a href="#name-Eq">Eq</a> <i>(struct)</i>
+		Like whether string matches regular expression
+
+		<input type='checkbox' class="stat" id="Like-stat-fields"><label for="Like-stat-fields">Exported Fields (2)</label><span id='Like-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-189">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-190">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Like-stat-methods"><label for="Like-stat-methods">Exported Methods (2)</label><span id='Like-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-281">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-287">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Like-stat-impls"><label for="Like-stat-impls">Implements (2+)</label><span id='Like-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-Limit" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-6">Limit</a> <i>(struct)</i>
+		Limit limit clause
+
+		<input type='checkbox' class="stat" id="Limit-stat-fields"><label for="Limit-stat-fields">Exported Fields (2)</label><span id='Limit-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-7">Limit</a> <i><a href="../../builtin.html#name-int">int</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-8">Offset</a> <i><a href="../../builtin.html#name-int">int</a></i></span>
+		<input type='checkbox' class="stat" id="Limit-stat-methods"><label for="Limit-stat-methods">Exported Methods (3)</label><span id='Limit-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-17">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-32">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/limit.go.html#line-12">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Limit-stat-impls"><label for="Limit-stat-impls">Implements (2+)</label><span id='Limit-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Locking" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-3">Locking</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Locking-stat-fields"><label for="Locking-stat-fields">Exported Fields (3)</label><span id='Locking-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-6">Options</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-4">Strength</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-5">Table</a> <i><a href="#name-Table">Table</a></i></span>
+		<input type='checkbox' class="stat" id="Locking-stat-methods"><label for="Locking-stat-methods">Exported Methods (3)</label><span id='Locking-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-15">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-29">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/locking.go.html#line-10">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Locking-stat-impls"><label for="Locking-stat-impls">Implements (2+)</label><span id='Locking-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Lt" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-253">Lt</a> <a href="#name-Eq">Eq</a> <i>(struct)</i>
+		Lt less than for where
+
+		<input type='checkbox' class="stat" id="Lt-stat-fields"><label for="Lt-stat-fields">Exported Fields (2)</label><span id='Lt-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-189">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-190">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Lt-stat-methods"><label for="Lt-stat-methods">Exported Methods (2)</label><span id='Lt-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-255">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-261">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Lt-stat-impls"><label for="Lt-stat-impls">Implements (2+)</label><span id='Lt-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-Lte" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-266">Lte</a> <a href="#name-Eq">Eq</a> <i>(struct)</i>
+		Lte less than or equal to for where
+
+		<input type='checkbox' class="stat" id="Lte-stat-fields"><label for="Lte-stat-fields">Exported Fields (2)</label><span id='Lte-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-189">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-190">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Lte-stat-methods"><label for="Lte-stat-methods">Exported Methods (2)</label><span id='Lte-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-268">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-274">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Lte-stat-impls"><label for="Lte-stat-impls">Implements (2+)</label><span id='Lte-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-NamedExpr" data-popularity="100">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-73">NamedExpr</a> <i>(struct)</i>
+		NamedExpr raw expression for named expr
+
+		<input type='checkbox' class="stat" id="NamedExpr-stat-fields"><label for="NamedExpr-stat-fields">Exported Fields (2)</label><span id='NamedExpr-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-74">SQL</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-75">Vars</a> <i>[]interface{}</i></span>
+		<input type='checkbox' class="stat" id="NamedExpr-stat-methods"><label for="NamedExpr-stat-methods">One Exported Method</label><span id='NamedExpr-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-79">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="NamedExpr-stat-impls"><label for="NamedExpr-stat-impls">Implements (1+)</label><span id='NamedExpr-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span></div>
+<div class="anchor" id="name-NegationExpressionBuilder" data-popularity="1250">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-16">NegationExpressionBuilder</a> <b<i>(interface)</i></b>
+		NegationExpressionBuilder negation expression builder
+
+		<input type='checkbox' class="stat" id="NegationExpressionBuilder-stat-methods"><label for="NegationExpressionBuilder-stat-methods">One Exported Method</label><span id='NegationExpressionBuilder-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-17">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="NegationExpressionBuilder-stat-impledby"><label for="NegationExpressionBuilder-stat-impledby">Implemented By (8+)</label><span id='NegationExpressionBuilder-stat-impledby-content' class="stat-content">
+			<a href="#name-Eq">Eq</a>
+			<a href="#name-Gt">Gt</a>
+			<a href="#name-Gte">Gte</a>
+			<a href="#name-IN">IN</a>
+			<a href="#name-Like">Like</a>
+			<a href="#name-Lt">Lt</a>
+			<a href="#name-Lte">Lte</a>
+			<a href="#name-Neq">Neq</a></span></div>
+<div class="anchor" id="name-Neq" data-popularity="200">	 type <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-209">Neq</a> <a href="#name-Eq">Eq</a> <i>(struct)</i>
+		Neq not equal to for where
+
+		<input type='checkbox' class="stat" id="Neq-stat-fields"><label for="Neq-stat-fields">Exported Fields (2)</label><span id='Neq-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-189">Column</a> <i>interface{}</i>
+			<a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-190">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Neq-stat-methods"><label for="Neq-stat-methods">Exported Methods (2)</label><span id='Neq-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-211">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/expression.go.html#line-222">NegationBuild</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Neq-stat-impls"><label for="Neq-stat-impls">Implements (2+)</label><span id='Neq-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-NegationExpressionBuilder">NegationExpressionBuilder</a></span></div>
+<div class="anchor" id="name-NotConditions" data-popularity="100">	 type <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-140">NotConditions</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="NotConditions-stat-fields"><label for="NotConditions-stat-fields">One Exported Field</label><span id='NotConditions-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-9">Exprs</a> <i>[]<a href="#name-Expression">Expression</a></i></span>
+		<input type='checkbox' class="stat" id="NotConditions-stat-methods"><label for="NotConditions-stat-methods">One Exported Method</label><span id='NotConditions-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-144">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="NotConditions-stat-impls"><label for="NotConditions-stat-impls">Implements (1+)</label><span id='NotConditions-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span></div>
+<div class="anchor" id="name-OnConflict" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-3">OnConflict</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="OnConflict-stat-fields"><label for="OnConflict-stat-fields">Exported Fields (4)</label><span id='OnConflict-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-4">Columns</a> <i>[]<a href="#name-Column">Column</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-6">DoNothing</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-7">DoUpdates</a> <i><a href="#name-Set">Set</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-5">Where</a> <i><a href="#name-Where">Where</a></i></span>
+		<input type='checkbox' class="stat" id="OnConflict-stat-methods"><label for="OnConflict-stat-methods">Exported Methods (3)</label><span id='OnConflict-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-15">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-42">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/on_conflict.go.html#line-10">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="OnConflict-stat-impls"><label for="OnConflict-stat-impls">Implements (2+)</label><span id='OnConflict-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-OrConditions" data-popularity="100">	 type <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-119">OrConditions</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="OrConditions-stat-fields"><label for="OrConditions-stat-fields">One Exported Field</label><span id='OrConditions-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-9">Exprs</a> <i>[]<a href="#name-Expression">Expression</a></i></span>
+		<input type='checkbox' class="stat" id="OrConditions-stat-methods"><label for="OrConditions-stat-methods">One Exported Method</label><span id='OrConditions-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-123">Build</a>(builder <a href="#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="OrConditions-stat-impls"><label for="OrConditions-stat-impls">Implements (1+)</label><span id='OrConditions-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a></span></div>
+<div class="anchor" id="name-OrderBy" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-9">OrderBy</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="OrderBy-stat-fields"><label for="OrderBy-stat-fields">Exported Fields (2)</label><span id='OrderBy-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-10">Columns</a> <i>[]<a href="#name-OrderByColumn">OrderByColumn</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-11">Expression</a> <i><a href="#name-Expression">Expression</a></i></span>
+		<input type='checkbox' class="stat" id="OrderBy-stat-methods"><label for="OrderBy-stat-methods">Exported Methods (3)</label><span id='OrderBy-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-20">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-38">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-15">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="OrderBy-stat-impls"><label for="OrderBy-stat-impls">Implements (2+)</label><span id='OrderBy-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-OrderByColumn" data-popularity="0">	 type <a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-3">OrderByColumn</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="OrderByColumn-stat-fields"><label for="OrderByColumn-stat-fields">Exported Fields (3)</label><span id='OrderByColumn-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-4">Column</a> <i><a href="#name-Column">Column</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-5">Desc</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/order_by.go.html#line-6">Reorder</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span></div>
+<div class="anchor" id="name-Returning" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/returning.go.html#line-3">Returning</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Returning-stat-fields"><label for="Returning-stat-fields">One Exported Field</label><span id='Returning-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/returning.go.html#line-4">Columns</a> <i>[]<a href="#name-Column">Column</a></i></span>
+		<input type='checkbox' class="stat" id="Returning-stat-methods"><label for="Returning-stat-methods">Exported Methods (3)</label><span id='Returning-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/returning.go.html#line-13">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/returning.go.html#line-24">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/returning.go.html#line-8">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Returning-stat-impls"><label for="Returning-stat-impls">Implements (2+)</label><span id='Returning-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Select" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/select.go.html#line-4">Select</a> <i>(struct)</i>
+		Select select attrs when querying, updating, creating
+
+		<input type='checkbox' class="stat" id="Select-stat-fields"><label for="Select-stat-fields">Exported Fields (3)</label><span id='Select-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/select.go.html#line-6">Columns</a> <i>[]<a href="#name-Column">Column</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/select.go.html#line-5">Distinct</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/select.go.html#line-7">Expression</a> <i><a href="#name-Expression">Expression</a></i></span>
+		<input type='checkbox' class="stat" id="Select-stat-methods"><label for="Select-stat-methods">Exported Methods (3)</label><span id='Select-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/select.go.html#line-14">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/select.go.html#line-31">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/select.go.html#line-10">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Select-stat-impls"><label for="Select-stat-impls">Implements (2+)</label><span id='Select-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Set" data-popularity="475">	 type <a href="../../../src/gorm.io/gorm/clause/set.go.html#line-5">Set</a> <i>([])</i>
+
+		<input type='checkbox' class="stat" id="Set-stat-methods"><label for="Set-stat-methods">Exported Methods (3)</label><span id='Set-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/set.go.html#line-16">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/set.go.html#line-34">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/set.go.html#line-12">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Set-stat-impls"><label for="Set-stat-impls">Implements (2+)</label><span id='Set-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span>
+		<input type='checkbox' class="stat" id="Set-stat-results"><label for="Set-stat-results">As Outputs Of (3+)</label><span id='Set-stat-results-content' class="stat-content">
+			func <a href="#name-AssignmentColumns">AssignmentColumns</a>(values []<a href="../../builtin.html#name-string">string</a>) <b>Set</b>
+			func <a href="#name-Assignments">Assignments</a>(values map[<a href="../../builtin.html#name-string">string</a>]interface{}) <b>Set</b>
+			func gorm.io/gorm/callbacks.<a href="callbacks.html#name-ConvertToAssignments">ConvertToAssignments</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) (set <b>Set</b>)</span></div>
+<div class="anchor" id="name-Table" data-popularity="0">	 type <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-84">Table</a> <i>(struct)</i>
+		Table quote with name
+
+		<input type='checkbox' class="stat" id="Table-stat-fields"><label for="Table-stat-fields">Exported Fields (3)</label><span id='Table-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-86">Alias</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-85">Name</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-87">Raw</a> <i><a href="../../builtin.html#name-bool">bool</a></i></span></div>
+<div class="anchor" id="name-Update" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/update.go.html#line-3">Update</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Update-stat-fields"><label for="Update-stat-fields">Exported Fields (2)</label><span id='Update-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/update.go.html#line-4">Modifier</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/update.go.html#line-5">Table</a> <i><a href="#name-Table">Table</a></i></span>
+		<input type='checkbox' class="stat" id="Update-stat-methods"><label for="Update-stat-methods">Exported Methods (3)</label><span id='Update-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/update.go.html#line-14">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/update.go.html#line-28">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/update.go.html#line-9">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Update-stat-impls"><label for="Update-stat-impls">Implements (2+)</label><span id='Update-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Values" data-popularity="475">	 type <a href="../../../src/gorm.io/gorm/clause/values.go.html#line-3">Values</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="Values-stat-fields"><label for="Values-stat-fields">Exported Fields (2)</label><span id='Values-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/values.go.html#line-4">Columns</a> <i>[]<a href="#name-Column">Column</a></i>
+			<a href="../../../src/gorm.io/gorm/clause/values.go.html#line-5">Values</a> <i>[][]interface{}</i></span>
+		<input type='checkbox' class="stat" id="Values-stat-methods"><label for="Values-stat-methods">Exported Methods (3)</label><span id='Values-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/values.go.html#line-14">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/values.go.html#line-42">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/values.go.html#line-9">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Values-stat-impls"><label for="Values-stat-impls">Implements (2+)</label><span id='Values-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span>
+		<input type='checkbox' class="stat" id="Values-stat-results"><label for="Values-stat-results">As Outputs Of (3+)</label><span id='Values-stat-results-content' class="stat-content">
+			func gorm.io/gorm/callbacks.<a href="callbacks.html#name-ConvertMapToValuesForCreate">ConvertMapToValuesForCreate</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, mapValue map[<a href="../../builtin.html#name-string">string</a>]interface{}) (values <b>Values</b>)
+			func gorm.io/gorm/callbacks.<a href="callbacks.html#name-ConvertSliceOfMapToValuesForCreate">ConvertSliceOfMapToValuesForCreate</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, mapValues []map[<a href="../../builtin.html#name-string">string</a>]interface{}) (values <b>Values</b>)
+			func gorm.io/gorm/callbacks.<a href="callbacks.html#name-ConvertToCreateValues">ConvertToCreateValues</a>(stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>) (values <b>Values</b>)</span></div>
+<div class="anchor" id="name-Where" data-popularity="250">	 type <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-8">Where</a> <i>(struct)</i>
+		Where where clause
+
+		<input type='checkbox' class="stat" id="Where-stat-fields"><label for="Where-stat-fields">One Exported Field</label><span id='Where-stat-fields-content' class="stat-content">
+			<a href="../../../src/gorm.io/gorm/clause/where.go.html#line-9">Exprs</a> <i>[]<a href="#name-Expression">Expression</a></i></span>
+		<input type='checkbox' class="stat" id="Where-stat-methods"><label for="Where-stat-methods">Exported Methods (3)</label><span id='Where-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-18">Build</a>(builder <a href="#name-Builder">Builder</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-78">MergeClause</a>(clause *<a href="#name-Clause">Clause</a>)
+			 (T) <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-13">Name</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Where-stat-impls"><label for="Where-stat-impls">Implements (2+)</label><span id='Where-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Expression">Expression</a>
+			 T : <a href="#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-With" data-popularity="0">	 type <a href="../../../src/gorm.io/gorm/clause/with.go.html#line-3">With</a> <i>(struct)</i>
+</div>
+<div class="anchor" id="name-Writer" data-popularity="1495">	 type <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-13">Writer</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="Writer-stat-methods"><label for="Writer-stat-methods">Exported Methods (2)</label><span id='Writer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-14">WriteByte</a>(<a href="../../builtin.html#name-byte">byte</a>) <a href="../../builtin.html#name-error">error</a>
+			 (T) <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-15">WriteString</a>(<a href="../../builtin.html#name-string">string</a>) (<a href="../../builtin.html#name-int">int</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impledby"><label for="Writer-stat-impledby">Implemented By (7+)</label><span id='Writer-stat-impledby-content' class="stat-content">
+			<a href="#name-Builder">Builder</a> <i>(interface)</i>
+			gorm.io/gorm.(*<a href="../gorm.html#name-Statement">Statement</a>)
+			bufio.<a href="../../bufio.html#name-ReadWriter">ReadWriter</a>
+			bufio.(*<a href="../../bufio.html#name-Writer">Writer</a>)
+			bytes.(*<a href="../../bytes.html#name-Buffer">Buffer</a>)
+			net/http/internal.<a href="../../net/http/internal.html#name-FlushAfterChunkWriter">FlushAfterChunkWriter</a>
+			strings.(*<a href="../../strings.html#name-Builder">Builder</a>)</span>
+		<input type='checkbox' class="stat" id="Writer-stat-impls"><label for="Writer-stat-impls">Implements (2+)</label><span id='Writer-stat-impls-content' class="stat-content">
+			 T : io.<a href="../../io.html#name-ByteWriter">ByteWriter</a>
+			 T : io.<a href="../../io.html#name-StringWriter">StringWriter</a></span>
+		<input type='checkbox' class="stat" id="Writer-stat-params"><label for="Writer-stat-params">As Inputs Of (7+)</label><span id='Writer-stat-params-content' class="stat-content">
+			func <a href="#name-Builder">Builder</a>.<a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-22">AddVar</a>(<b>Writer</b>, ...interface{})
+			func gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <b>Writer</b>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, v interface{})
+			func gorm.io/gorm.<a href="../gorm.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/gorm/interfaces.go.html#line-19">QuoteTo</a>(<b>Writer</b>, <a href="../../builtin.html#name-string">string</a>)
+			func gorm.io/gorm.(*<a href="../gorm.html#name-Statement">Statement</a>).<a href="../../../src/gorm.io/gorm/statement.go.html#line-154">AddVar</a>(writer <b>Writer</b>, vars ...interface{})
+			func gorm.io/gorm.(*<a href="../gorm.html#name-Statement">Statement</a>).<a href="../../../src/gorm.io/gorm/statement.go.html#line-74">QuoteTo</a>(writer <b>Writer</b>, field interface{})
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-163">BindVarTo</a>(writer <b>Writer</b>, stmt *<a href="../gorm.html">gorm</a>.<a href="../gorm.html#name-Statement">Statement</a>, v interface{})
+			func gorm.io/driver/mysql.<a href="../driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../../src/gorm.io/driver/mysql/mysql.go.html#line-167">QuoteTo</a>(writer <b>Writer</b>, str <a href="../../builtin.html#name-string">string</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-And">	 func <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-89">And</a>(exprs ...<a href="#name-Expression">Expression</a>) <a href="#name-Expression">Expression</a></div>
+<div class="anchor" id="name-AssignmentColumns">	 func <a href="../../../src/gorm.io/gorm/clause/set.go.html#line-54">AssignmentColumns</a>(values []<a href="../../builtin.html#name-string">string</a>) <a href="#name-Set">Set</a></div>
+<div class="anchor" id="name-Assignments">	 func <a href="../../../src/gorm.io/gorm/clause/set.go.html#line-40">Assignments</a>(values map[<a href="../../builtin.html#name-string">string</a>]interface{}) <a href="#name-Set">Set</a></div>
+<div class="anchor" id="name-Associations">	const <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-67">Associations</a> <a href="../../builtin.html#name-string">string</a> = "@@@as@@@" // associations</div>
+<div class="anchor" id="name-CrossJoin">	const <a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-6">CrossJoin</a> <a href="#name-JoinType">JoinType</a> = "CROSS"</div>
+<div class="anchor" id="name-CurrentTable">	const <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-66">CurrentTable</a> <a href="../../builtin.html#name-string">string</a> = "@@@ct@@@" // current table</div>
+<div class="anchor" id="name-InnerJoin">	const <a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-7">InnerJoin</a> <a href="#name-JoinType">JoinType</a> = "INNER"</div>
+<div class="anchor" id="name-LeftJoin">	const <a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-8">LeftJoin</a> <a href="#name-JoinType">JoinType</a> = "LEFT"</div>
+<div class="anchor" id="name-Not">	 func <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-133">Not</a>(exprs ...<a href="#name-Expression">Expression</a>) <a href="#name-Expression">Expression</a></div>
+<div class="anchor" id="name-Or">	 func <a href="../../../src/gorm.io/gorm/clause/where.go.html#line-112">Or</a>(exprs ...<a href="#name-Expression">Expression</a>) <a href="#name-Expression">Expression</a></div>
+<div class="anchor" id="name-PrimaryColumn">	  var <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-72">PrimaryColumn</a> <a href="#name-Column">Column</a></div>
+<div class="anchor" id="name-PrimaryKey">	const <a href="../../../src/gorm.io/gorm/clause/clause.go.html#line-65">PrimaryKey</a> <a href="../../builtin.html#name-string">string</a> = "@@@py@@@" // primary key</div>
+<div class="anchor" id="name-RightJoin">	const <a href="../../../src/gorm.io/gorm/clause/joins.go.html#line-9">RightJoin</a> <a href="#name-JoinType">JoinType</a> = "RIGHT"</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

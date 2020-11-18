@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: sys_darwin.go in package vendor/golang.org/x/net/route</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	sys_darwin.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../pkg/vendor/golang.org/x/net/route.html">vendor/golang.org/x/net/route</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2016 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>package route</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>func (typ RIBType) parseable() bool {</code></span>
+<span class="codeline" id="line-8"><code>	switch typ {</code></span>
+<span class="codeline" id="line-9"><code>	case sysNET_RT_STAT, sysNET_RT_TRASH:</code></span>
+<span class="codeline" id="line-10"><code>		return false</code></span>
+<span class="codeline" id="line-11"><code>	default:</code></span>
+<span class="codeline" id="line-12"><code>		return true</code></span>
+<span class="codeline" id="line-13"><code>	}</code></span>
+<span class="codeline" id="line-14"><code>}</code></span>
+<span class="codeline" id="line-15"><code></code></span>
+<span class="codeline" id="line-16"><code>// RouteMetrics represents route metrics.</code></span>
+<span class="codeline" id="line-17"><code>type RouteMetrics struct {</code></span>
+<span class="codeline" id="line-18"><code>	PathMTU int // path maximum transmission unit</code></span>
+<span class="codeline" id="line-19"><code>}</code></span>
+<span class="codeline" id="line-20"><code></code></span>
+<span class="codeline" id="line-21"><code>// SysType implements the SysType method of Sys interface.</code></span>
+<span class="codeline" id="line-22"><code>func (rmx *RouteMetrics) SysType() SysType { return SysMetrics }</code></span>
+<span class="codeline" id="line-23"><code></code></span>
+<span class="codeline" id="line-24"><code>// Sys implements the Sys method of Message interface.</code></span>
+<span class="codeline" id="line-25"><code>func (m *RouteMessage) Sys() []Sys {</code></span>
+<span class="codeline" id="line-26"><code>	return []Sys{</code></span>
+<span class="codeline" id="line-27"><code>		&amp;RouteMetrics{</code></span>
+<span class="codeline" id="line-28"><code>			PathMTU: int(nativeEndian.Uint32(m.raw[m.extOff+4 : m.extOff+8])),</code></span>
+<span class="codeline" id="line-29"><code>		},</code></span>
+<span class="codeline" id="line-30"><code>	}</code></span>
+<span class="codeline" id="line-31"><code>}</code></span>
+<span class="codeline" id="line-32"><code></code></span>
+<span class="codeline" id="line-33"><code>// InterfaceMetrics represents interface metrics.</code></span>
+<span class="codeline" id="line-34"><code>type InterfaceMetrics struct {</code></span>
+<span class="codeline" id="line-35"><code>	Type int // interface type</code></span>
+<span class="codeline" id="line-36"><code>	MTU  int // maximum transmission unit</code></span>
+<span class="codeline" id="line-37"><code>}</code></span>
+<span class="codeline" id="line-38"><code></code></span>
+<span class="codeline" id="line-39"><code>// SysType implements the SysType method of Sys interface.</code></span>
+<span class="codeline" id="line-40"><code>func (imx *InterfaceMetrics) SysType() SysType { return SysMetrics }</code></span>
+<span class="codeline" id="line-41"><code></code></span>
+<span class="codeline" id="line-42"><code>// Sys implements the Sys method of Message interface.</code></span>
+<span class="codeline" id="line-43"><code>func (m *InterfaceMessage) Sys() []Sys {</code></span>
+<span class="codeline" id="line-44"><code>	return []Sys{</code></span>
+<span class="codeline" id="line-45"><code>		&amp;InterfaceMetrics{</code></span>
+<span class="codeline" id="line-46"><code>			Type: int(m.raw[m.extOff]),</code></span>
+<span class="codeline" id="line-47"><code>			MTU:  int(nativeEndian.Uint32(m.raw[m.extOff+8 : m.extOff+12])),</code></span>
+<span class="codeline" id="line-48"><code>		},</code></span>
+<span class="codeline" id="line-49"><code>	}</code></span>
+<span class="codeline" id="line-50"><code>}</code></span>
+<span class="codeline" id="line-51"><code></code></span>
+<span class="codeline" id="line-52"><code>func probeRoutingStack() (int, map[int]*wireFormat) {</code></span>
+<span class="codeline" id="line-53"><code>	rtm := &amp;wireFormat{extOff: 36, bodyOff: sizeofRtMsghdrDarwin15}</code></span>
+<span class="codeline" id="line-54"><code>	rtm.parse = rtm.parseRouteMessage</code></span>
+<span class="codeline" id="line-55"><code>	rtm2 := &amp;wireFormat{extOff: 36, bodyOff: sizeofRtMsghdr2Darwin15}</code></span>
+<span class="codeline" id="line-56"><code>	rtm2.parse = rtm2.parseRouteMessage</code></span>
+<span class="codeline" id="line-57"><code>	ifm := &amp;wireFormat{extOff: 16, bodyOff: sizeofIfMsghdrDarwin15}</code></span>
+<span class="codeline" id="line-58"><code>	ifm.parse = ifm.parseInterfaceMessage</code></span>
+<span class="codeline" id="line-59"><code>	ifm2 := &amp;wireFormat{extOff: 32, bodyOff: sizeofIfMsghdr2Darwin15}</code></span>
+<span class="codeline" id="line-60"><code>	ifm2.parse = ifm2.parseInterfaceMessage</code></span>
+<span class="codeline" id="line-61"><code>	ifam := &amp;wireFormat{extOff: sizeofIfaMsghdrDarwin15, bodyOff: sizeofIfaMsghdrDarwin15}</code></span>
+<span class="codeline" id="line-62"><code>	ifam.parse = ifam.parseInterfaceAddrMessage</code></span>
+<span class="codeline" id="line-63"><code>	ifmam := &amp;wireFormat{extOff: sizeofIfmaMsghdrDarwin15, bodyOff: sizeofIfmaMsghdrDarwin15}</code></span>
+<span class="codeline" id="line-64"><code>	ifmam.parse = ifmam.parseInterfaceMulticastAddrMessage</code></span>
+<span class="codeline" id="line-65"><code>	ifmam2 := &amp;wireFormat{extOff: sizeofIfmaMsghdr2Darwin15, bodyOff: sizeofIfmaMsghdr2Darwin15}</code></span>
+<span class="codeline" id="line-66"><code>	ifmam2.parse = ifmam2.parseInterfaceMulticastAddrMessage</code></span>
+<span class="codeline" id="line-67"><code>	// Darwin kernels require 32-bit aligned access to routing facilities.</code></span>
+<span class="codeline" id="line-68"><code>	return 4, map[int]*wireFormat{</code></span>
+<span class="codeline" id="line-69"><code>		sysRTM_ADD:       rtm,</code></span>
+<span class="codeline" id="line-70"><code>		sysRTM_DELETE:    rtm,</code></span>
+<span class="codeline" id="line-71"><code>		sysRTM_CHANGE:    rtm,</code></span>
+<span class="codeline" id="line-72"><code>		sysRTM_GET:       rtm,</code></span>
+<span class="codeline" id="line-73"><code>		sysRTM_LOSING:    rtm,</code></span>
+<span class="codeline" id="line-74"><code>		sysRTM_REDIRECT:  rtm,</code></span>
+<span class="codeline" id="line-75"><code>		sysRTM_MISS:      rtm,</code></span>
+<span class="codeline" id="line-76"><code>		sysRTM_LOCK:      rtm,</code></span>
+<span class="codeline" id="line-77"><code>		sysRTM_RESOLVE:   rtm,</code></span>
+<span class="codeline" id="line-78"><code>		sysRTM_NEWADDR:   ifam,</code></span>
+<span class="codeline" id="line-79"><code>		sysRTM_DELADDR:   ifam,</code></span>
+<span class="codeline" id="line-80"><code>		sysRTM_IFINFO:    ifm,</code></span>
+<span class="codeline" id="line-81"><code>		sysRTM_NEWMADDR:  ifmam,</code></span>
+<span class="codeline" id="line-82"><code>		sysRTM_DELMADDR:  ifmam,</code></span>
+<span class="codeline" id="line-83"><code>		sysRTM_IFINFO2:   ifm2,</code></span>
+<span class="codeline" id="line-84"><code>		sysRTM_NEWMADDR2: ifmam2,</code></span>
+<span class="codeline" id="line-85"><code>		sysRTM_GET2:      rtm2,</code></span>
+<span class="codeline" id="line-86"><code>	}</code></span>
+<span class="codeline" id="line-87"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

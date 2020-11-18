@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: vendor/golang.org/x/sys/cpu</title>
+<link href="../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>cpu</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../../../index.html#pkg-vendor/golang.org/x/sys/cpu">vendor/golang.org/x/sys/cpu</a><i> (on <a href="https://golang.org/pkg/vendor/golang.org/x/sys/cpu/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/vendor/golang.org/x/sys/cpu" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../../../dep/vendor/golang.org/x/sys/cpu.html">one package</a>, and imported by <a href="../../../../../dep/vendor/golang.org/x/sys/cpu.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../../../../src/vendor/golang.org/x/sys/cpu/byteorder.go.html">byteorder.go</a>
+	<a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#doc">d-&gt;</a> <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html">cpu.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu_gc_x86.go.html">cpu_gc_x86.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu_x86.go.html">cpu_x86.go</a>
+	    <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu_x86.s.html">cpu_x86.s</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-CacheLinePad" data-popularity="0">	 type <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-17">CacheLinePad</a> <i>(struct)</i>
+		CacheLinePad is used to pad structs to avoid false sharing.
+</div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ARM">	  var <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-85">ARM</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasSWP <a href="../../../../builtin.html#name-bool">bool</a>; HasHALF <a href="../../../../builtin.html#name-bool">bool</a>; HasTHUMB <a href="../../../../builtin.html#name-bool">bool</a>; Has26BIT <a href="../../../../builtin.html#name-bool">bool</a>; HasFASTMUL <a href="../../../../builtin.html#name-bool">bool</a>; HasFPA <a href="../../../../builtin.html#name-bool">bool</a>; HasVFP <a href="../../../../builtin.html#name-bool">bool</a>; HasEDSP <a href="../../../../builtin.html#name-bool">bool</a>; HasJAVA <a href="../../../../builtin.html#name-bool">bool</a>; HasIWMMXT <a href="../../../../builtin.html#name-bool">bool</a>; HasCRUNCH <a href="../../../../builtin.html#name-bool">bool</a>; HasTHUMBEE <a href="../../../../builtin.html#name-bool">bool</a>; HasNEON <a href="../../../../builtin.html#name-bool">bool</a>; HasVFPv3 <a href="../../../../builtin.html#name-bool">bool</a>; HasVFPv3D16 <a href="../../../../builtin.html#name-bool">bool</a>; HasTLS <a href="../../../../builtin.html#name-bool">bool</a>; HasVFPv4 <a href="../../../../builtin.html#name-bool">bool</a>; HasIDIVA <a href="../../../../builtin.html#name-bool">bool</a>; HasIDIVT <a href="../../../../builtin.html#name-bool">bool</a>; HasVFPD32 <a href="../../../../builtin.html#name-bool">bool</a>; HasLPAE <a href="../../../../builtin.html#name-bool">bool</a>; HasEVTSTRM <a href="../../../../builtin.html#name-bool">bool</a>; HasAES <a href="../../../../builtin.html#name-bool">bool</a>; HasPMULL <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA1 <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA2 <a href="../../../../builtin.html#name-bool">bool</a>; HasCRC32 <a href="../../../../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		ARM contains the supported CPU features of the current ARM (32-bit) platform.
+		All feature flags are false if:
+		  1. the current platform is not arm, or
+		  2. the current operating system is not Linux.</div>
+<div class="anchor" id="name-ARM64">	  var <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-52">ARM64</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasFP <a href="../../../../builtin.html#name-bool">bool</a>; HasASIMD <a href="../../../../builtin.html#name-bool">bool</a>; HasEVTSTRM <a href="../../../../builtin.html#name-bool">bool</a>; HasAES <a href="../../../../builtin.html#name-bool">bool</a>; HasPMULL <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA1 <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA2 <a href="../../../../builtin.html#name-bool">bool</a>; HasCRC32 <a href="../../../../builtin.html#name-bool">bool</a>; HasATOMICS <a href="../../../../builtin.html#name-bool">bool</a>; HasFPHP <a href="../../../../builtin.html#name-bool">bool</a>; HasASIMDHP <a href="../../../../builtin.html#name-bool">bool</a>; HasCPUID <a href="../../../../builtin.html#name-bool">bool</a>; HasASIMDRDM <a href="../../../../builtin.html#name-bool">bool</a>; HasJSCVT <a href="../../../../builtin.html#name-bool">bool</a>; HasFCMA <a href="../../../../builtin.html#name-bool">bool</a>; HasLRCPC <a href="../../../../builtin.html#name-bool">bool</a>; HasDCPOP <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA3 <a href="../../../../builtin.html#name-bool">bool</a>; HasSM3 <a href="../../../../builtin.html#name-bool">bool</a>; HasSM4 <a href="../../../../builtin.html#name-bool">bool</a>; HasASIMDDP <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA512 <a href="../../../../builtin.html#name-bool">bool</a>; HasSVE <a href="../../../../builtin.html#name-bool">bool</a>; HasASIMDFHM <a href="../../../../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		ARM64 contains the supported CPU features of the
+		current ARMv8(aarch64) platform. If the current platform
+		is not arm64 then all feature flags are false.</div>
+<div class="anchor" id="name-Initialized">	  var <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-14">Initialized</a> <a href="../../../../builtin.html#name-bool">bool</a>
+		Initialized reports whether the CPU features were initialized.
+
+		For some GOOS/GOARCH combinations initialization of the CPU features depends
+		on reading an operating specific file, e.g. /proc/self/auxv on linux/arm
+		Initialized will report false if reading the file fails.</div>
+<div class="anchor" id="name-MIPS64X">	  var <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-120">MIPS64X</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasMSA <a href="../../../../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		MIPS64X contains the supported CPU features of the current mips64/mips64le
+		platforms. If the current platform is not mips64/mips64le or the current
+		operating system is not Linux then all feature flags are false.</div>
+<div class="anchor" id="name-PPC64">	  var <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-134">PPC64</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasDARN <a href="../../../../builtin.html#name-bool">bool</a>; HasSCV <a href="../../../../builtin.html#name-bool">bool</a>; IsPOWER8 <a href="../../../../builtin.html#name-bool">bool</a>; IsPOWER9 <a href="../../../../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		PPC64 contains the supported CPU features of the current ppc64/ppc64le platforms.
+		If the current platform is not ppc64/ppc64le then all feature flags are false.
+
+		For ppc64/ppc64le, it is safe to check only for ISA level starting on ISA v3.00,
+		since there are no optional categories. There are some exceptions that also
+		require kernel support to work (DARN, SCV), so there are feature bits for
+		those as well. The minimum processor requirement is POWER8 (ISA 2.07).
+		The struct is padded to avoid false sharing.</div>
+<div class="anchor" id="name-S390X">	  var <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-150">S390X</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasZARCH <a href="../../../../builtin.html#name-bool">bool</a>; HasSTFLE <a href="../../../../builtin.html#name-bool">bool</a>; HasLDISP <a href="../../../../builtin.html#name-bool">bool</a>; HasEIMM <a href="../../../../builtin.html#name-bool">bool</a>; HasDFP <a href="../../../../builtin.html#name-bool">bool</a>; HasETF3EH <a href="../../../../builtin.html#name-bool">bool</a>; HasMSA <a href="../../../../builtin.html#name-bool">bool</a>; HasAES <a href="../../../../builtin.html#name-bool">bool</a>; HasAESCBC <a href="../../../../builtin.html#name-bool">bool</a>; HasAESCTR <a href="../../../../builtin.html#name-bool">bool</a>; HasAESGCM <a href="../../../../builtin.html#name-bool">bool</a>; HasGHASH <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA1 <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA256 <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA512 <a href="../../../../builtin.html#name-bool">bool</a>; HasSHA3 <a href="../../../../builtin.html#name-bool">bool</a>; HasVX <a href="../../../../builtin.html#name-bool">bool</a>; HasVXE <a href="../../../../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		S390X contains the supported CPU features of the current IBM Z
+		(s390x) platform. If the current platform is not IBM Z then all
+		feature flags are false.
+
+		S390X is padded to avoid false sharing. Further HasVX is only set
+		if the OS supports vector registers in addition to the STFLE
+		feature bit being set.</div>
+<div class="anchor" id="name-X86">	  var <a href="../../../../../src/vendor/golang.org/x/sys/cpu/cpu.go.html#line-26">X86</a> struct{_ <a href="#name-CacheLinePad">CacheLinePad</a>; HasAES <a href="../../../../builtin.html#name-bool">bool</a>; HasADX <a href="../../../../builtin.html#name-bool">bool</a>; HasAVX <a href="../../../../builtin.html#name-bool">bool</a>; HasAVX2 <a href="../../../../builtin.html#name-bool">bool</a>; HasBMI1 <a href="../../../../builtin.html#name-bool">bool</a>; HasBMI2 <a href="../../../../builtin.html#name-bool">bool</a>; HasERMS <a href="../../../../builtin.html#name-bool">bool</a>; HasFMA <a href="../../../../builtin.html#name-bool">bool</a>; HasOSXSAVE <a href="../../../../builtin.html#name-bool">bool</a>; HasPCLMULQDQ <a href="../../../../builtin.html#name-bool">bool</a>; HasPOPCNT <a href="../../../../builtin.html#name-bool">bool</a>; HasRDRAND <a href="../../../../builtin.html#name-bool">bool</a>; HasRDSEED <a href="../../../../builtin.html#name-bool">bool</a>; HasSSE2 <a href="../../../../builtin.html#name-bool">bool</a>; HasSSE3 <a href="../../../../builtin.html#name-bool">bool</a>; HasSSSE3 <a href="../../../../builtin.html#name-bool">bool</a>; HasSSE41 <a href="../../../../builtin.html#name-bool">bool</a>; HasSSE42 <a href="../../../../builtin.html#name-bool">bool</a>; _ <a href="#name-CacheLinePad">CacheLinePad</a>}
+		X86 contains the supported CPU features of the
+		current X86/AMD64 platform. If the current platform
+		is not X86/AMD64 then all feature flags are false.
+
+		X86 is padded to avoid false sharing. Further the HasAVX
+		and HasAVX2 are only set if the OS supports XMM and YMM
+		registers in addition to the CPUID feature bit being set.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

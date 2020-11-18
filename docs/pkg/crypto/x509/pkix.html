@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/x509/pkix</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>pkix</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-crypto/x509/pkix">crypto/x509/pkix</a><i> (on <a href="https://golang.org/pkg/crypto/x509/pkix/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/x509/pkix" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/crypto/x509/pkix.html">5 packages</a>, and imported by <a href="../../../dep/crypto/x509/pkix.html#imported-by">one package</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../src/crypto/x509/pkix/pkix.go.html#doc">d-&gt;</a> <a href="../../../src/crypto/x509/pkix/pkix.go.html">pkix.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-AlgorithmIdentifier" data-popularity="0">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-19">AlgorithmIdentifier</a> <i>(struct)</i>
+		AlgorithmIdentifier represents the ASN.1 structure of the same name. See RFC
+		5280, section 4.1.1.2.
+
+		<input type='checkbox' class="stat" id="AlgorithmIdentifier-stat-fields"><label for="AlgorithmIdentifier-stat-fields">Exported Fields (2)</label><span id='AlgorithmIdentifier-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-20">Algorithm</a> <i><a href="../../encoding/asn1.html">asn1</a>.<a href="../../encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-21">Parameters</a> <i><a href="../../encoding/asn1.html">asn1</a>.<a href="../../encoding/asn1.html#name-RawValue">RawValue</a></i></span></div>
+<div class="anchor" id="name-AttributeTypeAndValue" data-popularity="0">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-99">AttributeTypeAndValue</a> <i>(struct)</i>
+		AttributeTypeAndValue mirrors the ASN.1 structure of the same name in
+		RFC 5280, Section 4.1.2.4.
+
+		<input type='checkbox' class="stat" id="AttributeTypeAndValue-stat-fields"><label for="AttributeTypeAndValue-stat-fields">Exported Fields (2)</label><span id='AttributeTypeAndValue-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-100">Type</a> <i><a href="../../encoding/asn1.html">asn1</a>.<a href="../../encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-101">Value</a> <i>interface{}</i></span></div>
+<div class="anchor" id="name-AttributeTypeAndValueSET" data-popularity="0">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-106">AttributeTypeAndValueSET</a> <i>(struct)</i>
+		AttributeTypeAndValueSET represents a set of ASN.1 sequences of
+		AttributeTypeAndValue sequences from RFC 2986 (PKCS #10).
+
+		<input type='checkbox' class="stat" id="AttributeTypeAndValueSET-stat-fields"><label for="AttributeTypeAndValueSET-stat-fields">Exported Fields (2)</label><span id='AttributeTypeAndValueSET-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-107">Type</a> <i><a href="../../encoding/asn1.html">asn1</a>.<a href="../../encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-108">Value</a> <i>[][]<a href="#name-AttributeTypeAndValue">AttributeTypeAndValue</a></i></span></div>
+<div class="anchor" id="name-CertificateList" data-popularity="235">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-286">CertificateList</a> <i>(struct)</i>
+		CertificateList represents the ASN.1 structure of the same name. See RFC
+		5280, section 5.1. Use Certificate.CheckCRLSignature to verify the
+		signature.
+
+		<input type='checkbox' class="stat" id="CertificateList-stat-fields"><label for="CertificateList-stat-fields">Exported Fields (3)</label><span id='CertificateList-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-288">SignatureAlgorithm</a> <i><a href="#name-AlgorithmIdentifier">AlgorithmIdentifier</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-289">SignatureValue</a> <i><a href="../../encoding/asn1.html">asn1</a>.<a href="../../encoding/asn1.html#name-BitString">BitString</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-287">TBSCertList</a> <i><a href="#name-TBSCertificateList">TBSCertificateList</a></i></span>
+		<input type='checkbox' class="stat" id="CertificateList-stat-methods"><label for="CertificateList-stat-methods">One Exported Method</label><span id='CertificateList-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-293">HasExpired</a>(now <a href="../../time.html">time</a>.<a href="../../time.html#name-Time">Time</a>) <a href="../../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="CertificateList-stat-results"><label for="CertificateList-stat-results">As Outputs Of (2+)</label><span id='CertificateList-stat-results-content' class="stat-content">
+			func crypto/x509.<a href="../x509.html#name-ParseCRL">ParseCRL</a>(crlBytes []<a href="../../builtin.html#name-byte">byte</a>) (*<b>CertificateList</b>, <a href="../../builtin.html#name-error">error</a>)
+			func crypto/x509.<a href="../x509.html#name-ParseDERCRL">ParseDERCRL</a>(derBytes []<a href="../../builtin.html#name-byte">byte</a>) (*<b>CertificateList</b>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="CertificateList-stat-params"><label for="CertificateList-stat-params">As Inputs Of (1+)</label><span id='CertificateList-stat-params-content' class="stat-content">
+			func crypto/x509.(*<a href="../x509.html#name-Certificate">Certificate</a>).<a href="../../../src/crypto/x509/x509.go.html#line-924">CheckCRLSignature</a>(crl *<b>CertificateList</b>) <a href="../../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Extension" data-popularity="0">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-113">Extension</a> <i>(struct)</i>
+		Extension represents the ASN.1 structure of the same name. See RFC
+		5280, section 4.2.
+
+		<input type='checkbox' class="stat" id="Extension-stat-fields"><label for="Extension-stat-fields">Exported Fields (3)</label><span id='Extension-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-115">Critical</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-114">Id</a> <i><a href="../../encoding/asn1.html">asn1</a>.<a href="../../encoding/asn1.html#name-ObjectIdentifier">ObjectIdentifier</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-116">Value</a> <i>[]<a href="../../builtin.html#name-byte">byte</a></i></span></div>
+<div class="anchor" id="name-Name" data-popularity="200">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-123">Name</a> <i>(struct)</i>
+		Name represents an X.509 distinguished name. This only includes the common
+		elements of a DN. Note that Name is only an approximation of the X.509
+		structure. If an accurate representation is needed, asn1.Unmarshal the raw
+		subject or issuer as an RDNSequence.
+
+		<input type='checkbox' class="stat" id="Name-stat-fields"><label for="Name-stat-fields">Exported Fields (11)</label><span id='Name-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-127">CommonName</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-124">Country</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-138">ExtraNames</a> <i>[]<a href="#name-AttributeTypeAndValue">AttributeTypeAndValue</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-125">Locality</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-133">Names</a> <i>[]<a href="#name-AttributeTypeAndValue">AttributeTypeAndValue</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-124">Organization</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-124">OrganizationalUnit</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-126">PostalCode</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-125">Province</a> <i>[]<a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-127">SerialNumber</a> <i><a href="../../builtin.html#name-string">string</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-126">StreetAddress</a> <i>[]<a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="Name-stat-methods"><label for="Name-stat-methods">Exported Methods (3)</label><span id='Name-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-144">FillFromRDNSequence</a>(rdns *<a href="#name-RDNSequence">RDNSequence</a>)
+			 (T) <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-249">String</a>() <a href="../../builtin.html#name-string">string</a>
+			 (T) <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-226">ToRDNSequence</a>() (ret <a href="#name-RDNSequence">RDNSequence</a>)</span>
+		<input type='checkbox' class="stat" id="Name-stat-impls"><label for="Name-stat-impls">Implements (1+)</label><span id='Name-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../fmt.html#name-Stringer">Stringer</a></span></div>
+<div class="anchor" id="name-RDNSequence" data-popularity="210">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-24">RDNSequence</a> <i>([])</i>
+
+		<input type='checkbox' class="stat" id="RDNSequence-stat-methods"><label for="RDNSequence-stat-methods">One Exported Method</label><span id='RDNSequence-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-40">String</a>() <a href="../../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="RDNSequence-stat-impls"><label for="RDNSequence-stat-impls">Implements (1+)</label><span id='RDNSequence-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="RDNSequence-stat-results"><label for="RDNSequence-stat-results">As Outputs Of (1+)</label><span id='RDNSequence-stat-results-content' class="stat-content">
+			func <a href="#name-Name">Name</a>.<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-226">ToRDNSequence</a>() (ret <b>RDNSequence</b>)</span>
+		<input type='checkbox' class="stat" id="RDNSequence-stat-params"><label for="RDNSequence-stat-params">As Inputs Of (1+)</label><span id='RDNSequence-stat-params-content' class="stat-content">
+			func (*<a href="#name-Name">Name</a>).<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-144">FillFromRDNSequence</a>(rdns *<b>RDNSequence</b>)</span></div>
+<div class="anchor" id="name-RelativeDistinguishedNameSET" data-popularity="0">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-95">RelativeDistinguishedNameSET</a> <i>([])</i>
+</div>
+<div class="anchor" id="name-RevokedCertificate" data-popularity="35">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-312">RevokedCertificate</a> <i>(struct)</i>
+		RevokedCertificate represents the ASN.1 structure of the same name. See RFC
+		5280, section 5.1.
+
+		<input type='checkbox' class="stat" id="RevokedCertificate-stat-fields"><label for="RevokedCertificate-stat-fields">Exported Fields (3)</label><span id='RevokedCertificate-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-315">Extensions</a> <i>[]<a href="#name-Extension">Extension</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-314">RevocationTime</a> <i><a href="../../time.html">time</a>.<a href="../../time.html#name-Time">Time</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-313">SerialNumber</a> <i>*<a href="../../math/big.html">big</a>.<a href="../../math/big.html#name-Int">Int</a></i></span>
+		<input type='checkbox' class="stat" id="RevokedCertificate-stat-params"><label for="RevokedCertificate-stat-params">As Inputs Of (1+)</label><span id='RevokedCertificate-stat-params-content' class="stat-content">
+			func crypto/x509.(*<a href="../x509.html#name-Certificate">Certificate</a>).<a href="../../../src/crypto/x509/x509.go.html#line-2227">CreateCRL</a>(rand <a href="../../io.html">io</a>.<a href="../../io.html#name-Reader">Reader</a>, priv interface{}, revokedCerts []<b>RevokedCertificate</b>, now, expiry <a href="../../time.html">time</a>.<a href="../../time.html#name-Time">Time</a>) (crlBytes []<a href="../../builtin.html#name-byte">byte</a>, err <a href="../../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-TBSCertificateList" data-popularity="0">	 type <a href="../../../src/crypto/x509/pkix/pkix.go.html#line-299">TBSCertificateList</a> <i>(struct)</i>
+		TBSCertificateList represents the ASN.1 structure of the same name. See RFC
+		5280, section 5.1.
+
+		<input type='checkbox' class="stat" id="TBSCertificateList-stat-fields"><label for="TBSCertificateList-stat-fields">Exported Fields (8)</label><span id='TBSCertificateList-stat-fields-content' class="stat-content">
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-307">Extensions</a> <i>[]<a href="#name-Extension">Extension</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-303">Issuer</a> <i><a href="#name-RDNSequence">RDNSequence</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-305">NextUpdate</a> <i><a href="../../time.html">time</a>.<a href="../../time.html#name-Time">Time</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-300">Raw</a> <i><a href="../../encoding/asn1.html">asn1</a>.<a href="../../encoding/asn1.html#name-RawContent">RawContent</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-306">RevokedCertificates</a> <i>[]<a href="#name-RevokedCertificate">RevokedCertificate</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-302">Signature</a> <i><a href="#name-AlgorithmIdentifier">AlgorithmIdentifier</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-304">ThisUpdate</a> <i><a href="../../time.html">time</a>.<a href="../../time.html#name-Time">Time</a></i>
+			<a href="../../../src/crypto/x509/pkix/pkix.go.html#line-301">Version</a> <i><a href="../../builtin.html#name-int">int</a></i></span></div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

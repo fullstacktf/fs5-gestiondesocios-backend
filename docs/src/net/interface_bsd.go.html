@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: interface_bsd.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	interface_bsd.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2011 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build darwin dragonfly freebsd netbsd openbsd</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>package net</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>import (</code></span>
+<span class="codeline" id="line-10"><code>	"syscall"</code></span>
+<span class="codeline" id="line-11"><code></code></span>
+<span class="codeline" id="line-12"><code>	"golang.org/x/net/route"</code></span>
+<span class="codeline" id="line-13"><code>)</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>// If the ifindex is zero, interfaceTable returns mappings of all</code></span>
+<span class="codeline" id="line-16"><code>// network interfaces. Otherwise it returns a mapping of a specific</code></span>
+<span class="codeline" id="line-17"><code>// interface.</code></span>
+<span class="codeline" id="line-18"><code>func interfaceTable(ifindex int) ([]Interface, error) {</code></span>
+<span class="codeline" id="line-19"><code>	msgs, err := interfaceMessages(ifindex)</code></span>
+<span class="codeline" id="line-20"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-21"><code>		return nil, err</code></span>
+<span class="codeline" id="line-22"><code>	}</code></span>
+<span class="codeline" id="line-23"><code>	n := len(msgs)</code></span>
+<span class="codeline" id="line-24"><code>	if ifindex != 0 {</code></span>
+<span class="codeline" id="line-25"><code>		n = 1</code></span>
+<span class="codeline" id="line-26"><code>	}</code></span>
+<span class="codeline" id="line-27"><code>	ift := make([]Interface, n)</code></span>
+<span class="codeline" id="line-28"><code>	n = 0</code></span>
+<span class="codeline" id="line-29"><code>	for _, m := range msgs {</code></span>
+<span class="codeline" id="line-30"><code>		switch m := m.(type) {</code></span>
+<span class="codeline" id="line-31"><code>		case *route.InterfaceMessage:</code></span>
+<span class="codeline" id="line-32"><code>			if ifindex != 0 &amp;&amp; ifindex != m.Index {</code></span>
+<span class="codeline" id="line-33"><code>				continue</code></span>
+<span class="codeline" id="line-34"><code>			}</code></span>
+<span class="codeline" id="line-35"><code>			ift[n].Index = m.Index</code></span>
+<span class="codeline" id="line-36"><code>			ift[n].Name = m.Name</code></span>
+<span class="codeline" id="line-37"><code>			ift[n].Flags = linkFlags(m.Flags)</code></span>
+<span class="codeline" id="line-38"><code>			if sa, ok := m.Addrs[syscall.RTAX_IFP].(*route.LinkAddr); ok &amp;&amp; len(sa.Addr) &gt; 0 {</code></span>
+<span class="codeline" id="line-39"><code>				ift[n].HardwareAddr = make([]byte, len(sa.Addr))</code></span>
+<span class="codeline" id="line-40"><code>				copy(ift[n].HardwareAddr, sa.Addr)</code></span>
+<span class="codeline" id="line-41"><code>			}</code></span>
+<span class="codeline" id="line-42"><code>			for _, sys := range m.Sys() {</code></span>
+<span class="codeline" id="line-43"><code>				if imx, ok := sys.(*route.InterfaceMetrics); ok {</code></span>
+<span class="codeline" id="line-44"><code>					ift[n].MTU = imx.MTU</code></span>
+<span class="codeline" id="line-45"><code>					break</code></span>
+<span class="codeline" id="line-46"><code>				}</code></span>
+<span class="codeline" id="line-47"><code>			}</code></span>
+<span class="codeline" id="line-48"><code>			n++</code></span>
+<span class="codeline" id="line-49"><code>			if ifindex == m.Index {</code></span>
+<span class="codeline" id="line-50"><code>				return ift[:n], nil</code></span>
+<span class="codeline" id="line-51"><code>			}</code></span>
+<span class="codeline" id="line-52"><code>		}</code></span>
+<span class="codeline" id="line-53"><code>	}</code></span>
+<span class="codeline" id="line-54"><code>	return ift[:n], nil</code></span>
+<span class="codeline" id="line-55"><code>}</code></span>
+<span class="codeline" id="line-56"><code></code></span>
+<span class="codeline" id="line-57"><code>func linkFlags(rawFlags int) Flags {</code></span>
+<span class="codeline" id="line-58"><code>	var f Flags</code></span>
+<span class="codeline" id="line-59"><code>	if rawFlags&amp;syscall.IFF_UP != 0 {</code></span>
+<span class="codeline" id="line-60"><code>		f |= FlagUp</code></span>
+<span class="codeline" id="line-61"><code>	}</code></span>
+<span class="codeline" id="line-62"><code>	if rawFlags&amp;syscall.IFF_BROADCAST != 0 {</code></span>
+<span class="codeline" id="line-63"><code>		f |= FlagBroadcast</code></span>
+<span class="codeline" id="line-64"><code>	}</code></span>
+<span class="codeline" id="line-65"><code>	if rawFlags&amp;syscall.IFF_LOOPBACK != 0 {</code></span>
+<span class="codeline" id="line-66"><code>		f |= FlagLoopback</code></span>
+<span class="codeline" id="line-67"><code>	}</code></span>
+<span class="codeline" id="line-68"><code>	if rawFlags&amp;syscall.IFF_POINTOPOINT != 0 {</code></span>
+<span class="codeline" id="line-69"><code>		f |= FlagPointToPoint</code></span>
+<span class="codeline" id="line-70"><code>	}</code></span>
+<span class="codeline" id="line-71"><code>	if rawFlags&amp;syscall.IFF_MULTICAST != 0 {</code></span>
+<span class="codeline" id="line-72"><code>		f |= FlagMulticast</code></span>
+<span class="codeline" id="line-73"><code>	}</code></span>
+<span class="codeline" id="line-74"><code>	return f</code></span>
+<span class="codeline" id="line-75"><code>}</code></span>
+<span class="codeline" id="line-76"><code></code></span>
+<span class="codeline" id="line-77"><code>// If the ifi is nil, interfaceAddrTable returns addresses for all</code></span>
+<span class="codeline" id="line-78"><code>// network interfaces. Otherwise it returns addresses for a specific</code></span>
+<span class="codeline" id="line-79"><code>// interface.</code></span>
+<span class="codeline" id="line-80"><code>func interfaceAddrTable(ifi *Interface) ([]Addr, error) {</code></span>
+<span class="codeline" id="line-81"><code>	index := 0</code></span>
+<span class="codeline" id="line-82"><code>	if ifi != nil {</code></span>
+<span class="codeline" id="line-83"><code>		index = ifi.Index</code></span>
+<span class="codeline" id="line-84"><code>	}</code></span>
+<span class="codeline" id="line-85"><code>	msgs, err := interfaceMessages(index)</code></span>
+<span class="codeline" id="line-86"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-87"><code>		return nil, err</code></span>
+<span class="codeline" id="line-88"><code>	}</code></span>
+<span class="codeline" id="line-89"><code>	ifat := make([]Addr, 0, len(msgs))</code></span>
+<span class="codeline" id="line-90"><code>	for _, m := range msgs {</code></span>
+<span class="codeline" id="line-91"><code>		switch m := m.(type) {</code></span>
+<span class="codeline" id="line-92"><code>		case *route.InterfaceAddrMessage:</code></span>
+<span class="codeline" id="line-93"><code>			if index != 0 &amp;&amp; index != m.Index {</code></span>
+<span class="codeline" id="line-94"><code>				continue</code></span>
+<span class="codeline" id="line-95"><code>			}</code></span>
+<span class="codeline" id="line-96"><code>			var mask IPMask</code></span>
+<span class="codeline" id="line-97"><code>			switch sa := m.Addrs[syscall.RTAX_NETMASK].(type) {</code></span>
+<span class="codeline" id="line-98"><code>			case *route.Inet4Addr:</code></span>
+<span class="codeline" id="line-99"><code>				mask = IPv4Mask(sa.IP[0], sa.IP[1], sa.IP[2], sa.IP[3])</code></span>
+<span class="codeline" id="line-100"><code>			case *route.Inet6Addr:</code></span>
+<span class="codeline" id="line-101"><code>				mask = make(IPMask, IPv6len)</code></span>
+<span class="codeline" id="line-102"><code>				copy(mask, sa.IP[:])</code></span>
+<span class="codeline" id="line-103"><code>			}</code></span>
+<span class="codeline" id="line-104"><code>			var ip IP</code></span>
+<span class="codeline" id="line-105"><code>			switch sa := m.Addrs[syscall.RTAX_IFA].(type) {</code></span>
+<span class="codeline" id="line-106"><code>			case *route.Inet4Addr:</code></span>
+<span class="codeline" id="line-107"><code>				ip = IPv4(sa.IP[0], sa.IP[1], sa.IP[2], sa.IP[3])</code></span>
+<span class="codeline" id="line-108"><code>			case *route.Inet6Addr:</code></span>
+<span class="codeline" id="line-109"><code>				ip = make(IP, IPv6len)</code></span>
+<span class="codeline" id="line-110"><code>				copy(ip, sa.IP[:])</code></span>
+<span class="codeline" id="line-111"><code>			}</code></span>
+<span class="codeline" id="line-112"><code>			if ip != nil &amp;&amp; mask != nil { // NetBSD may contain route.LinkAddr</code></span>
+<span class="codeline" id="line-113"><code>				ifat = append(ifat, &amp;IPNet{IP: ip, Mask: mask})</code></span>
+<span class="codeline" id="line-114"><code>			}</code></span>
+<span class="codeline" id="line-115"><code>		}</code></span>
+<span class="codeline" id="line-116"><code>	}</code></span>
+<span class="codeline" id="line-117"><code>	return ifat, nil</code></span>
+<span class="codeline" id="line-118"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/sha512</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>sha512</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/sha512">crypto/sha512</a><i> (on <a href="https://golang.org/pkg/crypto/sha512/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/sha512" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/sha512.html">6 packages</a>, and imported by <a href="../../dep/crypto/sha512.html#imported-by">4 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/crypto/sha512/sha512.go.html#doc">d-&gt;</a> <a href="../../src/crypto/sha512/sha512.go.html">sha512.go</a>
+	    <a href="../../src/crypto/sha512/sha512block.go.html">sha512block.go</a>
+	    <a href="../../src/crypto/sha512/sha512block_amd64.go.html">sha512block_amd64.go</a>
+	    <a href="../../src/crypto/sha512/sha512block_amd64.s.html">sha512block_amd64.s</a>
+
+<span class="title">Exported Type Names</span>
+
+	(none)
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BlockSize">	const <a href="../../src/crypto/sha512/sha512.go.html#line-42">BlockSize</a> = 128
+		BlockSize is the block size, in bytes, of the SHA-512/224,
+		SHA-512/256, SHA-384 and SHA-512 hash functions.</div>
+<div class="anchor" id="name-New">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-213">New</a>() <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>
+		New returns a new hash.Hash computing the SHA-512 checksum.</div>
+<div class="anchor" id="name-New384">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-234">New384</a>() <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>
+		New384 returns a new hash.Hash computing the SHA-384 checksum.</div>
+<div class="anchor" id="name-New512_224">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-220">New512_224</a>() <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>
+		New512_224 returns a new hash.Hash computing the SHA-512/224 checksum.</div>
+<div class="anchor" id="name-New512_256">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-227">New512_256</a>() <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>
+		New512_256 returns a new hash.Hash computing the SHA-512/256 checksum.</div>
+<div class="anchor" id="name-Size">	const <a href="../../src/crypto/sha512/sha512.go.html#line-29">Size</a> = 64
+		Size is the size, in bytes, of a SHA-512 checksum.</div>
+<div class="anchor" id="name-Size224">	const <a href="../../src/crypto/sha512/sha512.go.html#line-32">Size224</a> = 28
+		Size224 is the size, in bytes, of a SHA-512/224 checksum.</div>
+<div class="anchor" id="name-Size256">	const <a href="../../src/crypto/sha512/sha512.go.html#line-35">Size256</a> = 32
+		Size256 is the size, in bytes, of a SHA-512/256 checksum.</div>
+<div class="anchor" id="name-Size384">	const <a href="../../src/crypto/sha512/sha512.go.html#line-38">Size384</a> = 48
+		Size384 is the size, in bytes, of a SHA-384 checksum.</div>
+<div class="anchor" id="name-Sum384">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-340">Sum384</a>(data []<a href="../builtin.html#name-byte">byte</a>) (sum384 [48]<a href="../builtin.html#name-byte">byte</a>)
+		Sum384 returns the SHA384 checksum of the data.</div>
+<div class="anchor" id="name-Sum512">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-332">Sum512</a>(data []<a href="../builtin.html#name-byte">byte</a>) [64]<a href="../builtin.html#name-byte">byte</a>
+		Sum512 returns the SHA512 checksum of the data.</div>
+<div class="anchor" id="name-Sum512_224">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-350">Sum512_224</a>(data []<a href="../builtin.html#name-byte">byte</a>) (sum224 [28]<a href="../builtin.html#name-byte">byte</a>)
+		Sum512_224 returns the Sum512/224 checksum of the data.</div>
+<div class="anchor" id="name-Sum512_256">	 func <a href="../../src/crypto/sha512/sha512.go.html#line-360">Sum512_256</a>(data []<a href="../builtin.html#name-byte">byte</a>) (sum256 [32]<a href="../builtin.html#name-byte">byte</a>)
+		Sum512_256 returns the Sum512/256 checksum of the data.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

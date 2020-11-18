@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: github.com/gorilla/mux</title>
+<link href="../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>mux</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../../index.html#pkg-github.com/gorilla/mux">github.com/gorilla/mux</a><i> (on <a href="https://pkg.go.dev/github.com/gorilla/mux" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../../dep/github.com/gorilla/mux.html">10 packages</a>, and imported by <a href="../../../dep/github.com/gorilla/mux.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../../src/github.com/gorilla/mux/doc.go.html#doc">d-&gt;</a> <a href="../../../src/github.com/gorilla/mux/doc.go.html">doc.go</a>
+	    <a href="../../../src/github.com/gorilla/mux/middleware.go.html">middleware.go</a>
+	    <a href="../../../src/github.com/gorilla/mux/mux.go.html">mux.go</a>
+	    <a href="../../../src/github.com/gorilla/mux/regexp.go.html">regexp.go</a>
+	    <a href="../../../src/github.com/gorilla/mux/route.go.html">route.go</a>
+	    <a href="../../../src/github.com/gorilla/mux/test_helpers.go.html">test_helpers.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-BuildVarsFunc" data-popularity="70">	 type <a href="../../../src/github.com/gorilla/mux/route.go.html#line-453">BuildVarsFunc</a> <i>(func)</i>
+		BuildVarsFunc is the function signature used by custom build variable
+		functions (which can modify route variables before a route's URL is built).
+
+		<input type='checkbox' class="stat" id="BuildVarsFunc-stat-params"><label for="BuildVarsFunc-stat-params">As Inputs Of (2+)</label><span id='BuildVarsFunc-stat-params-content' class="stat-content">
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-457">BuildVarsFunc</a>(f <b>BuildVarsFunc</b>) *<a href="#name-Route">Route</a>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-353">BuildVarsFunc</a>(f <b>BuildVarsFunc</b>) *<a href="#name-Route">Route</a></span></div>
+<div class="anchor" id="name-MatcherFunc" data-popularity="120">	 type <a href="../../../src/github.com/gorilla/mux/route.go.html#line-301">MatcherFunc</a> <i>(func)</i>
+		MatcherFunc is the function signature used by custom matchers.
+
+		<input type='checkbox' class="stat" id="MatcherFunc-stat-methods"><label for="MatcherFunc-stat-methods">One Exported Method</label><span id='MatcherFunc-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-304">Match</a>(r *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>, match *<a href="#name-RouteMatch">RouteMatch</a>) <a href="../../builtin.html#name-bool">bool</a></span>
+		<input type='checkbox' class="stat" id="MatcherFunc-stat-params"><label for="MatcherFunc-stat-params">As Inputs Of (2+)</label><span id='MatcherFunc-stat-params-content' class="stat-content">
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-309">MatcherFunc</a>(f <b>MatcherFunc</b>) *<a href="#name-Route">Route</a>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-317">MatcherFunc</a>(f <b>MatcherFunc</b>) *<a href="#name-Route">Route</a></span></div>
+<div class="anchor" id="name-MiddlewareFunc" data-popularity="160">	 type <a href="../../../src/github.com/gorilla/mux/middleware.go.html#line-11">MiddlewareFunc</a> <i>(func)</i>
+		MiddlewareFunc is a function which receives an http.Handler and returns another http.Handler.
+		Typically, the returned handler is a closure which does something with the http.ResponseWriter and http.Request passed
+		to it, and then calls the handler passed as parameter to the MiddlewareFunc.
+
+		<input type='checkbox' class="stat" id="MiddlewareFunc-stat-methods"><label for="MiddlewareFunc-stat-methods">One Exported Method</label><span id='MiddlewareFunc-stat-methods-content' class="stat-content">
+			 (T) <a href="../../../src/github.com/gorilla/mux/middleware.go.html#line-19">Middleware</a>(handler <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a>) <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a></span>
+		<input type='checkbox' class="stat" id="MiddlewareFunc-stat-results"><label for="MiddlewareFunc-stat-results">As Outputs Of (1+)</label><span id='MiddlewareFunc-stat-results-content' class="stat-content">
+			func <a href="#name-CORSMethodMiddleware">CORSMethodMiddleware</a>(r *<a href="#name-Router">Router</a>) <b>MiddlewareFunc</b></span>
+		<input type='checkbox' class="stat" id="MiddlewareFunc-stat-params"><label for="MiddlewareFunc-stat-params">As Inputs Of (1+)</label><span id='MiddlewareFunc-stat-params-content' class="stat-content">
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/middleware.go.html#line-24">Use</a>(mwf ...<b>MiddlewareFunc</b>)</span></div>
+<div class="anchor" id="name-Route" data-popularity="3700">	 type <a href="../../../src/github.com/gorilla/mux/route.go.html#line-17">Route</a> <i>(struct)</i>
+		Route stores information to match a request and build URLs.
+
+		<input type='checkbox' class="stat" id="Route-stat-methods"><label for="Route-stat-methods">Exported Methods (29)</label><span id='Route-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-110">BuildOnly</a>() *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-457">BuildVarsFunc</a>(f <a href="#name-BuildVarsFunc">BuildVarsFunc</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-105">GetError</a>() <a href="../../builtin.html#name-error">error</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-131">GetHandler</a>() <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-711">GetHostTemplate</a>() (<a href="../../builtin.html#name-string">string</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-694">GetMethods</a>() ([]<a href="../../builtin.html#name-string">string</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-152">GetName</a>() <a href="../../builtin.html#name-string">string</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-642">GetPathRegexp</a>() (<a href="../../builtin.html#name-string">string</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-628">GetPathTemplate</a>() (<a href="../../builtin.html#name-string">string</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-657">GetQueriesRegexp</a>() ([]<a href="../../builtin.html#name-string">string</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-676">GetQueriesTemplates</a>() ([]<a href="../../builtin.html#name-string">string</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-118">Handler</a>(handler <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-126">HandlerFunc</a>(f func(<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-ResponseWriter">ResponseWriter</a>, *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>)) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-239">Headers</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-265">HeadersRegexp</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-293">Host</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-41">Match</a>(req *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>, match *<a href="#name-RouteMatch">RouteMatch</a>) <a href="../../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-309">MatcherFunc</a>(f <a href="#name-MatcherFunc">MatcherFunc</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-325">Methods</a>(methods ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-139">Name</a>(name <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-353">Path</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-369">PathPrefix</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-393">Queries</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-439">Schemes</a>(schemes ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-36">SkipClean</a>() <a href="../../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-484">Subrouter</a>() *<a href="#name-Router">Router</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-533">URL</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) (*<a href="../../net/url.html">url</a>.<a href="../../net/url.html#name-URL">URL</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-575">URLHost</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) (*<a href="../../net/url.html">url</a>.<a href="../../net/url.html#name-URL">URL</a>, <a href="../../builtin.html#name-error">error</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/route.go.html#line-603">URLPath</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) (*<a href="../../net/url.html">url</a>.<a href="../../net/url.html#name-URL">URL</a>, <a href="../../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Route-stat-results"><label for="Route-stat-results">As Outputs Of (30+)</label><span id='Route-stat-results-content' class="stat-content">
+			func <a href="#name-CurrentRoute">CurrentRoute</a>(r *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-110">BuildOnly</a>() *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-457">BuildVarsFunc</a>(f <a href="#name-BuildVarsFunc">BuildVarsFunc</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-118">Handler</a>(handler <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-126">HandlerFunc</a>(f func(<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-ResponseWriter">ResponseWriter</a>, *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>)) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-239">Headers</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-265">HeadersRegexp</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-293">Host</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-309">MatcherFunc</a>(f <a href="#name-MatcherFunc">MatcherFunc</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-325">Methods</a>(methods ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-139">Name</a>(name <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-353">Path</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-369">PathPrefix</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-393">Queries</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-439">Schemes</a>(schemes ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-353">BuildVarsFunc</a>(f <a href="#name-BuildVarsFunc">BuildVarsFunc</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-214">Get</a>(name <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-220">GetRoute</a>(name <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-292">Handle</a>(path <a href="../../builtin.html#name-string">string</a>, handler <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-298">HandleFunc</a>(path <a href="../../builtin.html#name-string">string</a>, f func(<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-ResponseWriter">ResponseWriter</a>, *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>)) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-305">Headers</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-311">Host</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-317">MatcherFunc</a>(f <a href="#name-MatcherFunc">MatcherFunc</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-323">Methods</a>(methods ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-286">Name</a>(name <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-277">NewRoute</a>() *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-329">Path</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-335">PathPrefix</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-341">Queries</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-347">Schemes</a>(schemes ...<a href="../../builtin.html#name-string">string</a>) *<b>Route</b></span></div>
+<div class="anchor" id="name-RouteMatch" data-popularity="105">	 type <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-409">RouteMatch</a> <i>(struct)</i>
+		RouteMatch stores information about a matched route.
+
+		<input type='checkbox' class="stat" id="RouteMatch-stat-fields"><label for="RouteMatch-stat-fields">Exported Fields (4)</label><span id='RouteMatch-stat-fields-content' class="stat-content">
+			<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-411">Handler</a> <i><a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a></i>
+			<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-417">MatchErr</a> <i><a href="../../builtin.html#name-error">error</a></i>
+			<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-410">Route</a> <i>*<a href="#name-Route">Route</a></i>
+			<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-412">Vars</a> <i>map[<a href="../../builtin.html#name-string">string</a>]<a href="../../builtin.html#name-string">string</a></i></span>
+		<input type='checkbox' class="stat" id="RouteMatch-stat-params"><label for="RouteMatch-stat-params">As Inputs Of (3+)</label><span id='RouteMatch-stat-params-content' class="stat-content">
+			func <a href="#name-MatcherFunc">MatcherFunc</a>.<a href="../../../src/github.com/gorilla/mux/route.go.html#line-304">Match</a>(r *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>, match *<b>RouteMatch</b>) <a href="../../builtin.html#name-bool">bool</a>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-41">Match</a>(req *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>, match *<b>RouteMatch</b>) <a href="../../builtin.html#name-bool">bool</a>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-136">Match</a>(req *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>, match *<b>RouteMatch</b>) <a href="../../builtin.html#name-bool">bool</a></span></div>
+<div class="anchor" id="name-Router" data-popularity="1630">	 type <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-47">Router</a> <i>(struct)</i>
+		Router registers routes to be matched and dispatches a handler.
+
+		It implements the http.Handler interface, so it can be registered to serve
+		requests:
+
+		    var router = mux.NewRouter()
+
+		    func main() {
+		        http.Handle("/", router)
+		    }
+
+		Or, for Google App Engine, register it in a init() function:
+
+		    func init() {
+		        http.Handle("/", router)
+		    }
+
+		This will send all incoming requests to the router.
+
+		<input type='checkbox' class="stat" id="Router-stat-fields"><label for="Router-stat-fields">Exported Fields (3)</label><span id='Router-stat-fields-content' class="stat-content">
+			<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-63">KeepContext</a> <i><a href="../../builtin.html#name-bool">bool</a></i>
+			<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-52">MethodNotAllowedHandler</a> <i><a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a></i>
+			<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-49">NotFoundHandler</a> <i><a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a></i></span>
+		<input type='checkbox' class="stat" id="Router-stat-methods"><label for="Router-stat-methods">Exported Methods (22)</label><span id='Router-stat-methods-content' class="stat-content">
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-353">BuildVarsFunc</a>(f <a href="#name-BuildVarsFunc">BuildVarsFunc</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-214">Get</a>(name <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-220">GetRoute</a>(name <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-292">Handle</a>(path <a href="../../builtin.html#name-string">string</a>, handler <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Handler">Handler</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-298">HandleFunc</a>(path <a href="../../builtin.html#name-string">string</a>, f func(<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-ResponseWriter">ResponseWriter</a>, *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>)) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-305">Headers</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-311">Host</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-136">Match</a>(req *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>, match *<a href="#name-RouteMatch">RouteMatch</a>) <a href="../../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-317">MatcherFunc</a>(f <a href="#name-MatcherFunc">MatcherFunc</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-323">Methods</a>(methods ...<a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-286">Name</a>(name <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-277">NewRoute</a>() *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-329">Path</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-335">PathPrefix</a>(tpl <a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-341">Queries</a>(pairs ...<a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-347">Schemes</a>(schemes ...<a href="../../builtin.html#name-string">string</a>) *<a href="#name-Route">Route</a>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-173">ServeHTTP</a>(w <a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-ResponseWriter">ResponseWriter</a>, req *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-256">SkipClean</a>(value <a href="../../builtin.html#name-bool">bool</a>) *<b>Router</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-243">StrictSlash</a>(value <a href="../../builtin.html#name-bool">bool</a>) *<b>Router</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/middleware.go.html#line-24">Use</a>(mwf ...<a href="#name-MiddlewareFunc">MiddlewareFunc</a>)
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-267">UseEncodedPath</a>() *<b>Router</b>
+			(*T) <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-360">Walk</a>(walkFn <a href="#name-WalkFunc">WalkFunc</a>) <a href="../../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Router-stat-impls"><label for="Router-stat-impls">Implements (1+)</label><span id='Router-stat-impls-content' class="stat-content">
+			*T : net/http.<a href="../../net/http.html#name-Handler">Handler</a></span>
+		<input type='checkbox' class="stat" id="Router-stat-results"><label for="Router-stat-results">As Outputs Of (5+)</label><span id='Router-stat-results-content' class="stat-content">
+			func <a href="#name-NewRouter">NewRouter</a>() *<b>Router</b>
+			func (*<a href="#name-Route">Route</a>).<a href="../../../src/github.com/gorilla/mux/route.go.html#line-484">Subrouter</a>() *<b>Router</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-256">SkipClean</a>(value <a href="../../builtin.html#name-bool">bool</a>) *<b>Router</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-243">StrictSlash</a>(value <a href="../../builtin.html#name-bool">bool</a>) *<b>Router</b>
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-267">UseEncodedPath</a>() *<b>Router</b></span>
+		<input type='checkbox' class="stat" id="Router-stat-params"><label for="Router-stat-params">As Inputs Of (3+)</label><span id='Router-stat-params-content' class="stat-content">
+			func <a href="#name-CORSMethodMiddleware">CORSMethodMiddleware</a>(r *<b>Router</b>) <a href="#name-MiddlewareFunc">MiddlewareFunc</a>
+			func fs5-gestiondesocios-backend/src/api/routes.<a href="../../fs5-gestiondesocios-backend/src/api/routes.html#name-SetGamesRoutes">SetGamesRoutes</a>(r *<b>Router</b>)
+			func fs5-gestiondesocios-backend/src/api/routes.<a href="../../fs5-gestiondesocios-backend/src/api/routes.html#name-SetUsersRoutes">SetUsersRoutes</a>(r *<b>Router</b>)</span></div>
+<div class="anchor" id="name-WalkFunc" data-popularity="35">	 type <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-371">WalkFunc</a> <i>(func)</i>
+		WalkFunc is the type of the function called for each route visited by Walk.
+		At every invocation, it is given the current route, and the current router,
+		and a list of ancestor routes that lead to the current route.
+
+		<input type='checkbox' class="stat" id="WalkFunc-stat-params"><label for="WalkFunc-stat-params">As Inputs Of (1+)</label><span id='WalkFunc-stat-params-content' class="stat-content">
+			func (*<a href="#name-Router">Router</a>).<a href="../../../src/github.com/gorilla/mux/mux.go.html#line-360">Walk</a>(walkFn <b>WalkFunc</b>) <a href="../../builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-CORSMethodMiddleware">	 func <a href="../../../src/github.com/gorilla/mux/middleware.go.html#line-39">CORSMethodMiddleware</a>(r *<a href="#name-Router">Router</a>) <a href="#name-MiddlewareFunc">MiddlewareFunc</a>
+		CORSMethodMiddleware automatically sets the Access-Control-Allow-Methods response header
+		on requests for routes that have an OPTIONS method matcher to all the method matchers on
+		the route. Routes that do not explicitly handle OPTIONS requests will not be processed
+		by the middleware. See examples for usage.</div>
+<div class="anchor" id="name-CurrentRoute">	 func <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-439">CurrentRoute</a>(r *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>) *<a href="#name-Route">Route</a>
+		CurrentRoute returns the matched route for the current request, if any.
+		This only works when called inside the handler of the matched route
+		because the matched route is stored in the request context which is cleared
+		after the handler returns.</div>
+<div class="anchor" id="name-ErrMethodMismatch">	  var <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-19">ErrMethodMismatch</a> <a href="../../builtin.html#name-error">error</a>
+		ErrMethodMismatch is returned when the method in the request does not match
+		the method defined against the route.</div>
+<div class="anchor" id="name-ErrNotFound">	  var <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-21">ErrNotFound</a> <a href="../../builtin.html#name-error">error</a>
+		ErrNotFound is returned when no route match is found.</div>
+<div class="anchor" id="name-NewRouter">	 func <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-25">NewRouter</a>() *<a href="#name-Router">Router</a>
+		NewRouter returns a new router instance.</div>
+<div class="anchor" id="name-SetURLVars">	 func <a href="../../../src/github.com/gorilla/mux/test_helpers.go.html#line-17">SetURLVars</a>(r *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>, val map[<a href="../../builtin.html#name-string">string</a>]<a href="../../builtin.html#name-string">string</a>) *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>
+		SetURLVars sets the URL variables for the given request, to be accessed via
+		mux.Vars for testing route behaviour. Arguments are not modified, a shallow
+		copy is returned.
+
+		This API should only be used for testing purposes; it provides a way to
+		inject variables into the request context. Alternatively, URL variables
+		can be set by making a route that captures the required variables,
+		starting a server and sending the request to that server.</div>
+<div class="anchor" id="name-SkipRouter">	  var <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-366">SkipRouter</a> <a href="../../builtin.html#name-error">error</a>
+		SkipRouter is used as a return value from WalkFuncs to indicate that the
+		router that walk is about to descend down to should be skipped.</div>
+<div class="anchor" id="name-Vars">	 func <a href="../../../src/github.com/gorilla/mux/mux.go.html#line-428">Vars</a>(r *<a href="../../net/http.html">http</a>.<a href="../../net/http.html#name-Request">Request</a>) map[<a href="../../builtin.html#name-string">string</a>]<a href="../../builtin.html#name-string">string</a>
+		Vars returns the route variables for the current request, if any.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

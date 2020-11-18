@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: message.go in package vendor/golang.org/x/net/route</title>
+<link href="../../../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	message.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../../../pkg/vendor/golang.org/x/net/route.html">vendor/golang.org/x/net/route</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2016 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// +build darwin dragonfly freebsd netbsd openbsd</code></span>
+<span class="codeline" id="line-6"><code></code></span>
+<span class="codeline" id="line-7"><code>package route</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>// A Message represents a routing message.</code></span>
+<span class="codeline" id="line-10"><code>type Message interface {</code></span>
+<span class="codeline" id="line-11"><code>	// Sys returns operating system-specific information.</code></span>
+<span class="codeline" id="line-12"><code>	Sys() []Sys</code></span>
+<span class="codeline" id="line-13"><code>}</code></span>
+<span class="codeline" id="line-14"><code></code></span>
+<span class="codeline" id="line-15"><code>// A Sys reprensents operating system-specific information.</code></span>
+<span class="codeline" id="line-16"><code>type Sys interface {</code></span>
+<span class="codeline" id="line-17"><code>	// SysType returns a type of operating system-specific</code></span>
+<span class="codeline" id="line-18"><code>	// information.</code></span>
+<span class="codeline" id="line-19"><code>	SysType() SysType</code></span>
+<span class="codeline" id="line-20"><code>}</code></span>
+<span class="codeline" id="line-21"><code></code></span>
+<span class="codeline" id="line-22"><code>// A SysType represents a type of operating system-specific</code></span>
+<span class="codeline" id="line-23"><code>// information.</code></span>
+<span class="codeline" id="line-24"><code>type SysType int</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>const (</code></span>
+<span class="codeline" id="line-27"><code>	SysMetrics SysType = iota</code></span>
+<span class="codeline" id="line-28"><code>	SysStats</code></span>
+<span class="codeline" id="line-29"><code>)</code></span>
+<span class="codeline" id="line-30"><code></code></span>
+<span class="codeline" id="line-31"><code>// ParseRIB parses b as a routing information base and returns a list</code></span>
+<span class="codeline" id="line-32"><code>// of routing messages.</code></span>
+<span class="codeline" id="line-33"><code>func ParseRIB(typ RIBType, b []byte) ([]Message, error) {</code></span>
+<span class="codeline" id="line-34"><code>	if !typ.parseable() {</code></span>
+<span class="codeline" id="line-35"><code>		return nil, errUnsupportedMessage</code></span>
+<span class="codeline" id="line-36"><code>	}</code></span>
+<span class="codeline" id="line-37"><code>	var msgs []Message</code></span>
+<span class="codeline" id="line-38"><code>	nmsgs, nskips := 0, 0</code></span>
+<span class="codeline" id="line-39"><code>	for len(b) &gt; 4 {</code></span>
+<span class="codeline" id="line-40"><code>		nmsgs++</code></span>
+<span class="codeline" id="line-41"><code>		l := int(nativeEndian.Uint16(b[:2]))</code></span>
+<span class="codeline" id="line-42"><code>		if l == 0 {</code></span>
+<span class="codeline" id="line-43"><code>			return nil, errInvalidMessage</code></span>
+<span class="codeline" id="line-44"><code>		}</code></span>
+<span class="codeline" id="line-45"><code>		if len(b) &lt; l {</code></span>
+<span class="codeline" id="line-46"><code>			return nil, errMessageTooShort</code></span>
+<span class="codeline" id="line-47"><code>		}</code></span>
+<span class="codeline" id="line-48"><code>		if b[2] != rtmVersion {</code></span>
+<span class="codeline" id="line-49"><code>			b = b[l:]</code></span>
+<span class="codeline" id="line-50"><code>			continue</code></span>
+<span class="codeline" id="line-51"><code>		}</code></span>
+<span class="codeline" id="line-52"><code>		if w, ok := wireFormats[int(b[3])]; !ok {</code></span>
+<span class="codeline" id="line-53"><code>			nskips++</code></span>
+<span class="codeline" id="line-54"><code>		} else {</code></span>
+<span class="codeline" id="line-55"><code>			m, err := w.parse(typ, b)</code></span>
+<span class="codeline" id="line-56"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-57"><code>				return nil, err</code></span>
+<span class="codeline" id="line-58"><code>			}</code></span>
+<span class="codeline" id="line-59"><code>			if m == nil {</code></span>
+<span class="codeline" id="line-60"><code>				nskips++</code></span>
+<span class="codeline" id="line-61"><code>			} else {</code></span>
+<span class="codeline" id="line-62"><code>				msgs = append(msgs, m)</code></span>
+<span class="codeline" id="line-63"><code>			}</code></span>
+<span class="codeline" id="line-64"><code>		}</code></span>
+<span class="codeline" id="line-65"><code>		b = b[l:]</code></span>
+<span class="codeline" id="line-66"><code>	}</code></span>
+<span class="codeline" id="line-67"><code>	// We failed to parse any of the messages - version mismatch?</code></span>
+<span class="codeline" id="line-68"><code>	if nmsgs != len(msgs)+nskips {</code></span>
+<span class="codeline" id="line-69"><code>		return nil, errMessageMismatch</code></span>
+<span class="codeline" id="line-70"><code>	}</code></span>
+<span class="codeline" id="line-71"><code>	return msgs, nil</code></span>
+<span class="codeline" id="line-72"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: database/sql</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>sql</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-database/sql">database/sql</a><i> (on <a href="https://golang.org/pkg/database/sql/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/database/sql" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/database/sql.html">14 packages</a>, and imported by <a href="../../dep/database/sql.html#imported-by">5 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/database/sql/convert.go.html">convert.go</a>
+	    <a href="../../src/database/sql/ctxutil.go.html">ctxutil.go</a>
+	<a href="../../src/database/sql/sql.go.html#doc">d-&gt;</a> <a href="../../src/database/sql/sql.go.html">sql.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-ColumnType" data-popularity="425">	 type <a href="../../src/database/sql/sql.go.html#line-2967">ColumnType</a> <i>(struct)</i>
+		ColumnType contains the name and type of a column.
+
+		<input type='checkbox' class="stat" id="ColumnType-stat-methods"><label for="ColumnType-stat-methods">Exported Methods (6)</label><span id='ColumnType-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-3021">DatabaseTypeName</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2998">DecimalSize</a>() (precision, scale <a href="../builtin.html#name-int64">int64</a>, ok <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2992">Length</a>() (length <a href="../builtin.html#name-int64">int64</a>, ok <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2983">Name</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-3011">Nullable</a>() (nullable, ok <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-3005">ScanType</a>() <a href="../reflect.html">reflect</a>.<a href="../reflect.html#name-Type">Type</a></span>
+		<input type='checkbox' class="stat" id="ColumnType-stat-impls"><label for="ColumnType-stat-impls">Implements (1+)</label><span id='ColumnType-stat-impls-content' class="stat-content">
+			*T : gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ColumnType">ColumnType</a></span>
+		<input type='checkbox' class="stat" id="ColumnType-stat-results"><label for="ColumnType-stat-results">As Outputs Of (1+)</label><span id='ColumnType-stat-results-content' class="stat-content">
+			func (*<a href="#name-Rows">Rows</a>).<a href="../../src/database/sql/sql.go.html#line-2951">ColumnTypes</a>() ([]*<b>ColumnType</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Conn" data-popularity="625">	 type <a href="../../src/database/sql/sql.go.html#line-1833">Conn</a> <i>(struct)</i>
+		Conn represents a single database connection rather than a pool of database
+		connections. Prefer running queries from DB unless there is a specific
+		need for a continuous single database connection.
+
+		A Conn must call Close to return the connection to the database pool
+		and may do so concurrently with a running query.
+
+		After a call to Close, all operations on the
+		connection fail with ErrConnDone.
+
+		<input type='checkbox' class="stat" id="Conn-stat-methods"><label for="Conn-stat-methods">Exported Methods (8)</label><span id='Conn-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1960">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="#name-TxOptions">TxOptions</a>) (*<a href="#name-Tx">Tx</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2002">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1872">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<a href="#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1862">PingContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1909">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<a href="#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1882">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<a href="#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1896">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="#name-Row">Row</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1922">Raw</a>(f func(driverConn interface{}) <a href="../builtin.html#name-error">error</a>) (err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Conn-stat-impls"><label for="Conn-stat-impls">Implements (3+)</label><span id='Conn-stat-impls-content' class="stat-content">
+			*T : gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>
+			*T : gorm.io/gorm.<a href="../gorm.io/gorm.html#name-TxBeginner">TxBeginner</a>
+			*T : io.<a href="../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Conn-stat-results"><label for="Conn-stat-results">As Outputs Of (1+)</label><span id='Conn-stat-results-content' class="stat-content">
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1799">Conn</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) (*<b>Conn</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-DB" data-popularity="1375">	 type <a href="../../src/database/sql/sql.go.html#line-402">DB</a> <i>(struct)</i>
+		DB is a database handle representing a pool of zero or more
+		underlying connections. It's safe for concurrent use by multiple
+		goroutines.
+
+		The sql package creates and frees connections automatically; it
+		also maintains a free pool of idle connections. If the database has
+		a concept of per-connection state, such state can be reliably observed
+		within a transaction (Tx) or connection (Conn). Once DB.Begin is called, the
+		returned Tx is bound to a single connection. Once Commit or
+		Rollback is called on the transaction, that transaction's
+		connection is returned to DB's idle connection pool. The pool size
+		can be controlled with SetMaxIdleConns.
+
+		<input type='checkbox' class="stat" id="DB-stat-methods"><label for="DB-stat-methods">Exported Methods (20)</label><span id='DB-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1740">Begin</a>() (*<a href="#name-Tx">Tx</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1723">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="#name-TxOptions">TxOptions</a>) (*<a href="#name-Tx">Tx</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-826">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1799">Conn</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) (*<a href="#name-Conn">Conn</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1784">Driver</a>() <a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Driver">Driver</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1541">Exec</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<a href="#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1524">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<a href="#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-816">Ping</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-794">PingContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1471">Prepare</a>(query <a href="../builtin.html#name-string">string</a>) (*<a href="#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1451">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<a href="#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1611">Query</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<a href="#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1594">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<a href="#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1709">QueryRow</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="#name-Row">Row</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1698">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="#name-Row">Row</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-963">SetConnMaxIdleTime</a>(d <a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-941">SetConnMaxLifetime</a>(d <a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-889">SetMaxIdleConns</a>(n <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-923">SetMaxOpenConns</a>(n <a href="../builtin.html#name-int">int</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-1080">Stats</a>() <a href="#name-DBStats">DBStats</a></span>
+		<input type='checkbox' class="stat" id="DB-stat-impls"><label for="DB-stat-impls">Implements (3+)</label><span id='DB-stat-impls-content' class="stat-content">
+			*T : gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>
+			*T : gorm.io/gorm.<a href="../gorm.io/gorm.html#name-TxBeginner">TxBeginner</a>
+			*T : io.<a href="../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="DB-stat-results"><label for="DB-stat-results">As Outputs Of (3+)</label><span id='DB-stat-results-content' class="stat-content">
+			func <a href="#name-Open">Open</a>(driverName, dataSourceName <a href="../builtin.html#name-string">string</a>) (*<b>DB</b>, <a href="../builtin.html#name-error">error</a>)
+			func <a href="#name-OpenDB">OpenDB</a>(c <a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Connector">Connector</a>) *<b>DB</b>
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-264">DB</a>() (*<b>DB</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-DBStats" data-popularity="75">	 type <a href="../../src/database/sql/sql.go.html#line-1063">DBStats</a> <i>(struct)</i>
+		DBStats contains database statistics.
+
+		<input type='checkbox' class="stat" id="DBStats-stat-fields"><label for="DBStats-stat-fields">Exported Fields (9)</label><span id='DBStats-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-1069">Idle</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1068">InUse</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1074">MaxIdleClosed</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1075">MaxIdleTimeClosed</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1076">MaxLifetimeClosed</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1064">MaxOpenConnections</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1067">OpenConnections</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1072">WaitCount</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-1073">WaitDuration</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Duration">Duration</a></i></span>
+		<input type='checkbox' class="stat" id="DBStats-stat-results"><label for="DBStats-stat-results">As Outputs Of (1+)</label><span id='DBStats-stat-results-content' class="stat-content">
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1080">Stats</a>() <b>DBStats</b></span></div>
+<div class="anchor" id="name-IsolationLevel" data-popularity="115">	 type <a href="../../src/database/sql/sql.go.html#line-119">IsolationLevel</a> <a href="../builtin.html#name-int">int</a>
+		IsolationLevel is the transaction isolation level used in TxOptions.
+
+		<input type='checkbox' class="stat" id="IsolationLevel-stat-methods"><label for="IsolationLevel-stat-methods">One Exported Method</label><span id='IsolationLevel-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/database/sql/sql.go.html#line-137">String</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="IsolationLevel-stat-impls"><label for="IsolationLevel-stat-impls">Implements (1+)</label><span id='IsolationLevel-stat-impls-content' class="stat-content">
+			 T : fmt.<a href="../fmt.html#name-Stringer">Stringer</a></span>
+		<input type='checkbox' class="stat" id="IsolationLevel-stat-values"><label for="IsolationLevel-stat-values">As Types Of (8+)</label><span id='IsolationLevel-stat-values-content' class="stat-content">
+			const <a href="#name-LevelDefault">LevelDefault</a>
+			const <a href="#name-LevelLinearizable">LevelLinearizable</a>
+			const <a href="#name-LevelReadCommitted">LevelReadCommitted</a>
+			const <a href="#name-LevelReadUncommitted">LevelReadUncommitted</a>
+			const <a href="#name-LevelRepeatableRead">LevelRepeatableRead</a>
+			const <a href="#name-LevelSerializable">LevelSerializable</a>
+			const <a href="#name-LevelSnapshot">LevelSnapshot</a>
+			const <a href="#name-LevelWriteCommitted">LevelWriteCommitted</a></span></div>
+<div class="anchor" id="name-NamedArg" data-popularity="75">	 type <a href="../../src/database/sql/sql.go.html#line-81">NamedArg</a> <i>(struct)</i>
+		A NamedArg is a named argument. NamedArg values may be used as
+		arguments to Query or Exec and bind to the corresponding named
+		parameter in the SQL statement.
+
+		For a more concise way to create NamedArg values, see
+		the Named function.
+
+		<input type='checkbox' class="stat" id="NamedArg-stat-fields"><label for="NamedArg-stat-fields">Exported Fields (2)</label><span id='NamedArg-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-90">Name</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-95">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="NamedArg-stat-results"><label for="NamedArg-stat-results">As Outputs Of (1+)</label><span id='NamedArg-stat-results-content' class="stat-content">
+			func <a href="#name-Named">Named</a>(name <a href="../builtin.html#name-string">string</a>, value interface{}) <b>NamedArg</b></span></div>
+<div class="anchor" id="name-NullBool" data-popularity="200">	 type <a href="../../src/database/sql/sql.go.html#line-292">NullBool</a> <i>(struct)</i>
+		NullBool represents a bool that may be null.
+		NullBool implements the Scanner interface so
+		it can be used as a scan destination, similar to NullString.
+
+		<input type='checkbox' class="stat" id="NullBool-stat-fields"><label for="NullBool-stat-fields">Exported Fields (2)</label><span id='NullBool-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-293">Bool</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-294">Valid</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="NullBool-stat-methods"><label for="NullBool-stat-methods">Exported Methods (2)</label><span id='NullBool-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-298">Scan</a>(value interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-308">Value</a>() (<a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Value">Value</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NullBool-stat-impls"><label for="NullBool-stat-impls">Implements (2+)</label><span id='NullBool-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Scanner">Scanner</a>
+			 T : database/sql/driver.<a href="sql/driver.html#name-Valuer">Valuer</a></span></div>
+<div class="anchor" id="name-NullFloat64" data-popularity="200">	 type <a href="../../src/database/sql/sql.go.html#line-266">NullFloat64</a> <i>(struct)</i>
+		NullFloat64 represents a float64 that may be null.
+		NullFloat64 implements the Scanner interface so
+		it can be used as a scan destination, similar to NullString.
+
+		<input type='checkbox' class="stat" id="NullFloat64-stat-fields"><label for="NullFloat64-stat-fields">Exported Fields (2)</label><span id='NullFloat64-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-267">Float64</a> <i><a href="../builtin.html#name-float64">float64</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-268">Valid</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="NullFloat64-stat-methods"><label for="NullFloat64-stat-methods">Exported Methods (2)</label><span id='NullFloat64-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-272">Scan</a>(value interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-282">Value</a>() (<a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Value">Value</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NullFloat64-stat-impls"><label for="NullFloat64-stat-impls">Implements (2+)</label><span id='NullFloat64-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Scanner">Scanner</a>
+			 T : database/sql/driver.<a href="sql/driver.html#name-Valuer">Valuer</a></span></div>
+<div class="anchor" id="name-NullInt32" data-popularity="200">	 type <a href="../../src/database/sql/sql.go.html#line-240">NullInt32</a> <i>(struct)</i>
+		NullInt32 represents an int32 that may be null.
+		NullInt32 implements the Scanner interface so
+		it can be used as a scan destination, similar to NullString.
+
+		<input type='checkbox' class="stat" id="NullInt32-stat-fields"><label for="NullInt32-stat-fields">Exported Fields (2)</label><span id='NullInt32-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-241">Int32</a> <i><a href="../builtin.html#name-int32">int32</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-242">Valid</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="NullInt32-stat-methods"><label for="NullInt32-stat-methods">Exported Methods (2)</label><span id='NullInt32-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-246">Scan</a>(value interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-256">Value</a>() (<a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Value">Value</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NullInt32-stat-impls"><label for="NullInt32-stat-impls">Implements (2+)</label><span id='NullInt32-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Scanner">Scanner</a>
+			 T : database/sql/driver.<a href="sql/driver.html#name-Valuer">Valuer</a></span></div>
+<div class="anchor" id="name-NullInt64" data-popularity="200">	 type <a href="../../src/database/sql/sql.go.html#line-214">NullInt64</a> <i>(struct)</i>
+		NullInt64 represents an int64 that may be null.
+		NullInt64 implements the Scanner interface so
+		it can be used as a scan destination, similar to NullString.
+
+		<input type='checkbox' class="stat" id="NullInt64-stat-fields"><label for="NullInt64-stat-fields">Exported Fields (2)</label><span id='NullInt64-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-215">Int64</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-216">Valid</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="NullInt64-stat-methods"><label for="NullInt64-stat-methods">Exported Methods (2)</label><span id='NullInt64-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-220">Scan</a>(value interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-230">Value</a>() (<a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Value">Value</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NullInt64-stat-impls"><label for="NullInt64-stat-impls">Implements (2+)</label><span id='NullInt64-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Scanner">Scanner</a>
+			 T : database/sql/driver.<a href="sql/driver.html#name-Valuer">Valuer</a></span></div>
+<div class="anchor" id="name-NullString" data-popularity="200">	 type <a href="../../src/database/sql/sql.go.html#line-188">NullString</a> <i>(struct)</i>
+		NullString represents a string that may be null.
+		NullString implements the Scanner interface so
+		it can be used as a scan destination:
+
+		 var s NullString
+		 err := db.QueryRow("SELECT name FROM foo WHERE id=?", id).Scan(&amp;s)
+		 ...
+		 if s.Valid {
+		    // use s.String
+		 } else {
+		    // NULL value
+		 }
+
+		<input type='checkbox' class="stat" id="NullString-stat-fields"><label for="NullString-stat-fields">Exported Fields (2)</label><span id='NullString-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-189">String</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-190">Valid</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="NullString-stat-methods"><label for="NullString-stat-methods">Exported Methods (2)</label><span id='NullString-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-194">Scan</a>(value interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-204">Value</a>() (<a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Value">Value</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NullString-stat-impls"><label for="NullString-stat-impls">Implements (2+)</label><span id='NullString-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Scanner">Scanner</a>
+			 T : database/sql/driver.<a href="sql/driver.html#name-Valuer">Valuer</a></span></div>
+<div class="anchor" id="name-NullTime" data-popularity="200">	 type <a href="../../src/database/sql/sql.go.html#line-318">NullTime</a> <i>(struct)</i>
+		NullTime represents a time.Time that may be null.
+		NullTime implements the Scanner interface so
+		it can be used as a scan destination, similar to NullString.
+
+		<input type='checkbox' class="stat" id="NullTime-stat-fields"><label for="NullTime-stat-fields">Exported Fields (2)</label><span id='NullTime-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-319">Time</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-320">Valid</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="NullTime-stat-methods"><label for="NullTime-stat-methods">Exported Methods (2)</label><span id='NullTime-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-324">Scan</a>(value interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-334">Value</a>() (<a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Value">Value</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="NullTime-stat-impls"><label for="NullTime-stat-impls">Implements (2+)</label><span id='NullTime-stat-impls-content' class="stat-content">
+			*T : <a href="#name-Scanner">Scanner</a>
+			 T : database/sql/driver.<a href="sql/driver.html#name-Valuer">Valuer</a></span></div>
+<div class="anchor" id="name-Out" data-popularity="0">	 type <a href="../../src/database/sql/sql.go.html#line-372">Out</a> <i>(struct)</i>
+		Out may be used to retrieve OUTPUT value parameters from stored procedures.
+
+		Not all drivers and databases support OUTPUT value parameters.
+
+		Example usage:
+
+		  var outArg string
+		  _, err := db.ExecContext(ctx, "ProcName", sql.Named("Arg1", sql.Out{Dest: &amp;outArg}))
+
+		<input type='checkbox' class="stat" id="Out-stat-fields"><label for="Out-stat-fields">Exported Fields (2)</label><span id='Out-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-377">Dest</a> <i>interface{}</i>
+			<a href="../../src/database/sql/sql.go.html#line-382">In</a> <i><a href="../builtin.html#name-bool">bool</a></i></span></div>
+<div class="anchor" id="name-RawBytes" data-popularity="0">	 type <a href="../../src/database/sql/sql.go.html#line-173">RawBytes</a> <i>([])</i>
+		RawBytes is a byte slice that holds a reference to memory owned by
+		the database itself. After a Scan into a RawBytes, the slice is only
+		valid until the next call to Next, Scan, or Close.
+</div>
+<div class="anchor" id="name-Result" data-popularity="1200">	 type <a href="../../src/database/sql/sql.go.html#line-3244">Result</a> <b<i>(interface)</i></b>
+		A Result summarizes an executed SQL command.
+
+		<input type='checkbox' class="stat" id="Result-stat-methods"><label for="Result-stat-methods">Exported Methods (2)</label><span id='Result-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/database/sql/driver/driver.go.html#line-314">LastInsertId</a>() (<a href="../builtin.html#name-int64">int64</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/database/sql/driver/driver.go.html#line-318">RowsAffected</a>() (<a href="../builtin.html#name-int64">int64</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Result-stat-impledby"><label for="Result-stat-impledby">Implemented By (2+)</label><span id='Result-stat-impledby-content' class="stat-content">
+			database/sql/driver.<a href="sql/driver.html#name-Result">Result</a> <i>(interface)</i>
+			database/sql/driver.<a href="sql/driver.html#name-RowsAffected">RowsAffected</a></span>
+		<input type='checkbox' class="stat" id="Result-stat-impls"><label for="Result-stat-impls">Implements (1+)</label><span id='Result-stat-impls-content' class="stat-content">
+			 T : database/sql/driver.<a href="sql/driver.html#name-Result">Result</a></span>
+		<input type='checkbox' class="stat" id="Result-stat-results"><label for="Result-stat-results">As Outputs Of (10+)</label><span id='Result-stat-results-content' class="stat-content">
+			func (*<a href="#name-Conn">Conn</a>).<a href="../../src/database/sql/sql.go.html#line-1872">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1541">Exec</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1524">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Stmt">Stmt</a>).<a href="../../src/database/sql/sql.go.html#line-2506">Exec</a>(args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Stmt">Stmt</a>).<a href="../../src/database/sql/sql.go.html#line-2477">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2364">Exec</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2354">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-32">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<b>Result</b>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-61">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (result <b>Result</b>, err <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-PreparedStmtTX">PreparedStmtTX</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-116">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (result <b>Result</b>, err <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Row" data-popularity="925">	 type <a href="../../src/database/sql/sql.go.html#line-3185">Row</a> <i>(struct)</i>
+		Row is the result of calling QueryRow to select a single row.
+
+		<input type='checkbox' class="stat" id="Row-stat-methods"><label for="Row-stat-methods">Exported Methods (2)</label><span id='Row-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-3239">Err</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-3196">Scan</a>(dest ...interface{}) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Row-stat-results"><label for="Row-stat-results">As Outputs Of (11+)</label><span id='Row-stat-results-content' class="stat-content">
+			func (*<a href="#name-Conn">Conn</a>).<a href="../../src/database/sql/sql.go.html#line-1896">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1709">QueryRow</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1698">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b>
+			func (*<a href="#name-Stmt">Stmt</a>).<a href="../../src/database/sql/sql.go.html#line-2716">QueryRow</a>(args ...interface{}) *<b>Row</b>
+			func (*<a href="#name-Stmt">Stmt</a>).<a href="../../src/database/sql/sql.go.html#line-2697">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, args ...interface{}) *<b>Row</b>
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2400">QueryRow</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b>
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2389">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b>
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-34">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b>
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-346">Row</a>() *<b>Row</b>
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-89">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b>
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-PreparedStmtTX">PreparedStmtTX</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-144">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<b>Row</b></span></div>
+<div class="anchor" id="name-Rows" data-popularity="1295">	 type <a href="../../src/database/sql/sql.go.html#line-2766">Rows</a> <i>(struct)</i>
+		Rows is the result of a query. Its cursor starts before the first row
+		of the result set. Use Next to advance from row to row.
+
+		<input type='checkbox' class="stat" id="Rows-stat-methods"><label for="Rows-stat-methods">Exported Methods (7)</label><span id='Rows-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-3150">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2951">ColumnTypes</a>() ([]*<a href="#name-ColumnType">ColumnType</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2934">Columns</a>() ([]<a href="../builtin.html#name-string">string</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2923">Err</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2833">Next</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2887">NextResultSet</a>() <a href="../builtin.html#name-bool">bool</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-3113">Scan</a>(dest ...interface{}) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Rows-stat-impls"><label for="Rows-stat-impls">Implements (1+)</label><span id='Rows-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Rows-stat-results"><label for="Rows-stat-results">As Outputs Of (11+)</label><span id='Rows-stat-results-content' class="stat-content">
+			func (*<a href="#name-Conn">Conn</a>).<a href="../../src/database/sql/sql.go.html#line-1882">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1611">Query</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1594">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Stmt">Stmt</a>).<a href="../../src/database/sql/sql.go.html#line-2677">Query</a>(args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Stmt">Stmt</a>).<a href="../../src/database/sql/sql.go.html#line-2622">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2379">Query</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2369">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-33">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-356">Rows</a>() (*<b>Rows</b>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-75">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (rows *<b>Rows</b>, err <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-PreparedStmtTX">PreparedStmtTX</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-130">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (rows *<b>Rows</b>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Rows-stat-params"><label for="Rows-stat-params">As Inputs Of (2+)</label><span id='Rows-stat-params-content' class="stat-content">
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-Scan">Scan</a>(rows *<b>Rows</b>, db *<a href="../gorm.io/gorm.html">gorm</a>.<a href="../gorm.io/gorm.html#name-DB">DB</a>, initialized <a href="../builtin.html#name-bool">bool</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-416">ScanRows</a>(rows *<b>Rows</b>, dest interface{}) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Scanner" data-popularity="1250">	 type <a href="../../src/database/sql/sql.go.html#line-342">Scanner</a> <b<i>(interface)</i></b>
+		Scanner is an interface used by Scan.
+
+		<input type='checkbox' class="stat" id="Scanner-stat-methods"><label for="Scanner-stat-methods">One Exported Method</label><span id='Scanner-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/database/sql/sql.go.html#line-361">Scan</a>(src interface{}) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Scanner-stat-impledby"><label for="Scanner-stat-impledby">Implemented By (8+)</label><span id='Scanner-stat-impledby-content' class="stat-content">
+			*<a href="#name-NullBool">NullBool</a>
+			*<a href="#name-NullFloat64">NullFloat64</a>
+			*<a href="#name-NullInt32">NullInt32</a>
+			*<a href="#name-NullInt64">NullInt64</a>
+			*<a href="#name-NullString">NullString</a>
+			*<a href="#name-NullTime">NullTime</a>
+			github.com/go-sql-driver/mysql.(*<a href="../github.com/go-sql-driver/mysql.html#name-NullTime">NullTime</a>)
+			gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-DeletedAt">DeletedAt</a>)</span></div>
+<div class="anchor" id="name-Stmt" data-popularity="1070">	 type <a href="../../src/database/sql/sql.go.html#line-2437">Stmt</a> <i>(struct)</i>
+		Stmt is a prepared statement.
+		A Stmt is safe for concurrent use by multiple goroutines.
+
+		If a Stmt is prepared on a Tx or Conn, it will be bound to a single
+		underlying connection forever. If the Tx or Conn closes, the Stmt will
+		become unusable and all operations will return an error.
+		If a Stmt is prepared on a DB, it will remain usable for the lifetime of the
+		DB. When the Stmt needs to execute on a new underlying connection, it will
+		prepare itself on the new connection automatically.
+
+		<input type='checkbox' class="stat" id="Stmt-stat-methods"><label for="Stmt-stat-methods">Exported Methods (7)</label><span id='Stmt-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2721">Close</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2506">Exec</a>(args ...interface{}) (<a href="#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2477">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, args ...interface{}) (<a href="#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2677">Query</a>(args ...interface{}) (*<a href="#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2622">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, args ...interface{}) (*<a href="#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2716">QueryRow</a>(args ...interface{}) *<a href="#name-Row">Row</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2697">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, args ...interface{}) *<a href="#name-Row">Row</a></span>
+		<input type='checkbox' class="stat" id="Stmt-stat-impls"><label for="Stmt-stat-impls">Implements (1+)</label><span id='Stmt-stat-impls-content' class="stat-content">
+			*T : io.<a href="../io.html#name-Closer">Closer</a></span>
+		<input type='checkbox' class="stat" id="Stmt-stat-results"><label for="Stmt-stat-results">As Outputs Of (8+)</label><span id='Stmt-stat-results-content' class="stat-content">
+			func (*<a href="#name-Conn">Conn</a>).<a href="../../src/database/sql/sql.go.html#line-1909">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<b>Stmt</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1471">Prepare</a>(query <a href="../builtin.html#name-string">string</a>) (*<b>Stmt</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1451">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<b>Stmt</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2245">Prepare</a>(query <a href="../builtin.html#name-string">string</a>) (*<b>Stmt</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2223">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<b>Stmt</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2348">Stmt</a>(stmt *<b>Stmt</b>) *<b>Stmt</b>
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2264">StmtContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, stmt *<b>Stmt</b>) *<b>Stmt</b>
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-31">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<b>Stmt</b>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Stmt-stat-params"><label for="Stmt-stat-params">As Inputs Of (2+)</label><span id='Stmt-stat-params-content' class="stat-content">
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2348">Stmt</a>(stmt *<b>Stmt</b>) *<b>Stmt</b>
+			func (*<a href="#name-Tx">Tx</a>).<a href="../../src/database/sql/sql.go.html#line-2264">StmtContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, stmt *<b>Stmt</b>) *<b>Stmt</b></span></div>
+<div class="anchor" id="name-Tx" data-popularity="1050">	 type <a href="../../src/database/sql/sql.go.html#line-2016">Tx</a> <i>(struct)</i>
+		Tx is an in-progress database transaction.
+
+		A transaction must end with a call to Commit or Rollback.
+
+		After a call to Commit or Rollback, all operations on the
+		transaction fail with ErrTxDone.
+
+		The statements prepared for a transaction by calling
+		the transaction's Prepare or Stmt methods are closed
+		by the call to Commit or Rollback.
+
+		<input type='checkbox' class="stat" id="Tx-stat-methods"><label for="Tx-stat-methods">Exported Methods (12)</label><span id='Tx-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2138">Commit</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2364">Exec</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<a href="#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2354">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<a href="#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2245">Prepare</a>(query <a href="../builtin.html#name-string">string</a>) (*<a href="#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2223">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<a href="#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2379">Query</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<a href="#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2369">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<a href="#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2400">QueryRow</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="#name-Row">Row</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2389">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="#name-Row">Row</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2209">Rollback</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2348">Stmt</a>(stmt *<a href="#name-Stmt">Stmt</a>) *<a href="#name-Stmt">Stmt</a>
+			(*T) <a href="../../src/database/sql/sql.go.html#line-2264">StmtContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, stmt *<a href="#name-Stmt">Stmt</a>) *<a href="#name-Stmt">Stmt</a></span>
+		<input type='checkbox' class="stat" id="Tx-stat-impls"><label for="Tx-stat-impls">Implements (3+)</label><span id='Tx-stat-impls-content' class="stat-content">
+			*T : database/sql/driver.<a href="sql/driver.html#name-Tx">Tx</a>
+			*T : gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>
+			*T : gorm.io/gorm.<a href="../gorm.io/gorm.html#name-TxCommitter">TxCommitter</a></span>
+		<input type='checkbox' class="stat" id="Tx-stat-results"><label for="Tx-stat-results">As Outputs Of (4+)</label><span id='Tx-stat-results-content' class="stat-content">
+			func (*<a href="#name-Conn">Conn</a>).<a href="../../src/database/sql/sql.go.html#line-1960">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="#name-TxOptions">TxOptions</a>) (*<b>Tx</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1740">Begin</a>() (*<b>Tx</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1723">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="#name-TxOptions">TxOptions</a>) (*<b>Tx</b>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-TxBeginner">TxBeginner</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-44">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="#name-TxOptions">TxOptions</a>) (*<b>Tx</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-TxOptions" data-popularity="245">	 type <a href="../../src/database/sql/sql.go.html#line-163">TxOptions</a> <i>(struct)</i>
+		TxOptions holds the transaction options to be used in DB.BeginTx.
+
+		<input type='checkbox' class="stat" id="TxOptions-stat-fields"><label for="TxOptions-stat-fields">Exported Fields (2)</label><span id='TxOptions-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-166">Isolation</a> <i><a href="#name-IsolationLevel">IsolationLevel</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-167">ReadOnly</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="TxOptions-stat-params"><label for="TxOptions-stat-params">As Inputs Of (7+)</label><span id='TxOptions-stat-params-content' class="stat-content">
+			func (*<a href="#name-Conn">Conn</a>).<a href="../../src/database/sql/sql.go.html#line-1960">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<b>TxOptions</b>) (*<a href="#name-Tx">Tx</a>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/database/sql/sql.go.html#line-1723">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<b>TxOptions</b>) (*<a href="#name-Tx">Tx</a>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-ConnPoolBeginner">ConnPoolBeginner</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-48">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<b>TxOptions</b>) (<a href="../gorm.io/gorm.html">gorm</a>.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-467">Begin</a>(opts ...*<b>TxOptions</b>) *<a href="../gorm.io/gorm.html">gorm</a>.<a href="../gorm.io/gorm.html#name-DB">DB</a>
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-431">Transaction</a>(fc func(tx *<a href="../gorm.io/gorm.html">gorm</a>.<a href="../gorm.io/gorm.html#name-DB">DB</a>) <a href="../builtin.html#name-error">error</a>, opts ...*<b>TxOptions</b>) (err <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.(*<a href="../gorm.io/gorm.html#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-53">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opt *<b>TxOptions</b>) (<a href="../gorm.io/gorm.html">gorm</a>.<a href="../gorm.io/gorm.html#name-ConnPool">ConnPool</a>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm.<a href="../gorm.io/gorm.html#name-TxBeginner">TxBeginner</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-44">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<b>TxOptions</b>) (*<a href="#name-Tx">Tx</a>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Drivers">	 func <a href="../../src/database/sql/sql.go.html#line-64">Drivers</a>() []<a href="../builtin.html#name-string">string</a>
+		Drivers returns a sorted list of the names of the registered drivers.</div>
+<div class="anchor" id="name-ErrConnDone">	  var <a href="../../src/database/sql/sql.go.html#line-1790">ErrConnDone</a> <a href="../builtin.html#name-error">error</a>
+		ErrConnDone is returned by any operation that is performed on a connection
+		that has already been returned to the connection pool.</div>
+<div class="anchor" id="name-ErrNoRows">	  var <a href="../../src/database/sql/sql.go.html#line-388">ErrNoRows</a> <a href="../builtin.html#name-error">error</a>
+		ErrNoRows is returned by Scan when QueryRow doesn't return a
+		row. In such a case, QueryRow returns a placeholder *Row value that
+		defers this error until a Scan.</div>
+<div class="anchor" id="name-ErrTxDone">	  var <a href="../../src/database/sql/sql.go.html#line-2081">ErrTxDone</a> <a href="../builtin.html#name-error">error</a>
+		ErrTxDone is returned by any operation that is performed on a transaction
+		that has already been committed or rolled back.</div>
+<div class="anchor" id="name-LevelDefault">	const <a href="../../src/database/sql/sql.go.html#line-126">LevelDefault</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 0
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-LevelLinearizable">	const <a href="../../src/database/sql/sql.go.html#line-133">LevelLinearizable</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 7
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-LevelReadCommitted">	const <a href="../../src/database/sql/sql.go.html#line-128">LevelReadCommitted</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 2
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-LevelReadUncommitted">	const <a href="../../src/database/sql/sql.go.html#line-127">LevelReadUncommitted</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 1
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-LevelRepeatableRead">	const <a href="../../src/database/sql/sql.go.html#line-130">LevelRepeatableRead</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 4
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-LevelSerializable">	const <a href="../../src/database/sql/sql.go.html#line-132">LevelSerializable</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 6
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-LevelSnapshot">	const <a href="../../src/database/sql/sql.go.html#line-131">LevelSnapshot</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 5
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-LevelWriteCommitted">	const <a href="../../src/database/sql/sql.go.html#line-129">LevelWriteCommitted</a> <a href="#name-IsolationLevel">IsolationLevel</a> = 3
+		Various isolation levels that drivers may support in BeginTx.
+		If a driver does not support a given isolation level an error may be returned.
+
+		See https://en.wikipedia.org/wiki/Isolation_(database_systems)#Isolation_levels.</div>
+<div class="anchor" id="name-Named">	 func <a href="../../src/database/sql/sql.go.html#line-110">Named</a>(name <a href="../builtin.html#name-string">string</a>, value interface{}) <a href="#name-NamedArg">NamedArg</a>
+		Named provides a more concise way to create NamedArg values.
+
+		Example usage:
+
+		    db.ExecContext(ctx, `
+		        delete from Invoice
+		        where
+		            TimeCreated &lt; @end
+		            and TimeCreated &gt;= @start;`,
+		        sql.Named("start", startTime),
+		        sql.Named("end", endTime),
+		    )</div>
+<div class="anchor" id="name-Open">	 func <a href="../../src/database/sql/sql.go.html#line-762">Open</a>(driverName, dataSourceName <a href="../builtin.html#name-string">string</a>) (*<a href="#name-DB">DB</a>, <a href="../builtin.html#name-error">error</a>)
+		Open opens a database specified by its database driver name and a
+		driver-specific data source name, usually consisting of at least a
+		database name and connection information.
+
+		Most users will open a database via a driver-specific connection
+		helper function that returns a *DB. No database drivers are included
+		in the Go standard library. See https://golang.org/s/sqldrivers for
+		a list of third-party drivers.
+
+		Open may just validate its arguments without creating a connection
+		to the database. To verify that the data source name is valid, call
+		Ping.
+
+		The returned DB is safe for concurrent use by multiple goroutines
+		and maintains its own pool of idle connections. Thus, the Open
+		function should be called just once. It is rarely necessary to
+		close a DB.</div>
+<div class="anchor" id="name-OpenDB">	 func <a href="../../src/database/sql/sql.go.html#line-730">OpenDB</a>(c <a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Connector">Connector</a>) *<a href="#name-DB">DB</a>
+		OpenDB opens a database using a Connector, allowing drivers to
+		bypass a string based data source name.
+
+		Most users will open a database via a driver-specific connection
+		helper function that returns a *DB. No database drivers are included
+		in the Go standard library. See https://golang.org/s/sqldrivers for
+		a list of third-party drivers.
+
+		OpenDB may just validate its arguments without creating a connection
+		to the database. To verify that the data source name is valid, call
+		Ping.
+
+		The returned DB is safe for concurrent use by multiple goroutines
+		and maintains its own pool of idle connections. Thus, the OpenDB
+		function should be called just once. It is rarely necessary to
+		close a DB.</div>
+<div class="anchor" id="name-Register">	 func <a href="../../src/database/sql/sql.go.html#line-44">Register</a>(name <a href="../builtin.html#name-string">string</a>, driver <a href="sql/driver.html">driver</a>.<a href="sql/driver.html#name-Driver">Driver</a>)
+		Register makes a database driver available by the provided name.
+		If Register is called twice with the same name or if driver is nil,
+		it panics.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

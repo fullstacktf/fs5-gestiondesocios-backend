@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: crypto/md5</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>md5</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-crypto/md5">crypto/md5</a><i> (on <a href="https://golang.org/pkg/crypto/md5/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/crypto/md5" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/crypto/md5.html">5 packages</a>, and imported by <a href="../../dep/crypto/md5.html#imported-by">2 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/crypto/md5/md5.go.html#doc">d-&gt;</a> <a href="../../src/crypto/md5/md5.go.html">md5.go</a>
+	    <a href="../../src/crypto/md5/md5block.go.html">md5block.go</a>
+	    <a href="../../src/crypto/md5/md5block_decl.go.html">md5block_decl.go</a>
+	    <a href="../../src/crypto/md5/md5block_amd64.s.html">md5block_amd64.s</a>
+
+<span class="title">Exported Type Names</span>
+
+	(none)
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-BlockSize">	const <a href="../../src/crypto/md5/md5.go.html#line-28">BlockSize</a> = 64
+		The blocksize of MD5 in bytes.</div>
+<div class="anchor" id="name-New">	 func <a href="../../src/crypto/md5/md5.go.html#line-113">New</a>() <a href="../hash.html">hash</a>.<a href="../hash.html#name-Hash">Hash</a>
+		New returns a new hash.Hash computing the MD5 checksum. The Hash also
+		implements encoding.BinaryMarshaler and encoding.BinaryUnmarshaler to
+		marshal and unmarshal the internal state of the hash.</div>
+<div class="anchor" id="name-Size">	const <a href="../../src/crypto/md5/md5.go.html#line-25">Size</a> = 16
+		The size of an MD5 checksum in bytes.</div>
+<div class="anchor" id="name-Sum">	 func <a href="../../src/crypto/md5/md5.go.html#line-190">Sum</a>(data []<a href="../builtin.html#name-byte">byte</a>) [16]<a href="../builtin.html#name-byte">byte</a>
+		Sum returns the MD5 checksum of the data.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

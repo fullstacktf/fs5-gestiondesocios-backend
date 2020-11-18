@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: internal/bytealg</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>bytealg</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-internal/bytealg">internal/bytealg</a><i> (on <a href="https://golang.org/pkg/internal/bytealg/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/internal/bytealg" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/internal/bytealg.html">2 packages</a>, and imported by <a href="../../dep/internal/bytealg.html#imported-by">6 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/internal/bytealg/bytealg.go.html">bytealg.go</a>
+	    <a href="../../src/internal/bytealg/compare_native.go.html">compare_native.go</a>
+	    <a href="../../src/internal/bytealg/count_native.go.html">count_native.go</a>
+	    <a href="../../src/internal/bytealg/equal_generic.go.html">equal_generic.go</a>
+	    <a href="../../src/internal/bytealg/equal_native.go.html">equal_native.go</a>
+	    <a href="../../src/internal/bytealg/index_amd64.go.html">index_amd64.go</a>
+	    <a href="../../src/internal/bytealg/index_native.go.html">index_native.go</a>
+	    <a href="../../src/internal/bytealg/indexbyte_native.go.html">indexbyte_native.go</a>
+	    <a href="../../src/internal/bytealg/compare_amd64.s.html">compare_amd64.s</a>
+	    <a href="../../src/internal/bytealg/count_amd64.s.html">count_amd64.s</a>
+	    <a href="../../src/internal/bytealg/equal_amd64.s.html">equal_amd64.s</a>
+	    <a href="../../src/internal/bytealg/index_amd64.s.html">index_amd64.s</a>
+	    <a href="../../src/internal/bytealg/indexbyte_amd64.s.html">indexbyte_amd64.s</a>
+
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-Compare">	 func <a href="../../src/internal/bytealg/compare_native.go.html#line-12">Compare</a>(a, b []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a></div>
+<div class="anchor" id="name-Count">	 func <a href="../../src/internal/bytealg/count_native.go.html#line-10">Count</a>(b []<a href="../builtin.html#name-byte">byte</a>, c <a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a></div>
+<div class="anchor" id="name-CountString">	 func <a href="../../src/internal/bytealg/count_native.go.html#line-13">CountString</a>(s <a href="../builtin.html#name-string">string</a>, c <a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a></div>
+<div class="anchor" id="name-Cutover">	 func <a href="../../src/internal/bytealg/index_amd64.go.html#line-23">Cutover</a>(n <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-int">int</a>
+		Cutover reports the number of failures of IndexByte we should tolerate
+		before switching over to Index.
+		n is the number of bytes processed so far.
+		See the bytes.Index implementation for details.</div>
+<div class="anchor" id="name-Equal">	 func <a href="../../src/internal/bytealg/equal_generic.go.html#line-14">Equal</a>(a, b []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a>
+		Equal reports whether a and b
+		are the same length and contain the same bytes.
+		A nil argument is equivalent to an empty slice.
+
+		Equal is equivalent to bytes.Equal.
+		It is provided here for convenience,
+		because some packages cannot depend on bytes.</div>
+<div class="anchor" id="name-HashStr">	 func <a href="../../src/internal/bytealg/bytealg.go.html#line-52">HashStr</a>(sep <a href="../builtin.html#name-string">string</a>) (<a href="../builtin.html#name-uint32">uint32</a>, <a href="../builtin.html#name-uint32">uint32</a>)
+		HashStr returns the hash and the appropriate multiplicative
+		factor for use in Rabin-Karp algorithm.</div>
+<div class="anchor" id="name-HashStrBytes">	 func <a href="../../src/internal/bytealg/bytealg.go.html#line-35">HashStrBytes</a>(sep []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-uint32">uint32</a>, <a href="../builtin.html#name-uint32">uint32</a>)
+		HashStrBytes returns the hash and the appropriate multiplicative
+		factor for use in Rabin-Karp algorithm.</div>
+<div class="anchor" id="name-HashStrRev">	 func <a href="../../src/internal/bytealg/bytealg.go.html#line-86">HashStrRev</a>(sep <a href="../builtin.html#name-string">string</a>) (<a href="../builtin.html#name-uint32">uint32</a>, <a href="../builtin.html#name-uint32">uint32</a>)
+		HashStrRev returns the hash of the reverse of sep and the
+		appropriate multiplicative factor for use in Rabin-Karp algorithm.</div>
+<div class="anchor" id="name-HashStrRevBytes">	 func <a href="../../src/internal/bytealg/bytealg.go.html#line-69">HashStrRevBytes</a>(sep []<a href="../builtin.html#name-byte">byte</a>) (<a href="../builtin.html#name-uint32">uint32</a>, <a href="../builtin.html#name-uint32">uint32</a>)
+		HashStrRevBytes returns the hash of the reverse of sep and the
+		appropriate multiplicative factor for use in Rabin-Karp algorithm.</div>
+<div class="anchor" id="name-Index">	 func <a href="../../src/internal/bytealg/index_native.go.html#line-13">Index</a>(a, b []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a>
+		Index returns the index of the first instance of b in a, or -1 if b is not present in a.
+		Requires 2 &lt;= len(b) &lt;= MaxLen.</div>
+<div class="anchor" id="name-IndexByte">	 func <a href="../../src/internal/bytealg/indexbyte_native.go.html#line-10">IndexByte</a>(b []<a href="../builtin.html#name-byte">byte</a>, c <a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a></div>
+<div class="anchor" id="name-IndexByteString">	 func <a href="../../src/internal/bytealg/indexbyte_native.go.html#line-13">IndexByteString</a>(s <a href="../builtin.html#name-string">string</a>, c <a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a></div>
+<div class="anchor" id="name-IndexRabinKarp">	 func <a href="../../src/internal/bytealg/bytealg.go.html#line-128">IndexRabinKarp</a>(s, substr <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-int">int</a>
+		IndexRabinKarp uses the Rabin-Karp search algorithm to return the index of the
+		first occurence of substr in s, or -1 if not present.</div>
+<div class="anchor" id="name-IndexRabinKarpBytes">	 func <a href="../../src/internal/bytealg/bytealg.go.html#line-103">IndexRabinKarpBytes</a>(s, sep []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a>
+		IndexRabinKarpBytes uses the Rabin-Karp search algorithm to return the index of the
+		first occurence of substr in s, or -1 if not present.</div>
+<div class="anchor" id="name-IndexString">	 func <a href="../../src/internal/bytealg/index_native.go.html#line-19">IndexString</a>(a, b <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-int">int</a>
+		IndexString returns the index of the first instance of b in a, or -1 if b is not present in a.
+		Requires 2 &lt;= len(b) &lt;= MaxLen.</div>
+<div class="anchor" id="name-MaxBruteForce">	const <a href="../../src/internal/bytealg/index_amd64.go.html#line-9">MaxBruteForce</a> = 64</div>
+<div class="anchor" id="name-MaxLen">	  var <a href="../../src/internal/bytealg/bytealg.go.html#line-24">MaxLen</a> <a href="../builtin.html#name-int">int</a>
+		MaxLen is the maximum length of the string to be searched for (argument b) in Index.
+		If MaxLen is not 0, make sure MaxLen &gt;= 4.</div>
+<div class="anchor" id="name-PrimeRK">	const <a href="../../src/internal/bytealg/bytealg.go.html#line-31">PrimeRK</a> = 16777619
+		PrimeRK is the prime base used in Rabin-Karp algorithm.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

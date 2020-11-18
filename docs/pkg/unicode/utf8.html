@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: unicode/utf8</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>utf8</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-unicode/utf8">unicode/utf8</a><i> (on <a href="https://golang.org/pkg/unicode/utf8/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/unicode/utf8" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports 0 packages, and imported by <a href="../../dep/unicode/utf8.html#imported-by">26 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/unicode/utf8/utf8.go.html#doc">d-&gt;</a> <a href="../../src/unicode/utf8/utf8.go.html">utf8.go</a>
+
+<span class="title">Exported Type Names</span>
+
+	(none)
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-DecodeLastRune">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-247">DecodeLastRune</a>(p []<a href="../builtin.html#name-byte">byte</a>) (r <a href="../builtin.html#name-rune">rune</a>, size <a href="../builtin.html#name-int">int</a>)
+		DecodeLastRune unpacks the last UTF-8 encoding in p and returns the rune and
+		its width in bytes. If p is empty it returns (RuneError, 0). Otherwise, if
+		the encoding is invalid, it returns (RuneError, 1). Both are impossible
+		results for correct, non-empty UTF-8.
+
+		An encoding is invalid if it is incorrect UTF-8, encodes a rune that is
+		out of range, or is not the shortest possible UTF-8 encoding for the
+		value. No other validation is performed.</div>
+<div class="anchor" id="name-DecodeLastRuneInString">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-287">DecodeLastRuneInString</a>(s <a href="../builtin.html#name-string">string</a>) (r <a href="../builtin.html#name-rune">rune</a>, size <a href="../builtin.html#name-int">int</a>)
+		DecodeLastRuneInString is like DecodeLastRune but its input is a string. If
+		s is empty it returns (RuneError, 0). Otherwise, if the encoding is invalid,
+		it returns (RuneError, 1). Both are impossible results for correct,
+		non-empty UTF-8.
+
+		An encoding is invalid if it is incorrect UTF-8, encodes a rune that is
+		out of range, or is not the shortest possible UTF-8 encoding for the
+		value. No other validation is performed.</div>
+<div class="anchor" id="name-DecodeRune">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-151">DecodeRune</a>(p []<a href="../builtin.html#name-byte">byte</a>) (r <a href="../builtin.html#name-rune">rune</a>, size <a href="../builtin.html#name-int">int</a>)
+		DecodeRune unpacks the first UTF-8 encoding in p and returns the rune and
+		its width in bytes. If p is empty it returns (RuneError, 0). Otherwise, if
+		the encoding is invalid, it returns (RuneError, 1). Both are impossible
+		results for correct, non-empty UTF-8.
+
+		An encoding is invalid if it is incorrect UTF-8, encodes a rune that is
+		out of range, or is not the shortest possible UTF-8 encoding for the
+		value. No other validation is performed.</div>
+<div class="anchor" id="name-DecodeRuneInString">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-199">DecodeRuneInString</a>(s <a href="../builtin.html#name-string">string</a>) (r <a href="../builtin.html#name-rune">rune</a>, size <a href="../builtin.html#name-int">int</a>)
+		DecodeRuneInString is like DecodeRune but its input is a string. If s is
+		empty it returns (RuneError, 0). Otherwise, if the encoding is invalid, it
+		returns (RuneError, 1). Both are impossible results for correct, non-empty
+		UTF-8.
+
+		An encoding is invalid if it is incorrect UTF-8, encodes a rune that is
+		out of range, or is not the shortest possible UTF-8 encoding for the
+		value. No other validation is performed.</div>
+<div class="anchor" id="name-EncodeRune">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-341">EncodeRune</a>(p []<a href="../builtin.html#name-byte">byte</a>, r <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-int">int</a>
+		EncodeRune writes into p (which must be large enough) the UTF-8 encoding of the rune.
+		It returns the number of bytes written.</div>
+<div class="anchor" id="name-FullRune">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-104">FullRune</a>(p []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a>
+		FullRune reports whether the bytes in p begin with a full UTF-8 encoding of a rune.
+		An invalid encoding is considered a full Rune since it will convert as a width-1 error rune.</div>
+<div class="anchor" id="name-FullRuneInString">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-124">FullRuneInString</a>(s <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+		FullRuneInString is like FullRune but its input is a string.</div>
+<div class="anchor" id="name-MaxRune">	const <a href="../../src/unicode/utf8/utf8.go.html#line-18">MaxRune</a> = 1114111 // Maximum valid Unicode code point.
+		Numbers fundamental to the encoding.</div>
+<div class="anchor" id="name-RuneCount">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-373">RuneCount</a>(p []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-int">int</a>
+		RuneCount returns the number of runes in p. Erroneous and short
+		encodings are treated as single runes of width 1 byte.</div>
+<div class="anchor" id="name-RuneCountInString">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-410">RuneCountInString</a>(s <a href="../builtin.html#name-string">string</a>) (n <a href="../builtin.html#name-int">int</a>)
+		RuneCountInString is like RuneCount but its input is a string.</div>
+<div class="anchor" id="name-RuneError">	const <a href="../../src/unicode/utf8/utf8.go.html#line-16">RuneError</a> = 65533 // the "error" Rune or "Unicode replacement character"
+		Numbers fundamental to the encoding.</div>
+<div class="anchor" id="name-RuneLen">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-321">RuneLen</a>(r <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-int">int</a>
+		RuneLen returns the number of bytes required to encode the rune.
+		It returns -1 if the rune is not a valid value to encode in UTF-8.</div>
+<div class="anchor" id="name-RuneSelf">	const <a href="../../src/unicode/utf8/utf8.go.html#line-17">RuneSelf</a> = 128 // characters below RuneSelf are represented as themselves in a single byte.
+		Numbers fundamental to the encoding.</div>
+<div class="anchor" id="name-RuneStart">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-447">RuneStart</a>(b <a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a>
+		RuneStart reports whether the byte could be the first byte of an encoded,
+		possibly invalid rune. Second and subsequent bytes always have the top two
+		bits set to 10.</div>
+<div class="anchor" id="name-UTFMax">	const <a href="../../src/unicode/utf8/utf8.go.html#line-19">UTFMax</a> = 4 // maximum number of bytes of a UTF-8 encoded Unicode character.
+		Numbers fundamental to the encoding.</div>
+<div class="anchor" id="name-Valid">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-450">Valid</a>(p []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-bool">bool</a>
+		Valid reports whether p consists entirely of valid UTF-8-encoded runes.</div>
+<div class="anchor" id="name-ValidRune">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-543">ValidRune</a>(r <a href="../builtin.html#name-rune">rune</a>) <a href="../builtin.html#name-bool">bool</a>
+		ValidRune reports whether r can be legally encoded as UTF-8.
+		Code points that are out of range or a surrogate half are illegal.</div>
+<div class="anchor" id="name-ValidString">	 func <a href="../../src/unicode/utf8/utf8.go.html#line-496">ValidString</a>(s <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+		ValidString reports whether s consists entirely of valid UTF-8-encoded runes.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: parse.go in package net</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	parse.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../pkg/net.html">net</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Copyright 2009 The Go Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-2"><code>// Use of this source code is governed by a BSD-style</code></span>
+<span class="codeline" id="line-3"><code>// license that can be found in the LICENSE file.</code></span>
+<span class="codeline" id="line-4"><code></code></span>
+<span class="codeline" id="line-5"><code>// Simple file i/o and string manipulation, to avoid</code></span>
+<span class="codeline" id="line-6"><code>// depending on strconv and bufio and strings.</code></span>
+<span class="codeline" id="line-7"><code></code></span>
+<span class="codeline" id="line-8"><code>package net</code></span>
+<span class="codeline" id="line-9"><code></code></span>
+<span class="codeline" id="line-10"><code>import (</code></span>
+<span class="codeline" id="line-11"><code>	"internal/bytealg"</code></span>
+<span class="codeline" id="line-12"><code>	"io"</code></span>
+<span class="codeline" id="line-13"><code>	"os"</code></span>
+<span class="codeline" id="line-14"><code>	"time"</code></span>
+<span class="codeline" id="line-15"><code>)</code></span>
+<span class="codeline" id="line-16"><code></code></span>
+<span class="codeline" id="line-17"><code>type file struct {</code></span>
+<span class="codeline" id="line-18"><code>	file  *os.File</code></span>
+<span class="codeline" id="line-19"><code>	data  []byte</code></span>
+<span class="codeline" id="line-20"><code>	atEOF bool</code></span>
+<span class="codeline" id="line-21"><code>}</code></span>
+<span class="codeline" id="line-22"><code></code></span>
+<span class="codeline" id="line-23"><code>func (f *file) close() { f.file.Close() }</code></span>
+<span class="codeline" id="line-24"><code></code></span>
+<span class="codeline" id="line-25"><code>func (f *file) getLineFromData() (s string, ok bool) {</code></span>
+<span class="codeline" id="line-26"><code>	data := f.data</code></span>
+<span class="codeline" id="line-27"><code>	i := 0</code></span>
+<span class="codeline" id="line-28"><code>	for i = 0; i &lt; len(data); i++ {</code></span>
+<span class="codeline" id="line-29"><code>		if data[i] == '\n' {</code></span>
+<span class="codeline" id="line-30"><code>			s = string(data[0:i])</code></span>
+<span class="codeline" id="line-31"><code>			ok = true</code></span>
+<span class="codeline" id="line-32"><code>			// move data</code></span>
+<span class="codeline" id="line-33"><code>			i++</code></span>
+<span class="codeline" id="line-34"><code>			n := len(data) - i</code></span>
+<span class="codeline" id="line-35"><code>			copy(data[0:], data[i:])</code></span>
+<span class="codeline" id="line-36"><code>			f.data = data[0:n]</code></span>
+<span class="codeline" id="line-37"><code>			return</code></span>
+<span class="codeline" id="line-38"><code>		}</code></span>
+<span class="codeline" id="line-39"><code>	}</code></span>
+<span class="codeline" id="line-40"><code>	if f.atEOF &amp;&amp; len(f.data) &gt; 0 {</code></span>
+<span class="codeline" id="line-41"><code>		// EOF, return all we have</code></span>
+<span class="codeline" id="line-42"><code>		s = string(data)</code></span>
+<span class="codeline" id="line-43"><code>		f.data = f.data[0:0]</code></span>
+<span class="codeline" id="line-44"><code>		ok = true</code></span>
+<span class="codeline" id="line-45"><code>	}</code></span>
+<span class="codeline" id="line-46"><code>	return</code></span>
+<span class="codeline" id="line-47"><code>}</code></span>
+<span class="codeline" id="line-48"><code></code></span>
+<span class="codeline" id="line-49"><code>func (f *file) readLine() (s string, ok bool) {</code></span>
+<span class="codeline" id="line-50"><code>	if s, ok = f.getLineFromData(); ok {</code></span>
+<span class="codeline" id="line-51"><code>		return</code></span>
+<span class="codeline" id="line-52"><code>	}</code></span>
+<span class="codeline" id="line-53"><code>	if len(f.data) &lt; cap(f.data) {</code></span>
+<span class="codeline" id="line-54"><code>		ln := len(f.data)</code></span>
+<span class="codeline" id="line-55"><code>		n, err := io.ReadFull(f.file, f.data[ln:cap(f.data)])</code></span>
+<span class="codeline" id="line-56"><code>		if n &gt;= 0 {</code></span>
+<span class="codeline" id="line-57"><code>			f.data = f.data[0 : ln+n]</code></span>
+<span class="codeline" id="line-58"><code>		}</code></span>
+<span class="codeline" id="line-59"><code>		if err == io.EOF || err == io.ErrUnexpectedEOF {</code></span>
+<span class="codeline" id="line-60"><code>			f.atEOF = true</code></span>
+<span class="codeline" id="line-61"><code>		}</code></span>
+<span class="codeline" id="line-62"><code>	}</code></span>
+<span class="codeline" id="line-63"><code>	s, ok = f.getLineFromData()</code></span>
+<span class="codeline" id="line-64"><code>	return</code></span>
+<span class="codeline" id="line-65"><code>}</code></span>
+<span class="codeline" id="line-66"><code></code></span>
+<span class="codeline" id="line-67"><code>func open(name string) (*file, error) {</code></span>
+<span class="codeline" id="line-68"><code>	fd, err := os.Open(name)</code></span>
+<span class="codeline" id="line-69"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-70"><code>		return nil, err</code></span>
+<span class="codeline" id="line-71"><code>	}</code></span>
+<span class="codeline" id="line-72"><code>	return &amp;file{fd, make([]byte, 0, 64*1024), false}, nil</code></span>
+<span class="codeline" id="line-73"><code>}</code></span>
+<span class="codeline" id="line-74"><code></code></span>
+<span class="codeline" id="line-75"><code>func stat(name string) (mtime time.Time, size int64, err error) {</code></span>
+<span class="codeline" id="line-76"><code>	st, err := os.Stat(name)</code></span>
+<span class="codeline" id="line-77"><code>	if err != nil {</code></span>
+<span class="codeline" id="line-78"><code>		return time.Time{}, 0, err</code></span>
+<span class="codeline" id="line-79"><code>	}</code></span>
+<span class="codeline" id="line-80"><code>	return st.ModTime(), st.Size(), nil</code></span>
+<span class="codeline" id="line-81"><code>}</code></span>
+<span class="codeline" id="line-82"><code></code></span>
+<span class="codeline" id="line-83"><code>// Count occurrences in s of any bytes in t.</code></span>
+<span class="codeline" id="line-84"><code>func countAnyByte(s string, t string) int {</code></span>
+<span class="codeline" id="line-85"><code>	n := 0</code></span>
+<span class="codeline" id="line-86"><code>	for i := 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-87"><code>		if bytealg.IndexByteString(t, s[i]) &gt;= 0 {</code></span>
+<span class="codeline" id="line-88"><code>			n++</code></span>
+<span class="codeline" id="line-89"><code>		}</code></span>
+<span class="codeline" id="line-90"><code>	}</code></span>
+<span class="codeline" id="line-91"><code>	return n</code></span>
+<span class="codeline" id="line-92"><code>}</code></span>
+<span class="codeline" id="line-93"><code></code></span>
+<span class="codeline" id="line-94"><code>// Split s at any bytes in t.</code></span>
+<span class="codeline" id="line-95"><code>func splitAtBytes(s string, t string) []string {</code></span>
+<span class="codeline" id="line-96"><code>	a := make([]string, 1+countAnyByte(s, t))</code></span>
+<span class="codeline" id="line-97"><code>	n := 0</code></span>
+<span class="codeline" id="line-98"><code>	last := 0</code></span>
+<span class="codeline" id="line-99"><code>	for i := 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-100"><code>		if bytealg.IndexByteString(t, s[i]) &gt;= 0 {</code></span>
+<span class="codeline" id="line-101"><code>			if last &lt; i {</code></span>
+<span class="codeline" id="line-102"><code>				a[n] = s[last:i]</code></span>
+<span class="codeline" id="line-103"><code>				n++</code></span>
+<span class="codeline" id="line-104"><code>			}</code></span>
+<span class="codeline" id="line-105"><code>			last = i + 1</code></span>
+<span class="codeline" id="line-106"><code>		}</code></span>
+<span class="codeline" id="line-107"><code>	}</code></span>
+<span class="codeline" id="line-108"><code>	if last &lt; len(s) {</code></span>
+<span class="codeline" id="line-109"><code>		a[n] = s[last:]</code></span>
+<span class="codeline" id="line-110"><code>		n++</code></span>
+<span class="codeline" id="line-111"><code>	}</code></span>
+<span class="codeline" id="line-112"><code>	return a[0:n]</code></span>
+<span class="codeline" id="line-113"><code>}</code></span>
+<span class="codeline" id="line-114"><code></code></span>
+<span class="codeline" id="line-115"><code>func getFields(s string) []string { return splitAtBytes(s, " \r\t\n") }</code></span>
+<span class="codeline" id="line-116"><code></code></span>
+<span class="codeline" id="line-117"><code>// Bigger than we need, not too big to worry about overflow</code></span>
+<span class="codeline" id="line-118"><code>const big = 0xFFFFFF</code></span>
+<span class="codeline" id="line-119"><code></code></span>
+<span class="codeline" id="line-120"><code>// Decimal to integer.</code></span>
+<span class="codeline" id="line-121"><code>// Returns number, characters consumed, success.</code></span>
+<span class="codeline" id="line-122"><code>func dtoi(s string) (n int, i int, ok bool) {</code></span>
+<span class="codeline" id="line-123"><code>	n = 0</code></span>
+<span class="codeline" id="line-124"><code>	for i = 0; i &lt; len(s) &amp;&amp; '0' &lt;= s[i] &amp;&amp; s[i] &lt;= '9'; i++ {</code></span>
+<span class="codeline" id="line-125"><code>		n = n*10 + int(s[i]-'0')</code></span>
+<span class="codeline" id="line-126"><code>		if n &gt;= big {</code></span>
+<span class="codeline" id="line-127"><code>			return big, i, false</code></span>
+<span class="codeline" id="line-128"><code>		}</code></span>
+<span class="codeline" id="line-129"><code>	}</code></span>
+<span class="codeline" id="line-130"><code>	if i == 0 {</code></span>
+<span class="codeline" id="line-131"><code>		return 0, 0, false</code></span>
+<span class="codeline" id="line-132"><code>	}</code></span>
+<span class="codeline" id="line-133"><code>	return n, i, true</code></span>
+<span class="codeline" id="line-134"><code>}</code></span>
+<span class="codeline" id="line-135"><code></code></span>
+<span class="codeline" id="line-136"><code>// Hexadecimal to integer.</code></span>
+<span class="codeline" id="line-137"><code>// Returns number, characters consumed, success.</code></span>
+<span class="codeline" id="line-138"><code>func xtoi(s string) (n int, i int, ok bool) {</code></span>
+<span class="codeline" id="line-139"><code>	n = 0</code></span>
+<span class="codeline" id="line-140"><code>	for i = 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-141"><code>		if '0' &lt;= s[i] &amp;&amp; s[i] &lt;= '9' {</code></span>
+<span class="codeline" id="line-142"><code>			n *= 16</code></span>
+<span class="codeline" id="line-143"><code>			n += int(s[i] - '0')</code></span>
+<span class="codeline" id="line-144"><code>		} else if 'a' &lt;= s[i] &amp;&amp; s[i] &lt;= 'f' {</code></span>
+<span class="codeline" id="line-145"><code>			n *= 16</code></span>
+<span class="codeline" id="line-146"><code>			n += int(s[i]-'a') + 10</code></span>
+<span class="codeline" id="line-147"><code>		} else if 'A' &lt;= s[i] &amp;&amp; s[i] &lt;= 'F' {</code></span>
+<span class="codeline" id="line-148"><code>			n *= 16</code></span>
+<span class="codeline" id="line-149"><code>			n += int(s[i]-'A') + 10</code></span>
+<span class="codeline" id="line-150"><code>		} else {</code></span>
+<span class="codeline" id="line-151"><code>			break</code></span>
+<span class="codeline" id="line-152"><code>		}</code></span>
+<span class="codeline" id="line-153"><code>		if n &gt;= big {</code></span>
+<span class="codeline" id="line-154"><code>			return 0, i, false</code></span>
+<span class="codeline" id="line-155"><code>		}</code></span>
+<span class="codeline" id="line-156"><code>	}</code></span>
+<span class="codeline" id="line-157"><code>	if i == 0 {</code></span>
+<span class="codeline" id="line-158"><code>		return 0, i, false</code></span>
+<span class="codeline" id="line-159"><code>	}</code></span>
+<span class="codeline" id="line-160"><code>	return n, i, true</code></span>
+<span class="codeline" id="line-161"><code>}</code></span>
+<span class="codeline" id="line-162"><code></code></span>
+<span class="codeline" id="line-163"><code>// xtoi2 converts the next two hex digits of s into a byte.</code></span>
+<span class="codeline" id="line-164"><code>// If s is longer than 2 bytes then the third byte must be e.</code></span>
+<span class="codeline" id="line-165"><code>// If the first two bytes of s are not hex digits or the third byte</code></span>
+<span class="codeline" id="line-166"><code>// does not match e, false is returned.</code></span>
+<span class="codeline" id="line-167"><code>func xtoi2(s string, e byte) (byte, bool) {</code></span>
+<span class="codeline" id="line-168"><code>	if len(s) &gt; 2 &amp;&amp; s[2] != e {</code></span>
+<span class="codeline" id="line-169"><code>		return 0, false</code></span>
+<span class="codeline" id="line-170"><code>	}</code></span>
+<span class="codeline" id="line-171"><code>	n, ei, ok := xtoi(s[:2])</code></span>
+<span class="codeline" id="line-172"><code>	return byte(n), ok &amp;&amp; ei == 2</code></span>
+<span class="codeline" id="line-173"><code>}</code></span>
+<span class="codeline" id="line-174"><code></code></span>
+<span class="codeline" id="line-175"><code>// Convert integer to decimal string.</code></span>
+<span class="codeline" id="line-176"><code>func itoa(val int) string {</code></span>
+<span class="codeline" id="line-177"><code>	if val &lt; 0 {</code></span>
+<span class="codeline" id="line-178"><code>		return "-" + uitoa(uint(-val))</code></span>
+<span class="codeline" id="line-179"><code>	}</code></span>
+<span class="codeline" id="line-180"><code>	return uitoa(uint(val))</code></span>
+<span class="codeline" id="line-181"><code>}</code></span>
+<span class="codeline" id="line-182"><code></code></span>
+<span class="codeline" id="line-183"><code>// Convert unsigned integer to decimal string.</code></span>
+<span class="codeline" id="line-184"><code>func uitoa(val uint) string {</code></span>
+<span class="codeline" id="line-185"><code>	if val == 0 { // avoid string allocation</code></span>
+<span class="codeline" id="line-186"><code>		return "0"</code></span>
+<span class="codeline" id="line-187"><code>	}</code></span>
+<span class="codeline" id="line-188"><code>	var buf [20]byte // big enough for 64bit value base 10</code></span>
+<span class="codeline" id="line-189"><code>	i := len(buf) - 1</code></span>
+<span class="codeline" id="line-190"><code>	for val &gt;= 10 {</code></span>
+<span class="codeline" id="line-191"><code>		q := val / 10</code></span>
+<span class="codeline" id="line-192"><code>		buf[i] = byte('0' + val - q*10)</code></span>
+<span class="codeline" id="line-193"><code>		i--</code></span>
+<span class="codeline" id="line-194"><code>		val = q</code></span>
+<span class="codeline" id="line-195"><code>	}</code></span>
+<span class="codeline" id="line-196"><code>	// val &lt; 10</code></span>
+<span class="codeline" id="line-197"><code>	buf[i] = byte('0' + val)</code></span>
+<span class="codeline" id="line-198"><code>	return string(buf[i:])</code></span>
+<span class="codeline" id="line-199"><code>}</code></span>
+<span class="codeline" id="line-200"><code></code></span>
+<span class="codeline" id="line-201"><code>// Convert i to a hexadecimal string. Leading zeros are not printed.</code></span>
+<span class="codeline" id="line-202"><code>func appendHex(dst []byte, i uint32) []byte {</code></span>
+<span class="codeline" id="line-203"><code>	if i == 0 {</code></span>
+<span class="codeline" id="line-204"><code>		return append(dst, '0')</code></span>
+<span class="codeline" id="line-205"><code>	}</code></span>
+<span class="codeline" id="line-206"><code>	for j := 7; j &gt;= 0; j-- {</code></span>
+<span class="codeline" id="line-207"><code>		v := i &gt;&gt; uint(j*4)</code></span>
+<span class="codeline" id="line-208"><code>		if v &gt; 0 {</code></span>
+<span class="codeline" id="line-209"><code>			dst = append(dst, hexDigit[v&amp;0xf])</code></span>
+<span class="codeline" id="line-210"><code>		}</code></span>
+<span class="codeline" id="line-211"><code>	}</code></span>
+<span class="codeline" id="line-212"><code>	return dst</code></span>
+<span class="codeline" id="line-213"><code>}</code></span>
+<span class="codeline" id="line-214"><code></code></span>
+<span class="codeline" id="line-215"><code>// Number of occurrences of b in s.</code></span>
+<span class="codeline" id="line-216"><code>func count(s string, b byte) int {</code></span>
+<span class="codeline" id="line-217"><code>	n := 0</code></span>
+<span class="codeline" id="line-218"><code>	for i := 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-219"><code>		if s[i] == b {</code></span>
+<span class="codeline" id="line-220"><code>			n++</code></span>
+<span class="codeline" id="line-221"><code>		}</code></span>
+<span class="codeline" id="line-222"><code>	}</code></span>
+<span class="codeline" id="line-223"><code>	return n</code></span>
+<span class="codeline" id="line-224"><code>}</code></span>
+<span class="codeline" id="line-225"><code></code></span>
+<span class="codeline" id="line-226"><code>// Index of rightmost occurrence of b in s.</code></span>
+<span class="codeline" id="line-227"><code>func last(s string, b byte) int {</code></span>
+<span class="codeline" id="line-228"><code>	i := len(s)</code></span>
+<span class="codeline" id="line-229"><code>	for i--; i &gt;= 0; i-- {</code></span>
+<span class="codeline" id="line-230"><code>		if s[i] == b {</code></span>
+<span class="codeline" id="line-231"><code>			break</code></span>
+<span class="codeline" id="line-232"><code>		}</code></span>
+<span class="codeline" id="line-233"><code>	}</code></span>
+<span class="codeline" id="line-234"><code>	return i</code></span>
+<span class="codeline" id="line-235"><code>}</code></span>
+<span class="codeline" id="line-236"><code></code></span>
+<span class="codeline" id="line-237"><code>// lowerASCIIBytes makes x ASCII lowercase in-place.</code></span>
+<span class="codeline" id="line-238"><code>func lowerASCIIBytes(x []byte) {</code></span>
+<span class="codeline" id="line-239"><code>	for i, b := range x {</code></span>
+<span class="codeline" id="line-240"><code>		if 'A' &lt;= b &amp;&amp; b &lt;= 'Z' {</code></span>
+<span class="codeline" id="line-241"><code>			x[i] += 'a' - 'A'</code></span>
+<span class="codeline" id="line-242"><code>		}</code></span>
+<span class="codeline" id="line-243"><code>	}</code></span>
+<span class="codeline" id="line-244"><code>}</code></span>
+<span class="codeline" id="line-245"><code></code></span>
+<span class="codeline" id="line-246"><code>// lowerASCII returns the ASCII lowercase version of b.</code></span>
+<span class="codeline" id="line-247"><code>func lowerASCII(b byte) byte {</code></span>
+<span class="codeline" id="line-248"><code>	if 'A' &lt;= b &amp;&amp; b &lt;= 'Z' {</code></span>
+<span class="codeline" id="line-249"><code>		return b + ('a' - 'A')</code></span>
+<span class="codeline" id="line-250"><code>	}</code></span>
+<span class="codeline" id="line-251"><code>	return b</code></span>
+<span class="codeline" id="line-252"><code>}</code></span>
+<span class="codeline" id="line-253"><code></code></span>
+<span class="codeline" id="line-254"><code>// trimSpace returns x without any leading or trailing ASCII whitespace.</code></span>
+<span class="codeline" id="line-255"><code>func trimSpace(x []byte) []byte {</code></span>
+<span class="codeline" id="line-256"><code>	for len(x) &gt; 0 &amp;&amp; isSpace(x[0]) {</code></span>
+<span class="codeline" id="line-257"><code>		x = x[1:]</code></span>
+<span class="codeline" id="line-258"><code>	}</code></span>
+<span class="codeline" id="line-259"><code>	for len(x) &gt; 0 &amp;&amp; isSpace(x[len(x)-1]) {</code></span>
+<span class="codeline" id="line-260"><code>		x = x[:len(x)-1]</code></span>
+<span class="codeline" id="line-261"><code>	}</code></span>
+<span class="codeline" id="line-262"><code>	return x</code></span>
+<span class="codeline" id="line-263"><code>}</code></span>
+<span class="codeline" id="line-264"><code></code></span>
+<span class="codeline" id="line-265"><code>// isSpace reports whether b is an ASCII space character.</code></span>
+<span class="codeline" id="line-266"><code>func isSpace(b byte) bool {</code></span>
+<span class="codeline" id="line-267"><code>	return b == ' ' || b == '\t' || b == '\n' || b == '\r'</code></span>
+<span class="codeline" id="line-268"><code>}</code></span>
+<span class="codeline" id="line-269"><code></code></span>
+<span class="codeline" id="line-270"><code>// removeComment returns line, removing any '#' byte and any following</code></span>
+<span class="codeline" id="line-271"><code>// bytes.</code></span>
+<span class="codeline" id="line-272"><code>func removeComment(line []byte) []byte {</code></span>
+<span class="codeline" id="line-273"><code>	if i := bytealg.IndexByte(line, '#'); i != -1 {</code></span>
+<span class="codeline" id="line-274"><code>		return line[:i]</code></span>
+<span class="codeline" id="line-275"><code>	}</code></span>
+<span class="codeline" id="line-276"><code>	return line</code></span>
+<span class="codeline" id="line-277"><code>}</code></span>
+<span class="codeline" id="line-278"><code></code></span>
+<span class="codeline" id="line-279"><code>// foreachLine runs fn on each line of x.</code></span>
+<span class="codeline" id="line-280"><code>// Each line (except for possibly the last) ends in '\n'.</code></span>
+<span class="codeline" id="line-281"><code>// It returns the first non-nil error returned by fn.</code></span>
+<span class="codeline" id="line-282"><code>func foreachLine(x []byte, fn func(line []byte) error) error {</code></span>
+<span class="codeline" id="line-283"><code>	for len(x) &gt; 0 {</code></span>
+<span class="codeline" id="line-284"><code>		nl := bytealg.IndexByte(x, '\n')</code></span>
+<span class="codeline" id="line-285"><code>		if nl == -1 {</code></span>
+<span class="codeline" id="line-286"><code>			return fn(x)</code></span>
+<span class="codeline" id="line-287"><code>		}</code></span>
+<span class="codeline" id="line-288"><code>		line := x[:nl+1]</code></span>
+<span class="codeline" id="line-289"><code>		x = x[nl+1:]</code></span>
+<span class="codeline" id="line-290"><code>		if err := fn(line); err != nil {</code></span>
+<span class="codeline" id="line-291"><code>			return err</code></span>
+<span class="codeline" id="line-292"><code>		}</code></span>
+<span class="codeline" id="line-293"><code>	}</code></span>
+<span class="codeline" id="line-294"><code>	return nil</code></span>
+<span class="codeline" id="line-295"><code>}</code></span>
+<span class="codeline" id="line-296"><code></code></span>
+<span class="codeline" id="line-297"><code>// foreachField runs fn on each non-empty run of non-space bytes in x.</code></span>
+<span class="codeline" id="line-298"><code>// It returns the first non-nil error returned by fn.</code></span>
+<span class="codeline" id="line-299"><code>func foreachField(x []byte, fn func(field []byte) error) error {</code></span>
+<span class="codeline" id="line-300"><code>	x = trimSpace(x)</code></span>
+<span class="codeline" id="line-301"><code>	for len(x) &gt; 0 {</code></span>
+<span class="codeline" id="line-302"><code>		sp := bytealg.IndexByte(x, ' ')</code></span>
+<span class="codeline" id="line-303"><code>		if sp == -1 {</code></span>
+<span class="codeline" id="line-304"><code>			return fn(x)</code></span>
+<span class="codeline" id="line-305"><code>		}</code></span>
+<span class="codeline" id="line-306"><code>		if field := trimSpace(x[:sp]); len(field) &gt; 0 {</code></span>
+<span class="codeline" id="line-307"><code>			if err := fn(field); err != nil {</code></span>
+<span class="codeline" id="line-308"><code>				return err</code></span>
+<span class="codeline" id="line-309"><code>			}</code></span>
+<span class="codeline" id="line-310"><code>		}</code></span>
+<span class="codeline" id="line-311"><code>		x = trimSpace(x[sp+1:])</code></span>
+<span class="codeline" id="line-312"><code>	}</code></span>
+<span class="codeline" id="line-313"><code>	return nil</code></span>
+<span class="codeline" id="line-314"><code>}</code></span>
+<span class="codeline" id="line-315"><code></code></span>
+<span class="codeline" id="line-316"><code>// stringsHasSuffix is strings.HasSuffix. It reports whether s ends in</code></span>
+<span class="codeline" id="line-317"><code>// suffix.</code></span>
+<span class="codeline" id="line-318"><code>func stringsHasSuffix(s, suffix string) bool {</code></span>
+<span class="codeline" id="line-319"><code>	return len(s) &gt;= len(suffix) &amp;&amp; s[len(s)-len(suffix):] == suffix</code></span>
+<span class="codeline" id="line-320"><code>}</code></span>
+<span class="codeline" id="line-321"><code></code></span>
+<span class="codeline" id="line-322"><code>// stringsHasSuffixFold reports whether s ends in suffix,</code></span>
+<span class="codeline" id="line-323"><code>// ASCII-case-insensitively.</code></span>
+<span class="codeline" id="line-324"><code>func stringsHasSuffixFold(s, suffix string) bool {</code></span>
+<span class="codeline" id="line-325"><code>	return len(s) &gt;= len(suffix) &amp;&amp; stringsEqualFold(s[len(s)-len(suffix):], suffix)</code></span>
+<span class="codeline" id="line-326"><code>}</code></span>
+<span class="codeline" id="line-327"><code></code></span>
+<span class="codeline" id="line-328"><code>// stringsHasPrefix is strings.HasPrefix. It reports whether s begins with prefix.</code></span>
+<span class="codeline" id="line-329"><code>func stringsHasPrefix(s, prefix string) bool {</code></span>
+<span class="codeline" id="line-330"><code>	return len(s) &gt;= len(prefix) &amp;&amp; s[:len(prefix)] == prefix</code></span>
+<span class="codeline" id="line-331"><code>}</code></span>
+<span class="codeline" id="line-332"><code></code></span>
+<span class="codeline" id="line-333"><code>// stringsEqualFold is strings.EqualFold, ASCII only. It reports whether s and t</code></span>
+<span class="codeline" id="line-334"><code>// are equal, ASCII-case-insensitively.</code></span>
+<span class="codeline" id="line-335"><code>func stringsEqualFold(s, t string) bool {</code></span>
+<span class="codeline" id="line-336"><code>	if len(s) != len(t) {</code></span>
+<span class="codeline" id="line-337"><code>		return false</code></span>
+<span class="codeline" id="line-338"><code>	}</code></span>
+<span class="codeline" id="line-339"><code>	for i := 0; i &lt; len(s); i++ {</code></span>
+<span class="codeline" id="line-340"><code>		if lowerASCII(s[i]) != lowerASCII(t[i]) {</code></span>
+<span class="codeline" id="line-341"><code>			return false</code></span>
+<span class="codeline" id="line-342"><code>		}</code></span>
+<span class="codeline" id="line-343"><code>	}</code></span>
+<span class="codeline" id="line-344"><code>	return true</code></span>
+<span class="codeline" id="line-345"><code>}</code></span>
+<span class="codeline" id="line-346"><code></code></span>
+<span class="codeline" id="line-347"><code>func readFull(r io.Reader) (all []byte, err error) {</code></span>
+<span class="codeline" id="line-348"><code>	buf := make([]byte, 1024)</code></span>
+<span class="codeline" id="line-349"><code>	for {</code></span>
+<span class="codeline" id="line-350"><code>		n, err := r.Read(buf)</code></span>
+<span class="codeline" id="line-351"><code>		all = append(all, buf[:n]...)</code></span>
+<span class="codeline" id="line-352"><code>		if err == io.EOF {</code></span>
+<span class="codeline" id="line-353"><code>			return all, nil</code></span>
+<span class="codeline" id="line-354"><code>		}</code></span>
+<span class="codeline" id="line-355"><code>		if err != nil {</code></span>
+<span class="codeline" id="line-356"><code>			return nil, err</code></span>
+<span class="codeline" id="line-357"><code>		}</code></span>
+<span class="codeline" id="line-358"><code>	}</code></span>
+<span class="codeline" id="line-359"><code>}</code></span>
+<span class="codeline" id="line-360"><code></code></span>
+<span class="codeline" id="line-361"><code>// goDebugString returns the value of the named GODEBUG key.</code></span>
+<span class="codeline" id="line-362"><code>// GODEBUG is of the form "key=val,key2=val2"</code></span>
+<span class="codeline" id="line-363"><code>func goDebugString(key string) string {</code></span>
+<span class="codeline" id="line-364"><code>	s := os.Getenv("GODEBUG")</code></span>
+<span class="codeline" id="line-365"><code>	for i := 0; i &lt; len(s)-len(key)-1; i++ {</code></span>
+<span class="codeline" id="line-366"><code>		if i &gt; 0 &amp;&amp; s[i-1] != ',' {</code></span>
+<span class="codeline" id="line-367"><code>			continue</code></span>
+<span class="codeline" id="line-368"><code>		}</code></span>
+<span class="codeline" id="line-369"><code>		afterKey := s[i+len(key):]</code></span>
+<span class="codeline" id="line-370"><code>		if afterKey[0] != '=' || s[i:i+len(key)] != key {</code></span>
+<span class="codeline" id="line-371"><code>			continue</code></span>
+<span class="codeline" id="line-372"><code>		}</code></span>
+<span class="codeline" id="line-373"><code>		val := afterKey[1:]</code></span>
+<span class="codeline" id="line-374"><code>		for i, b := range val {</code></span>
+<span class="codeline" id="line-375"><code>			if b == ',' {</code></span>
+<span class="codeline" id="line-376"><code>				return val[:i]</code></span>
+<span class="codeline" id="line-377"><code>			}</code></span>
+<span class="codeline" id="line-378"><code>		}</code></span>
+<span class="codeline" id="line-379"><code>		return val</code></span>
+<span class="codeline" id="line-380"><code>	}</code></span>
+<span class="codeline" id="line-381"><code>	return ""</code></span>
+<span class="codeline" id="line-382"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

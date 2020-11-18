@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: container/list</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>list</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-container/list">container/list</a><i> (on <a href="https://golang.org/pkg/container/list/" target="_blank">golang.org</a> and <a href="https://pkg.go.dev/container/list" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports 0 packages, and imported by <a href="../../dep/container/list.html#imported-by">3 packages</a>
+
+<span class="title">Involved Source Files</span>
+	<a href="../../src/container/list/list.go.html#doc">d-&gt;</a> <a href="../../src/container/list/list.go.html">list.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Element" data-popularity="945">	 type <a href="../../src/container/list/list.go.html#line-15">Element</a> <i>(struct)</i>
+		Element is an element of a linked list.
+
+		<input type='checkbox' class="stat" id="Element-stat-fields"><label for="Element-stat-fields">One Exported Field</label><span id='Element-stat-fields-content' class="stat-content">
+			<a href="../../src/container/list/list.go.html#line-27">Value</a> <i>interface{}</i></span>
+		<input type='checkbox' class="stat" id="Element-stat-methods"><label for="Element-stat-methods">Exported Methods (2)</label><span id='Element-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/container/list/list.go.html#line-31">Next</a>() *<b>Element</b>
+			(*T) <a href="../../src/container/list/list.go.html#line-39">Prev</a>() *<b>Element</b></span>
+		<input type='checkbox' class="stat" id="Element-stat-results"><label for="Element-stat-results">As Outputs Of (8+)</label><span id='Element-stat-results-content' class="stat-content">
+			func (*<a href="#name-Element">Element</a>).<a href="../../src/container/list/list.go.html#line-31">Next</a>() *<b>Element</b>
+			func (*<a href="#name-Element">Element</a>).<a href="../../src/container/list/list.go.html#line-39">Prev</a>() *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-77">Back</a>() *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-69">Front</a>() *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-172">InsertAfter</a>(v interface{}, mark *<b>Element</b>) *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-161">InsertBefore</a>(v interface{}, mark *<b>Element</b>) *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-153">PushBack</a>(v interface{}) *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-147">PushFront</a>(v interface{}) *<b>Element</b></span>
+		<input type='checkbox' class="stat" id="Element-stat-params"><label for="Element-stat-params">As Inputs Of (7+)</label><span id='Element-stat-params-content' class="stat-content">
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-172">InsertAfter</a>(v interface{}, mark *<b>Element</b>) *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-161">InsertBefore</a>(v interface{}, mark *<b>Element</b>) *<b>Element</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-215">MoveAfter</a>(e, mark *<b>Element</b>)
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-205">MoveBefore</a>(e, mark *<b>Element</b>)
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-194">MoveToBack</a>(e *<b>Element</b>)
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-183">MoveToFront</a>(e *<b>Element</b>)
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-137">Remove</a>(e *<b>Element</b>) interface{}</span></div>
+<div class="anchor" id="name-List" data-popularity="970">	 type <a href="../../src/container/list/list.go.html#line-48">List</a> <i>(struct)</i>
+		List represents a doubly linked list.
+		The zero value for List is an empty list ready to use.
+
+		<input type='checkbox' class="stat" id="List-stat-methods"><label for="List-stat-methods">Exported Methods (15)</label><span id='List-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/container/list/list.go.html#line-77">Back</a>() *<a href="#name-Element">Element</a>
+			(*T) <a href="../../src/container/list/list.go.html#line-69">Front</a>() *<a href="#name-Element">Element</a>
+			(*T) <a href="../../src/container/list/list.go.html#line-54">Init</a>() *<b>List</b>
+			(*T) <a href="../../src/container/list/list.go.html#line-172">InsertAfter</a>(v interface{}, mark *<a href="#name-Element">Element</a>) *<a href="#name-Element">Element</a>
+			(*T) <a href="../../src/container/list/list.go.html#line-161">InsertBefore</a>(v interface{}, mark *<a href="#name-Element">Element</a>) *<a href="#name-Element">Element</a>
+			(*T) <a href="../../src/container/list/list.go.html#line-66">Len</a>() <a href="../builtin.html#name-int">int</a>
+			(*T) <a href="../../src/container/list/list.go.html#line-215">MoveAfter</a>(e, mark *<a href="#name-Element">Element</a>)
+			(*T) <a href="../../src/container/list/list.go.html#line-205">MoveBefore</a>(e, mark *<a href="#name-Element">Element</a>)
+			(*T) <a href="../../src/container/list/list.go.html#line-194">MoveToBack</a>(e *<a href="#name-Element">Element</a>)
+			(*T) <a href="../../src/container/list/list.go.html#line-183">MoveToFront</a>(e *<a href="#name-Element">Element</a>)
+			(*T) <a href="../../src/container/list/list.go.html#line-153">PushBack</a>(v interface{}) *<a href="#name-Element">Element</a>
+			(*T) <a href="../../src/container/list/list.go.html#line-224">PushBackList</a>(other *<b>List</b>)
+			(*T) <a href="../../src/container/list/list.go.html#line-147">PushFront</a>(v interface{}) *<a href="#name-Element">Element</a>
+			(*T) <a href="../../src/container/list/list.go.html#line-233">PushFrontList</a>(other *<b>List</b>)
+			(*T) <a href="../../src/container/list/list.go.html#line-137">Remove</a>(e *<a href="#name-Element">Element</a>) interface{}</span>
+		<input type='checkbox' class="stat" id="List-stat-results"><label for="List-stat-results">As Outputs Of (2+)</label><span id='List-stat-results-content' class="stat-content">
+			func <a href="#name-New">New</a>() *<b>List</b>
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-54">Init</a>() *<b>List</b></span>
+		<input type='checkbox' class="stat" id="List-stat-params"><label for="List-stat-params">As Inputs Of (2+)</label><span id='List-stat-params-content' class="stat-content">
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-224">PushBackList</a>(other *<b>List</b>)
+			func (*<a href="#name-List">List</a>).<a href="../../src/container/list/list.go.html#line-233">PushFrontList</a>(other *<b>List</b>)</span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-New">	 func <a href="../../src/container/list/list.go.html#line-62">New</a>() *<a href="#name-List">List</a>
+		New returns an initialized list.</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

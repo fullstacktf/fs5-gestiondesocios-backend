@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Package: gorm.io/gorm</title>
+<link href="../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre><code><span style="font-size:xx-large;">package <b>gorm</b></span>
+
+<span class="title">Import Path</span>
+	<a href="../../index.html#pkg-gorm.io/gorm">gorm.io/gorm</a><i> (on <a href="https://pkg.go.dev/gorm.io/gorm" target="_blank">go.dev</a>)</i>
+
+<span class="title">Dependency Relation</span>
+	imports <a href="../../dep/gorm.io/gorm.html">17 packages</a>, and imported by <a href="../../dep/gorm.io/gorm.html#imported-by">4 packages</a>
+
+<span class="title">Involved Source Files</span>
+	    <a href="../../src/gorm.io/gorm/association.go.html">association.go</a>
+	    <a href="../../src/gorm.io/gorm/callbacks.go.html">callbacks.go</a>
+	    <a href="../../src/gorm.io/gorm/chainable_api.go.html">chainable_api.go</a>
+	    <a href="../../src/gorm.io/gorm/errors.go.html">errors.go</a>
+	    <a href="../../src/gorm.io/gorm/finisher_api.go.html">finisher_api.go</a>
+	    <a href="../../src/gorm.io/gorm/gorm.go.html">gorm.go</a>
+	    <a href="../../src/gorm.io/gorm/interfaces.go.html">interfaces.go</a>
+	    <a href="../../src/gorm.io/gorm/migrator.go.html">migrator.go</a>
+	    <a href="../../src/gorm.io/gorm/model.go.html">model.go</a>
+	    <a href="../../src/gorm.io/gorm/prepare_stmt.go.html">prepare_stmt.go</a>
+	    <a href="../../src/gorm.io/gorm/scan.go.html">scan.go</a>
+	    <a href="../../src/gorm.io/gorm/soft_delete.go.html">soft_delete.go</a>
+	    <a href="../../src/gorm.io/gorm/statement.go.html">statement.go</a>
+
+<span class="title">Exported Type Names</span>
+
+<div class="anchor" id="name-Association" data-popularity="375">	 type <a href="../../src/gorm.io/gorm/association.go.html#line-15">Association</a> <i>(struct)</i>
+		Association Mode contains some helper methods to handle relationship things easily.
+
+		<input type='checkbox' class="stat" id="Association-stat-fields"><label for="Association-stat-fields">Exported Fields (3)</label><span id='Association-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/association.go.html#line-16">DB</a> <i>*<a href="#name-DB">DB</a></i>
+			<a href="../../src/gorm.io/gorm/association.go.html#line-18">Error</a> <i><a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/gorm.io/gorm/association.go.html#line-17">Relationship</a> <i>*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Relationship">Relationship</a></i></span>
+		<input type='checkbox' class="stat" id="Association-stat-methods"><label for="Association-stat-methods">Exported Methods (6)</label><span id='Association-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/gorm.io/gorm/association.go.html#line-51">Append</a>(values ...interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/association.go.html#line-302">Clear</a>() <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/association.go.html#line-306">Count</a>() (count <a href="../builtin.html#name-int64">int64</a>)
+			(*T) <a href="../../src/gorm.io/gorm/association.go.html#line-163">Delete</a>(values ...interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/association.go.html#line-44">Find</a>(out interface{}, conds ...interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/association.go.html#line-66">Replace</a>(values ...interface{}) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Association-stat-results"><label for="Association-stat-results">As Outputs Of (1+)</label><span id='Association-stat-results-content' class="stat-content">
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/association.go.html#line-21">Association</a>(column <a href="../builtin.html#name-string">string</a>) *<b>Association</b></span></div>
+<div class="anchor" id="name-ColumnType" data-popularity="845">	 type <a href="../../src/gorm.io/gorm/migrator.go.html#line-25">ColumnType</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="ColumnType-stat-methods"><label for="ColumnType-stat-methods">Exported Methods (5)</label><span id='ColumnType-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-27">DatabaseTypeName</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-29">DecimalSize</a>() (precision <a href="../builtin.html#name-int64">int64</a>, scale <a href="../builtin.html#name-int64">int64</a>, ok <a href="../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-28">Length</a>() (length <a href="../builtin.html#name-int64">int64</a>, ok <a href="../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-26">Name</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-30">Nullable</a>() (nullable <a href="../builtin.html#name-bool">bool</a>, ok <a href="../builtin.html#name-bool">bool</a>)</span>
+		<input type='checkbox' class="stat" id="ColumnType-stat-impledby"><label for="ColumnType-stat-impledby">Implemented By (2+)</label><span id='ColumnType-stat-impledby-content' class="stat-content">
+			gorm.io/driver/mysql.<a href="driver/mysql.html#name-Column">Column</a>
+			database/sql.(*<a href="../database/sql.html#name-ColumnType">ColumnType</a>)</span>
+		<input type='checkbox' class="stat" id="ColumnType-stat-results"><label for="ColumnType-stat-results">As Outputs Of (3+)</label><span id='ColumnType-stat-results-content' class="stat-content">
+			func <a href="#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator.go.html#line-54">ColumnTypes</a>(dst interface{}) ([]<b>ColumnType</b>, <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator/migrator.go.html#line-404">ColumnTypes</a>(value interface{}) (columnTypes []<b>ColumnType</b>, err <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/driver/mysql/migrator.go.html#line-192">ColumnTypes</a>(value interface{}) (columnTypes []<b>ColumnType</b>, err <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="ColumnType-stat-params"><label for="ColumnType-stat-params">As Inputs Of (2+)</label><span id='ColumnType-stat-params-content' class="stat-content">
+			func <a href="#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator.go.html#line-51">MigrateColumn</a>(dst interface{}, field *<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>, columnType <b>ColumnType</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator/migrator.go.html#line-361">MigrateColumn</a>(value interface{}, field *<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>, columnType <b>ColumnType</b>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-Config" data-popularity="535">	 type <a href="../../src/gorm.io/gorm/gorm.go.html#line-17">Config</a> <i>(struct)</i>
+		Config GORM config
+
+		<input type='checkbox' class="stat" id="Config-stat-fields"><label for="Config-stat-fields">Exported Fields (14)</label><span id='Config-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-38">AllowGlobalUpdate</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-41">ClauseBuilders</a> <i>map[<a href="../builtin.html#name-string">string</a>]<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-ClauseBuilder">ClauseBuilder</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-43">ConnPool</a> <i><a href="#name-ConnPool">ConnPool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-45">Dialector</a> <i><a href="#name-Dialector">Dialector</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-34">DisableAutomaticPing</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-36">DisableForeignKeyConstraintWhenMigrating</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-30">DryRun</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-24">FullSaveAssociations</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-26">Logger</a> <i><a href="gorm/logger.html">logger</a>.<a href="gorm/logger.html#name-Interface">Interface</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-22">NamingStrategy</a> <i><a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Namer">Namer</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-28">NowFunc</a> <i>func() <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-47">Plugins</a> <i>map[<a href="../builtin.html#name-string">string</a>]<a href="#name-Plugin">Plugin</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-32">PrepareStmt</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-20">SkipDefaultTransaction</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Config-stat-methods"><label for="Config-stat-methods">Exported Methods (8)</label><span id='Config-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, stmt *<a href="#name-Statement">Statement</a>, v interface{})
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-16">DataTypeOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expression">Expression</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-20">Explain</a>(sql <a href="../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-14">Initialize</a>(*<a href="#name-DB">DB</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-15">Migrator</a>(db *<a href="#name-DB">DB</a>) <a href="#name-Migrator">Migrator</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-13">Name</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-19">QuoteTo</a>(<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, <a href="../builtin.html#name-string">string</a>)</span>
+		<input type='checkbox' class="stat" id="Config-stat-impls"><label for="Config-stat-impls">Implements (2+)</label><span id='Config-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Dialector">Dialector</a>
+			 T : <a href="#name-Plugin">Plugin</a></span>
+		<input type='checkbox' class="stat" id="Config-stat-params"><label for="Config-stat-params">As Inputs Of (1+)</label><span id='Config-stat-params-content' class="stat-content">
+			func <a href="#name-Open">Open</a>(dialector <a href="#name-Dialector">Dialector</a>, config *<b>Config</b>) (db *<a href="#name-DB">DB</a>, err <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ConnPool" data-popularity="1100">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-30">ConnPool</a> <b<i>(interface)</i></b>
+		ConnPool db conns pool interface
+
+		<input type='checkbox' class="stat" id="ConnPool-stat-methods"><label for="ConnPool-stat-methods">Exported Methods (4)</label><span id='ConnPool-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-32">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-31">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-33">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-34">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Row">Row</a></span>
+		<input type='checkbox' class="stat" id="ConnPool-stat-impledby"><label for="ConnPool-stat-impledby">Implemented By (5+)</label><span id='ConnPool-stat-impledby-content' class="stat-content">
+			*<a href="#name-PreparedStmtDB">PreparedStmtDB</a>
+			*<a href="#name-PreparedStmtTX">PreparedStmtTX</a>
+			database/sql.(*<a href="../database/sql.html#name-Conn">Conn</a>)
+			database/sql.(*<a href="../database/sql.html#name-DB">DB</a>)
+			database/sql.(*<a href="../database/sql.html#name-Tx">Tx</a>)</span>
+		<input type='checkbox' class="stat" id="ConnPool-stat-results"><label for="ConnPool-stat-results">As Outputs Of (2+)</label><span id='ConnPool-stat-results-content' class="stat-content">
+			func <a href="#name-ConnPoolBeginner">ConnPoolBeginner</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-48">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) (<b>ConnPool</b>, <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-PreparedStmtDB">PreparedStmtDB</a>).<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-53">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opt *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) (<b>ConnPool</b>, <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-ConnPoolBeginner" data-popularity="200">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-47">ConnPoolBeginner</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="ConnPoolBeginner-stat-methods"><label for="ConnPoolBeginner-stat-methods">One Exported Method</label><span id='ConnPoolBeginner-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-48">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) (<a href="#name-ConnPool">ConnPool</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="ConnPoolBeginner-stat-impledby"><label for="ConnPoolBeginner-stat-impledby">Implemented By (1+)</label><span id='ConnPoolBeginner-stat-impledby-content' class="stat-content">
+			*<a href="#name-PreparedStmtDB">PreparedStmtDB</a></span></div>
+<div class="anchor" id="name-DB" data-popularity="8915">	 type <a href="../../src/gorm.io/gorm/gorm.go.html#line-54">DB</a> <i>(struct)</i>
+		DB GORM DB definition
+
+		<input type='checkbox' class="stat" id="DB-stat-fields"><label for="DB-stat-fields">Exported Fields (18)</label><span id='DB-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55">Config</a> <i>*<a href="#name-Config">Config</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-38">AllowGlobalUpdate</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-41">ClauseBuilders</a> <i>map[<a href="../builtin.html#name-string">string</a>]<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-ClauseBuilder">ClauseBuilder</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-43">ConnPool</a> <i><a href="#name-ConnPool">ConnPool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-45">Dialector</a> <i><a href="#name-Dialector">Dialector</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-34">DisableAutomaticPing</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-36">DisableForeignKeyConstraintWhenMigrating</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-30">DryRun</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-24">FullSaveAssociations</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-26">Logger</a> <i><a href="gorm/logger.html">logger</a>.<a href="gorm/logger.html#name-Interface">Interface</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-22">NamingStrategy</a> <i><a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Namer">Namer</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-28">NowFunc</a> <i>func() <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-47">Plugins</a> <i>map[<a href="../builtin.html#name-string">string</a>]<a href="#name-Plugin">Plugin</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-32">PrepareStmt</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-20">SkipDefaultTransaction</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-56">Error</a> <i><a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-57">RowsAffected</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-58">Statement</a> <i>*<a href="#name-Statement">Statement</a></i></span>
+		<input type='checkbox' class="stat" id="DB-stat-methods"><label for="DB-stat-methods">Exported Methods (70)</label><span id='DB-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-254">AddError</a>(err <a href="../builtin.html#name-error">error</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-270">Assign</a>(attrs ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/association.go.html#line-21">Association</a>(column <a href="../builtin.html#name-string">string</a>) *<a href="#name-Association">Association</a>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-264">Attrs</a>(attrs ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-14">AutoMigrate</a>(dst ...interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-467">Begin</a>(opts ...*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) *<b>DB</b>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, stmt *<a href="#name-Statement">Statement</a>, v interface{})
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-249">Callback</a>() *<a href="../../src/gorm.io/gorm/callbacks.go.html#line-29">callbacks</a>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-24">Clauses</a>(conds ...<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expression">Expression</a>) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-495">Commit</a>() *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-295">Count</a>(count *<a href="../builtin.html#name-int64">int64</a>) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-17">Create</a>(value interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-264">DB</a>() (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-DB">DB</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-16">DataTypeOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-217">Debug</a>() (tx *<b>DB</b>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expression">Expression</a>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-285">Delete</a>(value interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-66">Distinct</a>(args ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-535">Exec</a>(sql <a href="../builtin.html#name-string">string</a>, values ...interface{}) (tx *<b>DB</b>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-20">Explain</a>(sql <a href="../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-107">Find</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-118">FindInBatches</a>(dest interface{}, batchSize <a href="../builtin.html#name-int">int</a>, fc func(tx *<b>DB</b>, batch <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-error">error</a>) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-66">First</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-210">FirstOrCreate</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-188">FirstOrInit</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-232">Get</a>(key <a href="../builtin.html#name-string">string</a>) (interface{}, <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-180">Group</a>(name <a href="../builtin.html#name-string">string</a>) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-191">Having</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-14">Initialize</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-244">InstanceGet</a>(key <a href="../builtin.html#name-string">string</a>) (interface{}, <a href="../builtin.html#name-bool">bool</a>)
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-237">InstanceSet</a>(key <a href="../builtin.html#name-string">string</a>, value interface{}) *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-173">Joins</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-92">Last</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-221">Limit</a>(limit <a href="../builtin.html#name-int">int</a>) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-9">Migrator</a>() <a href="#name-Migrator">Migrator</a>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-17">Model</a>(value interface{}) (tx *<b>DB</b>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-13">Name</a>() <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-153">Not</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-228">Offset</a>(offset <a href="../builtin.html#name-int">int</a>) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-132">Omit</a>(columns ...<a href="../builtin.html#name-string">string</a>) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-162">Or</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-202">Order</a>(value interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-394">Pluck</a>(column <a href="../builtin.html#name-string">string</a>, dest interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-255">Preload</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (tx *<b>DB</b>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-19">QuoteTo</a>(<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, <a href="../builtin.html#name-string">string</a>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-282">Raw</a>(sql <a href="../builtin.html#name-string">string</a>, values ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-505">Rollback</a>() *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-525">RollbackTo</a>(name <a href="../builtin.html#name-string">string</a>) *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-346">Row</a>() *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Row">Row</a>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-356">Rows</a>() (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-25">Save</a>(value interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-516">SavePoint</a>(name <a href="../builtin.html#name-string">string</a>) *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-367">Scan</a>(dest interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-416">ScanRows</a>(rows *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, dest interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-246">Scopes</a>(funcs ...func(*<b>DB</b>) *<b>DB</b>) *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-76">Select</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-150">Session</a>(config *<a href="#name-Session">Session</a>) *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-225">Set</a>(key <a href="../builtin.html#name-string">string</a>, value interface{}) *<b>DB</b>
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-306">SetupJoinTable</a>(model interface{}, field <a href="../builtin.html#name-string">string</a>, joinTable interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-47">Table</a>(name <a href="../builtin.html#name-string">string</a>, args ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-80">Take</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-431">Transaction</a>(fc func(tx *<b>DB</b>) <a href="../builtin.html#name-error">error</a>, opts ...*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) (err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-276">Unscoped</a>() (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-253">Update</a>(column <a href="../builtin.html#name-string">string</a>, value interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-268">UpdateColumn</a>(column <a href="../builtin.html#name-string">string</a>, value interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-276">UpdateColumns</a>(values interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-261">Updates</a>(values interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-354">Use</a>(plugin <a href="#name-Plugin">Plugin</a>) (err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-144">Where</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			(*T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-212">WithContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) *<b>DB</b></span>
+		<input type='checkbox' class="stat" id="DB-stat-impls"><label for="DB-stat-impls">Implements (1+)</label><span id='DB-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Plugin">Plugin</a></span>
+		<input type='checkbox' class="stat" id="DB-stat-results"><label for="DB-stat-results">As Outputs Of (51+)</label><span id='DB-stat-results-content' class="stat-content">
+			func <a href="#name-Open">Open</a>(dialector <a href="#name-Dialector">Dialector</a>, config *<a href="#name-Config">Config</a>) (db *<b>DB</b>, err <a href="../builtin.html#name-error">error</a>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-270">Assign</a>(attrs ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-264">Attrs</a>(attrs ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-467">Begin</a>(opts ...*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-24">Clauses</a>(conds ...<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expression">Expression</a>) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-495">Commit</a>() *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-295">Count</a>(count *<a href="../builtin.html#name-int64">int64</a>) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-17">Create</a>(value interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-217">Debug</a>() (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-285">Delete</a>(value interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-66">Distinct</a>(args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-535">Exec</a>(sql <a href="../builtin.html#name-string">string</a>, values ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-107">Find</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-118">FindInBatches</a>(dest interface{}, batchSize <a href="../builtin.html#name-int">int</a>, fc func(tx *<b>DB</b>, batch <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-error">error</a>) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-66">First</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-210">FirstOrCreate</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-188">FirstOrInit</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-180">Group</a>(name <a href="../builtin.html#name-string">string</a>) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-191">Having</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-237">InstanceSet</a>(key <a href="../builtin.html#name-string">string</a>, value interface{}) *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-173">Joins</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-92">Last</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-221">Limit</a>(limit <a href="../builtin.html#name-int">int</a>) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-17">Model</a>(value interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-153">Not</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-228">Offset</a>(offset <a href="../builtin.html#name-int">int</a>) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-132">Omit</a>(columns ...<a href="../builtin.html#name-string">string</a>) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-162">Or</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-202">Order</a>(value interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-394">Pluck</a>(column <a href="../builtin.html#name-string">string</a>, dest interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-255">Preload</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-282">Raw</a>(sql <a href="../builtin.html#name-string">string</a>, values ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-505">Rollback</a>() *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-525">RollbackTo</a>(name <a href="../builtin.html#name-string">string</a>) *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-25">Save</a>(value interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-516">SavePoint</a>(name <a href="../builtin.html#name-string">string</a>) *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-367">Scan</a>(dest interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-246">Scopes</a>(funcs ...func(*<b>DB</b>) *<b>DB</b>) *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-76">Select</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-150">Session</a>(config *<a href="#name-Session">Session</a>) *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-225">Set</a>(key <a href="../builtin.html#name-string">string</a>, value interface{}) *<b>DB</b>
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-47">Table</a>(name <a href="../builtin.html#name-string">string</a>, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-80">Take</a>(dest interface{}, conds ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-276">Unscoped</a>() (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-253">Update</a>(column <a href="../builtin.html#name-string">string</a>, value interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-268">UpdateColumn</a>(column <a href="../builtin.html#name-string">string</a>, value interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-276">UpdateColumns</a>(values interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/finisher_api.go.html#line-261">Updates</a>(values interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/chainable_api.go.html#line-144">Where</a>(query interface{}, args ...interface{}) (tx *<b>DB</b>)
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-212">WithContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) *<b>DB</b>
+			func fs5-gestiondesocios-backend/src/api/utils.<a href="../fs5-gestiondesocios-backend/src/api/utils.html#name-GetConnection">GetConnection</a>() *<b>DB</b></span>
+		<input type='checkbox' class="stat" id="DB-stat-params"><label for="DB-stat-params">As Inputs Of (44+)</label><span id='DB-stat-params-content' class="stat-content">
+			func <a href="#name-Scan">Scan</a>(rows *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, db *<b>DB</b>, initialized <a href="../builtin.html#name-bool">bool</a>)
+			func <a href="#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-14">Initialize</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-15">Migrator</a>(db *<b>DB</b>) <a href="#name-Migrator">Migrator</a>
+			func <a href="#name-Plugin">Plugin</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-26">Initialize</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-SavePointerDialectorInterface">SavePointerDialectorInterface</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-40">RollbackTo</a>(tx *<b>DB</b>, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-SavePointerDialectorInterface">SavePointerDialectorInterface</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-39">SavePoint</a>(tx *<b>DB</b>, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			func <a href="#name-Valuer">Valuer</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-58">GormValue</a>(<a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, *<b>DB</b>) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expr">Expr</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterCreate">AfterCreate</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterDelete">AfterDelete</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterQuery">AfterQuery</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterUpdate">AfterUpdate</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeforeCreate">BeforeCreate</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeforeDelete">BeforeDelete</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeforeUpdate">BeforeUpdate</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeginTransaction">BeginTransaction</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BuildQuerySQL">BuildQuerySQL</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-CommitOrRollbackTransaction">CommitOrRollbackTransaction</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-CreateWithReturning">CreateWithReturning</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-Delete">Delete</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-DeleteBeforeAssociations">DeleteBeforeAssociations</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-Preload">Preload</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-Query">Query</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-RawExec">RawExec</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-RegisterDefaultCallbacks">RegisterDefaultCallbacks</a>(db *<b>DB</b>, config *<a href="gorm/callbacks.html">callbacks</a>.<a href="gorm/callbacks.html#name-Config">Config</a>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-RowQuery">RowQuery</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-SaveAfterAssociations">SaveAfterAssociations</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-SaveBeforeAssociations">SaveBeforeAssociations</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-SetupUpdateReflectValue">SetupUpdateReflectValue</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-Update">Update</a>(db *<b>DB</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterCreateInterface">AfterCreateInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-10">AfterCreate</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterDeleteInterface">AfterDeleteInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-34">AfterDelete</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterFindInterface">AfterFindInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-38">AfterFind</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterSaveInterface">AfterSaveInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-26">AfterSave</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-AfterUpdateInterface">AfterUpdateInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-18">AfterUpdate</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeforeCreateInterface">BeforeCreateInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-6">BeforeCreate</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeforeDeleteInterface">BeforeDeleteInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-30">BeforeDelete</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeforeSaveInterface">BeforeSaveInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-22">BeforeSave</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-BeforeUpdateInterface">BeforeUpdateInterface</a>.<a href="../../src/gorm.io/gorm/callbacks/interfaces.go.html#line-14">BeforeUpdate</a>(*<b>DB</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-GormDataTypeInterface">GormDataTypeInterface</a>.<a href="../../src/gorm.io/gorm/migrator/migrator.go.html#line-28">GormDBDataType</a>(*<b>DB</b>, *<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="../builtin.html#name-string">string</a>
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Update">Update</a>(db *<b>DB</b>)
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/driver/mysql/mysql.go.html#line-46">Initialize</a>(db *<b>DB</b>) (err <a href="../builtin.html#name-error">error</a>)
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/driver/mysql/mysql.go.html#line-151">Migrator</a>(db *<b>DB</b>) <a href="#name-Migrator">Migrator</a>
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/driver/mysql/mysql.go.html#line-280">RollbackTo</a>(tx *<b>DB</b>, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/driver/mysql/mysql.go.html#line-275">SavePoint</a>(tx *<b>DB</b>, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a></span></div>
+<div class="anchor" id="name-DeletedAt" data-popularity="600">	 type <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-13">DeletedAt</a> <a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-NullTime">NullTime</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="DeletedAt-stat-fields"><label for="DeletedAt-stat-fields">Exported Fields (2)</label><span id='DeletedAt-stat-fields-content' class="stat-content">
+			<a href="../../src/database/sql/sql.go.html#line-319">Time</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/database/sql/sql.go.html#line-320">Valid</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="DeletedAt-stat-methods"><label for="DeletedAt-stat-methods">Exported Methods (6)</label><span id='DeletedAt-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-87">DeleteClauses</a>(f *<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) []<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Interface">Interface</a>
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-28">MarshalJSON</a>() ([]<a href="../builtin.html#name-byte">byte</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-47">QueryClauses</a>(f *<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) []<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Interface">Interface</a>
+			(*T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-16">Scan</a>(value interface{}) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-35">UnmarshalJSON</a>(b []<a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-21">Value</a>() (<a href="../database/sql/driver.html">driver</a>.<a href="../database/sql/driver.html#name-Value">Value</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="DeletedAt-stat-impls"><label for="DeletedAt-stat-impls">Implements (6+)</label><span id='DeletedAt-stat-impls-content' class="stat-content">
+			 T : gorm.io/gorm/schema.<a href="gorm/schema.html#name-DeleteClausesInterface">DeleteClausesInterface</a>
+			 T : gorm.io/gorm/schema.<a href="gorm/schema.html#name-QueryClausesInterface">QueryClausesInterface</a>
+			*T : database/sql.<a href="../database/sql.html#name-Scanner">Scanner</a>
+			 T : database/sql/driver.<a href="../database/sql/driver.html#name-Valuer">Valuer</a>
+			 T : encoding/json.<a href="../encoding/json.html#name-Marshaler">Marshaler</a>
+			*T : encoding/json.<a href="../encoding/json.html#name-Unmarshaler">Unmarshaler</a></span></div>
+<div class="anchor" id="name-Dialector" data-popularity="1235">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-12">Dialector</a> <b<i>(interface)</i></b>
+		Dialector GORM database dialector
+
+		<input type='checkbox' class="stat" id="Dialector-stat-methods"><label for="Dialector-stat-methods">Exported Methods (8)</label><span id='Dialector-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, stmt *<a href="#name-Statement">Statement</a>, v interface{})
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-16">DataTypeOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expression">Expression</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-20">Explain</a>(sql <a href="../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-14">Initialize</a>(*<a href="#name-DB">DB</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-15">Migrator</a>(db *<a href="#name-DB">DB</a>) <a href="#name-Migrator">Migrator</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-13">Name</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-19">QuoteTo</a>(<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, <a href="../builtin.html#name-string">string</a>)</span>
+		<input type='checkbox' class="stat" id="Dialector-stat-impledby"><label for="Dialector-stat-impledby">Implemented By (4+)</label><span id='Dialector-stat-impledby-content' class="stat-content">
+			<a href="#name-Config">Config</a>
+			gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Config">Config</a>
+			gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>
+			gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a></span>
+		<input type='checkbox' class="stat" id="Dialector-stat-impls"><label for="Dialector-stat-impls">Implements (1+)</label><span id='Dialector-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Plugin">Plugin</a></span>
+		<input type='checkbox' class="stat" id="Dialector-stat-results"><label for="Dialector-stat-results">As Outputs Of (2+)</label><span id='Dialector-stat-results-content' class="stat-content">
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-New">New</a>(config <a href="driver/mysql.html">mysql</a>.<a href="driver/mysql.html#name-Config">Config</a>) <b>Dialector</b>
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Open">Open</a>(dsn <a href="../builtin.html#name-string">string</a>) <b>Dialector</b></span>
+		<input type='checkbox' class="stat" id="Dialector-stat-params"><label for="Dialector-stat-params">As Inputs Of (1+)</label><span id='Dialector-stat-params-content' class="stat-content">
+			func <a href="#name-Open">Open</a>(dialector <b>Dialector</b>, config *<a href="#name-Config">Config</a>) (db *<a href="#name-DB">DB</a>, err <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-Migrator" data-popularity="1675">	 type <a href="../../src/gorm.io/gorm/migrator.go.html#line-33">Migrator</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="Migrator-stat-methods"><label for="Migrator-stat-methods">Exported Methods (23)</label><span id='Migrator-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-48">AddColumn</a>(dst interface{}, field <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-50">AlterColumn</a>(dst interface{}, field <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-35">AutoMigrate</a>(dst ...interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-54">ColumnTypes</a>(dst interface{}) ([]<a href="#name-ColumnType">ColumnType</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-61">CreateConstraint</a>(dst interface{}, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-66">CreateIndex</a>(dst interface{}, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-42">CreateTable</a>(dst ...interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-57">CreateView</a>(name <a href="../builtin.html#name-string">string</a>, option <a href="#name-ViewOption">ViewOption</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-38">CurrentDatabase</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-49">DropColumn</a>(dst interface{}, field <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-62">DropConstraint</a>(dst interface{}, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-67">DropIndex</a>(dst interface{}, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-43">DropTable</a>(dst ...interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-58">DropView</a>(name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-39">FullDataTypeOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expr">Expr</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-52">HasColumn</a>(dst interface{}, field <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-63">HasConstraint</a>(dst interface{}, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-68">HasIndex</a>(dst interface{}, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-44">HasTable</a>(dst interface{}) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-51">MigrateColumn</a>(dst interface{}, field *<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>, columnType <a href="#name-ColumnType">ColumnType</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-53">RenameColumn</a>(dst interface{}, oldName, field <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-69">RenameIndex</a>(dst interface{}, oldName, newName <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-45">RenameTable</a>(oldName, newName interface{}) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="Migrator-stat-impledby"><label for="Migrator-stat-impledby">Implemented By (2+)</label><span id='Migrator-stat-impledby-content' class="stat-content">
+			gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>
+			gorm.io/driver/mysql.<a href="driver/mysql.html#name-Migrator">Migrator</a></span>
+		<input type='checkbox' class="stat" id="Migrator-stat-results"><label for="Migrator-stat-results">As Outputs Of (3+)</label><span id='Migrator-stat-results-content' class="stat-content">
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/migrator.go.html#line-9">Migrator</a>() <b>Migrator</b>
+			func <a href="#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-15">Migrator</a>(db *<a href="#name-DB">DB</a>) <b>Migrator</b>
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/driver/mysql/mysql.go.html#line-151">Migrator</a>(db *<a href="#name-DB">DB</a>) <b>Migrator</b></span></div>
+<div class="anchor" id="name-Model" data-popularity="0">	 type <a href="../../src/gorm.io/gorm/model.go.html#line-10">Model</a> <i>(struct)</i>
+		Model a basic GoLang struct which includes the following fields: ID, CreatedAt, UpdatedAt, DeletedAt
+		It may be embedded into your model or you may build your own model without it
+		   type User struct {
+		     gorm.Model
+		   }
+
+		<input type='checkbox' class="stat" id="Model-stat-fields"><label for="Model-stat-fields">Exported Fields (4)</label><span id='Model-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/model.go.html#line-12">CreatedAt</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/gorm.io/gorm/model.go.html#line-14">DeletedAt</a> <i><a href="#name-DeletedAt">DeletedAt</a></i>
+			<a href="../../src/gorm.io/gorm/model.go.html#line-11">ID</a> <i><a href="../builtin.html#name-uint">uint</a></i>
+			<a href="../../src/gorm.io/gorm/model.go.html#line-13">UpdatedAt</a> <i><a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i></span></div>
+<div class="anchor" id="name-Plugin" data-popularity="1335">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-24">Plugin</a> <b<i>(interface)</i></b>
+		Plugin GORM plugin interface
+
+		<input type='checkbox' class="stat" id="Plugin-stat-methods"><label for="Plugin-stat-methods">Exported Methods (2)</label><span id='Plugin-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-26">Initialize</a>(*<a href="#name-DB">DB</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-25">Name</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="Plugin-stat-impledby"><label for="Plugin-stat-impledby">Implemented By (8+)</label><span id='Plugin-stat-impledby-content' class="stat-content">
+			<a href="#name-Config">Config</a>
+			<a href="#name-DB">DB</a>
+			<a href="#name-Dialector">Dialector</a> <i>(interface)</i>
+			<a href="#name-Statement">Statement</a>
+			gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Config">Config</a>
+			gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>
+			gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>
+			gorm.io/driver/mysql.<a href="driver/mysql.html#name-Migrator">Migrator</a></span>
+		<input type='checkbox' class="stat" id="Plugin-stat-params"><label for="Plugin-stat-params">As Inputs Of (1+)</label><span id='Plugin-stat-params-content' class="stat-content">
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-354">Use</a>(plugin <b>Plugin</b>) (err <a href="../builtin.html#name-error">error</a>)</span></div>
+<div class="anchor" id="name-PreparedStmtDB" data-popularity="400">	 type <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-9">PreparedStmtDB</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="PreparedStmtDB-stat-fields"><label for="PreparedStmtDB-stat-fields">Exported Fields (4)</label><span id='PreparedStmtDB-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-13">ConnPool</a> <i><a href="#name-ConnPool">ConnPool</a></i>
+			<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-12">Mux</a> <i>*<a href="../sync.html">sync</a>.<a href="../sync.html#name-RWMutex">RWMutex</a></i>
+			<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-11">PreparedSQL</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-10">Stmts</a> <i>map[<a href="../builtin.html#name-string">string</a>]*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a></i></span>
+		<input type='checkbox' class="stat" id="PreparedStmtDB-stat-methods"><label for="PreparedStmtDB-stat-methods">Exported Methods (6)</label><span id='PreparedStmtDB-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-53">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opt *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) (<a href="#name-ConnPool">ConnPool</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-16">Close</a>()
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-61">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (result <a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Result">Result</a>, err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-31">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-75">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (rows *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, err <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-89">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Row">Row</a></span>
+		<input type='checkbox' class="stat" id="PreparedStmtDB-stat-impls"><label for="PreparedStmtDB-stat-impls">Implements (2+)</label><span id='PreparedStmtDB-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ConnPool">ConnPool</a>
+			*T : <a href="#name-ConnPoolBeginner">ConnPoolBeginner</a></span></div>
+<div class="anchor" id="name-PreparedStmtTX" data-popularity="750">	 type <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-97">PreparedStmtTX</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="PreparedStmtTX-stat-fields"><label for="PreparedStmtTX-stat-fields">Exported Fields (2)</label><span id='PreparedStmtTX-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-99">PreparedStmtDB</a> <i>*<a href="#name-PreparedStmtDB">PreparedStmtDB</a></i>
+			<a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-98">Tx</a> <i>*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Tx">Tx</a></i></span>
+		<input type='checkbox' class="stat" id="PreparedStmtTX-stat-methods"><label for="PreparedStmtTX-stat-methods">Exported Methods (12)</label><span id='PreparedStmtTX-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-102">Commit</a>() <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-2364">Exec</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Result">Result</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-116">ExecContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (result <a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Result">Result</a>, err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/database/sql/sql.go.html#line-2245">Prepare</a>(query <a href="../builtin.html#name-string">string</a>) (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/database/sql/sql.go.html#line-2223">PrepareContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>) (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/database/sql/sql.go.html#line-2379">Query</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-130">QueryContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (rows *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/database/sql/sql.go.html#line-2400">QueryRow</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Row">Row</a>
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-144">QueryRowContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, query <a href="../builtin.html#name-string">string</a>, args ...interface{}) *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Row">Row</a>
+			(*T) <a href="../../src/gorm.io/gorm/prepare_stmt.go.html#line-109">Rollback</a>() <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-2348">Stmt</a>(stmt *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a>) *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a>
+			 (T) <a href="../../src/database/sql/sql.go.html#line-2264">StmtContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, stmt *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a>) *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Stmt">Stmt</a></span>
+		<input type='checkbox' class="stat" id="PreparedStmtTX-stat-impls"><label for="PreparedStmtTX-stat-impls">Implements (3+)</label><span id='PreparedStmtTX-stat-impls-content' class="stat-content">
+			*T : <a href="#name-ConnPool">ConnPool</a>
+			*T : <a href="#name-TxCommitter">TxCommitter</a>
+			*T : database/sql/driver.<a href="../database/sql/driver.html#name-Tx">Tx</a></span></div>
+<div class="anchor" id="name-SavePointerDialectorInterface" data-popularity="400">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-38">SavePointerDialectorInterface</a> <b<i>(interface)</i></b>
+		SavePointerDialectorInterface save pointer interface
+
+		<input type='checkbox' class="stat" id="SavePointerDialectorInterface-stat-methods"><label for="SavePointerDialectorInterface-stat-methods">Exported Methods (2)</label><span id='SavePointerDialectorInterface-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-40">RollbackTo</a>(tx *<a href="#name-DB">DB</a>, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-39">SavePoint</a>(tx *<a href="#name-DB">DB</a>, name <a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="SavePointerDialectorInterface-stat-impledby"><label for="SavePointerDialectorInterface-stat-impledby">Implemented By (2+)</label><span id='SavePointerDialectorInterface-stat-impledby-content' class="stat-content">
+			gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>
+			gorm.io/driver/mysql.<a href="driver/mysql.html#name-Migrator">Migrator</a></span></div>
+<div class="anchor" id="name-Session" data-popularity="35">	 type <a href="../../src/gorm.io/gorm/gorm.go.html#line-63">Session</a> <i>(struct)</i>
+		Session session config when create session with Session() method
+
+		<input type='checkbox' class="stat" id="Session-stat-fields"><label for="Session-stat-fields">Exported Fields (9)</label><span id='Session-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-68">AllowGlobalUpdate</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-70">Context</a> <i><a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-64">DryRun</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-69">FullSaveAssociations</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-71">Logger</a> <i><a href="gorm/logger.html">logger</a>.<a href="gorm/logger.html#name-Interface">Interface</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-72">NowFunc</a> <i>func() <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-65">PrepareStmt</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-67">SkipDefaultTransaction</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/gorm.go.html#line-66">WithConditions</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="Session-stat-params"><label for="Session-stat-params">As Inputs Of (1+)</label><span id='Session-stat-params-content' class="stat-content">
+			func (*<a href="#name-DB">DB</a>).<a href="../../src/gorm.io/gorm/gorm.go.html#line-150">Session</a>(config *<b>Session</b>) *<a href="#name-DB">DB</a></span></div>
+<div class="anchor" id="name-SoftDeleteDeleteClause" data-popularity="350">	 type <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-91">SoftDeleteDeleteClause</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="SoftDeleteDeleteClause-stat-fields"><label for="SoftDeleteDeleteClause-stat-fields">One Exported Field</label><span id='SoftDeleteDeleteClause-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/soft_delete.go.html#line-52">Field</a> <i>*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a></i></span>
+		<input type='checkbox' class="stat" id="SoftDeleteDeleteClause-stat-methods"><label for="SoftDeleteDeleteClause-stat-methods">Exported Methods (4)</label><span id='SoftDeleteDeleteClause-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-99">Build</a>(<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Builder">Builder</a>)
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-102">MergeClause</a>(*<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Clause">Clause</a>)
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-105">ModifyStatement</a>(stmt *<a href="#name-Statement">Statement</a>)
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-95">Name</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SoftDeleteDeleteClause-stat-impls"><label for="SoftDeleteDeleteClause-stat-impls">Implements (3+)</label><span id='SoftDeleteDeleteClause-stat-impls-content' class="stat-content">
+			 T : <a href="#name-StatementModifier">StatementModifier</a>
+			 T : gorm.io/gorm/clause.<a href="gorm/clause.html#name-Expression">Expression</a>
+			 T : gorm.io/gorm/clause.<a href="gorm/clause.html#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-SoftDeleteQueryClause" data-popularity="350">	 type <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-51">SoftDeleteQueryClause</a> <i>(struct)</i>
+
+		<input type='checkbox' class="stat" id="SoftDeleteQueryClause-stat-fields"><label for="SoftDeleteQueryClause-stat-fields">One Exported Field</label><span id='SoftDeleteQueryClause-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/soft_delete.go.html#line-52">Field</a> <i>*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a></i></span>
+		<input type='checkbox' class="stat" id="SoftDeleteQueryClause-stat-methods"><label for="SoftDeleteQueryClause-stat-methods">Exported Methods (4)</label><span id='SoftDeleteQueryClause-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-59">Build</a>(<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Builder">Builder</a>)
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-62">MergeClause</a>(*<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Clause">Clause</a>)
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-65">ModifyStatement</a>(stmt *<a href="#name-Statement">Statement</a>)
+			 (T) <a href="../../src/gorm.io/gorm/soft_delete.go.html#line-55">Name</a>() <a href="../builtin.html#name-string">string</a></span>
+		<input type='checkbox' class="stat" id="SoftDeleteQueryClause-stat-impls"><label for="SoftDeleteQueryClause-stat-impls">Implements (3+)</label><span id='SoftDeleteQueryClause-stat-impls-content' class="stat-content">
+			 T : <a href="#name-StatementModifier">StatementModifier</a>
+			 T : gorm.io/gorm/clause.<a href="gorm/clause.html#name-Expression">Expression</a>
+			 T : gorm.io/gorm/clause.<a href="gorm/clause.html#name-Interface">Interface</a></span></div>
+<div class="anchor" id="name-Statement" data-popularity="4470">	 type <a href="../../src/gorm.io/gorm/statement.go.html#line-21">Statement</a> <i>(struct)</i>
+		Statement statement
+
+		<input type='checkbox' class="stat" id="Statement-stat-fields"><label for="Statement-stat-fields">Exported Fields (39)</label><span id='Statement-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-29">Clauses</a> <i>map[<a href="../builtin.html#name-string">string</a>]<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Clause">Clause</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-36">ConnPool</a> <i><a href="#name-ConnPool">ConnPool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-38">Context</a> <i><a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-43">CurDestIndex</a> <i><a href="../builtin.html#name-int">int</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22">DB</a> <i>*<a href="#name-DB">DB</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55">Config</a> <i>*<a href="#name-Config">Config</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-38">AllowGlobalUpdate</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-41">ClauseBuilders</a> <i>map[<a href="../builtin.html#name-string">string</a>]<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-ClauseBuilder">ClauseBuilder</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-45">Dialector</a> <i><a href="#name-Dialector">Dialector</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-34">DisableAutomaticPing</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-36">DisableForeignKeyConstraintWhenMigrating</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-30">DryRun</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-24">FullSaveAssociations</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-26">Logger</a> <i><a href="gorm/logger.html">logger</a>.<a href="gorm/logger.html#name-Interface">Interface</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-22">NamingStrategy</a> <i><a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Namer">Namer</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-28">NowFunc</a> <i>func() <a href="../time.html">time</a>.<a href="../time.html#name-Time">Time</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-47">Plugins</a> <i>map[<a href="../builtin.html#name-string">string</a>]<a href="#name-Plugin">Plugin</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-32">PrepareStmt</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-55" class="path-duplicate">Config</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-20">SkipDefaultTransaction</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-56">Error</a> <i><a href="../builtin.html#name-error">error</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-57">RowsAffected</a> <i><a href="../builtin.html#name-int64">int64</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-22" class="path-duplicate">DB</a>.<a href="../../src/gorm.io/gorm/gorm.go.html#line-58">Statement</a> <i>*<b>Statement</b></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-27">Dest</a> <i>interface{}</i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-30">Distinct</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-33">Joins</a> <i>[]<a href="../../src/gorm.io/gorm/statement.go.html#line-48">join</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-25">Model</a> <i>interface{}</i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-32">Omits</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-34">Preloads</a> <i>map[<a href="../builtin.html#name-string">string</a>][]interface{}</i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-39">RaiseErrorOnNotFound</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-28">ReflectValue</a> <i><a href="../reflect.html">reflect</a>.<a href="../reflect.html#name-Value">Value</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-41">SQL</a> <i><a href="../strings.html">strings</a>.<a href="../strings.html#name-Builder">Builder</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-37">Schema</a> <i>*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Schema">Schema</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-31">Selects</a> <i>[]<a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-35">Settings</a> <i><a href="../sync.html">sync</a>.<a href="../sync.html#name-Map">Map</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-24">Table</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-23">TableExpr</a> <i>*<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expr">Expr</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-26">Unscoped</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-40">UpdatingColumn</a> <i><a href="../builtin.html#name-bool">bool</a></i>
+			<a href="../../src/gorm.io/gorm/statement.go.html#line-42">Vars</a> <i>[]interface{}</i></span>
+		<input type='checkbox' class="stat" id="Statement-stat-methods"><label for="Statement-stat-methods">Exported Methods (76)</label><span id='Statement-stat-methods-content' class="stat-content">
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-222">AddClause</a>(v <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Interface">Interface</a>)
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-235">AddClauseIfNotExists</a>(v <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Interface">Interface</a>)
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-254">AddError</a>(err <a href="../builtin.html#name-error">error</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-154">AddVar</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, vars ...interface{})
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-270">Assign</a>(attrs ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/association.go.html#line-21">Association</a>(column <a href="../builtin.html#name-string">string</a>) *<a href="#name-Association">Association</a>
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-264">Attrs</a>(attrs ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-14">AutoMigrate</a>(dst ...interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-467">Begin</a>(opts ...*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, stmt *<b>Statement</b>, v interface{})
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-374">Build</a>(clauses ...<a href="../builtin.html#name-string">string</a>)
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-242">BuildCondition</a>(query interface{}, args ...interface{}) (conds []<a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expression">Expression</a>)
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-249">Callback</a>() *<a href="../../src/gorm.io/gorm/callbacks.go.html#line-29">callbacks</a>
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-490">Changed</a>(fields ...<a href="../builtin.html#name-string">string</a>) <a href="../builtin.html#name-bool">bool</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-495">Commit</a>() *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-295">Count</a>(count *<a href="../builtin.html#name-int64">int64</a>) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-17">Create</a>(value interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-16">DataTypeOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-217">Debug</a>() (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-17">DefaultValueOf</a>(*<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-Field">Field</a>) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expression">Expression</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-285">Delete</a>(value interface{}, conds ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-535">Exec</a>(sql <a href="../builtin.html#name-string">string</a>, values ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-20">Explain</a>(sql <a href="../builtin.html#name-string">string</a>, vars ...interface{}) <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-107">Find</a>(dest interface{}, conds ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-118">FindInBatches</a>(dest interface{}, batchSize <a href="../builtin.html#name-int">int</a>, fc func(tx *<a href="#name-DB">DB</a>, batch <a href="../builtin.html#name-int">int</a>) <a href="../builtin.html#name-error">error</a>) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-66">First</a>(dest interface{}, conds ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-210">FirstOrCreate</a>(dest interface{}, conds ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-188">FirstOrInit</a>(dest interface{}, conds ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-232">Get</a>(key <a href="../builtin.html#name-string">string</a>) (interface{}, <a href="../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-180">Group</a>(name <a href="../builtin.html#name-string">string</a>) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-191">Having</a>(query interface{}, args ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-14">Initialize</a>(*<a href="#name-DB">DB</a>) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-244">InstanceGet</a>(key <a href="../builtin.html#name-string">string</a>) (interface{}, <a href="../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-237">InstanceSet</a>(key <a href="../builtin.html#name-string">string</a>, value interface{}) *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-92">Last</a>(dest interface{}, conds ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-221">Limit</a>(limit <a href="../builtin.html#name-int">int</a>) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/migrator.go.html#line-9">Migrator</a>() <a href="#name-Migrator">Migrator</a>
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-13">Name</a>() <a href="../builtin.html#name-string">string</a>
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-153">Not</a>(query interface{}, args ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-228">Offset</a>(offset <a href="../builtin.html#name-int">int</a>) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-132">Omit</a>(columns ...<a href="../builtin.html#name-string">string</a>) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-162">Or</a>(query interface{}, args ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-202">Order</a>(value interface{}) (tx *<a href="#name-DB">DB</a>)
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-393">Parse</a>(value interface{}) (err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-394">Pluck</a>(column <a href="../builtin.html#name-string">string</a>, dest interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-255">Preload</a>(query <a href="../builtin.html#name-string">string</a>, args ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-147">Quote</a>(field interface{}) <a href="../builtin.html#name-string">string</a>
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-74">QuoteTo</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, field interface{})
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-282">Raw</a>(sql <a href="../builtin.html#name-string">string</a>, values ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-505">Rollback</a>() *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-525">RollbackTo</a>(name <a href="../builtin.html#name-string">string</a>) *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-346">Row</a>() *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Row">Row</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-356">Rows</a>() (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-25">Save</a>(value interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-516">SavePoint</a>(name <a href="../builtin.html#name-string">string</a>) *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-367">Scan</a>(dest interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-416">ScanRows</a>(rows *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, dest interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-246">Scopes</a>(funcs ...func(*<a href="#name-DB">DB</a>) *<a href="#name-DB">DB</a>) *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-76">Select</a>(query interface{}, args ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-540">SelectAndOmitColumns</a>(requireCreate, requireUpdate <a href="../builtin.html#name-bool">bool</a>) (map[<a href="../builtin.html#name-string">string</a>]<a href="../builtin.html#name-bool">bool</a>, <a href="../builtin.html#name-bool">bool</a>)
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-150">Session</a>(config *<a href="#name-Session">Session</a>) *<a href="#name-DB">DB</a>
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-225">Set</a>(key <a href="../builtin.html#name-string">string</a>, value interface{}) *<a href="#name-DB">DB</a>
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-449">SetColumn</a>(name <a href="../builtin.html#name-string">string</a>, value interface{})
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-306">SetupJoinTable</a>(model interface{}, field <a href="../builtin.html#name-string">string</a>, joinTable interface{}) <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-80">Take</a>(dest interface{}, conds ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-431">Transaction</a>(fc func(tx *<a href="#name-DB">DB</a>) <a href="../builtin.html#name-error">error</a>, opts ...*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) (err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-253">Update</a>(column <a href="../builtin.html#name-string">string</a>, value interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-268">UpdateColumn</a>(column <a href="../builtin.html#name-string">string</a>, value interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-276">UpdateColumns</a>(values interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/finisher_api.go.html#line-261">Updates</a>(values interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-354">Use</a>(plugin <a href="#name-Plugin">Plugin</a>) (err <a href="../builtin.html#name-error">error</a>)
+			 (T) <a href="../../src/gorm.io/gorm/chainable_api.go.html#line-144">Where</a>(query interface{}, args ...interface{}) (tx *<a href="#name-DB">DB</a>)
+			 (T) <a href="../../src/gorm.io/gorm/gorm.go.html#line-212">WithContext</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>) *<a href="#name-DB">DB</a>
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-64">WriteByte</a>(c <a href="../builtin.html#name-byte">byte</a>) <a href="../builtin.html#name-error">error</a>
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-69">WriteQuoted</a>(value interface{})
+			(*T) <a href="../../src/gorm.io/gorm/statement.go.html#line-59">WriteString</a>(str <a href="../builtin.html#name-string">string</a>) (<a href="../builtin.html#name-int">int</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="Statement-stat-impls"><label for="Statement-stat-impls">Implements (5+)</label><span id='Statement-stat-impls-content' class="stat-content">
+			 T : <a href="#name-Plugin">Plugin</a>
+			*T : gorm.io/gorm/clause.<a href="gorm/clause.html#name-Builder">Builder</a>
+			*T : gorm.io/gorm/clause.<a href="gorm/clause.html#name-Writer">Writer</a>
+			*T : io.<a href="../io.html#name-ByteWriter">ByteWriter</a>
+			*T : io.<a href="../io.html#name-StringWriter">StringWriter</a></span>
+		<input type='checkbox' class="stat" id="Statement-stat-params"><label for="Statement-stat-params">As Inputs Of (12+)</label><span id='Statement-stat-params-content' class="stat-content">
+			func <a href="#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/gorm/interfaces.go.html#line-18">BindVarTo</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, stmt *<b>Statement</b>, v interface{})
+			func <a href="#name-SoftDeleteDeleteClause">SoftDeleteDeleteClause</a>.<a href="../../src/gorm.io/gorm/soft_delete.go.html#line-105">ModifyStatement</a>(stmt *<b>Statement</b>)
+			func <a href="#name-SoftDeleteQueryClause">SoftDeleteQueryClause</a>.<a href="../../src/gorm.io/gorm/soft_delete.go.html#line-65">ModifyStatement</a>(stmt *<b>Statement</b>)
+			func <a href="#name-StatementModifier">StatementModifier</a>.<a href="../../src/gorm.io/gorm/statement.go.html#line-55">ModifyStatement</a>(*<b>Statement</b>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-ConvertMapToValuesForCreate">ConvertMapToValuesForCreate</a>(stmt *<b>Statement</b>, mapValue map[<a href="../builtin.html#name-string">string</a>]interface{}) (values <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Values">Values</a>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-ConvertSliceOfMapToValuesForCreate">ConvertSliceOfMapToValuesForCreate</a>(stmt *<b>Statement</b>, mapValues []map[<a href="../builtin.html#name-string">string</a>]interface{}) (values <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Values">Values</a>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-ConvertToAssignments">ConvertToAssignments</a>(stmt *<b>Statement</b>) (set <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Set">Set</a>)
+			func gorm.io/gorm/callbacks.<a href="gorm/callbacks.html#name-ConvertToCreateValues">ConvertToCreateValues</a>(stmt *<b>Statement</b>) (values <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Values">Values</a>)
+			func gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-BuildIndexOptionsInterface">BuildIndexOptionsInterface</a>.<a href="../../src/gorm.io/gorm/migrator/migrator.go.html#line-534">BuildIndexOptions</a>([]<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-IndexOption">IndexOption</a>, *<b>Statement</b>) []interface{}
+			func gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator/migrator.go.html#line-512">BuildIndexOptions</a>(opts []<a href="gorm/schema.html">schema</a>.<a href="gorm/schema.html#name-IndexOption">IndexOption</a>, stmt *<b>Statement</b>) (results []interface{})
+			func gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator/migrator.go.html#line-701">CurrentTable</a>(stmt *<b>Statement</b>) interface{}
+			func gorm.io/driver/mysql.<a href="driver/mysql.html#name-Dialector">Dialector</a>.<a href="../../src/gorm.io/driver/mysql/mysql.go.html#line-163">BindVarTo</a>(writer <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Writer">Writer</a>, stmt *<b>Statement</b>, v interface{})</span></div>
+<div class="anchor" id="name-StatementModifier" data-popularity="350">	 type <a href="../../src/gorm.io/gorm/statement.go.html#line-54">StatementModifier</a> <b<i>(interface)</i></b>
+		StatementModifier statement modifier interface
+
+		<input type='checkbox' class="stat" id="StatementModifier-stat-methods"><label for="StatementModifier-stat-methods">One Exported Method</label><span id='StatementModifier-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/statement.go.html#line-55">ModifyStatement</a>(*<a href="#name-Statement">Statement</a>)</span>
+		<input type='checkbox' class="stat" id="StatementModifier-stat-impledby"><label for="StatementModifier-stat-impledby">Implemented By (2+)</label><span id='StatementModifier-stat-impledby-content' class="stat-content">
+			<a href="#name-SoftDeleteDeleteClause">SoftDeleteDeleteClause</a>
+			<a href="#name-SoftDeleteQueryClause">SoftDeleteQueryClause</a></span></div>
+<div class="anchor" id="name-TxBeginner" data-popularity="350">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-43">TxBeginner</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="TxBeginner-stat-methods"><label for="TxBeginner-stat-methods">One Exported Method</label><span id='TxBeginner-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-44">BeginTx</a>(ctx <a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, opts *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-TxOptions">TxOptions</a>) (*<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Tx">Tx</a>, <a href="../builtin.html#name-error">error</a>)</span>
+		<input type='checkbox' class="stat" id="TxBeginner-stat-impledby"><label for="TxBeginner-stat-impledby">Implemented By (2+)</label><span id='TxBeginner-stat-impledby-content' class="stat-content">
+			database/sql.(*<a href="../database/sql.html#name-Conn">Conn</a>)
+			database/sql.(*<a href="../database/sql.html#name-DB">DB</a>)</span></div>
+<div class="anchor" id="name-TxCommitter" data-popularity="600">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-51">TxCommitter</a> <b<i>(interface)</i></b>
+
+		<input type='checkbox' class="stat" id="TxCommitter-stat-methods"><label for="TxCommitter-stat-methods">Exported Methods (2)</label><span id='TxCommitter-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/database/sql/driver/driver.go.html#line-511">Commit</a>() <a href="../builtin.html#name-error">error</a>
+			 (T) <a href="../../src/database/sql/driver/driver.go.html#line-512">Rollback</a>() <a href="../builtin.html#name-error">error</a></span>
+		<input type='checkbox' class="stat" id="TxCommitter-stat-impledby"><label for="TxCommitter-stat-impledby">Implemented By (3+)</label><span id='TxCommitter-stat-impledby-content' class="stat-content">
+			*<a href="#name-PreparedStmtTX">PreparedStmtTX</a>
+			database/sql.(*<a href="../database/sql.html#name-Tx">Tx</a>)
+			database/sql/driver.<a href="../database/sql/driver.html#name-Tx">Tx</a> <i>(interface)</i></span>
+		<input type='checkbox' class="stat" id="TxCommitter-stat-impls"><label for="TxCommitter-stat-impls">Implements (1+)</label><span id='TxCommitter-stat-impls-content' class="stat-content">
+			 T : database/sql/driver.<a href="../database/sql/driver.html#name-Tx">Tx</a></span></div>
+<div class="anchor" id="name-Valuer" data-popularity="50">	 type <a href="../../src/gorm.io/gorm/interfaces.go.html#line-57">Valuer</a> <b<i>(interface)</i></b>
+		Valuer gorm valuer interface
+
+		<input type='checkbox' class="stat" id="Valuer-stat-methods"><label for="Valuer-stat-methods">One Exported Method</label><span id='Valuer-stat-methods-content' class="stat-content">
+			 (T) <a href="../../src/gorm.io/gorm/interfaces.go.html#line-58">GormValue</a>(<a href="../context.html">context</a>.<a href="../context.html#name-Context">Context</a>, *<a href="#name-DB">DB</a>) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expr">Expr</a></span></div>
+<div class="anchor" id="name-ViewOption" data-popularity="70">	 type <a href="../../src/gorm.io/gorm/migrator.go.html#line-19">ViewOption</a> <i>(struct)</i>
+		ViewOption view option
+
+		<input type='checkbox' class="stat" id="ViewOption-stat-fields"><label for="ViewOption-stat-fields">Exported Fields (3)</label><span id='ViewOption-stat-fields-content' class="stat-content">
+			<a href="../../src/gorm.io/gorm/migrator.go.html#line-21">CheckOption</a> <i><a href="../builtin.html#name-string">string</a></i>
+			<a href="../../src/gorm.io/gorm/migrator.go.html#line-22">Query</a> <i>*<a href="#name-DB">DB</a></i>
+			<a href="../../src/gorm.io/gorm/migrator.go.html#line-20">Replace</a> <i><a href="../builtin.html#name-bool">bool</a></i></span>
+		<input type='checkbox' class="stat" id="ViewOption-stat-params"><label for="ViewOption-stat-params">As Inputs Of (2+)</label><span id='ViewOption-stat-params-content' class="stat-content">
+			func <a href="#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator.go.html#line-57">CreateView</a>(name <a href="../builtin.html#name-string">string</a>, option <b>ViewOption</b>) <a href="../builtin.html#name-error">error</a>
+			func gorm.io/gorm/migrator.<a href="gorm/migrator.html#name-Migrator">Migrator</a>.<a href="../../src/gorm.io/gorm/migrator/migrator.go.html#line-422">CreateView</a>(name <a href="../builtin.html#name-string">string</a>, option <b>ViewOption</b>) <a href="../builtin.html#name-error">error</a></span></div>
+<span class="title">Exported Values</span>
+
+<div class="anchor" id="name-ErrDryRunModeUnsupported">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-33">ErrDryRunModeUnsupported</a> <a href="../builtin.html#name-error">error</a>
+		ErrDryRunModeUnsupported dry run mode unsupported</div>
+<div class="anchor" id="name-ErrEmptySlice">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-31">ErrEmptySlice</a> <a href="../builtin.html#name-error">error</a>
+		ErrEmptySlice empty slice found</div>
+<div class="anchor" id="name-ErrInvalidData">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-23">ErrInvalidData</a> <a href="../builtin.html#name-error">error</a>
+		ErrInvalidData unsupported data</div>
+<div class="anchor" id="name-ErrInvalidField">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-29">ErrInvalidField</a> <a href="../builtin.html#name-error">error</a>
+		ErrInvalidField invalid field</div>
+<div class="anchor" id="name-ErrInvalidTransaction">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-11">ErrInvalidTransaction</a> <a href="../builtin.html#name-error">error</a>
+		ErrInvalidTransaction invalid transaction when you are trying to `Commit` or `Rollback`</div>
+<div class="anchor" id="name-ErrMissingWhereClause">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-15">ErrMissingWhereClause</a> <a href="../builtin.html#name-error">error</a>
+		ErrMissingWhereClause missing where clause</div>
+<div class="anchor" id="name-ErrModelValueRequired">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-21">ErrModelValueRequired</a> <a href="../builtin.html#name-error">error</a>
+		ErrModelValueRequired model value required</div>
+<div class="anchor" id="name-ErrNotImplemented">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-13">ErrNotImplemented</a> <a href="../builtin.html#name-error">error</a>
+		ErrNotImplemented not implemented</div>
+<div class="anchor" id="name-ErrPrimaryKeyRequired">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-19">ErrPrimaryKeyRequired</a> <a href="../builtin.html#name-error">error</a>
+		ErrPrimaryKeyRequired primary keys required</div>
+<div class="anchor" id="name-ErrRecordNotFound">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-9">ErrRecordNotFound</a> <a href="../builtin.html#name-error">error</a>
+		ErrRecordNotFound record not found error</div>
+<div class="anchor" id="name-ErrRegistered">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-27">ErrRegistered</a> <a href="../builtin.html#name-error">error</a>
+		ErrRegistered registered</div>
+<div class="anchor" id="name-ErrUnsupportedDriver">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-25">ErrUnsupportedDriver</a> <a href="../builtin.html#name-error">error</a>
+		ErrUnsupportedDriver unsupported driver</div>
+<div class="anchor" id="name-ErrUnsupportedRelation">	  var <a href="../../src/gorm.io/gorm/errors.go.html#line-17">ErrUnsupportedRelation</a> <a href="../builtin.html#name-error">error</a>
+		ErrUnsupportedRelation unsupported relations</div>
+<div class="anchor" id="name-Expr">	 func <a href="../../src/gorm.io/gorm/gorm.go.html#line-302">Expr</a>(expr <a href="../builtin.html#name-string">string</a>, args ...interface{}) <a href="gorm/clause.html">clause</a>.<a href="gorm/clause.html#name-Expr">Expr</a></div>
+<div class="anchor" id="name-Open">	 func <a href="../../src/gorm.io/gorm/gorm.go.html#line-76">Open</a>(dialector <a href="#name-Dialector">Dialector</a>, config *<a href="#name-Config">Config</a>) (db *<a href="#name-DB">DB</a>, err <a href="../builtin.html#name-error">error</a>)
+		Open initialize db session based on dialector</div>
+<div class="anchor" id="name-Scan">	 func <a href="../../src/gorm.io/gorm/scan.go.html#line-52">Scan</a>(rows *<a href="../database/sql.html">sql</a>.<a href="../database/sql.html#name-Rows">Rows</a>, db *<a href="#name-DB">DB</a>, initialized <a href="../builtin.html#name-bool">bool</a>)</div></code></pre><pre id="footer">
+<table><tr><td><img src="../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>

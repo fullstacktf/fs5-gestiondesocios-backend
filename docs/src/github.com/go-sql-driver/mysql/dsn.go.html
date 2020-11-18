@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Source: dsn.go in package github.com/go-sql-driver/mysql</title>
+<link href="../../../../css/light-v0.1.6.css" rel="stylesheet">
+<script src="../../../../jvs/golds-v0.1.6.js"></script>
+<body><div>
+
+<pre id="header"><code><span class="title">Source File</span>
+	dsn.go
+
+<span class="title">Belonging Package</span>
+	<a href="../../../../pkg/github.com/go-sql-driver/mysql.html">github.com/go-sql-driver/mysql</a>
+</code></pre>
+
+<pre class="line-numbers">
+<span class="codeline" id="line-1"><code>// Go MySQL Driver - A MySQL-Driver for Go's database/sql package</code></span>
+<span class="codeline" id="line-2"><code>//</code></span>
+<span class="codeline" id="line-3"><code>// Copyright 2016 The Go-MySQL-Driver Authors. All rights reserved.</code></span>
+<span class="codeline" id="line-4"><code>//</code></span>
+<span class="codeline" id="line-5"><code>// This Source Code Form is subject to the terms of the Mozilla Public</code></span>
+<span class="codeline" id="line-6"><code>// License, v. 2.0. If a copy of the MPL was not distributed with this file,</code></span>
+<span class="codeline" id="line-7"><code>// You can obtain one at http://mozilla.org/MPL/2.0/.</code></span>
+<span class="codeline" id="line-8"><code></code></span>
+<span class="codeline" id="line-9"><code>package mysql</code></span>
+<span class="codeline" id="line-10"><code></code></span>
+<span class="codeline" id="line-11"><code>import (</code></span>
+<span class="codeline" id="line-12"><code>	"bytes"</code></span>
+<span class="codeline" id="line-13"><code>	"crypto/rsa"</code></span>
+<span class="codeline" id="line-14"><code>	"crypto/tls"</code></span>
+<span class="codeline" id="line-15"><code>	"errors"</code></span>
+<span class="codeline" id="line-16"><code>	"fmt"</code></span>
+<span class="codeline" id="line-17"><code>	"math/big"</code></span>
+<span class="codeline" id="line-18"><code>	"net"</code></span>
+<span class="codeline" id="line-19"><code>	"net/url"</code></span>
+<span class="codeline" id="line-20"><code>	"sort"</code></span>
+<span class="codeline" id="line-21"><code>	"strconv"</code></span>
+<span class="codeline" id="line-22"><code>	"strings"</code></span>
+<span class="codeline" id="line-23"><code>	"time"</code></span>
+<span class="codeline" id="line-24"><code>)</code></span>
+<span class="codeline" id="line-25"><code></code></span>
+<span class="codeline" id="line-26"><code>var (</code></span>
+<span class="codeline" id="line-27"><code>	errInvalidDSNUnescaped       = errors.New("invalid DSN: did you forget to escape a param value?")</code></span>
+<span class="codeline" id="line-28"><code>	errInvalidDSNAddr            = errors.New("invalid DSN: network address not terminated (missing closing brace)")</code></span>
+<span class="codeline" id="line-29"><code>	errInvalidDSNNoSlash         = errors.New("invalid DSN: missing the slash separating the database name")</code></span>
+<span class="codeline" id="line-30"><code>	errInvalidDSNUnsafeCollation = errors.New("invalid DSN: interpolateParams can not be used with unsafe collations")</code></span>
+<span class="codeline" id="line-31"><code>)</code></span>
+<span class="codeline" id="line-32"><code></code></span>
+<span class="codeline" id="line-33"><code>// Config is a configuration parsed from a DSN string.</code></span>
+<span class="codeline" id="line-34"><code>// If a new Config is created instead of being parsed from a DSN string,</code></span>
+<span class="codeline" id="line-35"><code>// the NewConfig function should be used, which sets default values.</code></span>
+<span class="codeline" id="line-36"><code>type Config struct {</code></span>
+<span class="codeline" id="line-37"><code>	User             string            // Username</code></span>
+<span class="codeline" id="line-38"><code>	Passwd           string            // Password (requires User)</code></span>
+<span class="codeline" id="line-39"><code>	Net              string            // Network type</code></span>
+<span class="codeline" id="line-40"><code>	Addr             string            // Network address (requires Net)</code></span>
+<span class="codeline" id="line-41"><code>	DBName           string            // Database name</code></span>
+<span class="codeline" id="line-42"><code>	Params           map[string]string // Connection parameters</code></span>
+<span class="codeline" id="line-43"><code>	Collation        string            // Connection collation</code></span>
+<span class="codeline" id="line-44"><code>	Loc              *time.Location    // Location for time.Time values</code></span>
+<span class="codeline" id="line-45"><code>	MaxAllowedPacket int               // Max packet size allowed</code></span>
+<span class="codeline" id="line-46"><code>	ServerPubKey     string            // Server public key name</code></span>
+<span class="codeline" id="line-47"><code>	pubKey           *rsa.PublicKey    // Server public key</code></span>
+<span class="codeline" id="line-48"><code>	TLSConfig        string            // TLS configuration name</code></span>
+<span class="codeline" id="line-49"><code>	tls              *tls.Config       // TLS configuration</code></span>
+<span class="codeline" id="line-50"><code>	Timeout          time.Duration     // Dial timeout</code></span>
+<span class="codeline" id="line-51"><code>	ReadTimeout      time.Duration     // I/O read timeout</code></span>
+<span class="codeline" id="line-52"><code>	WriteTimeout     time.Duration     // I/O write timeout</code></span>
+<span class="codeline" id="line-53"><code></code></span>
+<span class="codeline" id="line-54"><code>	AllowAllFiles           bool // Allow all files to be used with LOAD DATA LOCAL INFILE</code></span>
+<span class="codeline" id="line-55"><code>	AllowCleartextPasswords bool // Allows the cleartext client side plugin</code></span>
+<span class="codeline" id="line-56"><code>	AllowNativePasswords    bool // Allows the native password authentication method</code></span>
+<span class="codeline" id="line-57"><code>	AllowOldPasswords       bool // Allows the old insecure password method</code></span>
+<span class="codeline" id="line-58"><code>	CheckConnLiveness       bool // Check connections for liveness before using them</code></span>
+<span class="codeline" id="line-59"><code>	ClientFoundRows         bool // Return number of matching rows instead of rows changed</code></span>
+<span class="codeline" id="line-60"><code>	ColumnsWithAlias        bool // Prepend table alias to column names</code></span>
+<span class="codeline" id="line-61"><code>	InterpolateParams       bool // Interpolate placeholders into query string</code></span>
+<span class="codeline" id="line-62"><code>	MultiStatements         bool // Allow multiple statements in one query</code></span>
+<span class="codeline" id="line-63"><code>	ParseTime               bool // Parse time values to time.Time</code></span>
+<span class="codeline" id="line-64"><code>	RejectReadOnly          bool // Reject read-only connections</code></span>
+<span class="codeline" id="line-65"><code>}</code></span>
+<span class="codeline" id="line-66"><code></code></span>
+<span class="codeline" id="line-67"><code>// NewConfig creates a new Config and sets default values.</code></span>
+<span class="codeline" id="line-68"><code>func NewConfig() *Config {</code></span>
+<span class="codeline" id="line-69"><code>	return &amp;Config{</code></span>
+<span class="codeline" id="line-70"><code>		Collation:            defaultCollation,</code></span>
+<span class="codeline" id="line-71"><code>		Loc:                  time.UTC,</code></span>
+<span class="codeline" id="line-72"><code>		MaxAllowedPacket:     defaultMaxAllowedPacket,</code></span>
+<span class="codeline" id="line-73"><code>		AllowNativePasswords: true,</code></span>
+<span class="codeline" id="line-74"><code>		CheckConnLiveness:    true,</code></span>
+<span class="codeline" id="line-75"><code>	}</code></span>
+<span class="codeline" id="line-76"><code>}</code></span>
+<span class="codeline" id="line-77"><code></code></span>
+<span class="codeline" id="line-78"><code>func (cfg *Config) Clone() *Config {</code></span>
+<span class="codeline" id="line-79"><code>	cp := *cfg</code></span>
+<span class="codeline" id="line-80"><code>	if cp.tls != nil {</code></span>
+<span class="codeline" id="line-81"><code>		cp.tls = cfg.tls.Clone()</code></span>
+<span class="codeline" id="line-82"><code>	}</code></span>
+<span class="codeline" id="line-83"><code>	if len(cp.Params) &gt; 0 {</code></span>
+<span class="codeline" id="line-84"><code>		cp.Params = make(map[string]string, len(cfg.Params))</code></span>
+<span class="codeline" id="line-85"><code>		for k, v := range cfg.Params {</code></span>
+<span class="codeline" id="line-86"><code>			cp.Params[k] = v</code></span>
+<span class="codeline" id="line-87"><code>		}</code></span>
+<span class="codeline" id="line-88"><code>	}</code></span>
+<span class="codeline" id="line-89"><code>	if cfg.pubKey != nil {</code></span>
+<span class="codeline" id="line-90"><code>		cp.pubKey = &amp;rsa.PublicKey{</code></span>
+<span class="codeline" id="line-91"><code>			N: new(big.Int).Set(cfg.pubKey.N),</code></span>
+<span class="codeline" id="line-92"><code>			E: cfg.pubKey.E,</code></span>
+<span class="codeline" id="line-93"><code>		}</code></span>
+<span class="codeline" id="line-94"><code>	}</code></span>
+<span class="codeline" id="line-95"><code>	return &amp;cp</code></span>
+<span class="codeline" id="line-96"><code>}</code></span>
+<span class="codeline" id="line-97"><code></code></span>
+<span class="codeline" id="line-98"><code>func (cfg *Config) normalize() error {</code></span>
+<span class="codeline" id="line-99"><code>	if cfg.InterpolateParams &amp;&amp; unsafeCollations[cfg.Collation] {</code></span>
+<span class="codeline" id="line-100"><code>		return errInvalidDSNUnsafeCollation</code></span>
+<span class="codeline" id="line-101"><code>	}</code></span>
+<span class="codeline" id="line-102"><code></code></span>
+<span class="codeline" id="line-103"><code>	// Set default network if empty</code></span>
+<span class="codeline" id="line-104"><code>	if cfg.Net == "" {</code></span>
+<span class="codeline" id="line-105"><code>		cfg.Net = "tcp"</code></span>
+<span class="codeline" id="line-106"><code>	}</code></span>
+<span class="codeline" id="line-107"><code></code></span>
+<span class="codeline" id="line-108"><code>	// Set default address if empty</code></span>
+<span class="codeline" id="line-109"><code>	if cfg.Addr == "" {</code></span>
+<span class="codeline" id="line-110"><code>		switch cfg.Net {</code></span>
+<span class="codeline" id="line-111"><code>		case "tcp":</code></span>
+<span class="codeline" id="line-112"><code>			cfg.Addr = "127.0.0.1:3306"</code></span>
+<span class="codeline" id="line-113"><code>		case "unix":</code></span>
+<span class="codeline" id="line-114"><code>			cfg.Addr = "/tmp/mysql.sock"</code></span>
+<span class="codeline" id="line-115"><code>		default:</code></span>
+<span class="codeline" id="line-116"><code>			return errors.New("default addr for network '" + cfg.Net + "' unknown")</code></span>
+<span class="codeline" id="line-117"><code>		}</code></span>
+<span class="codeline" id="line-118"><code>	} else if cfg.Net == "tcp" {</code></span>
+<span class="codeline" id="line-119"><code>		cfg.Addr = ensureHavePort(cfg.Addr)</code></span>
+<span class="codeline" id="line-120"><code>	}</code></span>
+<span class="codeline" id="line-121"><code></code></span>
+<span class="codeline" id="line-122"><code>	switch cfg.TLSConfig {</code></span>
+<span class="codeline" id="line-123"><code>	case "false", "":</code></span>
+<span class="codeline" id="line-124"><code>		// don't set anything</code></span>
+<span class="codeline" id="line-125"><code>	case "true":</code></span>
+<span class="codeline" id="line-126"><code>		cfg.tls = &amp;tls.Config{}</code></span>
+<span class="codeline" id="line-127"><code>	case "skip-verify", "preferred":</code></span>
+<span class="codeline" id="line-128"><code>		cfg.tls = &amp;tls.Config{InsecureSkipVerify: true}</code></span>
+<span class="codeline" id="line-129"><code>	default:</code></span>
+<span class="codeline" id="line-130"><code>		cfg.tls = getTLSConfigClone(cfg.TLSConfig)</code></span>
+<span class="codeline" id="line-131"><code>		if cfg.tls == nil {</code></span>
+<span class="codeline" id="line-132"><code>			return errors.New("invalid value / unknown config name: " + cfg.TLSConfig)</code></span>
+<span class="codeline" id="line-133"><code>		}</code></span>
+<span class="codeline" id="line-134"><code>	}</code></span>
+<span class="codeline" id="line-135"><code></code></span>
+<span class="codeline" id="line-136"><code>	if cfg.tls != nil &amp;&amp; cfg.tls.ServerName == "" &amp;&amp; !cfg.tls.InsecureSkipVerify {</code></span>
+<span class="codeline" id="line-137"><code>		host, _, err := net.SplitHostPort(cfg.Addr)</code></span>
+<span class="codeline" id="line-138"><code>		if err == nil {</code></span>
+<span class="codeline" id="line-139"><code>			cfg.tls.ServerName = host</code></span>
+<span class="codeline" id="line-140"><code>		}</code></span>
+<span class="codeline" id="line-141"><code>	}</code></span>
+<span class="codeline" id="line-142"><code></code></span>
+<span class="codeline" id="line-143"><code>	if cfg.ServerPubKey != "" {</code></span>
+<span class="codeline" id="line-144"><code>		cfg.pubKey = getServerPubKey(cfg.ServerPubKey)</code></span>
+<span class="codeline" id="line-145"><code>		if cfg.pubKey == nil {</code></span>
+<span class="codeline" id="line-146"><code>			return errors.New("invalid value / unknown server pub key name: " + cfg.ServerPubKey)</code></span>
+<span class="codeline" id="line-147"><code>		}</code></span>
+<span class="codeline" id="line-148"><code>	}</code></span>
+<span class="codeline" id="line-149"><code></code></span>
+<span class="codeline" id="line-150"><code>	return nil</code></span>
+<span class="codeline" id="line-151"><code>}</code></span>
+<span class="codeline" id="line-152"><code></code></span>
+<span class="codeline" id="line-153"><code>func writeDSNParam(buf *bytes.Buffer, hasParam *bool, name, value string) {</code></span>
+<span class="codeline" id="line-154"><code>	buf.Grow(1 + len(name) + 1 + len(value))</code></span>
+<span class="codeline" id="line-155"><code>	if !*hasParam {</code></span>
+<span class="codeline" id="line-156"><code>		*hasParam = true</code></span>
+<span class="codeline" id="line-157"><code>		buf.WriteByte('?')</code></span>
+<span class="codeline" id="line-158"><code>	} else {</code></span>
+<span class="codeline" id="line-159"><code>		buf.WriteByte('&amp;')</code></span>
+<span class="codeline" id="line-160"><code>	}</code></span>
+<span class="codeline" id="line-161"><code>	buf.WriteString(name)</code></span>
+<span class="codeline" id="line-162"><code>	buf.WriteByte('=')</code></span>
+<span class="codeline" id="line-163"><code>	buf.WriteString(value)</code></span>
+<span class="codeline" id="line-164"><code>}</code></span>
+<span class="codeline" id="line-165"><code></code></span>
+<span class="codeline" id="line-166"><code>// FormatDSN formats the given Config into a DSN string which can be passed to</code></span>
+<span class="codeline" id="line-167"><code>// the driver.</code></span>
+<span class="codeline" id="line-168"><code>func (cfg *Config) FormatDSN() string {</code></span>
+<span class="codeline" id="line-169"><code>	var buf bytes.Buffer</code></span>
+<span class="codeline" id="line-170"><code></code></span>
+<span class="codeline" id="line-171"><code>	// [username[:password]@]</code></span>
+<span class="codeline" id="line-172"><code>	if len(cfg.User) &gt; 0 {</code></span>
+<span class="codeline" id="line-173"><code>		buf.WriteString(cfg.User)</code></span>
+<span class="codeline" id="line-174"><code>		if len(cfg.Passwd) &gt; 0 {</code></span>
+<span class="codeline" id="line-175"><code>			buf.WriteByte(':')</code></span>
+<span class="codeline" id="line-176"><code>			buf.WriteString(cfg.Passwd)</code></span>
+<span class="codeline" id="line-177"><code>		}</code></span>
+<span class="codeline" id="line-178"><code>		buf.WriteByte('@')</code></span>
+<span class="codeline" id="line-179"><code>	}</code></span>
+<span class="codeline" id="line-180"><code></code></span>
+<span class="codeline" id="line-181"><code>	// [protocol[(address)]]</code></span>
+<span class="codeline" id="line-182"><code>	if len(cfg.Net) &gt; 0 {</code></span>
+<span class="codeline" id="line-183"><code>		buf.WriteString(cfg.Net)</code></span>
+<span class="codeline" id="line-184"><code>		if len(cfg.Addr) &gt; 0 {</code></span>
+<span class="codeline" id="line-185"><code>			buf.WriteByte('(')</code></span>
+<span class="codeline" id="line-186"><code>			buf.WriteString(cfg.Addr)</code></span>
+<span class="codeline" id="line-187"><code>			buf.WriteByte(')')</code></span>
+<span class="codeline" id="line-188"><code>		}</code></span>
+<span class="codeline" id="line-189"><code>	}</code></span>
+<span class="codeline" id="line-190"><code></code></span>
+<span class="codeline" id="line-191"><code>	// /dbname</code></span>
+<span class="codeline" id="line-192"><code>	buf.WriteByte('/')</code></span>
+<span class="codeline" id="line-193"><code>	buf.WriteString(cfg.DBName)</code></span>
+<span class="codeline" id="line-194"><code></code></span>
+<span class="codeline" id="line-195"><code>	// [?param1=value1&amp;...&amp;paramN=valueN]</code></span>
+<span class="codeline" id="line-196"><code>	hasParam := false</code></span>
+<span class="codeline" id="line-197"><code></code></span>
+<span class="codeline" id="line-198"><code>	if cfg.AllowAllFiles {</code></span>
+<span class="codeline" id="line-199"><code>		hasParam = true</code></span>
+<span class="codeline" id="line-200"><code>		buf.WriteString("?allowAllFiles=true")</code></span>
+<span class="codeline" id="line-201"><code>	}</code></span>
+<span class="codeline" id="line-202"><code></code></span>
+<span class="codeline" id="line-203"><code>	if cfg.AllowCleartextPasswords {</code></span>
+<span class="codeline" id="line-204"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "allowCleartextPasswords", "true")</code></span>
+<span class="codeline" id="line-205"><code>	}</code></span>
+<span class="codeline" id="line-206"><code></code></span>
+<span class="codeline" id="line-207"><code>	if !cfg.AllowNativePasswords {</code></span>
+<span class="codeline" id="line-208"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "allowNativePasswords", "false")</code></span>
+<span class="codeline" id="line-209"><code>	}</code></span>
+<span class="codeline" id="line-210"><code></code></span>
+<span class="codeline" id="line-211"><code>	if cfg.AllowOldPasswords {</code></span>
+<span class="codeline" id="line-212"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "allowOldPasswords", "true")</code></span>
+<span class="codeline" id="line-213"><code>	}</code></span>
+<span class="codeline" id="line-214"><code></code></span>
+<span class="codeline" id="line-215"><code>	if !cfg.CheckConnLiveness {</code></span>
+<span class="codeline" id="line-216"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "checkConnLiveness", "false")</code></span>
+<span class="codeline" id="line-217"><code>	}</code></span>
+<span class="codeline" id="line-218"><code></code></span>
+<span class="codeline" id="line-219"><code>	if cfg.ClientFoundRows {</code></span>
+<span class="codeline" id="line-220"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "clientFoundRows", "true")</code></span>
+<span class="codeline" id="line-221"><code>	}</code></span>
+<span class="codeline" id="line-222"><code></code></span>
+<span class="codeline" id="line-223"><code>	if col := cfg.Collation; col != defaultCollation &amp;&amp; len(col) &gt; 0 {</code></span>
+<span class="codeline" id="line-224"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "collation", col)</code></span>
+<span class="codeline" id="line-225"><code>	}</code></span>
+<span class="codeline" id="line-226"><code></code></span>
+<span class="codeline" id="line-227"><code>	if cfg.ColumnsWithAlias {</code></span>
+<span class="codeline" id="line-228"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "columnsWithAlias", "true")</code></span>
+<span class="codeline" id="line-229"><code>	}</code></span>
+<span class="codeline" id="line-230"><code></code></span>
+<span class="codeline" id="line-231"><code>	if cfg.InterpolateParams {</code></span>
+<span class="codeline" id="line-232"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "interpolateParams", "true")</code></span>
+<span class="codeline" id="line-233"><code>	}</code></span>
+<span class="codeline" id="line-234"><code></code></span>
+<span class="codeline" id="line-235"><code>	if cfg.Loc != time.UTC &amp;&amp; cfg.Loc != nil {</code></span>
+<span class="codeline" id="line-236"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "loc", url.QueryEscape(cfg.Loc.String()))</code></span>
+<span class="codeline" id="line-237"><code>	}</code></span>
+<span class="codeline" id="line-238"><code></code></span>
+<span class="codeline" id="line-239"><code>	if cfg.MultiStatements {</code></span>
+<span class="codeline" id="line-240"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "multiStatements", "true")</code></span>
+<span class="codeline" id="line-241"><code>	}</code></span>
+<span class="codeline" id="line-242"><code></code></span>
+<span class="codeline" id="line-243"><code>	if cfg.ParseTime {</code></span>
+<span class="codeline" id="line-244"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "parseTime", "true")</code></span>
+<span class="codeline" id="line-245"><code>	}</code></span>
+<span class="codeline" id="line-246"><code></code></span>
+<span class="codeline" id="line-247"><code>	if cfg.ReadTimeout &gt; 0 {</code></span>
+<span class="codeline" id="line-248"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "readTimeout", cfg.ReadTimeout.String())</code></span>
+<span class="codeline" id="line-249"><code>	}</code></span>
+<span class="codeline" id="line-250"><code></code></span>
+<span class="codeline" id="line-251"><code>	if cfg.RejectReadOnly {</code></span>
+<span class="codeline" id="line-252"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "rejectReadOnly", "true")</code></span>
+<span class="codeline" id="line-253"><code>	}</code></span>
+<span class="codeline" id="line-254"><code></code></span>
+<span class="codeline" id="line-255"><code>	if len(cfg.ServerPubKey) &gt; 0 {</code></span>
+<span class="codeline" id="line-256"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "serverPubKey", url.QueryEscape(cfg.ServerPubKey))</code></span>
+<span class="codeline" id="line-257"><code>	}</code></span>
+<span class="codeline" id="line-258"><code></code></span>
+<span class="codeline" id="line-259"><code>	if cfg.Timeout &gt; 0 {</code></span>
+<span class="codeline" id="line-260"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "timeout", cfg.Timeout.String())</code></span>
+<span class="codeline" id="line-261"><code>	}</code></span>
+<span class="codeline" id="line-262"><code></code></span>
+<span class="codeline" id="line-263"><code>	if len(cfg.TLSConfig) &gt; 0 {</code></span>
+<span class="codeline" id="line-264"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "tls", url.QueryEscape(cfg.TLSConfig))</code></span>
+<span class="codeline" id="line-265"><code>	}</code></span>
+<span class="codeline" id="line-266"><code></code></span>
+<span class="codeline" id="line-267"><code>	if cfg.WriteTimeout &gt; 0 {</code></span>
+<span class="codeline" id="line-268"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "writeTimeout", cfg.WriteTimeout.String())</code></span>
+<span class="codeline" id="line-269"><code>	}</code></span>
+<span class="codeline" id="line-270"><code></code></span>
+<span class="codeline" id="line-271"><code>	if cfg.MaxAllowedPacket != defaultMaxAllowedPacket {</code></span>
+<span class="codeline" id="line-272"><code>		writeDSNParam(&amp;buf, &amp;hasParam, "maxAllowedPacket", strconv.Itoa(cfg.MaxAllowedPacket))</code></span>
+<span class="codeline" id="line-273"><code>	}</code></span>
+<span class="codeline" id="line-274"><code></code></span>
+<span class="codeline" id="line-275"><code>	// other params</code></span>
+<span class="codeline" id="line-276"><code>	if cfg.Params != nil {</code></span>
+<span class="codeline" id="line-277"><code>		var params []string</code></span>
+<span class="codeline" id="line-278"><code>		for param := range cfg.Params {</code></span>
+<span class="codeline" id="line-279"><code>			params = append(params, param)</code></span>
+<span class="codeline" id="line-280"><code>		}</code></span>
+<span class="codeline" id="line-281"><code>		sort.Strings(params)</code></span>
+<span class="codeline" id="line-282"><code>		for _, param := range params {</code></span>
+<span class="codeline" id="line-283"><code>			writeDSNParam(&amp;buf, &amp;hasParam, param, url.QueryEscape(cfg.Params[param]))</code></span>
+<span class="codeline" id="line-284"><code>		}</code></span>
+<span class="codeline" id="line-285"><code>	}</code></span>
+<span class="codeline" id="line-286"><code></code></span>
+<span class="codeline" id="line-287"><code>	return buf.String()</code></span>
+<span class="codeline" id="line-288"><code>}</code></span>
+<span class="codeline" id="line-289"><code></code></span>
+<span class="codeline" id="line-290"><code>// ParseDSN parses the DSN string to a Config</code></span>
+<span class="codeline" id="line-291"><code>func ParseDSN(dsn string) (cfg *Config, err error) {</code></span>
+<span class="codeline" id="line-292"><code>	// New config with some default values</code></span>
+<span class="codeline" id="line-293"><code>	cfg = NewConfig()</code></span>
+<span class="codeline" id="line-294"><code></code></span>
+<span class="codeline" id="line-295"><code>	// [user[:password]@][net[(addr)]]/dbname[?param1=value1&amp;paramN=valueN]</code></span>
+<span class="codeline" id="line-296"><code>	// Find the last '/' (since the password or the net addr might contain a '/')</code></span>
+<span class="codeline" id="line-297"><code>	foundSlash := false</code></span>
+<span class="codeline" id="line-298"><code>	for i := len(dsn) - 1; i &gt;= 0; i-- {</code></span>
+<span class="codeline" id="line-299"><code>		if dsn[i] == '/' {</code></span>
+<span class="codeline" id="line-300"><code>			foundSlash = true</code></span>
+<span class="codeline" id="line-301"><code>			var j, k int</code></span>
+<span class="codeline" id="line-302"><code></code></span>
+<span class="codeline" id="line-303"><code>			// left part is empty if i &lt;= 0</code></span>
+<span class="codeline" id="line-304"><code>			if i &gt; 0 {</code></span>
+<span class="codeline" id="line-305"><code>				// [username[:password]@][protocol[(address)]]</code></span>
+<span class="codeline" id="line-306"><code>				// Find the last '@' in dsn[:i]</code></span>
+<span class="codeline" id="line-307"><code>				for j = i; j &gt;= 0; j-- {</code></span>
+<span class="codeline" id="line-308"><code>					if dsn[j] == '@' {</code></span>
+<span class="codeline" id="line-309"><code>						// username[:password]</code></span>
+<span class="codeline" id="line-310"><code>						// Find the first ':' in dsn[:j]</code></span>
+<span class="codeline" id="line-311"><code>						for k = 0; k &lt; j; k++ {</code></span>
+<span class="codeline" id="line-312"><code>							if dsn[k] == ':' {</code></span>
+<span class="codeline" id="line-313"><code>								cfg.Passwd = dsn[k+1 : j]</code></span>
+<span class="codeline" id="line-314"><code>								break</code></span>
+<span class="codeline" id="line-315"><code>							}</code></span>
+<span class="codeline" id="line-316"><code>						}</code></span>
+<span class="codeline" id="line-317"><code>						cfg.User = dsn[:k]</code></span>
+<span class="codeline" id="line-318"><code></code></span>
+<span class="codeline" id="line-319"><code>						break</code></span>
+<span class="codeline" id="line-320"><code>					}</code></span>
+<span class="codeline" id="line-321"><code>				}</code></span>
+<span class="codeline" id="line-322"><code></code></span>
+<span class="codeline" id="line-323"><code>				// [protocol[(address)]]</code></span>
+<span class="codeline" id="line-324"><code>				// Find the first '(' in dsn[j+1:i]</code></span>
+<span class="codeline" id="line-325"><code>				for k = j + 1; k &lt; i; k++ {</code></span>
+<span class="codeline" id="line-326"><code>					if dsn[k] == '(' {</code></span>
+<span class="codeline" id="line-327"><code>						// dsn[i-1] must be == ')' if an address is specified</code></span>
+<span class="codeline" id="line-328"><code>						if dsn[i-1] != ')' {</code></span>
+<span class="codeline" id="line-329"><code>							if strings.ContainsRune(dsn[k+1:i], ')') {</code></span>
+<span class="codeline" id="line-330"><code>								return nil, errInvalidDSNUnescaped</code></span>
+<span class="codeline" id="line-331"><code>							}</code></span>
+<span class="codeline" id="line-332"><code>							return nil, errInvalidDSNAddr</code></span>
+<span class="codeline" id="line-333"><code>						}</code></span>
+<span class="codeline" id="line-334"><code>						cfg.Addr = dsn[k+1 : i-1]</code></span>
+<span class="codeline" id="line-335"><code>						break</code></span>
+<span class="codeline" id="line-336"><code>					}</code></span>
+<span class="codeline" id="line-337"><code>				}</code></span>
+<span class="codeline" id="line-338"><code>				cfg.Net = dsn[j+1 : k]</code></span>
+<span class="codeline" id="line-339"><code>			}</code></span>
+<span class="codeline" id="line-340"><code></code></span>
+<span class="codeline" id="line-341"><code>			// dbname[?param1=value1&amp;...&amp;paramN=valueN]</code></span>
+<span class="codeline" id="line-342"><code>			// Find the first '?' in dsn[i+1:]</code></span>
+<span class="codeline" id="line-343"><code>			for j = i + 1; j &lt; len(dsn); j++ {</code></span>
+<span class="codeline" id="line-344"><code>				if dsn[j] == '?' {</code></span>
+<span class="codeline" id="line-345"><code>					if err = parseDSNParams(cfg, dsn[j+1:]); err != nil {</code></span>
+<span class="codeline" id="line-346"><code>						return</code></span>
+<span class="codeline" id="line-347"><code>					}</code></span>
+<span class="codeline" id="line-348"><code>					break</code></span>
+<span class="codeline" id="line-349"><code>				}</code></span>
+<span class="codeline" id="line-350"><code>			}</code></span>
+<span class="codeline" id="line-351"><code>			cfg.DBName = dsn[i+1 : j]</code></span>
+<span class="codeline" id="line-352"><code></code></span>
+<span class="codeline" id="line-353"><code>			break</code></span>
+<span class="codeline" id="line-354"><code>		}</code></span>
+<span class="codeline" id="line-355"><code>	}</code></span>
+<span class="codeline" id="line-356"><code></code></span>
+<span class="codeline" id="line-357"><code>	if !foundSlash &amp;&amp; len(dsn) &gt; 0 {</code></span>
+<span class="codeline" id="line-358"><code>		return nil, errInvalidDSNNoSlash</code></span>
+<span class="codeline" id="line-359"><code>	}</code></span>
+<span class="codeline" id="line-360"><code></code></span>
+<span class="codeline" id="line-361"><code>	if err = cfg.normalize(); err != nil {</code></span>
+<span class="codeline" id="line-362"><code>		return nil, err</code></span>
+<span class="codeline" id="line-363"><code>	}</code></span>
+<span class="codeline" id="line-364"><code>	return</code></span>
+<span class="codeline" id="line-365"><code>}</code></span>
+<span class="codeline" id="line-366"><code></code></span>
+<span class="codeline" id="line-367"><code>// parseDSNParams parses the DSN "query string"</code></span>
+<span class="codeline" id="line-368"><code>// Values must be url.QueryEscape'ed</code></span>
+<span class="codeline" id="line-369"><code>func parseDSNParams(cfg *Config, params string) (err error) {</code></span>
+<span class="codeline" id="line-370"><code>	for _, v := range strings.Split(params, "&amp;") {</code></span>
+<span class="codeline" id="line-371"><code>		param := strings.SplitN(v, "=", 2)</code></span>
+<span class="codeline" id="line-372"><code>		if len(param) != 2 {</code></span>
+<span class="codeline" id="line-373"><code>			continue</code></span>
+<span class="codeline" id="line-374"><code>		}</code></span>
+<span class="codeline" id="line-375"><code></code></span>
+<span class="codeline" id="line-376"><code>		// cfg params</code></span>
+<span class="codeline" id="line-377"><code>		switch value := param[1]; param[0] {</code></span>
+<span class="codeline" id="line-378"><code>		// Disable INFILE whitelist / enable all files</code></span>
+<span class="codeline" id="line-379"><code>		case "allowAllFiles":</code></span>
+<span class="codeline" id="line-380"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-381"><code>			cfg.AllowAllFiles, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-382"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-383"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-384"><code>			}</code></span>
+<span class="codeline" id="line-385"><code></code></span>
+<span class="codeline" id="line-386"><code>		// Use cleartext authentication mode (MySQL 5.5.10+)</code></span>
+<span class="codeline" id="line-387"><code>		case "allowCleartextPasswords":</code></span>
+<span class="codeline" id="line-388"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-389"><code>			cfg.AllowCleartextPasswords, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-390"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-391"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-392"><code>			}</code></span>
+<span class="codeline" id="line-393"><code></code></span>
+<span class="codeline" id="line-394"><code>		// Use native password authentication</code></span>
+<span class="codeline" id="line-395"><code>		case "allowNativePasswords":</code></span>
+<span class="codeline" id="line-396"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-397"><code>			cfg.AllowNativePasswords, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-398"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-399"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-400"><code>			}</code></span>
+<span class="codeline" id="line-401"><code></code></span>
+<span class="codeline" id="line-402"><code>		// Use old authentication mode (pre MySQL 4.1)</code></span>
+<span class="codeline" id="line-403"><code>		case "allowOldPasswords":</code></span>
+<span class="codeline" id="line-404"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-405"><code>			cfg.AllowOldPasswords, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-406"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-407"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-408"><code>			}</code></span>
+<span class="codeline" id="line-409"><code></code></span>
+<span class="codeline" id="line-410"><code>		// Check connections for Liveness before using them</code></span>
+<span class="codeline" id="line-411"><code>		case "checkConnLiveness":</code></span>
+<span class="codeline" id="line-412"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-413"><code>			cfg.CheckConnLiveness, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-414"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-415"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-416"><code>			}</code></span>
+<span class="codeline" id="line-417"><code></code></span>
+<span class="codeline" id="line-418"><code>		// Switch "rowsAffected" mode</code></span>
+<span class="codeline" id="line-419"><code>		case "clientFoundRows":</code></span>
+<span class="codeline" id="line-420"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-421"><code>			cfg.ClientFoundRows, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-422"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-423"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-424"><code>			}</code></span>
+<span class="codeline" id="line-425"><code></code></span>
+<span class="codeline" id="line-426"><code>		// Collation</code></span>
+<span class="codeline" id="line-427"><code>		case "collation":</code></span>
+<span class="codeline" id="line-428"><code>			cfg.Collation = value</code></span>
+<span class="codeline" id="line-429"><code>			break</code></span>
+<span class="codeline" id="line-430"><code></code></span>
+<span class="codeline" id="line-431"><code>		case "columnsWithAlias":</code></span>
+<span class="codeline" id="line-432"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-433"><code>			cfg.ColumnsWithAlias, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-434"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-435"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-436"><code>			}</code></span>
+<span class="codeline" id="line-437"><code></code></span>
+<span class="codeline" id="line-438"><code>		// Compression</code></span>
+<span class="codeline" id="line-439"><code>		case "compress":</code></span>
+<span class="codeline" id="line-440"><code>			return errors.New("compression not implemented yet")</code></span>
+<span class="codeline" id="line-441"><code></code></span>
+<span class="codeline" id="line-442"><code>		// Enable client side placeholder substitution</code></span>
+<span class="codeline" id="line-443"><code>		case "interpolateParams":</code></span>
+<span class="codeline" id="line-444"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-445"><code>			cfg.InterpolateParams, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-446"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-447"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-448"><code>			}</code></span>
+<span class="codeline" id="line-449"><code></code></span>
+<span class="codeline" id="line-450"><code>		// Time Location</code></span>
+<span class="codeline" id="line-451"><code>		case "loc":</code></span>
+<span class="codeline" id="line-452"><code>			if value, err = url.QueryUnescape(value); err != nil {</code></span>
+<span class="codeline" id="line-453"><code>				return</code></span>
+<span class="codeline" id="line-454"><code>			}</code></span>
+<span class="codeline" id="line-455"><code>			cfg.Loc, err = time.LoadLocation(value)</code></span>
+<span class="codeline" id="line-456"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-457"><code>				return</code></span>
+<span class="codeline" id="line-458"><code>			}</code></span>
+<span class="codeline" id="line-459"><code></code></span>
+<span class="codeline" id="line-460"><code>		// multiple statements in one query</code></span>
+<span class="codeline" id="line-461"><code>		case "multiStatements":</code></span>
+<span class="codeline" id="line-462"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-463"><code>			cfg.MultiStatements, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-464"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-465"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-466"><code>			}</code></span>
+<span class="codeline" id="line-467"><code></code></span>
+<span class="codeline" id="line-468"><code>		// time.Time parsing</code></span>
+<span class="codeline" id="line-469"><code>		case "parseTime":</code></span>
+<span class="codeline" id="line-470"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-471"><code>			cfg.ParseTime, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-472"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-473"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-474"><code>			}</code></span>
+<span class="codeline" id="line-475"><code></code></span>
+<span class="codeline" id="line-476"><code>		// I/O read Timeout</code></span>
+<span class="codeline" id="line-477"><code>		case "readTimeout":</code></span>
+<span class="codeline" id="line-478"><code>			cfg.ReadTimeout, err = time.ParseDuration(value)</code></span>
+<span class="codeline" id="line-479"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-480"><code>				return</code></span>
+<span class="codeline" id="line-481"><code>			}</code></span>
+<span class="codeline" id="line-482"><code></code></span>
+<span class="codeline" id="line-483"><code>		// Reject read-only connections</code></span>
+<span class="codeline" id="line-484"><code>		case "rejectReadOnly":</code></span>
+<span class="codeline" id="line-485"><code>			var isBool bool</code></span>
+<span class="codeline" id="line-486"><code>			cfg.RejectReadOnly, isBool = readBool(value)</code></span>
+<span class="codeline" id="line-487"><code>			if !isBool {</code></span>
+<span class="codeline" id="line-488"><code>				return errors.New("invalid bool value: " + value)</code></span>
+<span class="codeline" id="line-489"><code>			}</code></span>
+<span class="codeline" id="line-490"><code></code></span>
+<span class="codeline" id="line-491"><code>		// Server public key</code></span>
+<span class="codeline" id="line-492"><code>		case "serverPubKey":</code></span>
+<span class="codeline" id="line-493"><code>			name, err := url.QueryUnescape(value)</code></span>
+<span class="codeline" id="line-494"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-495"><code>				return fmt.Errorf("invalid value for server pub key name: %v", err)</code></span>
+<span class="codeline" id="line-496"><code>			}</code></span>
+<span class="codeline" id="line-497"><code>			cfg.ServerPubKey = name</code></span>
+<span class="codeline" id="line-498"><code></code></span>
+<span class="codeline" id="line-499"><code>		// Strict mode</code></span>
+<span class="codeline" id="line-500"><code>		case "strict":</code></span>
+<span class="codeline" id="line-501"><code>			panic("strict mode has been removed. See https://github.com/go-sql-driver/mysql/wiki/strict-mode")</code></span>
+<span class="codeline" id="line-502"><code></code></span>
+<span class="codeline" id="line-503"><code>		// Dial Timeout</code></span>
+<span class="codeline" id="line-504"><code>		case "timeout":</code></span>
+<span class="codeline" id="line-505"><code>			cfg.Timeout, err = time.ParseDuration(value)</code></span>
+<span class="codeline" id="line-506"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-507"><code>				return</code></span>
+<span class="codeline" id="line-508"><code>			}</code></span>
+<span class="codeline" id="line-509"><code></code></span>
+<span class="codeline" id="line-510"><code>		// TLS-Encryption</code></span>
+<span class="codeline" id="line-511"><code>		case "tls":</code></span>
+<span class="codeline" id="line-512"><code>			boolValue, isBool := readBool(value)</code></span>
+<span class="codeline" id="line-513"><code>			if isBool {</code></span>
+<span class="codeline" id="line-514"><code>				if boolValue {</code></span>
+<span class="codeline" id="line-515"><code>					cfg.TLSConfig = "true"</code></span>
+<span class="codeline" id="line-516"><code>				} else {</code></span>
+<span class="codeline" id="line-517"><code>					cfg.TLSConfig = "false"</code></span>
+<span class="codeline" id="line-518"><code>				}</code></span>
+<span class="codeline" id="line-519"><code>			} else if vl := strings.ToLower(value); vl == "skip-verify" || vl == "preferred" {</code></span>
+<span class="codeline" id="line-520"><code>				cfg.TLSConfig = vl</code></span>
+<span class="codeline" id="line-521"><code>			} else {</code></span>
+<span class="codeline" id="line-522"><code>				name, err := url.QueryUnescape(value)</code></span>
+<span class="codeline" id="line-523"><code>				if err != nil {</code></span>
+<span class="codeline" id="line-524"><code>					return fmt.Errorf("invalid value for TLS config name: %v", err)</code></span>
+<span class="codeline" id="line-525"><code>				}</code></span>
+<span class="codeline" id="line-526"><code>				cfg.TLSConfig = name</code></span>
+<span class="codeline" id="line-527"><code>			}</code></span>
+<span class="codeline" id="line-528"><code></code></span>
+<span class="codeline" id="line-529"><code>		// I/O write Timeout</code></span>
+<span class="codeline" id="line-530"><code>		case "writeTimeout":</code></span>
+<span class="codeline" id="line-531"><code>			cfg.WriteTimeout, err = time.ParseDuration(value)</code></span>
+<span class="codeline" id="line-532"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-533"><code>				return</code></span>
+<span class="codeline" id="line-534"><code>			}</code></span>
+<span class="codeline" id="line-535"><code>		case "maxAllowedPacket":</code></span>
+<span class="codeline" id="line-536"><code>			cfg.MaxAllowedPacket, err = strconv.Atoi(value)</code></span>
+<span class="codeline" id="line-537"><code>			if err != nil {</code></span>
+<span class="codeline" id="line-538"><code>				return</code></span>
+<span class="codeline" id="line-539"><code>			}</code></span>
+<span class="codeline" id="line-540"><code>		default:</code></span>
+<span class="codeline" id="line-541"><code>			// lazy init</code></span>
+<span class="codeline" id="line-542"><code>			if cfg.Params == nil {</code></span>
+<span class="codeline" id="line-543"><code>				cfg.Params = make(map[string]string)</code></span>
+<span class="codeline" id="line-544"><code>			}</code></span>
+<span class="codeline" id="line-545"><code></code></span>
+<span class="codeline" id="line-546"><code>			if cfg.Params[param[0]], err = url.QueryUnescape(value); err != nil {</code></span>
+<span class="codeline" id="line-547"><code>				return</code></span>
+<span class="codeline" id="line-548"><code>			}</code></span>
+<span class="codeline" id="line-549"><code>		}</code></span>
+<span class="codeline" id="line-550"><code>	}</code></span>
+<span class="codeline" id="line-551"><code></code></span>
+<span class="codeline" id="line-552"><code>	return</code></span>
+<span class="codeline" id="line-553"><code>}</code></span>
+<span class="codeline" id="line-554"><code></code></span>
+<span class="codeline" id="line-555"><code>func ensureHavePort(addr string) string {</code></span>
+<span class="codeline" id="line-556"><code>	if _, _, err := net.SplitHostPort(addr); err != nil {</code></span>
+<span class="codeline" id="line-557"><code>		return net.JoinHostPort(addr, "3306")</code></span>
+<span class="codeline" id="line-558"><code>	}</code></span>
+<span class="codeline" id="line-559"><code>	return addr</code></span>
+<span class="codeline" id="line-560"><code>}</code></span>
+</pre><pre id="footer">
+<table><tr><td><img src="../../../../png/go101-twitter.png"></td>
+<td>The pages are generated with <a href="https://go101.org/article/tool-golds.html"><b>Golds</b></a> <i>v0.1.6</i>. (GOOS=darwin GOARCH=amd64)
+<b>Golds</b> is a <a href="https://go101.org">Go 101</a> project and developed by <a href="https://tapirgames.com">Tapir Liu</a>.
+PR and bug reports are welcome and can be submitted to <a href="https://github.com/go101/golds">the issue list</a>.
+Please follow <a href="https://twitter.com/go100and1">@Go100and1</a> (reachable from the left QR code) to get the latest news of <b>Golds</b>.</td></tr></table
+</pre>
+</div></body></html>
