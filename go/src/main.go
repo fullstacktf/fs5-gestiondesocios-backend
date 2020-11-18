@@ -1,13 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"fs5-gestiondesocios-backend/src/api/routes"
 	"fs5-gestiondesocios-backend/src/api/utils"
 	"log"
 	"net/http"
-	"sync/atomic"
 
 	"github.com/gorilla/mux"
 )
@@ -48,9 +46,4 @@ func main() {
 	log.Fatal(http.ListenAndServe(":80", router))*/
 }
 
-var counter uint64
-
-func Counter(w http.ResponseWriter, r *http.Request) {
-	atomic.AddUint64(&counter, 1)
-	json.NewEncoder(w).Encode(counter)
-}
+//To generate the docs use this command /Users/daviddiaz/go/bin/golds -gen -emphasize-wdpkgs -compact .

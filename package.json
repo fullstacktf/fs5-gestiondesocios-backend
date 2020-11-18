@@ -5,7 +5,9 @@
     "main": "server.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "clean": "rm -rf dist build .cache"
+        "clean": "rm -rf dist build .cache",
+        "clear-docs": "rm -r docs",
+        "build-docs": "cd go/src && golds -gen -emphasize-wdpkgs -dir=docs -compact . && mv docs ../../ && cd ../../ && mv docs/*/* ./docs/"
     },
     "repository": {
         "type": "git",
