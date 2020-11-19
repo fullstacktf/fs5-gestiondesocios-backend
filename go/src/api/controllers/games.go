@@ -38,7 +38,7 @@ func GetGame(writer http.ResponseWriter, r *http.Request) {
 
 //GetGames retrieves a game by id
 func GetGames(writer http.ResponseWriter, r *http.Request) {
-	games := []models.AssocUser{}
+	games := []models.Game{}
 
 	db := utils.GetConnection()
 
