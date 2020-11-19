@@ -33,6 +33,7 @@ func main() {
 	utils.MigrateDB()
 	router := mux.NewRouter()
 	routes.SetUsersRoutes(router)
+	routes.SetGamesRoutes(router)
 	server := http.Server{
 		Addr:    ":80",
 		Handler: router,

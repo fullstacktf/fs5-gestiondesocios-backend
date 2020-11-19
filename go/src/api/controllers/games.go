@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"fs5-gestiondesocios-backend/src/api/models"
 	"fs5-gestiondesocios-backend/src/api/utils"
 	"log"
@@ -9,6 +10,8 @@ import (
 
 	"github.com/gorilla/mux"
 )
+
+//TODO Create generic controllers
 
 //GetGame retrieves a game by id
 func GetGame(writer http.ResponseWriter, r *http.Request) {
@@ -31,4 +34,50 @@ func GetGame(writer http.ResponseWriter, r *http.Request) {
 		utils.SendError(writer, http.StatusNotFound)
 	}
 
+}
+
+//GetGames retrieves a game by id
+func GetGames(writer http.ResponseWriter, r *http.Request) {
+	games := []models.AssocUser{}
+
+	db := utils.GetConnection()
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Error clossing the DB")
+	} else {
+		defer sqlDB.Close()
+	}
+	db.Find(&games)
+	jGames, _ := json.Marshal(games)
+	utils.SendResponse(writer, http.StatusOK, jGames)
+}
+
+//InsertGame inserts a game into the "games" table
+func InsertGame(writer http.ResponseWriter, r *http.Request) {
+	game := models.Game{}
+	db := utils.GetConnection()
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Error clossing the DB")
+	} else {
+		defer sqlDB.Close()
+	}
+	errDB := json.NewDecoder(r.Body).Decode(&game)
+	if errDB != nil {
+		fmt.Println(errDB)
+		utils.SendError(writer, http.StatusBadRequest)
+		return
+	}
+
+	errDB = db.Create(&game).Error
+	if errDB != nil {
+		fmt.Println(errDB)
+		utils.SendError(writer, http.StatusBadRequest)
+		return
+	}
+
+	j, _ := json.Marshal(game)
+	utils.SendResponse(writer, http.StatusCreated, j)
 }

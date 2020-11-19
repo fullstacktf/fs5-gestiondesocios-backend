@@ -9,7 +9,9 @@ CREATE TABLE borrowedGames (
   idGame INT PRIMARY KEY,
   idBorrower INT NOT NULL,
   borrowDate DATE,
-  FOREIGN KEY (idBorrower) REFERENCES assoc_partners (id)
+  FOREIGN KEY (idBorrower) REFERENCES assoc_partners (id),
+  CONSTRAINT fk_idGame FOREIGN KEY (idGame) REFERENCES games (id)
+
 );
 
 CREATE TABLE games (
@@ -18,8 +20,7 @@ CREATE TABLE games (
   entryDate DATE,
   disponibility BIT(1) NOT NULL,
   comments VARCHAR(200),
-  CONSTRAINT fk_idOwner FOREIGN KEY (idOwner) REFERENCES assoc_partners (id),
-  CONSTRAINT fk_idGame FOREIGN KEY (id) REFERENCES borrowedGames (idGame)
+  CONSTRAINT fk_idOwner FOREIGN KEY (idOwner) REFERENCES assoc_partners (id)
 );
 
 CREATE TABLE assoc_users (

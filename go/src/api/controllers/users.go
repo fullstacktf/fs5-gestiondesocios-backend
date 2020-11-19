@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//GetUser retrieves a game by id
+//GetUser retrieves an user by id
 func GetUser(writer http.ResponseWriter, r *http.Request) {
 	user := models.AssocUser{}
 
@@ -33,7 +33,7 @@ func GetUser(writer http.ResponseWriter, r *http.Request) {
 
 }
 
-//GetUsers retrieves a game by id
+//GetUsers retrieves all users
 func GetUsers(writer http.ResponseWriter, r *http.Request) {
 	users := []models.AssocUser{}
 

@@ -11,4 +11,6 @@ func SetGamesRoutes(r *mux.Router) {
 	subRouter := r.PathPrefix("/api").Subrouter()
 	subRouter.HandleFunc("/games/{id}",
 		controllers.GetGame).Methods("GET")
+	subRouter.HandleFunc("/games",
+		controllers.InsertGame).Methods("POST")
 }
