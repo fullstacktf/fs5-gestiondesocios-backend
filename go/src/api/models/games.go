@@ -10,7 +10,7 @@ type date struct {
 
 //Game is the struc of the table called "games"
 type Game struct {
-	ID            uint   `json:"id"`
+	ID            uint   `json:"id" gorm:"primaryKey"`
 	IDOwner       uint   `json:"idOwner"`
 	EntryDate     string `json:"entryDate" gorm:"-"`
 	Disponibility bool   `json:"disponibility"`

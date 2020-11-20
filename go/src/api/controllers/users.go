@@ -28,7 +28,7 @@ func GetUser(writer http.ResponseWriter, r *http.Request) {
 		jUser, _ := json.Marshal(user)
 		utils.SendResponse(writer, http.StatusOK, jUser)
 	} else {
-		utils.SendError(writer, http.StatusNotFound)
+		utils.SendError(writer, http.StatusNotFound, "User not found")
 	}
 
 }

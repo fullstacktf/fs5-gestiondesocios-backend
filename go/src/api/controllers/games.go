@@ -31,7 +31,7 @@ func GetGame(writer http.ResponseWriter, r *http.Request) {
 		jGame, _ := json.Marshal(game)
 		utils.SendResponse(writer, http.StatusOK, jGame)
 	} else {
-		utils.SendError(writer, http.StatusNotFound)
+		utils.SendError(writer, http.StatusNotFound, "Game not found")
 	}
 
 }
@@ -67,14 +67,14 @@ func InsertGame(writer http.ResponseWriter, r *http.Request) {
 	errDB := json.NewDecoder(r.Body).Decode(&game)
 	if errDB != nil {
 		fmt.Println(errDB)
-		utils.SendError(writer, http.StatusBadRequest)
+		utils.SendError(writer, http.StatusBadRequest, "Error formating game")
 		return
 	}
 
 	errDB = db.Create(&game).Error
 	if errDB != nil {
 		fmt.Println(errDB)
-		utils.SendError(writer, http.StatusBadRequest)
+		utils.SendError(writer, http.StatusBadRequest, "Error inserting game")
 		return
 	}
 

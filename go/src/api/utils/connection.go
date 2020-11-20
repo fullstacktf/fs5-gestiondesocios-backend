@@ -44,3 +44,21 @@ func GetConnection() *gorm.DB {
 	}
 	return db
 }
+
+// GetConnection exports the DB
+func GetConnectionLocalHost() *gorm.DB {
+	config := &dBConfig{
+		Host:     "127.0.0.1",
+		Port:     3306,
+		User:     "dev",
+		DBName:   "fullstackAsociacion",
+		Password: "passdev",
+	}
+	db, err := gorm.Open(mysql.Open(dbURL(config)), &gorm.Config{})
+	if err != nil {
+		log.Fatal("Error BBDD")
+	} else {
+		log.Printf("I'm connected!")
+	}
+	return db
+}

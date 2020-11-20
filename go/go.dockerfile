@@ -6,7 +6,7 @@ RUN cd ../../
 RUN export GOPATH=$(pwd) 
 RUN apk add git
 RUN apk upgrade
-RUN ls -lh
+RUN apk add build-base
 RUN go get github.com/gorilla/mux
 RUN go get gorm.io/gorm
 RUN go get gorm.io/driver/mysql

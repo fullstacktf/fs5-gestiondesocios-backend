@@ -18,5 +18,4 @@ func MigrateDB() {
 	fmt.Println("Migrating models...")
 	db.AutoMigrate(&models.Game{})
 	db.AutoMigrate(&models.AssocUser{})
-
 }
