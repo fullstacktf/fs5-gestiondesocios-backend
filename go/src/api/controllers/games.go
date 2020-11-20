@@ -16,7 +16,6 @@ import (
 //GetGame retrieves a game by id
 func GetGame(writer http.ResponseWriter, r *http.Request) {
 	game := models.Game{}
-
 	id := mux.Vars(r)["id"]
 
 	db := utils.GetConnection()
@@ -31,7 +30,7 @@ func GetGame(writer http.ResponseWriter, r *http.Request) {
 		jGame, _ := json.Marshal(game)
 		utils.SendResponse(writer, http.StatusOK, jGame)
 	} else {
-		utils.SendError(writer, http.StatusNotFound, "Game not found")
+		utils.SendError(writer, http.StatusConflict, "Game not found")
 	}
 
 }
@@ -49,8 +48,13 @@ func GetGames(writer http.ResponseWriter, r *http.Request) {
 		defer sqlDB.Close()
 	}
 	db.Find(&games)
-	jGames, _ := json.Marshal(games)
-	utils.SendResponse(writer, http.StatusOK, jGames)
+	if len(games) > 0 {
+		jGames, _ := json.Marshal(games)
+		utils.SendResponse(writer, http.StatusOK, jGames)
+	} else {
+		utils.SendError(writer, http.StatusConflict, "Games not found")
+	}
+
 }
 
 //InsertGame inserts a game into the "games" table
