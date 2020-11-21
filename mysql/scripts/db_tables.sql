@@ -29,7 +29,6 @@ CREATE TABLE assoc_users (
   user_password VARCHAR(30) NOT NULL
 );
 
-INSERT INTO assoc_users VALUES (1, "David", "password");
 INSERT INTO assoc_partners VALUES (1, "Pepe");
 
 

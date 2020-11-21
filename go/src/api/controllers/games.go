@@ -85,3 +85,51 @@ func InsertGame(writer http.ResponseWriter, r *http.Request) {
 	j, _ := json.Marshal(game)
 	utils.SendResponse(writer, http.StatusCreated, j)
 }
+
+func DeleteGame(writer http.ResponseWriter, r *http.Request) {
+	game := models.Game{}
+	id := mux.Vars(r)["id"]
+	db := utils.GetConnection()
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Error clossing the DB")
+	} else {
+		defer sqlDB.Close()
+	}
+	db.Find(&game, id)
+	if game.ID > 0 {
+		db.Delete(game)
+		utils.SendResponse(writer, http.StatusOK, []byte(`Game removed successfully`))
+	} else {
+		utils.SendError(writer, http.StatusNotFound, "Error removing the game, might not exist")
+	}
+}
+
+func UpdateGame(writer http.ResponseWriter, r *http.Request) {
+	gameFind := models.Game{}
+	gameNewData := models.Game{}
+
+	id := mux.Vars(r)["id"]
+	db := utils.GetConnection()
+
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Error clossing the DB")
+	} else {
+		defer sqlDB.Close()
+	}
+	db.Find(&gameFind, id)
+
+	if gameFind.ID > 0 {
+		err := json.NewDecoder(r.Body).Decode(&gameNewData)
+		if err != nil {
+			utils.SendError(writer, http.StatusBadRequest, "Invalid data")
+			return
+		}
+		db.Model(&gameFind).Updates(gameNewData)
+		j, _ := json.Marshal(gameFind)
+		utils.SendResponse(writer, http.StatusOK, j)
+	} else {
+		utils.SendError(writer, http.StatusNotFound, "Game not found")
+	}
+}
