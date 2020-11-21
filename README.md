@@ -8,7 +8,7 @@
 
 ## GET
 
-/api/games/$id
+/api/games/$id ✅
 
 /api/borrowedGames/$id
 
@@ -18,7 +18,7 @@
 
 ## DELETE
 
-/api/games/$id
+/api/games/$id ✅
 
 /api/borrowedGames/$id
 
@@ -26,7 +26,7 @@
 
 ## POST
 
-/api/games/
+/api/games/ ✅
 
 /api/borrowedGames
 
@@ -34,7 +34,7 @@
 
 ## PUT 
 
-/api/games/$id
+/api/games/$id ✅
 
 /api/borrowedGames/$id
 
