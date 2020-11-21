@@ -30,7 +30,7 @@ func GetGame(writer http.ResponseWriter, r *http.Request) {
 		jGame, _ := json.Marshal(game)
 		utils.SendResponse(writer, http.StatusOK, jGame)
 	} else {
-		utils.SendError(writer, http.StatusConflict, "Game not found")
+		utils.SendError(writer, http.StatusNotFound, "Game not found")
 	}
 
 }
@@ -52,7 +52,7 @@ func GetGames(writer http.ResponseWriter, r *http.Request) {
 		jGames, _ := json.Marshal(games)
 		utils.SendResponse(writer, http.StatusOK, jGames)
 	} else {
-		utils.SendError(writer, http.StatusConflict, "Games not found")
+		utils.SendError(writer, http.StatusNotFound, "Games not found")
 	}
 
 }

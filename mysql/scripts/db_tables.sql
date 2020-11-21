@@ -7,11 +7,11 @@ CREATE TABLE assoc_partners (
 
 CREATE TABLE games (
   id INT PRIMARY KEY,
-  idOwner INT,
-  entryDate DATE,
+  id_owner INT,
+  entry_date VARCHAR(200),
   disponibility BOOL NOT NULL,
   comments VARCHAR(200),
-  CONSTRAINT fk_idOwner FOREIGN KEY (idOwner) REFERENCES assoc_partners (id)
+  CONSTRAINT fk_idOwner FOREIGN KEY (id_owner) REFERENCES assoc_partners (id)
 );
 
 CREATE TABLE borrowedGames (
@@ -29,6 +29,7 @@ CREATE TABLE assoc_users (
   user_password VARCHAR(30) NOT NULL
 );
 
-INSERT INTO assoc_users VALUES (1, "David", "password")
+INSERT INTO assoc_users VALUES (1, "David", "password");
+INSERT INTO assoc_partners VALUES (1, "Pepe");
 
 

@@ -11,8 +11,8 @@ type date struct {
 //Game is the struc of the table called "games"
 type Game struct {
 	ID            uint   `json:"id" gorm:"primaryKey"`
-	IDOwner       uint   `json:"idOwner"`
-	EntryDate     string `json:"entryDate" gorm:"-"`
+	IDOwner       uint   `json:"id_owner"`
+	EntryDate     string `json:"entry_date"`
 	Disponibility bool   `json:"disponibility"`
 	Comments      string `json:"comments" gorm:"size:200"`
 }
