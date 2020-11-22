@@ -6,7 +6,6 @@
 
 ![BBDD Diagram](https://i.imgur.com/tAxAZuj.png)
 
-
 # Endpoints
 
 ## GET
@@ -31,7 +30,7 @@
 
 /api/partner/
 
-## PUT 
+## PUT
 
 /api/games/$id
 

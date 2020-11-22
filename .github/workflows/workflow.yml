@@ -33,11 +33,11 @@ jobs:
                   cd go/src/ && go vet .
                   golint .
             - name: Publish to Github Packages Registry
-                uses: elgohr/Publish-Docker-Github-Action@master
-                with:
-                    name: dd8888/fs5-gestiondesocios-backend/CICD
-                    registry: docker.pkg.github.com
-                    username: ${{ secrets.GITHUB_USERNAME }}
-                    password: ${{ secrets.GITHUB_TOKEN }}
-                    dockerfile: Dockerfile-prod
-                    tags: latest
+              uses: elgohr/Publish-Docker-Github-Action@master
+              with:
+                  name: dd8888/fs5-gestiondesocios-backend/CICD
+                  registry: docker.pkg.github.com
+                  username: ${{ secrets.GITHUB_USERNAME }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+                  dockerfile: Dockerfile-prod
+                  tags: latest
