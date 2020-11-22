@@ -1,0 +1,21 @@
+name: Deploy to Digital Ocean droplet
+on:
+    push:
+        branches:
+            - main
+            - integracion-continua
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to droplet using SSH
+              uses: appleboy/ssh-action@master
+              with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  pass: ${{ secrets.PRIVATE_KEY }}
+                  debug: true
+                  script: |
+                      cd ../../
+                      git pull
+                      docker-compose up
