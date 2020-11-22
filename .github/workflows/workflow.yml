@@ -32,6 +32,7 @@ jobs:
               run: |
                   cd go/src/ && go vet .
                   golint .
+
             - name: Publish to Github Packages Registry
               uses: elgohr/Publish-Docker-Github-Action@master
               with:
