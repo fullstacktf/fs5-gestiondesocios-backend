@@ -14,12 +14,12 @@ CREATE TABLE games (
   CONSTRAINT fk_idOwner FOREIGN KEY (id_owner) REFERENCES assoc_partners (id)
 );
 
-CREATE TABLE borrowedGames (
-  idGame INT PRIMARY KEY,
-  idBorrower INT NOT NULL,
-  borrowDate DATE,
-  FOREIGN KEY (idBorrower) REFERENCES assoc_partners (id),
-  CONSTRAINT fk_idGame FOREIGN KEY (idGame) REFERENCES games (id)
+CREATE TABLE borrowed_games (
+  id_game INT PRIMARY KEY,
+  id_borrower INT NOT NULL,
+  borrow_date VARCHAR(200),
+  FOREIGN KEY (id_borrower) REFERENCES assoc_partners (id),
+  CONSTRAINT fk_idGame FOREIGN KEY (id_game) REFERENCES games (id)
 
 );
 

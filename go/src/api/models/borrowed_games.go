@@ -4,7 +4,7 @@ package models
 
 //BorrowedGame is the struc of the table called "borrowedGames"
 type BorrowedGame struct {
-	IDGame     uint   `json:"idGame" gorm:"primaryKey"`
-	IDBorrower uint   `json:"idBorrower"`
-	BorrowDate string `json:"borrowDate" gorm:"-"`
+	IDGame     uint   `json:"id_game" gorm:"primaryKey"`
+	IDBorrower uint   `json:"id_borrower"`
+	BorrowDate string `json:"borrow_date"`
 }
