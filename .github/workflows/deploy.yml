@@ -16,6 +16,6 @@ jobs:
                   password: ${{ secrets.PRIVATE_KEY }}
                   debug: true
                   script: |
-                      cd ../../
-                      git pull
+                      cd fs5-gestiondesocios-backend/
+                      git pull https://github.com/fullstacktf/fs5-gestiondesocios-backend.git
                       docker-compose up
