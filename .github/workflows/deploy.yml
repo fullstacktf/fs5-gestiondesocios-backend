@@ -13,7 +13,7 @@ jobs:
               with:
                   host: ${{ secrets.HOST }}
                   username: ${{ secrets.USERNAME }}
-                  pass: ${{ secrets.PRIVATE_KEY }}
+                  password: ${{ secrets.PRIVATE_KEY }}
                   debug: true
                   script: |
                       cd ../../
