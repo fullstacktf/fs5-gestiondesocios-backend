@@ -4,6 +4,7 @@ on:
     push:
         branches:
             - main
+            - integracion-continua
     pull_request:
         branches:
             - main
