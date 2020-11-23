@@ -15,6 +15,7 @@ func main() {
 	routes.SetUsersRoutes(router)
 	routes.SetGamesRoutes(router)
 	routes.SetBorrowedGamesRoutes(router)
+	routes.SetAssocPartnerRoutes(router)
 	server := http.Server{
 		Addr:    ":80",
 		Handler: router,

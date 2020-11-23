@@ -2,7 +2,7 @@ USE fullstackAsociacion;
 
 CREATE TABLE assoc_partners (
   id INT PRIMARY KEY,
-  partnerName VARCHAR(30) NOT NULL
+  partner_name VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE games (
