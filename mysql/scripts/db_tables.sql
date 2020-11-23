@@ -1,33 +1,34 @@
 USE fullstackAsociacion;
 
-CREATE TABLE assocPartner (
+CREATE TABLE assoc_partners (
   id INT PRIMARY KEY,
-  partnerName VARCHAR(30) NOT NULL
+  partner_name VARCHAR(30) NOT NULL
 );
 
-CREATE TABLE borrowedGame (
-  idGame INT PRIMARY KEY,
-  idBorrower INT NOT NULL,
-  borrowDate DATE,
-  FOREIGN KEY (idBorrower) REFERENCES assocPartner (id)
-);
-
-CREATE TABLE game (
+CREATE TABLE games (
   id INT PRIMARY KEY,
-  idOwner INT,
-  entryDate DATE,
-  disponibility BIT(1) NOT NULL,
+  id_owner INT,
+  entry_date VARCHAR(200),
+  disponibility BOOL NOT NULL,
   comments VARCHAR(200),
-  CONSTRAINT fk_idOwner FOREIGN KEY (idOwner) REFERENCES assocPartner (id),
-  CONSTRAINT fk_idGame FOREIGN KEY (id) REFERENCES borrowedGame (idGame)
+  CONSTRAINT fk_idOwner FOREIGN KEY (id_owner) REFERENCES assoc_partners (id)
 );
 
-CREATE TABLE user (
+CREATE TABLE borrowed_games (
+  id_game INT PRIMARY KEY,
+  id_borrower INT NOT NULL,
+  borrow_date VARCHAR(200),
+  FOREIGN KEY (id_borrower) REFERENCES assoc_partners (id),
+  CONSTRAINT fk_idGame FOREIGN KEY (id_game) REFERENCES games (id)
+
+);
+
+CREATE TABLE assoc_users (
   id INT PRIMARY KEY,
-  userName VARCHAR(30) NOT NULL,
-  userPassword VARCHAR(30) NOT NULL
+  username VARCHAR(30) NOT NULL,
+  user_password VARCHAR(30) NOT NULL
 );
 
-
+INSERT INTO assoc_partners VALUES (1, "Pepe");
 
 
