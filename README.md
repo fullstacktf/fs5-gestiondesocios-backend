@@ -2,21 +2,24 @@
 
 [![build](https://img.shields.io/github/workflow/status/fullstacktf/fs5-gestiondesocios-backend/CICD)](https://github.com/fullstacktf/fs5-gestiondesocios-backend/actions?query=workflow%3ACICD)
 
-## BBDD Diagram
+## [API Docs](https://fullstacktf.github.io/fs5-gestiondesocios-backend/) /unfinished/
 
-![BBDD Diagram](https://i.imgur.com/tAxAZuj.png)
 
-# Endpoints
+# API Endpoints
 
 ## GET
 
-/api/games/$id
+/api/games/$id ✅
 
 /api/borrowedGames/$id
 
+/api/users ✅
+
+/api/users/$id ✅
+
 ## DELETE
 
-/api/games/$id
+/api/games/$id ✅
 
 /api/borrowedGames/$id
 
@@ -24,7 +27,7 @@
 
 ## POST
 
-/api/games/
+/api/games/ ✅
 
 /api/borrowedGames
 
@@ -32,6 +35,10 @@
 
 ## PUT
 
-/api/games/$id
+/api/games/$id ✅
 
 /api/borrowedGames/$id
+
+## BBDD Diagram
+
+![BBDD Diagram](https://i.imgur.com/tAxAZuj.png)
