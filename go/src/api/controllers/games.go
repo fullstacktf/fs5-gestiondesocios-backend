@@ -86,6 +86,7 @@ func InsertGame(writer http.ResponseWriter, r *http.Request) {
 	utils.SendResponse(writer, http.StatusCreated, j)
 }
 
+//DeleteGame deletes a game given the ID
 func DeleteGame(writer http.ResponseWriter, r *http.Request) {
 	game := models.Game{}
 	id := mux.Vars(r)["id"]
@@ -105,6 +106,7 @@ func DeleteGame(writer http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//UpdateGame updates a game given the ID
 func UpdateGame(writer http.ResponseWriter, r *http.Request) {
 	gameFind := models.Game{}
 	gameNewData := models.Game{}

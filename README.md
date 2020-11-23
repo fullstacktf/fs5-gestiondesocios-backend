@@ -4,6 +4,7 @@
 
 ## [API Docs](https://fullstacktf.github.io/fs5-gestiondesocios-backend/) /unfinished/
 
+
 # API Endpoints
 
 ## GET
@@ -32,7 +33,7 @@
 
 /api/partner/
 
-## PUT 
+## PUT
 
 /api/games/$id ✅
 
