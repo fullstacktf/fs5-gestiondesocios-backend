@@ -18,9 +18,9 @@ jobs:
 
             - name: Run docker and tests
               run: |
-                  docker-compose up -d
-                  docker exec -t app_go sh
-                  cd api/tests && go test -v
-                  exit
-                  chmod +x ./stopdockers.sh
+                  docker-compose up -d &&
+                  docker exec -t app_go sh &&
+                  cd api/tests && go test -v &&
+                  exit &&
+                  chmod +x ./stopdockers.sh &&
                   ./stopdockers.sh
