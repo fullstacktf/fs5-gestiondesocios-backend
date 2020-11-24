@@ -22,7 +22,7 @@ jobs:
 
             - name: Exec docker GO
               run: |
-                  docker exec -t app_go sh
+                  docker exec -t app_go /bin/bash
 
             - name: Run tests
               run: |
