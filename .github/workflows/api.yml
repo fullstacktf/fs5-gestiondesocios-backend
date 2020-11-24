@@ -16,14 +16,19 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
-            - name: Run docker and tests
+            - name: Run docker compose
               run: |
                   docker-compose up -d &&
+
+            - name: Exec docker GO
               run: |
                   docker exec -t app_go sh
+
+            - name: Run tests
               run: |
                   cd api/tests && go test -v && exit
+
+            - name: Stops docker
               run: |
                   chmod +x ./stopdockers.sh &&
                   ./stopdockers.sh
-                  
