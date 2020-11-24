@@ -20,13 +20,9 @@ jobs:
               run: |
                   docker-compose up -d
 
-            - name: Exec docker GO
+            - name: Exec docker GO and tests
               run: |
-                  docker exec -t app_go /bin/bash
-
-            - name: Run tests
-              run: |
-                  cd api/tests && go test -v && exit
+                  docker exec -t app_go sh -c 'cd api/tests && go test -v'
 
             - name: Stops docker
               run: |
