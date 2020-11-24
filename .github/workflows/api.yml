@@ -24,6 +24,6 @@ jobs:
               run: |
                   docker exec -t app_go sh -c 'cd api/tests && go test -v'
 
-            - name: Stops docker
+            - name: Stops docker containers
               run: |
                   chmod +x ./stopdockers.sh && ./stopdockers.sh
