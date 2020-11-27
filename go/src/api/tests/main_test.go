@@ -17,6 +17,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
+// games.go Tests
 func TestGetGamesWorking(t *testing.T) {
 	clearTable()
 	insertGame()
@@ -66,6 +67,77 @@ func TestGetGameNotExist(t *testing.T) {
 		End()
 }
 
+// End of games.go Tests
+
+// assoc_partners.go Tests
+
+func TestGetPartnersWorking(t *testing.T) {
+	clearTable()
+	insertGame()
+	apitest.New().
+		Debug().
+		Handler(newApp().Router).
+		Get("/api/assoc_partners").
+		Expect(t).
+		Status(http.StatusOK).
+		End()
+}
+
+func TestGetPartnerWorking(t *testing.T) {
+	clearTable()
+	insertGame()
+	var getUserMock = apitest.NewMock().
+		Get("/api/assoc_partners/1").
+		RespondWith().
+		Body(`{"id":1,"partner_name":"Pepe"}`).
+		Status(http.StatusOK).
+		End()
+
+	apitest.New().
+		Mocks(getUserMock).
+		Handler(newApp().Router).
+		Get("/api/assoc_partners/1").
+		Expect(t).
+		Status(http.StatusOK).
+		End()
+}
+
+func TestGetPartnerNotExist(t *testing.T) {
+	clearTable()
+	var getUserMock = apitest.NewMock().
+		Get("/api/assoc_partners/1010").
+		RespondWith().
+		Body(`Partner not found`).
+		Status(http.StatusNotFound).
+		End()
+
+	apitest.New().
+		Mocks(getUserMock).
+		Handler(newApp().Router).
+		Get("/api/assoc_partners/1010").
+		Expect(t).
+		Status(http.StatusNotFound).
+		End()
+}
+
+// End of assoc_partners.go Tests
+
+func TestGetBorrowedGamesWorking(t *testing.T) {
+	clearTable()
+	insertBorrowedGame()
+	apitest.New().
+		Debug().
+		Handler(newApp().Router).
+		Get("/api/borrowedgames").
+		Expect(t).
+		Status(http.StatusOK).
+		End()
+}
+
+// borrowed_games.go Tests
+
+// End of borrowed_games.go Tests
+
 type app struct {
 	Router *mux.Router
 }
@@ -79,5 +151,13 @@ func newApp() *app {
 		controllers.GetGames).Methods("GET")
 	subRouter.HandleFunc("/games",
 		controllers.InsertGame).Methods("POST")
+	subRouter.HandleFunc("/assoc_partners",
+		controllers.GetPartners).Methods("GET")
+	subRouter.HandleFunc("/assoc_partners/{id}",
+		controllers.GetPartner).Methods("GET")
+	subRouter.HandleFunc("/assoc_partners",
+		controllers.InsertPartner).Methods("POST")
+	subRouter.HandleFunc("/borrowedgames",
+		controllers.GetBorrowedGames).Methods("GET")
 	return &app{Router: router}
 }

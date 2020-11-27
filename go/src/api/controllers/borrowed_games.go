@@ -28,7 +28,7 @@ func GetBorrowedGames(writer http.ResponseWriter, r *http.Request) {
 		jBorrowedGames, _ := json.Marshal(borrowedGames)
 		utils.SendResponse(writer, http.StatusOK, jBorrowedGames)
 	} else {
-		utils.SendError(writer, http.StatusNotFound, "Games not found")
+		utils.SendError(writer, http.StatusNotFound, "Borrowed Games not found")
 	}
 
 }
