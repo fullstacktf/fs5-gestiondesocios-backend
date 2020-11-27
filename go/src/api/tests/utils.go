@@ -30,10 +30,21 @@ const insertGameQuery = `INSERT INTO games VALUES (1, 1, "10-10-2020", true, "10
 const insertAssocPartnerQuery = `INSERT INTO assoc_partners VALUES (1, "Pepe");`
 
 func clearTable() {
+	db.Exec("DELETE FROM borrowed_games")
 	db.Exec("DELETE FROM games")
 	db.Exec("DELETE FROM assoc_partners")
 }
+
 func insertGame() {
 	db.Exec(insertAssocPartnerQuery)
 	db.Exec(insertGameQuery)
+}
+
+const insertUnavailableGameQuery = `INSERT INTO games VALUES (1, 1, "10-10-2020", false, "10/10");`
+const insertBorrwedGameQuery = `INSERT INTO borrowed_games VALUES (1, 1, "10-10-2020");`
+
+func insertBorrowedGame() {
+	db.Exec(insertAssocPartnerQuery)
+	db.Exec(insertUnavailableGameQuery)
+	db.Exec(insertBorrwedGameQuery)
 }
