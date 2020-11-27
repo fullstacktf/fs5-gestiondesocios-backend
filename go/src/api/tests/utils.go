@@ -41,10 +41,10 @@ func insertGame() {
 }
 
 const insertUnavailableGameQuery = `INSERT INTO games VALUES (1, 1, "10-10-2020", false, "10/10");`
-const insertBorrwedGameQuery = `INSERT INTO borrowed_games VALUES (1, 1, "10-10-2020");`
+const insertBorrowedGameQuery = `INSERT INTO borrowed_games VALUES (1, 1, "10-10-2020");`
 
 func insertBorrowedGame() {
 	db.Exec(insertAssocPartnerQuery)
 	db.Exec(insertUnavailableGameQuery)
-	db.Exec(insertBorrwedGameQuery)
+	db.Exec(insertBorrowedGameQuery)
 }
