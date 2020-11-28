@@ -30,7 +30,7 @@ func dbURL(dbConfig *dBConfig) string {
 // GetConnection exports the DB
 func GetConnection() *gorm.DB {
 	config := &dBConfig{
-		Host:     "localhost",
+		Host:     "app_mariadb",
 		Port:     3306,
 		User:     "dev",
 		DBName:   "fullstackAsociacion",
@@ -48,7 +48,7 @@ func GetConnection() *gorm.DB {
 // GetConnectionTest exports to the test DB
 func GetConnectionTest() *gorm.DB {
 	config := &dBConfig{
-		Host:     "localhost",
+		Host:     "app_mariadb",
 		Port:     3306,
 		User:     "dev",
 		DBName:   "fullstackAsociacion_test",
