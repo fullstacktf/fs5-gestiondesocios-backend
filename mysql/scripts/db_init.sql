@@ -1,3 +1,4 @@
 CREATE DATABASE IF NOT EXISTS fullstackAsociacion;
+CREATE DATABASE IF NOT EXISTS fullstackAsociacion_test;
 CREATE USER IF NOT EXISTS 'dev'@'%' IDENTIFIED BY 'passdev';
 GRANT ALL PRIVILEGES ON *.* TO 'dev'@'%';

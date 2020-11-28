@@ -16,7 +16,9 @@ func GetUser(writer http.ResponseWriter, r *http.Request) {
 
 	id := mux.Vars(r)["id"]
 
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal("Error clossing the DB")
@@ -37,7 +39,9 @@ func GetUser(writer http.ResponseWriter, r *http.Request) {
 func GetUsers(writer http.ResponseWriter, r *http.Request) {
 	users := []models.AssocUser{}
 
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {

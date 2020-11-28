@@ -30,7 +30,7 @@ func dbURL(dbConfig *dBConfig) string {
 // GetConnection exports the DB
 func GetConnection() *gorm.DB {
 	config := &dBConfig{
-		Host:     "app_mariadb",
+		Host:     "localhost",
 		Port:     3306,
 		User:     "dev",
 		DBName:   "fullstackAsociacion",
@@ -45,13 +45,13 @@ func GetConnection() *gorm.DB {
 	return db
 }
 
-// GetConnection exports the DB
-func GetConnectionLocalHost() *gorm.DB {
+// GetConnectionTest exports to the test DB
+func GetConnectionTest() *gorm.DB {
 	config := &dBConfig{
-		Host:     "127.0.0.1",
+		Host:     "localhost",
 		Port:     3306,
 		User:     "dev",
-		DBName:   "fullstackAsociacion",
+		DBName:   "fullstackAsociacion_test",
 		Password: "passdev",
 	}
 	db, err := gorm.Open(mysql.Open(dbURL(config)), &gorm.Config{})
@@ -62,3 +62,21 @@ func GetConnectionLocalHost() *gorm.DB {
 	}
 	return db
 }
+
+// // GetConnectionLocalHost exports the DB
+// func GetConnectionLocalHost() *gorm.DB {
+// 	config := &dBConfig{
+// 		Host:     "127.0.0.1",
+// 		Port:     3306,
+// 		User:     "dev",
+// 		DBName:   "fullstackAsociacion",
+// 		Password: "passdev",
+// 	}
+// 	db, err := gorm.Open(mysql.Open(dbURL(config)), &gorm.Config{})
+// 	if err != nil {
+// 		log.Fatal("Error BBDD")
+// 	} else {
+// 		log.Printf("I'm connected!")
+// 	}
+// 	return db
+// }

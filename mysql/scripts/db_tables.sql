@@ -32,3 +32,4 @@ CREATE TABLE assoc_users (
 INSERT INTO assoc_partners VALUES (1, "Pepe");
 
 
+

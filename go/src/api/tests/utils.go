@@ -7,23 +7,51 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var db = utils.GetConnection()
+var db = utils.GetConnectionTest()
 var router = mux.NewRouter()
 
 func assertTableExists() {
 	sql, _ := db.DB()
-	if _, err := sql.Exec(tableCreationQuery); err != nil {
+	if _, err := sql.Exec(tableCreationQueryAssocPartners); err != nil {
+		log.Fatal(err)
+	}
+	if _, err := sql.Exec(tableCreationQueryGames); err != nil {
+		log.Fatal(err)
+	}
+	if _, err := sql.Exec(tableCreationQueryBorrowedGames); err != nil {
+		log.Fatal(err)
+	}
+	if _, err := sql.Exec(tableCreationQueryAssocUsers); err != nil {
 		log.Fatal(err)
 	}
 }
 
-const tableCreationQuery = `CREATE TABLE IF NOT EXISTS games (
-    id INT PRIMARY KEY,
-    id_owner INT,
-    entry_date VARCHAR(200),
-    disponibility BOOL NOT NULL,
-    comments VARCHAR(200),
-    CONSTRAINT fk_idOwner FOREIGN KEY (idOwner) REFERENCES assoc_partners (id)
+const tableCreationQueryAssocPartners = `CREATE TABLE IF NOT EXISTS assoc_partners (
+	id INT PRIMARY KEY,
+	partner_name VARCHAR(30) NOT NULL
+  );`
+
+const tableCreationQueryGames = `CREATE TABLE IF NOT EXISTS games (
+	id INT PRIMARY KEY,
+	id_owner INT,
+	entry_date VARCHAR(200),
+	disponibility BOOL NOT NULL,
+	comments VARCHAR(200),
+	CONSTRAINT fk_idOwner FOREIGN KEY (id_owner) REFERENCES assoc_partners (id)
+  );`
+
+const tableCreationQueryBorrowedGames = `CREATE TABLE IF NOT EXISTS borrowed_games (
+	id_game INT PRIMARY KEY,
+	id_borrower INT NOT NULL,
+	borrow_date VARCHAR(200),
+	FOREIGN KEY (id_borrower) REFERENCES assoc_partners (id),
+	CONSTRAINT fk_idGame FOREIGN KEY (id_game) REFERENCES games (id)
+  );`
+
+const tableCreationQueryAssocUsers = `CREATE TABLE IF NOT EXISTS assoc_users (
+	id INT PRIMARY KEY,
+	username VARCHAR(30) NOT NULL,
+	user_password VARCHAR(30) NOT NULL
   );`
 
 const insertGameQuery = `INSERT INTO games VALUES (1, 1, "10-10-2020", true, "10/10");`
@@ -33,6 +61,7 @@ func clearTable() {
 	db.Exec("DELETE FROM borrowed_games")
 	db.Exec("DELETE FROM games")
 	db.Exec("DELETE FROM assoc_partners")
+	db.Exec("DELETE FROM assoc_users")
 }
 
 func insertGame() {
