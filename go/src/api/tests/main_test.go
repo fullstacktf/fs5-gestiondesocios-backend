@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fs5-gestiondesocios-backend/src/api/controllers"
+	"fs5-gestiondesocios-backend/src/api/utils"
 	"net/http"
 	"os"
 	"testing"
@@ -122,9 +123,12 @@ func TestGetPartnerNotExist(t *testing.T) {
 
 // End of assoc_partners.go Tests
 
+// borrowed_games.go Tests
+
 func TestGetBorrowedGamesWorking(t *testing.T) {
 	clearTable()
 	insertBorrowedGame()
+
 	apitest.New().
 		Debug().
 		Handler(newApp().Router).
@@ -134,8 +138,6 @@ func TestGetBorrowedGamesWorking(t *testing.T) {
 		End()
 }
 
-// borrowed_games.go Tests
-
 // End of borrowed_games.go Tests
 
 type app struct {
@@ -144,6 +146,7 @@ type app struct {
 
 func newApp() *app {
 	router := mux.NewRouter()
+	controllers.SetDatabase(utils.GetConnectionTest())
 	subRouter := router.PathPrefix("/api").Subrouter()
 	subRouter.HandleFunc("/games/{id}",
 		controllers.GetGame).Methods("GET")

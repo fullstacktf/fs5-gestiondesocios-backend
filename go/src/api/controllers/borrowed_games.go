@@ -15,7 +15,9 @@ import (
 func GetBorrowedGames(writer http.ResponseWriter, r *http.Request) {
 	borrowedGames := []models.BorrowedGame{}
 
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -36,7 +38,9 @@ func GetBorrowedGames(writer http.ResponseWriter, r *http.Request) {
 // InsertBorrowedGame inserts a borrowed game in the table
 func InsertBorrowedGame(writer http.ResponseWriter, r *http.Request) {
 	borrowedGame := models.BorrowedGame{}
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -70,7 +74,9 @@ func InsertBorrowedGame(writer http.ResponseWriter, r *http.Request) {
 func DeleteBorrowedGame(writer http.ResponseWriter, r *http.Request) {
 	borrowedGame := models.BorrowedGame{}
 	id := mux.Vars(r)["id_game"]
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal("Error clossing the DB")

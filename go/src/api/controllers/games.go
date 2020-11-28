@@ -17,8 +17,10 @@ import (
 func GetGame(writer http.ResponseWriter, r *http.Request) {
 	game := models.Game{}
 	id := mux.Vars(r)["id"]
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
-	db := utils.GetConnection()
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal("Error clossing the DB")
@@ -39,7 +41,9 @@ func GetGame(writer http.ResponseWriter, r *http.Request) {
 func GetGames(writer http.ResponseWriter, r *http.Request) {
 	games := []models.Game{}
 
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -60,7 +64,9 @@ func GetGames(writer http.ResponseWriter, r *http.Request) {
 //InsertGame inserts a game into the "games" table
 func InsertGame(writer http.ResponseWriter, r *http.Request) {
 	game := models.Game{}
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -90,7 +96,9 @@ func InsertGame(writer http.ResponseWriter, r *http.Request) {
 func DeleteGame(writer http.ResponseWriter, r *http.Request) {
 	game := models.Game{}
 	id := mux.Vars(r)["id"]
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal("Error clossing the DB")
@@ -112,7 +120,9 @@ func UpdateGame(writer http.ResponseWriter, r *http.Request) {
 	gameNewData := models.Game{}
 
 	id := mux.Vars(r)["id"]
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {

@@ -16,7 +16,9 @@ func GetPartner(writer http.ResponseWriter, r *http.Request) {
 	partner := models.AssocPartner{}
 	id := mux.Vars(r)["id"]
 
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal("Error clossing the DB")
@@ -37,7 +39,9 @@ func GetPartner(writer http.ResponseWriter, r *http.Request) {
 func GetPartners(writer http.ResponseWriter, r *http.Request) {
 	partners := []models.AssocPartner{}
 
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -58,7 +62,9 @@ func GetPartners(writer http.ResponseWriter, r *http.Request) {
 //InsertPartner inserts a partner into the "assoc_partners" table
 func InsertPartner(writer http.ResponseWriter, r *http.Request) {
 	partner := models.AssocPartner{}
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -88,7 +94,9 @@ func InsertPartner(writer http.ResponseWriter, r *http.Request) {
 func DeletePartner(writer http.ResponseWriter, r *http.Request) {
 	partner := models.AssocPartner{}
 	id := mux.Vars(r)["id"]
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 	sqlDB, err := db.DB()
 	if err != nil {
 		log.Fatal("Error clossing the DB")
@@ -110,7 +118,9 @@ func UpdatePartner(writer http.ResponseWriter, r *http.Request) {
 	partnerNewData := models.AssocPartner{}
 
 	id := mux.Vars(r)["id"]
-	db := utils.GetConnection()
+	if !initDB {
+		db = utils.GetConnection()
+	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
