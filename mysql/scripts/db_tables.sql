@@ -7,6 +7,9 @@ CREATE TABLE assoc_partners (
 
 CREATE TABLE games (
   id INT PRIMARY KEY,
+  game_name VARCHAR(200),
+  rating  FLOAT,
+  user_rating FLOAT,
   id_owner INT,
   entry_date VARCHAR(200),
   disponibility BOOL NOT NULL,
