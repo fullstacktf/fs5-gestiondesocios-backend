@@ -33,6 +33,9 @@ const tableCreationQueryAssocPartners = `CREATE TABLE IF NOT EXISTS assoc_partne
 
 const tableCreationQueryGames = `CREATE TABLE IF NOT EXISTS games (
 	id INT PRIMARY KEY,
+	game_name VARCHAR(200),
+  	rating  FLOAT,
+  	user_rating FLOAT,
 	id_owner INT,
 	entry_date VARCHAR(200),
 	disponibility BOOL NOT NULL,
@@ -54,7 +57,7 @@ const tableCreationQueryAssocUsers = `CREATE TABLE IF NOT EXISTS assoc_users (
 	user_password VARCHAR(30) NOT NULL
   );`
 
-const insertGameQuery = `INSERT INTO games VALUES (1, 1, "10-10-2020", true, "10/10");`
+const insertGameQuery = `INSERT INTO games VALUES (1, "juego1", 2, 3, 1, "10-10-2020", true, "10/10");`
 const insertAssocPartnerQuery = `INSERT INTO assoc_partners VALUES (1, "Pepe");`
 
 func clearTable() {
@@ -69,7 +72,7 @@ func insertGame() {
 	db.Exec(insertGameQuery)
 }
 
-const insertUnavailableGameQuery = `INSERT INTO games VALUES (1, 1, "10-10-2020", false, "10/10");`
+const insertUnavailableGameQuery = `INSERT INTO games VALUES (1, "juego1", 2, 3, 1, "10-10-2020", false, "10/10");`
 const insertBorrowedGameQuery = `INSERT INTO borrowed_games VALUES (1, 1, "10-10-2020");`
 
 func insertBorrowedGame() {
