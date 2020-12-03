@@ -1,11 +1,11 @@
 USE fullstackAsociacion;
 
-CREATE TABLE assoc_partners (
+CREATE TABLE IF NOT EXISTS assoc_partners (
   id INT PRIMARY KEY,
   partner_name VARCHAR(30) NOT NULL
 );
 
-CREATE TABLE games (
+CREATE TABLE IF NOT EXISTS games (
   id INT PRIMARY KEY,
   game_name VARCHAR(200),
   rating  FLOAT,
@@ -17,7 +17,7 @@ CREATE TABLE games (
   CONSTRAINT fk_idOwner FOREIGN KEY (id_owner) REFERENCES assoc_partners (id)
 );
 
-CREATE TABLE borrowed_games (
+CREATE TABLE IF NOT EXISTS borrowed_games (
   id_game INT PRIMARY KEY,
   id_borrower INT NOT NULL,
   borrow_date VARCHAR(200),
@@ -26,7 +26,7 @@ CREATE TABLE borrowed_games (
 
 );
 
-CREATE TABLE assoc_users (
+CREATE TABLE IF NOT EXISTS assoc_users (
   id INT PRIMARY KEY,
   username VARCHAR(30) NOT NULL,
   user_password VARCHAR(30) NOT NULL
