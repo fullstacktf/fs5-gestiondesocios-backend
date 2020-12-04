@@ -55,6 +55,7 @@ func GetConnectionTest() *gorm.DB {
 		Password: "passdev",
 	}
 	db, err := gorm.Open(mysql.Open(dbURL(config)), &gorm.Config{})
+
 	if err != nil {
 		log.Fatal("Error BBDD")
 	} else {
