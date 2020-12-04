@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS games (
   id INT PRIMARY KEY,
   game_name VARCHAR(200),
   rating  FLOAT,
-  user_rating FLOAT,
   id_owner INT,
   entry_date VARCHAR(200),
   disponibility BOOL NOT NULL,

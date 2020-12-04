@@ -20,6 +20,7 @@ func main() {
 		Addr:    ":80",
 		Handler: router,
 	}
+	utils.Populate_db()
 	log.Println("Running on port 80")
 	log.Println(server.ListenAndServe())
 }
