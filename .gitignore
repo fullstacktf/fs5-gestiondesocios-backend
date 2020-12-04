@@ -10,3 +10,5 @@ dist
 .DS_STORE
 
 .vscode
+
+mysql/mysql-data
