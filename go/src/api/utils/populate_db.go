@@ -67,5 +67,5 @@ func Populate_db() {
 	}
 
 	db := GetConnection()
-	db.Create(&games)
+	db.FirstOrCreate(&games)
 }
