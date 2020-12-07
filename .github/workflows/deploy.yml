@@ -3,6 +3,9 @@ on:
     push:
         branches:
             - main
+    pull_request:
+        branches:
+            - main
 jobs:
     deploy:
         runs-on: ubuntu-latest
@@ -17,4 +20,10 @@ jobs:
                   script: |
                       cd fs5-gestiondesocios-backend/
                       git pull https://github.com/fullstacktf/fs5-gestiondesocios-backend.git
-                      docker-compose build
+                      docker stop app_go
+                      docker container rm app_go
+                      docker rmi fs5-gestiondesocios-backend_app
+                      docker stop projectdb
+                      docker container rm projectdb
+                      docker rmi fs5-gestiondesocios-backend_db
+                      sudo docker-compose up -d
