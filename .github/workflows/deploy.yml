@@ -26,4 +26,4 @@ jobs:
                       docker stop projectdb
                       docker container rm projectdb
                       docker rmi fs5-gestiondesocios-backend_db
-                      sudo docker-compose up -d
+                      docker-compose up -d
