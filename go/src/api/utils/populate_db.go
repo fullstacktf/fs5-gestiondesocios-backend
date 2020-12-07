@@ -48,10 +48,10 @@ func Populate_db() {
 	arrDate := strings.Split(strings.ReplaceAll(value[3].String(), "\"", ""), ",")
 
 	game := models.Game{}
+	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 
 	games := []models.Game{}
 	for i := 0; i < len(arrIds); i++ {
-		reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -67,5 +67,5 @@ func Populate_db() {
 	}
 
 	db := GetConnection()
-	db.FirstOrCreate(&games)
+	db.Create(&games)
 }
