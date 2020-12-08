@@ -37,27 +37,29 @@ func Populate_db() {
 		panic("That's embarrassing...")
 	}
 
-	value := gjson.GetMany(json1.String(), "items.item.#.-objectid", "items.item.#.name.#content", "items.item.#.stats.rating.average.-value", "items.item.#.status.-lastmodified")
+	value := gjson.GetMany(json1.String(), "items.item.#.-objectid", "items.item.#.name.#content", "items.item.#.image", "items.item.#.stats.rating.average.-value", "items.item.#.status.-lastmodified")
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	arrIds := strings.Split(strings.ReplaceAll(value[0].String(), "\"", ""), ",")
 	arrNames := strings.Split(strings.ReplaceAll(value[1].String(), "\"", ""), ",")
-	arrRating := strings.Split(strings.ReplaceAll(value[2].String(), "\"", ""), ",")
-	arrDate := strings.Split(strings.ReplaceAll(value[3].String(), "\"", ""), ",")
+	arrImages := strings.Split(strings.ReplaceAll(value[2].String(), "\"", ""), ",")
+	arrRating := strings.Split(strings.ReplaceAll(value[3].String(), "\"", ""), ",")
+	arrDate := strings.Split(strings.ReplaceAll(value[4].String(), "\"", ""), ",")
 
 	game := models.Game{}
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
 
 	games := []models.Game{}
-	for i := 0; i < len(arrIds); i++ {
+	for i := 0; i < len(arrImages); i++ {
 		if err != nil {
 			log.Fatal(err)
 		}
 		processedID := reg.ReplaceAllString(arrIds[i], "")
 		game.ID, _ = strconv.ParseUint(processedID, 10, 0)
 		game.GameName = arrNames[i]
+		game.GameImage = arrImages[i]
 		game.Rating, _ = strconv.ParseFloat(arrRating[i], 64)
 		game.EntryDate = arrDate[i]
 		game.Disponibility = true

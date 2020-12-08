@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS assoc_partners (
 CREATE TABLE IF NOT EXISTS games (
   id INT PRIMARY KEY,
   game_name VARCHAR(200),
+  game_image VARCHAR(200),
   rating  FLOAT,
   id_owner INT,
   entry_date VARCHAR(200),
