@@ -37,7 +37,7 @@ func TestGetGameWorking(t *testing.T) {
 	var getUserMock = apitest.NewMock().
 		Get("/api/games/1").
 		RespondWith().
-		Body(`{"id":1, "game_name":"juego1", "rating":2, "id_owner":1,"entryDate":"10-10-2020","disponibility":false,"comments":"10/10"}`).
+		Body(`{"id":1, "game_name":"juego1", "game_image":"https://cf.geekdo-images.com/NaVK216SnjDz3VLr5kKOAg__original/img/zcBNkPVorAebzEyRQNXr4dZkVsk=/0x0/pic350302.jpg" "rating":2, "id_owner":1,"entryDate":"10-10-2020","disponibility":false,"comments":"10/10"}`).
 		Status(http.StatusOK).
 		End()
 

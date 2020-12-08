@@ -12,6 +12,7 @@ type date struct {
 type Game struct {
 	ID            uint64  `json:"id" gorm:"primaryKey"`
 	GameName      string  `json:"game_name"`
+	GameImage     string  `json:"game_image"`
 	Rating        float64 `json:"rating"`
 	IDOwner       uint    `json:"id_owner"`
 	EntryDate     string  `json:"entry_date"`
