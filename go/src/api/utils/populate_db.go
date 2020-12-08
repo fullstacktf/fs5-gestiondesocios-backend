@@ -31,7 +31,7 @@ func Populate_db() {
 		fmt.Errorf("Read body: %v", err)
 	}
 
-	xml := strings.NewReader(string(data))
+	xml := strings.NewReader(strings.ReplaceAll(string(data), ",", ""))
 	json1, err := xj.Convert(xml)
 	if err != nil {
 		panic("That's embarrassing...")
@@ -50,16 +50,30 @@ func Populate_db() {
 
 	game := models.Game{}
 	reg, err := regexp.Compile("[^a-zA-Z0-9]+")
+	index := 0
+	for i := 0; i < len(arrNames); i++ {
+		if arrNames[i] == "The Lord of the Rings Board Game" {
+			index = i
+		}
+	}
 
 	games := []models.Game{}
-	for i := 0; i < len(arrImages); i++ {
+	for i := 0; i < len(arrIds); i++ {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		if i < index {
+			game.GameImage = arrImages[i]
+		} else if i == index {
+			game.GameImage = "https://images-na.ssl-images-amazon.com/images/I/51ctYQQPKML._SX425_.jpg"
+		} else {
+			game.GameImage = arrImages[i-1]
+		}
+
 		processedID := reg.ReplaceAllString(arrIds[i], "")
 		game.ID, _ = strconv.ParseUint(processedID, 10, 0)
 		game.GameName = arrNames[i]
-		game.GameImage = arrImages[i]
 		game.Rating, _ = strconv.ParseFloat(arrRating[i], 64)
 		game.EntryDate = arrDate[i]
 		game.Disponibility = true
