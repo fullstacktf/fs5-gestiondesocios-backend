@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/basgys/goxml2json v1.1.0
 	github.com/gorilla/mux v1.8.0
+	github.com/rs/cors v1.7.0
 	github.com/steinfletcher/apitest v1.4.16
 	github.com/tidwall/gjson v1.6.3
 	go101.org/golds v0.1.6

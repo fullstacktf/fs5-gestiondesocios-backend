@@ -7,9 +7,14 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 )
 
 func main() {
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},                            // All origins
+		AllowedMethods: []string{"GET", "POST", "DELETE", "PUT"}, // Allowing only get, just an example
+	})
 	utils.MigrateDB()
 	router := mux.NewRouter()
 	routes.SetUsersRoutes(router)
@@ -18,7 +23,7 @@ func main() {
 	routes.SetAssocPartnerRoutes(router)
 	server := http.Server{
 		Addr:    ":80",
-		Handler: router,
+		Handler: c.Handler(router),
 	}
 	utils.Populate_db()
 	log.Println("Running on port 80")
