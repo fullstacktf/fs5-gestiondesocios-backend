@@ -13,6 +13,7 @@ RUN go get gorm.io/driver/mysql
 RUN go get github.com/steinfletcher/apitest
 RUN go get -u github.com/basgys/goxml2json
 RUN go get -u github.com/tidwall/gjson 
+RUN go get -u github.com/rs/cors
 ENV WAIT_VERSION 2.7.2
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
 RUN chmod +x /wait
