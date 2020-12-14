@@ -1,8 +1,8 @@
 package tests
 
 import (
-	"fs5-gestiondesocios-backend/src/api/controllers"
-	"fs5-gestiondesocios-backend/src/api/utils"
+	"fs5-gestiondesocios-backend/api/controllers"
+	"fs5-gestiondesocios-backend/api/utils"
 	"net/http"
 	"os"
 	"testing"

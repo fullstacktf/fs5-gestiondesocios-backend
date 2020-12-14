@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"fs5-gestiondesocios-backend/src/api/models"
+	"fs5-gestiondesocios-backend/api/models"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -83,5 +83,5 @@ func Populate_db() {
 	}
 
 	db := GetConnection()
-	db.Create(&games)
+	db.Save(&games)
 }

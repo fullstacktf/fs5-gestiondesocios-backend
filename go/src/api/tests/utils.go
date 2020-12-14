@@ -1,7 +1,7 @@
 package tests
 
 import (
-	"fs5-gestiondesocios-backend/src/api/utils"
+	"fs5-gestiondesocios-backend/api/utils"
 	"log"
 
 	"github.com/gorilla/mux"

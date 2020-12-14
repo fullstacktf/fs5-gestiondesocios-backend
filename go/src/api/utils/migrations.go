@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"fs5-gestiondesocios-backend/src/api/models"
+	"fs5-gestiondesocios-backend/api/models"
 	"log"
 )
 

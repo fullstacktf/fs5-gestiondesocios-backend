@@ -11,7 +11,7 @@ services:
             - my_network
         depends_on:
             - "db"
-        command: sh -c "/wait && go run main.go"
+        command: sh -c "/wait && /app/main"
         environment:
             - WAIT_HOSTS=app_mariadb:3306
             - WAIT_HOSTS_TIMEOUT=300

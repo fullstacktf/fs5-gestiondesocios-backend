@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fs5-gestiondesocios-backend/src/api/routes"
-	"fs5-gestiondesocios-backend/src/api/utils"
+	"fs5-gestiondesocios-backend/api/routes"
+	"fs5-gestiondesocios-backend/api/utils"
 	"log"
 	"net/http"
 

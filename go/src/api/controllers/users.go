@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"fs5-gestiondesocios-backend/src/api/models"
-	"fs5-gestiondesocios-backend/src/api/utils"
+	"fs5-gestiondesocios-backend/api/models"
+	"fs5-gestiondesocios-backend/api/utils"
 	"log"
 	"net/http"
 

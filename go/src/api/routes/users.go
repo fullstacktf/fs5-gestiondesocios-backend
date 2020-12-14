@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"fs5-gestiondesocios-backend/src/api/controllers"
+	"fs5-gestiondesocios-backend/api/controllers"
 
 	"github.com/gorilla/mux"
 )

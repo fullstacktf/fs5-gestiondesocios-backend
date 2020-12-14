@@ -23,7 +23,7 @@ jobs:
                       docker stop app_go
                       docker container rm app_go
                       docker rmi fs5-gestiondesocios-backend_app
-                      docker stop projectdb
-                      docker container rm projectdb
+                      docker stop app_mariadb
+                      docker container rm app_mariadb
                       docker rmi fs5-gestiondesocios-backend_db
                       docker-compose up -d
