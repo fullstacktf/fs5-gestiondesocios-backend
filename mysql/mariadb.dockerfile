@@ -7,8 +7,6 @@ ENV MYSQL_DATABASE testDB
 ENV MYSQL_USER toto
 ENV MYSQL_PASSWORD test123
 
-#RUN apt-get update
-
 EXPOSE 3306
 
 CMD ["mysqld"]
