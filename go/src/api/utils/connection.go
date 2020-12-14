@@ -48,7 +48,7 @@ func GetConnection() *gorm.DB {
 // GetConnectionTest exports to the test DB
 func GetConnectionTest() *gorm.DB {
 	config := &dBConfig{
-		Host:     "app_mariadb",
+		Host:     "app_mariadb_fake",
 		Port:     3306,
 		User:     "dev",
 		DBName:   "fullstackAsociacion_test",
@@ -57,13 +57,22 @@ func GetConnectionTest() *gorm.DB {
 	db, err := gorm.Open(mysql.Open(dbURL(config)), &gorm.Config{})
 
 	if err != nil {
-		log.Fatal("Error BBDD")
+		log.Fatal(err)
 	} else {
 		log.Printf("I'm connected!")
 	}
 	return db
 }
 
+/*
+docker-compose up -d
+docker network create testAPI
+docker build -t tests .
+docker run -d --net testAPI --name app_mariadb_fake fs5-gestiondesocios-backend_db
+docker run --net testAPI --name test_db tests
+
+
+*/
 // // GetConnectionLocalHost exports the DB
 // func GetConnectionLocalHost() *gorm.DB {
 // 	config := &dBConfig{

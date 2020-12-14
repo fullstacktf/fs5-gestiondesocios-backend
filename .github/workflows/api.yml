@@ -19,9 +19,21 @@ jobs:
               run: |
                   docker-compose up -d
 
-            - name: Exec docker GO and tests
+            - name: Create network
               run: |
-                  docker exec -t app_go sh -c 'cd api/tests && go test -v'
+                  docker network create testAPI
+
+            - name: Build tests Dockerfile
+              run: |
+                  cd go && docker build -t tests .
+
+            - name: Run fake DB
+              run: |
+                  docker run -d --net testAPI --name app_mariadb_fake fs5-gestiondesocios-backend_db
+
+            - name: Run API tests
+              run: |
+                  docker run --net testAPI --name test_db tests
 
             - name: Stops docker containers
               run: |
