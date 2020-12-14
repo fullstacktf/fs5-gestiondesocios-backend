@@ -21,7 +21,7 @@ jobs:
 
             - name: Exec docker GO and tests
               run: |
-                  docker exec -t app_go sh -c 'cd app/tests && go test -v'
+                  docker exec -t app_go sh -c 'cd app/api/tests && go test -v'
 
             - name: Stops docker containers
               run: |
