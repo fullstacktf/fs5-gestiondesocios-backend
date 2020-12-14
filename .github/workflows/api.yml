@@ -25,7 +25,7 @@ jobs:
 
             - name: Build tests Dockerfile
               run: |
-                  docker build -t tests .
+                  cd go && docker build -t tests .
 
             - name: Run fake DB
               run: |
